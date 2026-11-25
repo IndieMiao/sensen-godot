@@ -1,6 +1,7 @@
 /**
  * 动态农场（C-31）的可调数值：社区与数据集、首次进入自家地块的赠品、各类建筑的占地与蓝图（C-150）、作物成熟时间；
- * 以及地块经济（C-58）：出售价格、外围采集与刷新时间、领蓝图条件；体力（C-148，照搬 P0）：上限、恢复、休息和各动作的价。
+ * 以及地块经济（C-58）：出售价格、外围采集与刷新时间、领蓝图条件；买入价格（C-149：Jasmine 卖种子，胡萝卜种子 9 照 P0，
+ * 所有者 C-137#15 第 3 题“照搬p0”）；体力（C-148，照搬 P0）：上限、恢复、休息和各动作的价。
  * 默认值按所有者拍板 Q-39（C-34#14）与 Q-40（C-33#14），经济按 C-30#29 第 3–5 题（C-30#30 写入的推荐）。
  * 来源是 assets/farm/data/dynamic_farm.json；它不在 content_version 的指纹里，改它不影响旧农场存档。
  */
@@ -25,6 +26,8 @@ export interface BlueprintRule { item: string; amount: number; min_sales: number
 export interface EconomyRules {
   /** 能卖的物品与单价（金币）；不在表里的不能卖。 */
   sell_prices: Record<string, number>;
+  /** C-149：Jasmine 柜台能买的物品与单价（金币）；不在表里的不能买。没有这一项等于什么都不卖。 */
+  buy_prices: Record<string, number>;
   gather: {
     /** 锁定的外围美术配方版本（499-art-recipe.json 的 outer_groves.version）；编号里的版本不同就拒收。 */
     recipe_version: string;
@@ -94,12 +97,15 @@ export function parseParcelRules(raw: unknown): ParcelRules {
   return r;
 }
 
-/** 价格、采集、蓝图条件的边界：单价 1–100000，刷新 1 秒–30 天，每次 1–99 个，模型名不跨类重复。 */
+/** 价格、采集、蓝图条件的边界：卖出和买入单价 1–100000，刷新 1 秒–30 天，每次 1–99 个，模型名不跨类重复。 */
 function parseEconomy(e: EconomyRules | undefined, fail: (what: string) => never): void {
   if (!e || typeof e !== 'object') fail('economy 缺失');
   const isMap = (v: unknown): v is Record<string, unknown> => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
   if (!isMap(e!.sell_prices) || !Object.keys(e!.sell_prices).length) fail('economy.sell_prices 不能为空');
   for (const [id, price] of Object.entries(e!.sell_prices)) if (!isId(id) || !count(price, 1, 100_000)) fail(`economy.sell_prices.${id} 不对`);
+  if (e!.buy_prices === undefined) e!.buy_prices = {};
+  if (!isMap(e!.buy_prices)) fail('economy.buy_prices 不对');
+  for (const [id, price] of Object.entries(e!.buy_prices)) if (!isId(id) || !count(price, 1, 100_000)) fail(`economy.buy_prices.${id} 不对`);
   const g = e!.gather;
   if (!isMap(g) || !isId(g.recipe_version) || !count(g.respawn_seconds, 1, 30 * 24 * 3600) || !isMap(g.sources) || !Object.keys(g.sources).length)
     fail('economy.gather 不对');

@@ -9,6 +9,8 @@
  * 这些字段是在 v1 上追加的可选字段：C-31 时期的旧存档没有它们，读写时按默认值补上（见 withEconomy），
  * 不改版本号，0.4.2 客户端照常读。
  *
+ * 买入（C-149，0.4.5）：在 Jasmine 柜台按 economy.buy_prices 的单价花金币买（先只有胡萝卜种子 9）。
+ * 单价只看服务端配置，请求里带的价格被丢掉；金币不够整批拒绝，存档不变。不改存档字段。
  * 多栋建筑（C-150，0.4.5）：buildings 存每栋建筑的类型、位置、朝向（0–3 个 90°）和放下时的占地，类型、占地、蓝图、
  * 每类上限按 dynamic_farm.json 的 buildings 配置。服务端拒绝与其它建筑重叠、压开垦格或作物的放置，转向后的占地同样检查。
  * 旧存档只有 house（唯一一栋小屋）：读写时转成 buildings 里的一栋 cottage，位置、朝向、占地原样（见 withBuildings）；
@@ -30,6 +32,8 @@ export const MAX_BATCH = 50;
 export const MAX_COINS = 1_000_000_000;
 /** 一条出售命令最多卖的个数。 */
 export const MAX_SELL_COUNT = 999;
+/** 一条买入命令最多买的个数（C-149）。 */
+export const MAX_BUY_COUNT = 999;
 /** 采集记录最多条数（外围物件总数远低于此）；过了刷新时间的记录在下次采集时清掉。 */
 export const MAX_GATHERED = 4096;
 
@@ -76,6 +80,7 @@ export type FarmCommand =
   | { type: 'sow'; cell: string; crop: string }
   | { type: 'harvest'; cell: string }
   | { type: 'sell'; item: string; count: number }
+  | { type: 'buy'; item: string; count: number }
   | { type: 'gather'; object: string }
   | { type: 'claim_blueprint'; blueprint: string }
   | { type: 'rest' };
@@ -199,6 +204,11 @@ export function parseFarmCommands(raw: unknown): FarmCommand[] | null {
       case 'sell':
         if (typeof c.item !== 'string' || c.item.length > 64 || !Number.isInteger(c.count) || (c.count as number) < 1 || (c.count as number) > MAX_SELL_COUNT) return null;
         out.push({ type: 'sell', item: c.item, count: c.count as number });
+        break;
+      case 'buy':
+        // 只取物品和个数；请求里的 price 等其它字段不进命令（单价只看服务端配置）。
+        if (typeof c.item !== 'string' || c.item.length > 64 || !Number.isInteger(c.count) || (c.count as number) < 1 || (c.count as number) > MAX_BUY_COUNT) return null;
+        out.push({ type: 'buy', item: c.item, count: c.count as number });
         break;
       case 'gather':
         if (typeof c.object !== 'string' || c.object.length > 256) return null;
@@ -352,6 +362,16 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         take(s.bag, c.item, c.count);
         s.coins += earned;
         s.sales += 1;
+        break;
+      }
+      case 'buy': {
+        // 单价只看服务端配置；请求里的价格在 parseFarmCommands 已丢掉。
+        const price = Object.hasOwn(eco.buy_prices, c.item) ? eco.buy_prices[c.item] : undefined;
+        if (price === undefined) return fail('NOT_FOR_SALE', { item: c.item });
+        const total = price * c.count;
+        if (s.coins < total) return fail('NOT_ENOUGH_COINS', { coins: s.coins, need: total });
+        s.coins -= total;
+        s.bag[c.item] = (s.bag[c.item] ?? 0) + c.count;
         break;
       }
       case 'gather': {

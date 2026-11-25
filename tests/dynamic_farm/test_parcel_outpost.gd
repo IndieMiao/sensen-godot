@@ -71,7 +71,7 @@ func _run() -> void:
 	if is_instance_valid(room.town):
 		deadline = Time.get_ticks_msec() + 10000
 		while room.town.busy and Time.get_ticks_msec() < deadline: await process_frame
-		_check(room.town.card.title == "Market · Jasmine" and room.town.keys.has("sell"), "her greeting has Sell")
+		_check(room.town.card.title == "Market · Jasmine" and room.town.keys.has("trade"), "her greeting has Trade")
 		_check(not room.tap_scene(room.cam.unproject_position(room.anchor("npc_sam").global_position)), "taps wait while she talks")
 		_check(tags.all(func(t): return not t.visible), "the prompts step aside under the greeting")
 		var sold: Dictionary = await room.town.sell("crop_carrot", 1)

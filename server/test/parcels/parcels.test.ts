@@ -412,6 +412,29 @@ for (const [name, enabled, makeStores] of makers) {
       expect((await command(app, ada, v + 1, [{ type: 'sell', item: 'hoe_starter', count: 1 }])).json().code).toBe('NOT_SELLABLE');
     });
 
+    it('C-149 buy: carrot seeds at the configured 9 coins whatever the request says; too few coins changes nothing', async () => {
+      const ada = await account(app, 'Ada');
+      const v = await withCarrots(app, ada, A);
+      const broke = await command(app, ada, v, [{ type: 'buy', item: 'seed_carrot', count: 1 }]);
+      expect(broke.statusCode).toBe(422);
+      expect(broke.json()).toMatchObject({ code: 'NOT_ENOUGH_COINS', detail: { coins: 0, need: 9 }, parcel: { farm_version: v } });
+      const before = await mine(app, ada);
+      expect(before.farm_version).toBe(v);
+      expect((await command(app, ada, v, [{ type: 'sell', item: 'crop_carrot', count: 2 }])).statusCode).toBe(200);
+      // A price in the request is ignored; the configured 9 applies.
+      const bought = await command(app, ada, v + 1, [{ type: 'buy', item: 'seed_carrot', count: 2, price: 0 }]);
+      expect(bought.statusCode).toBe(200);
+      expect(bought.json().parcel).toMatchObject({ farm_version: v + 2, farm: { coins: 6, sales: 1 } });
+      const seeds = before.farm.bag.seed_carrot ?? 0;
+      expect((await mine(app, ada)).farm).toMatchObject({ coins: 6, bag: { seed_carrot: seeds + 2 } });
+      // 6 coins cannot pay for a 9-coin seed: refused and the save is the same.
+      const short = await command(app, ada, v + 2, [{ type: 'buy', item: 'seed_carrot', count: 1, price: 1 }]);
+      expect(short.statusCode).toBe(422);
+      expect(short.json()).toMatchObject({ code: 'NOT_ENOUGH_COINS', detail: { coins: 6, need: 9 } });
+      expect(await mine(app, ada)).toMatchObject({ farm_version: v + 2, farm: { coins: 6, bag: { seed_carrot: seeds + 2 } } });
+      expect((await command(app, ada, v + 2, [{ type: 'buy', item: 'crop_carrot', count: 1 }])).json().code).toBe('NOT_FOR_SALE');
+    });
+
     it('C-58 the same request resent or sent many times at once pays, gathers and grants only once', async () => {
       const ada = await account(app, 'Ada');
       const v = await withCarrots(app, ada, A);

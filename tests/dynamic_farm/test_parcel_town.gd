@@ -28,6 +28,7 @@ func _run() -> void:
 	_rules()
 	_commands()
 	await _market()
+	await _buy()
 	await _carpenter()
 	await _failures()
 	await _entries()
@@ -43,6 +44,13 @@ func _rules() -> void:
 	var eco: Dictionary = ParcelFarm.rules().economy
 	_check(eco.sell_prices == {"crop_carrot": 12, "wood": 2, "wild_herb": 1, "stone": 2}, "C-30#36 prices: carrot 12, wood 2, herb 1, stone 2")
 	_check(eco.blueprints.coop == {"item": "blueprint_coop", "amount": 1, "min_sales": 1}, "one coop blueprint after the first sale")
+	_check(eco.buy_prices == {"seed_carrot": 9}, "C-149: Jasmine sells carrot seeds at 9, the P0 seed price")
+	var p0_carrot := {}
+	var p0 = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/p0_content.json"))
+	for crop: Dictionary in p0.get("crops", []):
+		if crop.get("id") == "crop_carrot": p0_carrot = crop
+	_check(int(p0_carrot.get("seed_price", -1)) == eco.buy_prices.seed_carrot, "C-149: the seed price is P0's (C-137#15 question 3)")
+	_check(ParcelFarm.parse_rules({"version": 1}).is_empty(), "malformed rules still read as none")
 	var old := {"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {"crop_carrot": 2}, "welcomed_at": T0}
 	var read := ParcelFarm.normalize(old)
 	_check(read.coins == 0 and read.sales == 0 and read.gathered.is_empty() and read.blueprints_claimed.is_empty(), "a save from before C-58 reads as 0 coins")
@@ -70,6 +78,15 @@ func _commands() -> void:
 	_check(claimed.ok and claimed.state.bag.blueprint_coop == 1 and claimed.state.blueprints_claimed.coop == T0 + 1, "the coop blueprint goes into the bag")
 	_check(ParcelFarm.apply(rules, claimed.state, [{"type": "claim_blueprint", "blueprint": "coop"}], T0).code == "BLUEPRINT_CLAIMED", "only once")
 	_check(ParcelFarm.apply(rules, sold.state, [{"type": "claim_blueprint", "blueprint": "chicken"}], T0).code == "UNKNOWN_BLUEPRINT", "unknown blueprints are refused")
+	# C-149 buy, as the server's farm.ts: 9 a seed from the rules, too few coins refuses the whole batch.
+	var bought := ParcelFarm.apply(rules, sold.state, [{"type": "buy", "item": "seed_carrot", "count": 2, "price": 0}], T0)
+	_check(bought.ok and bought.state.coins == 6 and bought.state.bag.seed_carrot == 3 and bought.state.sales == 1, "2 seeds cost 18; a price in the command is ignored")
+	var broke := ParcelFarm.apply(rules, sold.state, [{"type": "buy", "item": "seed_carrot", "count": 1}, {"type": "buy", "item": "seed_carrot", "count": 2}], T0)
+	_check(not broke.ok and broke.index == 1 and broke.code == "NOT_ENOUGH_COINS" and broke.detail == {"coins": 15, "need": 18}, "too few coins: the batch fails whole")
+	_check(sold.state.coins == 24 and sold.state.bag.seed_carrot == 1, "a refused buy leaves the state as it was")
+	_check(ParcelFarm.apply(rules, sold.state, [{"type": "buy", "item": "crop_carrot", "count": 1}], T0).code == "NOT_FOR_SALE", "only the shelf's items can be bought")
+	_check(ParcelFarm.apply(rules, sold.state, [{"type": "buy", "item": "seed_carrot", "count": 0}], T0).code == "SCHEMA", "count 0 is malformed")
+	_check(ParcelFarm.apply(rules, sold.state, [{"type": "buy", "item": "seed_carrot", "count": 1000}], T0).code == "SCHEMA", "at most 999 at once")
 
 func _store_with(bag: Dictionary) -> RefCounted:
 	var store := LocalStore.new(PARCEL, DIR)
@@ -94,10 +111,11 @@ func _market() -> void:
 	await process_frame
 	town = await _open(Town.MARKET, store)
 	_check(town.card.line == Town.LINES.hello, "second meeting: no introduction again")
-	town.keys.sell.activated.emit()
+	_check(town.keys.trade.text == "Trade", "Jasmine's key is Trade (the P0 keeper greeting, LOCK-16)")
+	town.keys.trade.activated.emit()
 	await process_frame
 	var counter = town.counter
-	_check(counter != null and town.stack.has_drawer(), "Sell opens Jasmine's counter")
+	_check(counter != null and town.stack.has_drawer(), "Trade opens Jasmine's counter")
 	_check(counter.sellable() == ["crop_carrot", "wood"], "the counter lists only what she buys (not seeds)")
 	_check(counter.coins.value == "0", "the counter shows the parcel's coins")
 	_check(counter.coins.icon == UiArt.COIN, "the counter's coins row shows the v3 coin (C-105)")
@@ -118,6 +136,46 @@ func _market() -> void:
 	town.stack.back()
 	await process_frame
 	_check(not is_instance_valid(town) or town.is_queued_for_deletion(), "closing the greeting leaves")
+
+## C-149: Jasmine's shelf (one carrot-seed row over the divider): the row reads like P0's counter_buy, buying takes the
+## coins and fills the bag, too few coins greys Buy with the shortfall, and the save keeps it all.
+func _buy() -> void:
+	_clean()
+	var store := _store_with({"crop_carrot": 3})
+	var town := await _open(Town.MARKET, store)
+	town.keys.trade.activated.emit()
+	await process_frame
+	var counter = town.counter
+	var row: UiShopRow = counter.row_of("seed_carrot")
+	_check(row != null and counter.shelf.get_child_count() == 1, "one shelf row: carrot seeds")
+	var spec: Dictionary = row.spec()
+	_check(spec.title == "Carrot Seeds" and spec.facts == ["Bag ×0"] and spec.price.text == "9 coins" and spec.price.line == "", "the row (C-149#10): name, bag count, 9 coins, no extra lines")
+	_check(row.buy != null and row.buy.is_unavailable() and row.buy.reason == "Need 9 more coins" and row.stepper == null, "no coins: Buy is grey with the shortfall")
+	await town.sell("crop_carrot", 2)
+	row = counter.row_of("seed_carrot")
+	_check(counter.coins.value == "24" and row.stepper != null and row.stepper.max_value == 2 and not row.buy.is_unavailable(), "24 coins: Buy, the stepper up to 2")
+	row.stepper.value = 2
+	_check(counter.row_of("seed_carrot").spec().price.text == "18 coins" and counter.row_of("seed_carrot").spec().price.line == "", "the stepper's count prices the row, no working shown")
+	var bought := [{}]
+	counter.buy_requested.connect(func(item: String, qty: int): bought[0] = {item = item, qty = qty})
+	counter.row_of("seed_carrot").buy.activated.emit()
+	await process_frame
+	await process_frame
+	_check(bought[0] == {item = "seed_carrot", qty = 2}, "Buy reports the item and the count")
+	_check(town.farm.coins == 6 and town.farm.bag.seed_carrot == 2 and counter.coins.value == "6", "buying 2: −18 coins, +2 seeds")
+	_check(town.toast.current_text() == "Received Carrot Seeds ×2", "the toast says what came in")
+	row = counter.row_of("seed_carrot")
+	_check(row.spec().facts[0] == "Bag ×2" and row.buy.is_unavailable() and row.buy.reason == "Need 3 more coins", "6 coins: grey again, 3 short")
+	var refused: Dictionary = await town.buy("seed_carrot", 1)
+	_check(not refused.ok and refused.code == "NOT_ENOUGH_COINS", "the store refuses a buy it cannot pay for")
+	var saved: Dictionary = store.read()
+	_check(saved.farm.coins == 6 and saved.farm.bag.seed_carrot == 2 and saved.farm.bag.crop_carrot == 1, "the refused buy left the save as it was")
+	town.close()
+	await process_frame
+	town = await _open(Town.MARKET, store)
+	_check(town.farm.coins == 6 and town.farm.bag.seed_carrot == 2, "coming back: the same coins and seeds")
+	town.close()
+	await process_frame
 
 func _carpenter() -> void:
 	_clean()
@@ -158,11 +216,11 @@ func _failures() -> void:
 	_clean()
 	var flaky := FlakyStore.new(_store_with({"crop_carrot": 1}))
 	var town := await _open(Town.MARKET, flaky)
-	_check(town.card.line == Town.LINES.unreachable and town.keys.has("retry") and not town.keys.has("sell"), "a failed read says so and offers Retry")
+	_check(town.card.line == Town.LINES.unreachable and town.keys.has("retry") and not town.keys.has("trade"), "a failed read says so and offers Retry")
 	flaky.fail = false
 	town.keys.retry.activated.emit()
 	for i in 3: await process_frame
-	_check(town.keys.has("sell") and not town.keys.has("retry") and town.farm.bag.crop_carrot == 1, "Retry reads the farm")
+	_check(town.keys.has("trade") and not town.keys.has("retry") and town.farm.bag.crop_carrot == 1, "Retry reads the farm")
 	town.close()
 	await process_frame
 	var blueprints: Dictionary = ParcelFarm.rules().economy.blueprints
@@ -185,6 +243,10 @@ func _entries() -> void:
 		_check(not map.find_children("*", "Button", true, false).any(func(b): return b.text in ["Market", "Carpenter"]),
 			"no Market or Carpenter button on the map with own_farm=%s" % own)
 		_check(map._entry != null and not map._entry.visible, "the Washington Square pin waits for the map (own_farm=%s)" % own)
+		# C-145 (C-115#62): the pin shows "Washington Square" whole, wider than a pin's usual 96 px name; same copy.
+		var whole := UiMapDestination.label_size_for(map._entry.SHORT, false, 4096.0)
+		_check(map._entry.pin.text == "Washington Square" and whole.x > UiMapDestination.SHORT_MAX_W and whole.x <= map._entry.NAME_MAX_W
+			and map._entry.pin.label_size() == whole, "the Washington Square pin's name is not cut (own_farm=%s)" % own)
 		map._open_town()
 		_check(not map._opening and map.find_children("*", "ParcelTown", true, false).is_empty(), "nothing opens without a home")
 		map.queue_free()
