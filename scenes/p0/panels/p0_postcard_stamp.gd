@@ -36,7 +36,7 @@ func _init(resident_ := "", earned_ := false, size_ := PASSPORT) -> void:
 		var key := str(P0Logic.content().get("residents", {}).get(resident, {}).get("portrait", ""))
 		face = P0Ui.resident_crop(key, "stamp")
 		if face == null:   # no card yet: the initial (不知火舞 on 284)
-			_initial = UiKit.label(load("res://modules/p0/p0_kindred.gd").initial(resident), UiTokens.STYLE_ROW_TITLE_XB15, UiTokens.COLOR_PRIMARY)
+			_initial = UiKit.label(load("res://modules/p0/p0_kindred.gd").initial(resident), UiTokens.STYLE_ROW_TITLE_XB15, UiTokens.COLOR_PRIMARY_INK)
 			_initial.name = "Initial"
 			_initial.add_theme_font_size_override(&"font_size", _INITIAL_SIZE)
 			_initial.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

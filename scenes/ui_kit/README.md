@@ -17,6 +17,33 @@ must not change structure, role, entry point or key copy. Engineering specs: SGO
 
 1 Figma px = 1 Godot UI unit: the project viewport is 360 wide with `canvas_items` + `expand`.
 
+### UI v3 (C-105)
+
+`docs/design/tokens/tokens-v3.json` (owner-confirmed in Q-121, spec `docs/design/ui-v3-2026-11-24/README.md`) is read on
+top of v2 by the same generator. The v2 names in `gen_theme.gd` `ALIASES` (paper, ink, the lime action colour, danger,
+the modal scrim, card / sheet / cell radii, pill) now hold their v3 values; every v3 token also has its own constant
+(`COLOR_SURFACE_PAPER`, `COLOR_GLASS_FILL`, `RADIUS_LG`, `SPACE_S4`, `SIZE_PANEL_W`, `ELEVATION_E2_*`,
+`MOTION_DURATION_BASE_MS`, `MOTION_EASING_POP` …). A v3 name a v2 token holds with another meaning gets `_V3`
+(`SIZE_HUD_AVATAR_V3`, `SIZE_QUICK_SLOT_W_V3`, the bright `COLOR_FLOAT_*_V3`): those v2 layouts and the main farm's
+cream float pills are kept. `COLOR_PRIMARY_INK` (#4A7318, 4.9:1 on paper) replaces lime for text in the action colour.
+Type: `STYLE_TYPE_*` (§2.2) and white `*_ON_DARK` / `*_ON_ACTION` variants; white on lime carries the §2.1 outline.
+
+| Class | Spec | Notes |
+|---|---|---|
+| `UiArt` (`modules/ui/kit`) | C-86 / C-I1–C-I4 | the 70 v3 art pieces in `assets/ui/v3` (items, heroes, system and coloured icons; Q-155) |
+| `UiMotion` (`modules/ui/kit`) | §5 | M-01 press, M-04 / M-05 panel in / out, M-10 float, M-16 quick bar; tokens only, runs while paused, `reduced` switch |
+| `UiGlassCapsule` | C-H4 | glass pill: coins (24 high, Ø18 coin right) or a title over a status |
+| `UiGlassButton` | C-R1 / C-R2 | Ø36 glass disc in 44, white icon or drawn ‹, optional notify dot |
+| `UiTagPill` | C-P3 / C-N3 | 28 `surface/tag` pill with a left tail |
+| `UiBagSlot` | C-P5 / C-P6 | Ø72 round slot: empty / filled / selected ring / new / locked / add |
+| `UiModalPanel` | C-P1–C-P4, C-L4 | scrim, 288 paper panel, header band, hero, tag, ✕, `body`; `open()` / `close()` play M-04 / M-05 |
+| `UiNpcCard` | C-N1–C-N7 | 312 card, 96 × 112 portrait over the top, name tag, ≤ 3-line line, `content` buttons become the CTA bar |
+| `UiGainFloat` | C-W5, M-10 | icon + outlined white line over the scene |
+
+`UiCommandButton.bar` is the C-N6 CTA bar; command buttons play M-01. Quick slots and the quick bar are glass (C-Q1 /
+C-Q2) with their LOCK-04 / 05 structure (five slots, names, Bag end, pins) unchanged; `UiQuickBar.bag_icon` sets the
+Bag end's icon (default P0's glyph; the dynamic farm gives `UiArt.SYS_BAG`).
+
 ## Rules for kit components
 
 1. **No literal values.** Colours, sizes, radii, spacing and durations come from `UiTokens`; text uses a

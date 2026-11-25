@@ -51,6 +51,11 @@ const LOCATE_ICON := "res://assets/p0/icons/locate.svg"
 const LOCATE_GAP := 12.0
 ## The profile key (C-128): the same round key at the left, with the account glyph; it opens the profile.
 const PROFILE_ICON := "res://assets/ui/icons/lucide/user-round.svg"
+## How long a profile tap waits for the saved outfit's parts at most (C-135), in seconds; then the profile opens all the
+## same and its figure may show late or stay blank. 5 s: a cold start's load took ~3 s on the phone (C-133), and a
+## stuck loader must not keep the profile and Settings out of reach. Overridden by the project setting below.
+const PROFILE_WAIT_SECONDS := 5.0
+const PROFILE_WAIT_SETTING := "sensen/dynamic_farm/profile_outfit_wait_seconds"
 const CHECKING := "Checking your account…"
 const SIGNED_IN := "Signed in as %s"
 const SIGNED_IN_NO_NAME := "Signed in"
@@ -88,6 +93,8 @@ var _profile_button: Button
 var _profile: Control
 ## A tap on the profile key waiting for the saved outfit's parts to load (C-133); the key is held meanwhile.
 var _profile_waiting := false
+## The most a profile tap waits for the outfit (PROFILE_WAIT_SECONDS).
+var profile_wait_seconds := float(ProjectSettings.get_setting(PROFILE_WAIT_SETTING, PROFILE_WAIT_SECONDS))
 ## The town that is loading after a tap on Market / Carpenter (C-61: the tap shows Loading… at once), else "".
 var _town_loading := ""
 ## The home's parcel save as last read or seen (the guide's line) and the parcel it belongs to; read again after
@@ -293,6 +300,23 @@ func _button(text: String, action: Callable) -> Button:
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL; button.pressed.connect(action)
 	return button
 
+## A disabled panel button that reads another text for a while (Loading…) keeps the width its `usual` text gives it,
+## with no side margins and the text centred; `text == usual` puts it back. A longer text widened the top panel past
+## the screen and cut off the buttons on the right (C-123, C-61#195).
+func _text_in_place(button: Button, text: String, usual: String) -> void:
+	if button.text == text: return
+	if text == usual:
+		button.text = usual
+		button.remove_theme_stylebox_override("disabled"); button.clip_text = false; button.custom_minimum_size.x = 0
+		return
+	if button.text == usual:
+		button.custom_minimum_size.x = button.get_combined_minimum_size().x
+		button.clip_text = true
+		var style := button.get_theme_stylebox("disabled").duplicate() as StyleBox
+		style.content_margin_left = 0; style.content_margin_right = 0
+		button.add_theme_stylebox_override("disabled", style)
+	button.text = text
+
 func _render() -> void:
 	_render_account()
 	if _selector == null or _suspended or _leaving: return
@@ -330,8 +354,8 @@ func _render() -> void:
 	_reselect.visible = state == "mine" and _claims.can_give_up(); _reselect.disabled = not idle
 	var town_ready: bool = _claims.has_home() and not _opening and not _claims.busy and _town == null and _town_loading.is_empty()
 	_market.disabled = not town_ready; _carpenter.disabled = not town_ready
-	_market.text = TOWN_LOADING if _town_loading == "market" else TOWN_NAMES.market
-	_carpenter.text = TOWN_LOADING if _town_loading == "carpenter" else TOWN_NAMES.carpenter
+	_text_in_place(_market, TOWN_LOADING if _town_loading == "market" else TOWN_NAMES.market, TOWN_NAMES.market)
+	_text_in_place(_carpenter, TOWN_LOADING if _town_loading == "carpenter" else TOWN_NAMES.carpenter, TOWN_NAMES.carpenter)
 	_home.visible = _claims.has_home()
 	_home.disabled = _selector.manifest.is_empty() or _opening or _town != null
 	_locate.disabled = _home.disabled
@@ -584,16 +608,19 @@ func _warm_outfit() -> void:
 
 ## The profile over the map (C-128), as the town is: the map's panels hide and its camera holds still until it closes.
 ## A tap while the saved outfit is still loading (just after a cold start) holds the key until it has loaded, frame
-## by frame, so the profile opens with its figure, never with an empty frame for it (C-133).
+## by frame, so the profile opens with its figure, never with an empty frame for it (C-133). It waits
+## profile_wait_seconds at most: a load that never ends opens the profile all the same (C-135).
 func _open_profile() -> void:
 	if _profile != null or _opening or _leaving or _suspended or _profile_waiting: return
 	var avatar := get_node_or_null("/root/Avatar")
 	if avatar != null and avatar.warming():
 		_profile_waiting = true; _render()
 		var start := Time.get_ticks_msec()
-		while is_inside_tree() and avatar.warming(): await get_tree().process_frame
+		var limit := int(profile_wait_seconds * 1000.0)
+		while is_inside_tree() and avatar.warming() and Time.get_ticks_msec() - start < limit: await get_tree().process_frame
 		_profile_waiting = false
-		print("PARCEL_PROFILE_WAIT ", JSON.stringify({"ms": Time.get_ticks_msec() - start}))
+		var timed_out: bool = is_inside_tree() and avatar.warming()
+		print("PARCEL_PROFILE_WAIT ", JSON.stringify({"ms": Time.get_ticks_msec() - start, "timed_out": timed_out}))
 		if not is_inside_tree(): return
 		_render()
 		if _profile != null or _opening or _leaving or _suspended: return

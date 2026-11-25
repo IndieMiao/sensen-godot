@@ -75,5 +75,5 @@ static func equipped_badge() -> PanelContainer:
 	p.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	p.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PRIMARY_TINT, _BADGE_RADIUS)
 		.with_margins(_BADGE_PAD.x, _BADGE_PAD.y, _BADGE_PAD.x, _BADGE_PAD.y))
-	p.add_child(UiKit.label("✓ Equipped", UiTokens.STYLE_C11_XB, UiTokens.COLOR_PRIMARY))
+	p.add_child(UiKit.label("✓ Equipped", UiTokens.STYLE_C11_XB, UiTokens.COLOR_PRIMARY_INK))
 	return p

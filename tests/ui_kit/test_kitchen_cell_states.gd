@@ -182,7 +182,7 @@ func test_try_it_tag_sits_centred_in_primary_on_a_half_colour_icon() -> void:
 	await _settle()
 	var label: Label = c.get("_chip_label")
 	assert_str(label.text).is_equal("Try it")
-	assert_object(label.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_PRIMARY)
+	assert_object(label.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_PRIMARY_INK)
 	var tag := label.get_parent() as Control
 	var cell := c.get_global_rect()
 	assert_float(absf(tag.get_global_rect().get_center().x - cell.get_center().x)).is_less_equal(0.6)
