@@ -149,12 +149,18 @@ func _start_claims() -> void:
 		await net.dynamic_farm_sign_in(bool(ProjectSettings.get_setting("sensen/dynamic_farm/account_restore", false)),
 			_guest_play())
 		_restoring = false
+		_sync_guest()
 	if is_inside_tree() and not _suspended: _claims.start()
 	if is_inside_tree(): _render()
 
 ## Install-and-play (C-100): this installation plays as a guest when no account is signed in.
 func _guest_play() -> bool:
 	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/guest_play", false))
+
+## Without an account the player is this installation's guest (or signed out): no give-up entry (Q-156).
+func _sync_guest() -> void:
+	var net := get_node_or_null("/root/Net")
+	if _claims != null and net != null and not _fake_claims(): _claims.guest = not net.account.signed_in()
 
 func _own_farm_entry() -> bool:
 	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/own_farm", false))
@@ -303,7 +309,7 @@ func _render() -> void:
 	_claim.visible = claimable and not _confirm.visible; _claim.disabled = not idle
 	_enter.visible = state == "mine"; _enter.disabled = not idle
 	_open.visible = state != "mine"
-	_reselect.visible = state == "mine" and _claims.reselect; _reselect.disabled = not idle
+	_reselect.visible = state == "mine" and _claims.can_give_up(); _reselect.disabled = not idle
 	var town_ready: bool = _claims.has_home() and not _opening and not _claims.busy and _town == null and _town_loading.is_empty()
 	_market.disabled = not town_ready; _carpenter.disabled = not town_ready
 	_market.text = TOWN_LOADING if _town_loading == "market" else TOWN_NAMES.market
@@ -393,6 +399,7 @@ func _sign_out() -> void:
 ## Ownership and the framed home were relative to the previous account.
 func _account_changed() -> void:
 	_framed_home = ""; _player_moved = false
+	_sync_guest()
 	if _claims != null: _claims.forget()
 	_render()
 

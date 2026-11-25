@@ -92,11 +92,18 @@ export class MemoryStore implements Store {
     return [...this.players.values()].some(p => p.install_key_hmac === hmac);
   }
 
-  /** players.last_seen_at（登录时刷新）。PgStore 存在 players 表里，这里单独记。 */
+  /** players.last_seen_at（登录时刷新，删 token 时记下它们的最后使用时间）。PgStore 存在 players 表里，这里单独记。 */
   private seen = new Map<string, number>();
 
+  /** 与 PgStore 的 deleteTokensSql 同一口径（C-120）：删掉的 token 的最后使用时间记到玩家身上，闲置判定不丢这段活动。 */
+  private dropTokens(drop: (t: TokenRow) => boolean) {
+    for (const t of this.tokens.filter(drop))
+      if ((this.seen.get(t.player_id) ?? 0) < t.last_used_at && this.players.has(t.player_id)) this.seen.set(t.player_id, t.last_used_at);
+    this.tokens = this.tokens.filter(t => !drop(t));
+  }
+
   /**
-   * 闲置地块回收用（C-100，MemoryParcelStore）：是否游客，以及最后一次登录或用 token 的时间。
+   * 闲置地块回收用（C-100，MemoryParcelStore）：是否游客，以及最后一次登录或用 token 的时间（含已删掉的 token，C-120）。
    * 与 PgParcelStore 的判定同一口径：GREATEST(players.last_seen_at, 该玩家 token 的最大 last_used_at)。
    */
   async playerActivity(playerId: string): Promise<{ guest: boolean; last_active_at: number } | null> {
@@ -185,7 +192,7 @@ export class MemoryStore implements Store {
   }
   async revokeUserTokens(userId: string) {
     const ids = new Set([...this.players.values()].filter(p => p.user_id === userId).map(p => p.id));
-    this.tokens = this.tokens.filter(t => !ids.has(t.player_id));
+    this.dropTokens(t => ids.has(t.player_id));
   }
   async saveEmailCode(email: string, purpose: string, hash: string, now: number, ttlMs: number, resendMs: number) {
     const key = purpose + ':' + email, prior = this.emailCodes.get(key);
@@ -223,8 +230,8 @@ export class MemoryStore implements Store {
   }
   async deletion(userId: string) { const d = this.deletions.get(userId); return d ? structuredClone(d) : null; }
 
-  async revokeToken(hash: string) { this.tokens = this.tokens.filter(t => t.token_hash !== hash); }
-  async revokeAllTokens(playerId: string) { this.tokens = this.tokens.filter(t => t.player_id !== playerId); }
+  async revokeToken(hash: string) { this.dropTokens(t => t.token_hash === hash); }
+  async revokeAllTokens(playerId: string) { this.dropTokens(t => t.player_id === playerId); }
   async rotateInstallKey(playerId: string, newHmac: string) {
     const p = this.players.get(playerId);
     if (p) p.install_key_hmac = newHmac;
@@ -235,7 +242,7 @@ export class MemoryStore implements Store {
     const t = this.tokens.find(x => x.token_hash === hash);
     if (!t) return null;
     if (now - t.last_used_at > TOKEN_IDLE_MS) { // 90 天闲置过期
-      this.tokens = this.tokens.filter(x => x.id !== t.id);
+      this.dropTokens(x => x.id === t.id);
       return null;
     }
     t.last_used_at = now;
