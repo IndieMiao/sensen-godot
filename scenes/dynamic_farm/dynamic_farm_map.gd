@@ -7,15 +7,16 @@ extends Control
 ## Washington Square Travel Post (town_entry.gd), opens its place card; Go opens the 3D room (parcel_outpost.tscn) where
 ## Jasmine (Market) and Scott (Carpenter) trade through the home's parcel save. Like "Enter my farm" it is only in
 ## packages with `own_farm` (C-59#29): internal test packages and the release package (C-98).
-## C-110: the map frames the player's home on entry and has a "My home" button; the account state and its
-## Sign in / Sign out entry stay on the top panel whether or not a parcel is selected.
-## The guide (C-35, C-61) says on the bottom card where the next step is, from the home's parcel save (ParcelGuide).
+## C-110: the map frames the player's home on entry and has a "My home" key; the account chip (Sign in, or the name
+## with Sign out behind it) stays at the top right whether or not a parcel is selected.
+## The guide (C-35, C-61) gives the next step: in the hint under the top row with nothing selected, on the home's card.
 ## C-112: farm-dev's camera feel (geo_native_camera.gd) and its round locate key, over the bottom card at the right;
 ## My home, San Francisco and the locate key fly there. Only buildings are coloured (ParcelMapController.kt).
 ## C-130: with the server's starter zone on, the map lands there for a player without a home (San Francisco and the
 ## locate key go there too), marks it with its own native layer and offers claiming only inside it.
 ## C-128 (0.4.4): a round profile key at the left, level with the locate key, opens the main farm's profile over the
 ## map, and from it Settings and the dressing room (parcel_profile.gd).
+## C-106: the UI v3 look of the owner-approved C-85 page ⑤ (map_ui.gd); states, actions and lines are unchanged.
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
@@ -58,13 +59,32 @@ const PROFILE_ICON := "res://assets/ui/icons/lucide/user-round.svg"
 ## stuck loader must not keep the profile and Settings out of reach. Overridden by the project setting below.
 const PROFILE_WAIT_SECONDS := 5.0
 const PROFILE_WAIT_SETTING := "sensen/dynamic_farm/profile_outfit_wait_seconds"
-const CHECKING := "Checking your account…"
-const SIGNED_IN := "Signed in as %s"
 const SIGNED_IN_NO_NAME := "Signed in"
-const NOT_SIGNED_IN := "Not signed in"
 const SIGN_OUT_ASK := "Sign out on this phone?"
 ## The saved account was kept because the server could not confirm it (5xx, rate limit or no network).
 const ACCOUNT_KEPT := "Can't reach the server. You're still signed in."
+## UI v3 (C-106, C-85 ⑤ as approved in Q-124): the pieces, the board's copy and the art.
+const MapUi := preload("res://scenes/dynamic_farm/map_ui.gd")
+const CITY := "San Francisco"
+const CITY_ICON := "res://assets/ui/icons/lucide/compass.svg"
+const HOME_ICON := "res://assets/ui/icons/lucide/house.svg"
+const ALERT_ICON := "res://assets/ui/icons/lucide/circle-alert.svg"
+## The signed-in chip's avatar: the existing player portrait (the board's stand-in, C-85 README §5).
+const AVATAR_IMAGE := "res://assets/ui/kit_images/player_portrait.png"
+const ACCOUNT_AVATAR_LEFT := 4.0  # C-85 ⑤ .acct padding-left
+const ACCOUNT_MAX_W := 160.0      # a long name cuts with … and leaves the city chip its room
+const TOP_INSET := 28.0           # the map's top edge before C-106, kept as the least inset
+const CREDIT_H := 24.0
+const BUSY_DOTS := "• • •"
+const PARCEL_TAG := "Parcel"
+const HOME_TAG := "Your home"
+const NOT_CLAIMED := "Not claimed"
+const CLAIM_ASK := "Claim this parcel?"
+const CLAIM_NOTE := "You can only have one home."
+const CLAIMING := "Claiming…"
+const PREVIEW_NOTE := "Explore and walk. Farming actions come later."
+const READY_TO_PREVIEW := "Ready to preview this farm."
+const CHOOSE_PREVIEW := "Choose a parcel to preview."
 ## Development stand-in for the C-31 server, shared by map visits in one run.
 static var _fake_server: RefCounted
 var _selector: Node
@@ -72,21 +92,40 @@ var _claims: Node
 var _camera: Control
 var _bridge: MapBridge
 var _hud: Control
+var _top: VBoxContainer
+var _city: Button
+var _hint: PanelContainer
+## The hint line (map progress, the next step); `_preview_note` the preview package's second line.
 var _message: Label
+var _preview_note: Label
+## The card's owner line ("Your home", "Claimed by …", "Not claimed", …).
 var _details: Label
+var _card: Control
+var _card_hero: TextureRect
+var _card_tag: UiTagPill
+var _card_name: Label
+var _card_cells: Label
+var _owner_row: HBoxContainer
+var _owner_dot: Panel
+var _guide: Label
+var _error_card: PanelContainer
+var _error_line: Label
+var _claim_toast: PanelContainer
+var _claim_note: Label
 var _open: Button
 var _claim: Button
 var _confirm: Control
 var _enter: Button
 var _reselect: Button
-var _account_line: Label
-var _account_button: Button # "Sign in" or "Sign out"
+var _account_button: Button # The account chip: the name, "Sign in", or • • • while checking
+var _avatar: Control
+var _account_styled := false
 var _sign_out_confirm: Control
+var _account_toast: PanelContainer
 var _account_note: Label
-var _places: Control
 var _home: Button
 var _locate: Button
-var _bottom: Control
+var _bottom: VBoxContainer
 var _entry: Control # The Washington Square pin and its place card (TownEntry).
 var _profile_button: Button
 ## The profile and the pages opened from it, over the map (parcel_profile.gd), else null.
@@ -104,7 +143,7 @@ var _farm_reading := false
 var _area_timer: Timer
 var _area_generation := -1
 var _retry: Button
-var _choices: OptionButton
+var _choices: VBoxContainer
 var _candidate_ids: Array[String] = []
 var _entering := "" # Parcel whose load was started from "Enter my farm".
 var _framed := false
@@ -124,13 +163,13 @@ func _ready() -> void:
 	_warm_outfit()
 	# The isolated build must set this BEFORE Net's autoload _ready, not from this scene.
 	if not bool(ProjectSettings.get_setting("sensen/network/online_qa", false)):
-		_message.text = "Use the isolated Dynamic Farm preview build."; return
+		_set_hint("Use the isolated Dynamic Farm preview build."); return
 	var parser := JSON.new()
 	if not FileAccess.file_exists(CONFIG) or parser.parse(FileAccess.get_file_as_string(CONFIG)) != OK or not parser.data is Dictionary:
-		_message.text = "This preview service is not configured."; return
+		_set_hint("This preview service is not configured."); return
 	var token := FileAccess.get_file_as_string("res://mapbox_token.txt").strip_edges() if FileAccess.file_exists("res://mapbox_token.txt") else ""
 	if not Engine.has_singleton("GodotMap") or token.is_empty():
-		_message.text = "This preview needs the Android parcel map."; return
+		_set_hint("This preview needs the Android parcel map."); return
 	_bridge = AndroidBridge.new()
 	_bridge.set_godot_surface_opaque(false) # A fresh map scene always requests the transparent mode.
 	_camera = CameraInput.new(); add_child(_camera); move_child(_camera, 0)
@@ -193,67 +232,218 @@ func _claim_api() -> RefCounted:
 	var net := get_node_or_null("/root/Net")
 	return ClaimApi.new(net.client if net != null else null, dataset)
 
+## The v3 map UI (C-106, after the owner-approved C-85 page ⑤, D-201 / Q-124): a top row of glass keys (Back, the city
+## chip, the account chip), one hint capsule under it, the parcel card at the bottom and keys on the sides (farm-dev's
+## round locate and profile keys, a glass My home). The states, actions and lines are the ones the map had; only where
+## they are drawn changed (map_ui.gd).
 func _build_ui() -> void:
 	_hud = Control.new(); _hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(_hud)
-	var top := _panel(false)
-	var heading := HBoxContainer.new(); top.add_child(heading)
-	var titles := VBoxContainer.new(); titles.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	titles.add_theme_constant_override("separation", 0); heading.add_child(titles)
-	titles.add_child(_label("Dynamic Farm", 20))
-	_account_line = _label("", 12); titles.add_child(_account_line)
-	_account_button = _button("Sign in", _account_action); _account_button.size_flags_horizontal = Control.SIZE_SHRINK_END
-	_account_button.custom_minimum_size.x = 96; heading.add_child(_account_button)
-	_sign_out_confirm = VBoxContainer.new(); _sign_out_confirm.hide(); top.add_child(_sign_out_confirm)
-	_sign_out_confirm.add_child(_label(SIGN_OUT_ASK, 14))
-	var sign_out_answer := HBoxContainer.new(); _sign_out_confirm.add_child(sign_out_answer)
-	sign_out_answer.add_child(_button("Sign out", _sign_out))
-	sign_out_answer.add_child(_button("Cancel", func(): _sign_out_confirm.hide(); _render()))
-	_account_note = _label(ACCOUNT_KEPT, 12); _account_note.hide(); top.add_child(_account_note)
-	_message = _label("Loading dynamic farm map…", 14); top.add_child(_message)
-	var row := HBoxContainer.new(); top.add_child(row)
-	_retry = _button("Retry", _retry_map); _retry.disabled = true; row.add_child(_retry)
-	row.add_child(_button("San Francisco", _reset_area.bind(true)))
-	row.add_child(_button("Back", _leave))
-	_places = HBoxContainer.new(); _places.visible = _own_farm_entry(); top.add_child(_places)
-	_home = _button(MY_HOME, _go_home); _home.hide(); _places.add_child(_home)
-	var bottom := _panel(true)
-	_bottom = bottom.get_parent()
-	_details = _label(PICK_PREVIEW, 16); bottom.add_child(_details)
-	_choices = OptionButton.new(); _choices.custom_minimum_size.y = 44; _choices.hide()
-	_choices.item_selected.connect(func(index: int):
-		if index >= 0 and index < _candidate_ids.size():
-			_selector.choose(_candidate_ids[index]); _choices.hide())
-	bottom.add_child(_choices)
-	_claim = _button("Make this my first home", func(): _confirm.show(); _render()); _claim.hide(); bottom.add_child(_claim)
-	_confirm = VBoxContainer.new(); _confirm.hide(); bottom.add_child(_confirm)
-	_confirm.add_child(_label("Claim this parcel? You can only have one home.", 14))
-	var answer := HBoxContainer.new(); _confirm.add_child(answer)
-	answer.add_child(_button("Claim", _claim_selection))
-	answer.add_child(_button("Cancel", func(): _confirm.hide(); _render()))
-	_enter = _button("Enter my farm", _enter_farm); _enter.hide(); bottom.add_child(_enter)
-	_open = _button("Preview in 3D", _preview); _open.disabled = true; bottom.add_child(_open)
-	_reselect = _button("Give up and choose again", _abandon); _reselect.hide(); bottom.add_child(_reselect)
-	_area_timer = Timer.new(); _area_timer.one_shot = true; _area_timer.timeout.connect(_refresh_area); add_child(_area_timer)
+	_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE; _hud.theme = MapUi.theme(); add_child(_hud)
+	var safe := _safe_margins()
+	_top = VBoxContainer.new(); _top.name = "Top"; _top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_top.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	_top.offset_left = UiTokens.SIZE_SCREEN_EDGE - (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5
+	_top.offset_right = -UiTokens.SIZE_SCREEN_EDGE; _top.offset_top = maxf(TOP_INSET, safe.y + UiTokens.SIZE_SCREEN_SAFE_INSET)
+	_top.add_theme_constant_override("separation", int(UiTokens.SPACE_S4)); _hud.add_child(_top)
+	var row := HBoxContainer.new(); row.name = "TopRow"; row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override("separation", int(UiTokens.SPACE_S3)); _top.add_child(row)
+	var back := UiGlassButton.new(null, UiGlassButton.Glyph.BACK); back.name = "Back"; back.tooltip_text = "Back"
+	back.pressed.connect(_leave); row.add_child(back)
+	_city = MapUi.glass_pill(CITY, load(CITY_ICON)); _city.name = "City"; _city.pressed.connect(_reset_area.bind(true))
+	row.add_child(_city)
+	var spacer := Control.new(); spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE; row.add_child(spacer)
+	_account_button = MapUi.glass_pill("Sign in"); _account_button.name = "Account"
+	_account_button.clip_text = true; _account_button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_account_button.pressed.connect(_account_action); row.add_child(_account_button)
+	_avatar = MapUi.avatar(load(AVATAR_IMAGE)); _avatar.name = "Avatar"
+	_avatar.position = Vector2(ACCOUNT_AVATAR_LEFT, (UiTokens.SIZE_TOUCH_MIN - MapUi.AVATAR) * 0.5); _account_button.add_child(_avatar)
+	# The saved account was kept although the server could not confirm it (C-110): an amber toast with Retry.
+	_account_toast = PanelContainer.new(); _account_toast.name = "AccountKept"; _account_toast.hide()
+	_account_toast.add_theme_stylebox_override("panel", MapUi.toast_box(UiTokens.COLOR_AMBER)); _top.add_child(_account_toast)
+	var kept := HBoxContainer.new(); kept.add_theme_constant_override("separation", int(UiTokens.SPACE_S4)); _account_toast.add_child(kept)
+	_account_note = MapUi.wrap(MapUi.label(ACCOUNT_KEPT, UiTokens.STYLE_TYPE_CAPTION)); _account_note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_account_note.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; kept.add_child(_account_note)
+	var kept_retry := MapUi.command("Retry", UiTokens.BUTTON_CMD_SECONDARY, true); kept_retry.name = "AccountRetry"
+	kept_retry.size_flags_horizontal = Control.SIZE_SHRINK_END; kept_retry.custom_minimum_size.x = 72
+	kept_retry.pressed.connect(_retry_map); kept.add_child(kept_retry)
+	# One line for where to go next or what the map is doing; it replaces the old top panel's status line and the bottom
+	# card's empty-state line, which said the same thing twice with no home (C-88#5).
+	_hint = PanelContainer.new(); _hint.name = "Hint"; _hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hint.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_hint.add_theme_stylebox_override("panel", MapUi.hint_box()); _top.add_child(_hint)
+	var lines := VBoxContainer.new(); lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lines.add_theme_constant_override("separation", 0); _hint.add_child(lines)
+	_message = MapUi.wrap(MapUi.label("Loading dynamic farm map…", UiTokens.STYLE_TYPE_LABEL_ON_DARK))
+	_message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; lines.add_child(_message)
 	# Only the preview package still cannot farm; one that enters one's own farm drops the line (C-35).
-	if not _own_farm_entry(): bottom.add_child(_label("Explore and walk. Farming actions come later.", 12))
-	var credits := HBoxContainer.new(); bottom.add_child(credits)
+	if not _own_farm_entry():
+		_preview_note = MapUi.wrap(MapUi.label(PREVIEW_NOTE, UiTokens.STYLE_TYPE_CAPTION_ON_DARK, UiTokens.COLOR_TEXT_ON_DARK_MUTED))
+		_preview_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; lines.add_child(_preview_note)
+	_bottom = VBoxContainer.new(); _bottom.name = "Bottom"; _bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bottom.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE); _bottom.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_bottom.offset_left = UiTokens.SIZE_SCREEN_EDGE; _bottom.offset_right = -UiTokens.SIZE_SCREEN_EDGE
+	_bottom.offset_bottom = -maxf(UiTokens.SPACE_S2, safe.w)
+	_bottom.add_theme_constant_override("separation", int(UiTokens.SPACE_S4)); _hud.add_child(_bottom)
+	# Claiming… on glass while the claim is sent (the card steps aside), a claim or give-up failure on white with a red bar.
+	_claim_toast = PanelContainer.new(); _claim_toast.name = "ClaimToast"; _claim_toast.hide()
+	_claim_toast.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; _bottom.add_child(_claim_toast)
+	_claim_note = MapUi.wrap(MapUi.label("", UiTokens.STYLE_TYPE_CAPTION)); _claim_note.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_claim_toast.add_child(_claim_note)
+	# A map or parcel read that failed: the line and Retry on a white card, as the board's load-failure state.
+	_error_card = PanelContainer.new(); _error_card.name = "LoadFailed"; _error_card.hide()
+	_error_card.add_theme_stylebox_override("panel", MapUi.card_box(UiTokens.SPACE_S6)); _bottom.add_child(_error_card)
+	var failed := VBoxContainer.new(); failed.alignment = BoxContainer.ALIGNMENT_CENTER
+	failed.add_theme_constant_override("separation", int(UiTokens.SPACE_S4)); _error_card.add_child(failed)
+	var alert := UiKit.icon(load(ALERT_ICON), 24); alert.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	alert.modulate = UiTokens.COLOR_AMBER; failed.add_child(alert)
+	_error_line = MapUi.wrap(MapUi.label("", UiTokens.STYLE_TYPE_BODY_BOLD)); _error_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	failed.add_child(_error_line)
+	_retry = MapUi.command("Retry", UiTokens.BUTTON_CMD_SECONDARY, true); _retry.name = "Retry"
+	_retry.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; _retry.custom_minimum_size.x = 88
+	_retry.pressed.connect(_retry_map); _retry.disabled = true; failed.add_child(_retry)
+	_build_card()
+	var credits := HBoxContainer.new(); credits.name = "Credits"; credits.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	credits.add_theme_constant_override("separation", int(UiTokens.SPACE_S3)); _bottom.add_child(credits)
 	for item in [["© Mapbox", "https://www.mapbox.com/about/maps/"], ["© OpenStreetMap", "https://www.openstreetmap.org/copyright"]]:
-		var credit := _button(item[0], ExternalLink.open.bind(item[1])); credit.flat = true; credits.add_child(credit)
+		var credit := MapUi.link(item[0], UiTokens.COLOR_TEXT_SECONDARY); credit.custom_minimum_size.y = CREDIT_H
+		credit.add_theme_font_size_override("font_size", MapUi.theme().get_font_size("font_size", UiTokens.STYLE_TYPE_MICRO))
+		credit.pressed.connect(ExternalLink.open.bind(item[1])); credits.add_child(credit)
 	# r8 fills buildings DataSF lacks from OpenStreetMap (C-113): ODbL asks for "© OpenStreetMap contributors" on the map.
-	bottom.add_child(_label("Parcels: DataSF · PDDL / CC0 · Buildings: DataSF, © OpenStreetMap contributors · ODbL", 10))
-	_locate = _round_key(LOCATE_ICON); _locate.name = "MapLocate"; _locate.disabled = true
-	_locate.pressed.connect(_locate_player); _hud.add_child(_locate)
-	_profile_button = _round_key(PROFILE_ICON, UiTokens.COLOR_TEXT); _profile_button.name = "MapProfile"
+	# The longer line wraps beside the two links instead of widening the row past a portrait screen.
+	var data := MapUi.wrap(MapUi.label("Parcels: DataSF · PDDL / CC0 · Buildings: DataSF, © OpenStreetMap contributors · ODbL",
+		UiTokens.STYLE_TYPE_MICRO, UiTokens.COLOR_TEXT_SECONDARY))
+	data.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	data.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; data.custom_minimum_size.y = CREDIT_H; credits.add_child(data)
+	# Side keys over the card: farm-dev's round locate key (C-112, LOCK-24) at the right with My home (C-110) above it;
+	# the same round profile key (C-128) at the left, level with locate. Market and Carpenter are in the Washington
+	# Square room now (C-115).
+	_locate = _round_key(LOCATE_ICON); _locate.name = "MapLocate"; _locate.tooltip_text = "Locate"
+	_locate.disabled = true; _locate.pressed.connect(_locate_player); _hud.add_child(_locate)
+	_home = UiGlassButton.new(UiArt.sys("home")); _home.name = "MyHome"; _home.tooltip_text = MY_HOME
+	_home.hide(); _home.pressed.connect(_go_home); _hud.add_child(_home)
+	_profile_button = _round_key(PROFILE_ICON, UiTokens.COLOR_TEXT); _profile_button.name = "MapProfile"; _profile_button.tooltip_text = "Profile"
 	_profile_button.pressed.connect(_open_profile); _hud.add_child(_profile_button)
 	_entry = TownEntry.new(); _entry.visible = false; _hud.add_child(_entry); _hud.move_child(_entry, 0)
 	_entry.go_requested.connect(_open_town)
 	_entry.card_changed.connect(_on_entry_card)
-	_bottom.item_rect_changed.connect(_place_locate); _hud.resized.connect(_place_locate)
+	_confirm = _dialog("ClaimConfirm", CLAIM_ASK, CLAIM_NOTE, UiArt.hero("parcel"),
+		[["Claim", UiTokens.BUTTON_CMD_PRIMARY, _claim_selection], ["Cancel", UiTokens.BUTTON_CMD_SECONDARY, _cancel_claim]], _cancel_claim)
+	_sign_out_confirm = _dialog("SignOutConfirm", SIGN_OUT_ASK, "", null,
+		[["Sign out", UiTokens.BUTTON_CMD_DESTRUCTIVE, _sign_out], ["Cancel", UiTokens.BUTTON_CMD_SECONDARY, _cancel_sign_out]], _cancel_sign_out)
+	_area_timer = Timer.new(); _area_timer.one_shot = true; _area_timer.timeout.connect(_refresh_area); add_child(_area_timer)
+	for node in [_bottom, _hud]: node.item_rect_changed.connect(_place_locate)
+	_hud.resized.connect(_place_locate)
+	_home.visibility_changed.connect(_place_locate)
 	_render_account()
 
-## farm-dev's round locate key, styled as P0 styles it (Close round, floating shadow, the glyph as drawn). `tint`
-## colours a white glyph (lucide's) the text colour the locate glyph is drawn in.
+## The parcel card (C-85 ⑤ A / C): the band with the hero and its tag, the address, the cell counts, whose it is, the
+## guide's next step at home, the overlapping parcels to pick from, and the actions the map had.
+func _build_card() -> void:
+	_card = Control.new(); _card.name = "Card"; _card.hide(); _card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bottom.add_child(_card)
+	var box := PanelContainer.new(); box.name = "Surface"; box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	box.mouse_filter = Control.MOUSE_FILTER_STOP; box.add_theme_stylebox_override("panel", MapUi.card_box()); _card.add_child(box)
+	box.minimum_size_changed.connect(func(): _card.custom_minimum_size.y = box.get_combined_minimum_size().y)
+	_card.add_child(MapUi.band())
+	_card_hero = UiKit.icon(UiArt.hero("parcel"), MapUi.HERO); _card_hero.name = "Hero"
+	_card_hero.position = Vector2(UiTokens.SPACE_S5, -MapUi.HERO * 0.5); _card.add_child(_card_hero)
+	_card_tag = UiTagPill.new(PARCEL_TAG); _card_tag.name = "Tag"
+	_card_tag.position = Vector2(MapUi.TAG_LEFT, (MapUi.BAND_H - UiTokens.SIZE_TAG_H) * 0.5); _card.add_child(_card_tag)
+	var column := VBoxContainer.new(); column.add_theme_constant_override("separation", int(UiTokens.SPACE_S2)); box.add_child(column)
+	_card_name = MapUi.wrap(MapUi.label("", UiTokens.STYLE_TYPE_HEADLINE)); _card_name.name = "Name"; column.add_child(_card_name)
+	_card_cells = MapUi.label("", UiTokens.STYLE_TYPE_CAPTION, UiTokens.COLOR_TEXT_MUTED); _card_cells.name = "Cells"; column.add_child(_card_cells)
+	_owner_row = HBoxContainer.new(); _owner_row.name = "Owner"; _owner_row.add_theme_constant_override("separation", int(UiTokens.SPACE_S3))
+	column.add_child(_owner_row)
+	_owner_dot = MapUi.dot(); _owner_dot.name = "Dot"; _owner_row.add_child(_owner_dot)
+	_details = MapUi.wrap(MapUi.label("", UiTokens.STYLE_TYPE_LABEL)); _details.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_owner_row.add_child(_details)
+	_guide = MapUi.wrap(MapUi.label("", UiTokens.STYLE_TYPE_CAPTION, UiTokens.COLOR_TEXT_SECONDARY)); _guide.name = "Guide"
+	column.add_child(_guide)
+	_choices = VBoxContainer.new(); _choices.name = "Choices"; _choices.hide()
+	_choices.add_theme_constant_override("separation", 1); column.add_child(_choices)
+	var actions := VBoxContainer.new(); actions.add_theme_constant_override("separation", int(UiTokens.SPACE_S4))
+	column.add_child(_gap(UiTokens.SPACE_S4)); column.add_child(actions)
+	_claim = MapUi.command("Make this my first home", UiTokens.BUTTON_CMD_PRIMARY); _claim.name = "MakeHome"
+	MapUi.set_icon(_claim, load(HOME_ICON), 18); _claim.hide(); _claim.pressed.connect(_ask_claim); actions.add_child(_claim)
+	_enter = MapUi.command("Enter my farm", UiTokens.BUTTON_CMD_PRIMARY); _enter.name = "EnterFarm"
+	_enter.hide(); _enter.pressed.connect(_enter_farm); actions.add_child(_enter)
+	_open = MapUi.command("Preview in 3D", UiTokens.BUTTON_CMD_SECONDARY); _open.name = "Preview"
+	_open.disabled = true; _open.pressed.connect(_preview); actions.add_child(_open)
+	_reselect = MapUi.link("Give up and choose again", UiTokens.COLOR_ACTION_DANGER); _reselect.name = "GiveUp"
+	_reselect.hide(); _reselect.pressed.connect(_abandon); actions.add_child(_reselect)
+
+static func _gap(height: float) -> Control:
+	var gap := Control.new(); gap.custom_minimum_size.y = height; gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return gap
+
+## A centred confirm dialog over a modal scrim (the claim confirm of ⑤ B, the sign-out confirm of C-110): an optional
+## hero over the top edge, the question, an optional second line and full-width keys. A scrim tap is `cancel`.
+func _dialog(node_name: String, title: String, line: String, hero: Texture2D, keys: Array, cancel: Callable) -> Control:
+	var overlay := Control.new(); overlay.name = node_name; overlay.hide()
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); _hud.add_child(overlay)
+	var scrim := ColorRect.new(); scrim.name = "Scrim"; scrim.color = UiTokens.COLOR_SCRIM_MODAL
+	scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); scrim.mouse_filter = Control.MOUSE_FILTER_STOP
+	scrim.gui_input.connect(func(e: InputEvent):
+		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and not e.pressed:
+			scrim.accept_event(); cancel.call())
+	overlay.add_child(scrim)
+	var center := CenterContainer.new(); center.name = "Center"; center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE; overlay.add_child(center)
+	var frame := Control.new(); frame.name = "Panel"; frame.custom_minimum_size.x = MapUi.DIALOG_W; center.add_child(frame)
+	var box := PanelContainer.new(); box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	box.add_theme_stylebox_override("panel", MapUi.card_box(MapUi.HERO * 0.5 + UiTokens.SPACE_S5 if hero != null else UiTokens.SPACE_S7, UiTokens.SPACE_S7))
+	frame.add_child(box)
+	box.minimum_size_changed.connect(func(): frame.custom_minimum_size.y = box.get_combined_minimum_size().y)
+	var column := VBoxContainer.new(); column.add_theme_constant_override("separation", int(UiTokens.SPACE_S4)); box.add_child(column)
+	var heading := MapUi.wrap(MapUi.label(title, UiTokens.STYLE_TYPE_HEADLINE)); heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(heading)
+	if not line.is_empty():
+		var second := MapUi.wrap(MapUi.label(line, UiTokens.STYLE_TYPE_BODY, UiTokens.COLOR_TEXT_SECONDARY))
+		second.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; column.add_child(second)
+	column.add_child(_gap(UiTokens.SPACE_S2))
+	for key in keys:
+		var b := MapUi.command(key[0], key[1]); b.pressed.connect(key[2]); column.add_child(b)
+	if hero != null:
+		var art := UiKit.icon(hero, MapUi.HERO); art.name = "Hero"
+		art.position = Vector2((MapUi.DIALOG_W - MapUi.HERO) * 0.5, -MapUi.HERO * 0.5); frame.add_child(art)
+	return overlay
+
+func _show_dialog(dialog: Control) -> void:
+	if dialog.visible: return
+	dialog.show()
+	UiMotion.panel_in(dialog.get_node("Center/Panel"), dialog.get_node("Scrim"))
+
+func _ask_claim() -> void:
+	_show_dialog(_confirm); _render()
+
+func _cancel_claim() -> void:
+	_confirm.hide(); _render()
+
+func _cancel_sign_out() -> void:
+	_sign_out_confirm.hide(); _render()
+
+## Top system inset (status bar, notch) and bottom (gesture bar) in UI units; zero on desktop (as dynamic_farm.gd).
+func _safe_margins() -> Vector4:
+	if not is_inside_tree() or not (OS.has_feature("android") or OS.has_feature("ios")): return Vector4.ZERO
+	return UIMetrics.safe_margins(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size(),
+		get_viewport().get_visible_rect().size, 0.0)
+
+## Side keys sit LOCATE_GAP over whatever the bottom column shows (the card, a toast, the credits): locate at the right
+## with My home above it, the profile key at the left level with locate. The round keys (locate, profile) fill their
+## 44 px; the glass My home key draws a smaller disc in its 44 px, so its disc's outer edge lines up with locate's.
+func _place_locate() -> void:
+	if _locate == null or _bottom == null: return
+	var nudge := (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5 # the glass disc's edge on the margin
+	var right := _hud.size.x - UiTokens.SIZE_SCREEN_EDGE
+	var y := _bottom.position.y - LOCATE_GAP - _locate.size.y
+	_locate.position = Vector2(right - _locate.size.x, y)
+	_profile_button.position = Vector2(UiTokens.SIZE_SCREEN_EDGE, y)
+	if _home.visible: _home.position = Vector2(right + nudge - _home.size.x, y - _home.size.y - UiTokens.SPACE_S2)
+
+## farm-dev's round locate key, styled as P0 styles it (Close round, floating shadow, the glyph as drawn): LOCK-24's
+## MapLocateButton as it is, kept on the v3 map (C-106); the profile key is the same key (C-128). `tint` colours a white
+## glyph (lucide's) the text colour the locate glyph is drawn in.
 func _round_key(glyph: String, tint := Color.WHITE) -> Button:
 	var b := Button.new(); b.focus_mode = Control.FOCUS_NONE
 	b.theme = UiKit.theme(); b.theme_type_variation = UiTokens.BUTTON_CLOSE_ROUND
@@ -270,38 +460,10 @@ func _round_key(glyph: String, tint := Color.WHITE) -> Button:
 	b.custom_minimum_size = Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE); b.size = b.custom_minimum_size
 	return b
 
-func _place_locate() -> void:
-	if _locate == null or _bottom == null: return
-	_locate.position = Vector2(_hud.size.x - _locate.size.x - LOCATE_GAP, _bottom.position.y - _locate.size.y - LOCATE_GAP)
-	_profile_button.position = Vector2(LOCATE_GAP, _locate.position.y)
-
-func _panel(bottom: bool) -> VBoxContainer:
-	var panel := PanelContainer.new(); _hud.add_child(panel)
-	panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE if bottom else Control.PRESET_TOP_WIDE)
-	panel.offset_left = 12; panel.offset_right = -12
-	if bottom: panel.offset_bottom = -24; panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	else: panel.offset_top = 28
-	var style := StyleBoxFlat.new(); style.bg_color = Color("FBF8F1")
-	style.set_corner_radius_all(12); style.set_content_margin_all(12); panel.add_theme_stylebox_override("panel", style)
-	var column := VBoxContainer.new(); column.add_theme_constant_override("separation", 8); panel.add_child(column)
-	return column
-
-func _label(text: String, font_size: int) -> Label:
-	var label := Label.new(); label.text = text; label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-	label.add_theme_color_override("font_color", Color("263E31")); label.add_theme_font_size_override("font_size", font_size)
-	return label
-
-func _button(text: String, action: Callable) -> Button:
-	var button := Button.new(); button.text = text; button.custom_minimum_size.y = 44
-	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL; button.pressed.connect(action)
-	return button
-
 func _render() -> void:
 	_render_account()
 	if _selector == null or _suspended or _leaving: return
 	_frame_on_entry()
-	_message.text = _selector.message
 	_retry.disabled = _selector.busy or _opening
 	var id := str(_selector.selection.get("block_id", ""))
 	if _selector.generation > 0: _claims.show_zone(_selector.generation) # Before the parcel layers load (C-130 V-362).
@@ -313,33 +475,102 @@ func _render() -> void:
 	var idle: bool = not _selector.busy and _selector.map_ready and not _opening and not _claims.busy
 	_open.disabled = not idle or id.is_empty()
 	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy and _profile == null
-	if id.is_empty(): _details.text = _no_selection()
-	else:
-		var p: Dictionary = _selector.selection
-		_details.text = "%s\n%d core · %d walk-only extension cells" % [p.name, p.core_cell_count, p.extension_cell_count]
-		if state == "mine":
-			_details.text += "\nYour home"
-			if not guide_line().is_empty(): _details.text += "\n" + guide_line()
-		elif state == "other":
-			var owner: String = _claims.owner_name(id)
-			_details.text += ("\nClaimed by %s" % owner) if not owner.is_empty() else "\n" + Claims.NO_NAME
-		elif state == "none" and _claims.has_home(): _details.text += "\nYou already have a home."
-		elif state != "other" and _claims.signed_out: _details.text += "\nSign in to claim a home."
-		elif state == "none" and not _claims.in_zone(id): _details.text += "\n" + Claims.OUTSIDE_ZONE
-	if not _claims.message.is_empty(): _details.text += "\n" + _claims.message
+	_render_card(id, state)
 	var claimable: bool = state == "none" and _claims.mine_known and not _claims.has_home() and _claims.in_zone(id)
 	if not claimable or not idle: _confirm.hide()
 	_claim.visible = claimable and not _confirm.visible; _claim.disabled = not idle
 	_enter.visible = state == "mine"; _enter.disabled = not idle
 	_open.visible = state != "mine"
 	_reselect.visible = state == "mine" and _claims.can_give_up(); _reselect.disabled = not idle
-	_home.visible = _claims.has_home()
+	_home.visible = _claims.has_home() and not (_entry != null and _entry.is_open())
 	_home.disabled = _selector.manifest.is_empty() or _opening
 	_locate.disabled = _home.disabled
-	_places.visible = _home.visible
 	_render_entry()
 	if _own_farm_entry() and _claims.has_home(): _read_farm()
 	if _selector._options.is_empty(): _choices.hide()
+	_render_feedback(id)
+	_place_locate.call_deferred()
+
+## The card for the selected parcel (or the list of overlapping ones): name, counts, whose it is and the next step.
+func _render_card(id: String, state: String) -> void:
+	var claiming: bool = _claims.busy and _claims.message == CLAIMING
+	_card.visible = (not id.is_empty() or _choices.visible) and not claiming
+	var mine := state == "mine"
+	_card_tag.text = HOME_TAG if mine else PARCEL_TAG
+	_card_hero.texture = UiArt.hero("home" if mine else "parcel")
+	for node in [_card_name, _card_cells]: node.visible = not id.is_empty()
+	_guide.text = guide_line() if mine else ""
+	_guide.visible = not _guide.text.is_empty()
+	if id.is_empty():
+		_details.text = ""; _owner_row.hide(); return
+	var p: Dictionary = _selector.selection
+	_card_name.text = str(p.name)
+	_card_cells.text = "%d core · %d walk-only extension cells" % [p.core_cell_count, p.extension_cell_count]
+	var line := ""
+	var color := UiTokens.COLOR_ACTION_DISABLED_INK
+	if mine: line = "Your home"; color = UiTokens.COLOR_ACTION_PRIMARY
+	elif state == "other":
+		var owner: String = _claims.owner_name(id)
+		line = ("Claimed by %s" % owner) if not owner.is_empty() else Claims.NO_NAME
+		color = UiTokens.COLOR_BADGE_UNREAD
+	elif state == "none" and _claims.has_home(): line = "You already have a home."
+	elif _claims.signed_out: line = "Sign in to claim a home."
+	elif state == "none" and not _claims.in_zone(id): line = Claims.OUTSIDE_ZONE
+	elif state == "none": line = NOT_CLAIMED
+	_details.text = line; MapUi.set_dot(_owner_dot, color); _owner_row.visible = not line.is_empty()
+
+## The hint line, the load-failure card and the claim toast.
+func _render_feedback(id: String) -> void:
+	var failed := _failed()
+	_error_card.visible = failed
+	_error_line.text = _selector.message if failed else ""
+	_set_hint(hint_line())
+	var note: String = _claims.message
+	_claim_toast.visible = not note.is_empty()
+	if note == CLAIMING:
+		_claim_note.text = "• • •  " + CLAIMING
+		_claim_note.theme_type_variation = UiTokens.STYLE_TYPE_LABEL_ON_DARK
+		_claim_toast.add_theme_stylebox_override("panel", MapUi.hint_box())
+	elif not note.is_empty():
+		_claim_note.text = note
+		_claim_note.theme_type_variation = UiTokens.STYLE_TYPE_CAPTION
+		_claim_toast.add_theme_stylebox_override("panel", MapUi.toast_box(UiTokens.COLOR_ACTION_DANGER))
+	_claim_note.custom_minimum_size.x = _line_width(_claim_note)
+
+## A selector line that failed and has Retry (map, parcel or farm read); shown on the load-failure card.
+func _failed() -> bool:
+	if _selector == null or _selector.busy: return false
+	var text: String = _selector.message
+	return text.contains("Retry") or text.to_lower().contains("try again")
+
+## The one hint line under the top row: with nothing selected the next step (C-35) in place of the idle "Tap a building"
+## prompt, so a player without a home reads it once (C-88#5); while busy or after a tap that found nothing, what the map
+## says; over a selected parcel nothing but its load ("Loading dynamic farm…"); a failure goes on its card instead.
+func hint_line() -> String:
+	if _selector == null: return _message.text
+	if _failed(): return ""
+	var text: String = _selector.message
+	if not _selector.selection.is_empty(): return text if _selector.busy else ""
+	if _choices.visible: return text
+	if text in ["", Selection.PROMPT, READY_TO_PREVIEW, CHOOSE_PREVIEW]: return _no_selection()
+	return text
+
+func _set_hint(text: String) -> void:
+	_message.text = text
+	if _hint == null: return
+	_hint.visible = not text.is_empty()
+	_message.custom_minimum_size.x = _line_width(_message)
+	if _preview_note != null:
+		_preview_note.custom_minimum_size.x = _line_width(_preview_note)
+		_message.custom_minimum_size.x = maxf(_message.custom_minimum_size.x, _preview_note.custom_minimum_size.x)
+
+## A label's one-line width, held to the screen less its margins (the label wraps beyond that).
+func _line_width(l: Label) -> float:
+	var font := l.get_theme_font("font")
+	var size := l.get_theme_font_size("font_size")
+	var widest := maxf(_hud.size.x, 360.0) - 2.0 * UiTokens.SIZE_SCREEN_EDGE - 2.0 * UiTokens.SPACE_S6 - MapUi.TOAST_BAR
+	if font == null: return widest
+	return minf(ceilf(font.get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x) + 1.0, widest)
 
 ## First framing after the map loads: the player's home if they have one, else the starter zone (C-130), else the
 ## dataset's area. It waits while the saved account, the home and the zone are still being read, and never moves a
@@ -383,34 +614,53 @@ func _locate_player() -> void:
 	if _selector == null or _selector.manifest.is_empty() or _opening: return
 	if not _frame_home(true): _reset_area(true)
 
-## Top panel: who is signed in on this phone, with Sign in / Sign out, shown whether or not a parcel is selected.
+## The account chip at the top right (C-110, C-85 ⑤ D): signed in, the avatar and the name (a tap asks to sign out);
+## signed out, "Sign in" in the action colour; while the saved account is checked or signed out, the avatar and • • •.
 ## Development builds on the in-memory claim stand-in have no account and hide it.
 func _render_account() -> void:
-	if _account_line == null: return
+	if _account_button == null: return
 	_profile_button.disabled = _opening or _profile != null or _profile_waiting or (_selector != null and _selector.busy)
 	var net := get_node_or_null("/root/Net")
 	var shown := net != null and not _fake_claims()
-	_account_line.visible = shown
+	_account_button.visible = shown
 	if not shown:
-		_account_button.hide(); _sign_out_confirm.hide(); _account_note.hide(); return
+		_sign_out_confirm.hide(); _account_toast.hide(); return
 	var signed_in: bool = net.account.signed_in()
-	if _restoring: _account_line.text = CHECKING
-	elif signed_in: _account_line.text = _account_name(net.account)
-	else: _account_line.text = NOT_SIGNED_IN
-	_account_button.text = "Sign out" if signed_in else "Sign in"
-	_account_button.disabled = _opening or (_claims != null and _claims.busy)
-	if not signed_in or _restoring or _signing_out: _sign_out_confirm.hide()
-	_account_button.visible = not _restoring and not _signing_out and not _sign_out_confirm.visible
-	_account_note.visible = signed_in and not _restoring and not str(net.restore_error).is_empty()
+	var waiting := _restoring or _signing_out
+	var text := BUSY_DOTS if waiting else _account_name(net.account) if signed_in else "Sign in"
+	_style_account(signed_in or waiting, text)
+	_account_button.disabled = waiting or _opening or (_claims != null and _claims.busy)
+	if not signed_in or waiting: _sign_out_confirm.hide()
+	_account_toast.visible = signed_in and not _restoring and not str(net.restore_error).is_empty()
 
+func _style_account(with_avatar: bool, text: String) -> void:
+	if _account_button.text == text and _avatar.visible == with_avatar and _account_styled: return
+	_account_styled = true
+	_account_button.text = text
+	_avatar.visible = with_avatar
+	if with_avatar:
+		MapUi.glass_look(_account_button); _account_button.icon = null
+	else:
+		MapUi.primary_pill(_account_button); MapUi.set_icon(_account_button, load(PROFILE_ICON), 16)
+	for state in ["normal", "hover", "focus", "disabled", "pressed", "hover_pressed"]:
+		var box := _account_button.get_theme_stylebox(state).duplicate() as UiStyleBox
+		box.content_margin_left = ACCOUNT_AVATAR_LEFT + MapUi.AVATAR + UiTokens.SPACE_S3 if with_avatar else UiTokens.SPACE_S5
+		box.content_margin_right = UiTokens.SPACE_S5
+		_account_button.add_theme_stylebox_override(state, box)
+	var font := _account_button.get_theme_font("font")
+	var width := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, _account_button.get_theme_font_size("font_size")).x
+	width += (ACCOUNT_AVATAR_LEFT + MapUi.AVATAR + UiTokens.SPACE_S3 if with_avatar else UiTokens.SPACE_S5 + 16 + UiTokens.SPACE_S3) + UiTokens.SPACE_S5
+	_account_button.custom_minimum_size.x = minf(ceilf(width) + 1.0, ACCOUNT_MAX_W)
+
+## The chip's name: the account's display name, else its email, else "Signed in".
 static func _account_name(account: AccountSession) -> String:
 	var name := account.display_name if not account.display_name.is_empty() else account.email
-	return SIGNED_IN % name.left(40) if not name.is_empty() else SIGNED_IN_NO_NAME
+	return name.left(40) if not name.is_empty() else SIGNED_IN_NO_NAME
 
 func _account_action() -> void:
 	var net := get_node_or_null("/root/Net")
 	if net == null or _restoring or _signing_out: return
-	if net.account.signed_in(): _sign_out_confirm.show(); _render()
+	if net.account.signed_in(): _show_dialog(_sign_out_confirm); _render()
 	else: _open_sign_in()
 
 ## Revokes this phone's token and clears the saved account. Only an install-and-play package
@@ -461,11 +711,16 @@ func _read_farm() -> void:
 	home_farm = read; _farm_parcel = parcel
 	_render()
 
+## Overlapping parcels (up to six) as a one-pick list in the card (C-85 ⑤ "多个地块重叠"); a row picks that parcel.
 func _show_candidates(rows: Array) -> void:
-	_choices.clear(); _candidate_ids.clear()
+	for child in _choices.get_children(): _choices.remove_child(child); child.queue_free()
+	_candidate_ids.clear()
 	for row in rows.slice(0, 6):
-		_candidate_ids.append(row.block_id); _choices.add_item(row.name)
-	_choices.select(-1); _choices.show()
+		_candidate_ids.append(str(row.block_id))
+		var pick := MapUi.command(str(row.name), UiTokens.BUTTON_NAV_ROW); pick.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		pick.pressed.connect(func(): _selector.choose(str(row.block_id)); _choices.hide(); _render())
+		_choices.add_child(pick)
+	_choices.show(); _render()
 
 ## The default area: the server's starter zone when it has one on (C-130), else the dataset's centre.
 func _reset_area(fly := false) -> void:
@@ -504,7 +759,7 @@ func _claim_selection() -> void:
 func _open_sign_in() -> void:
 	if _claims == null or find_children("*", "AccountPanel", true, false).size() > 0: return
 	# Loaded at run time: the panel uses the Net autoload, which scripts preloading this scene may not have yet.
-	var panel: CanvasLayer = load(ACCOUNT_PANEL).open(self, "sign_in")
+	var panel: CanvasLayer = load(ACCOUNT_PANEL).open(self, "sign_in", "", true) # the v3 look (C-85 ④)
 	_camera.input_enabled = false
 	var signed_in: bool = await panel.closed
 	if not is_inside_tree(): return
@@ -528,11 +783,12 @@ func _on_map_tap(point: Vector2) -> void:
 		_entry.open_card(); return
 	_selector.tap(point, _camera.zoom)
 
-## While the card is open it stands over the map's panels; a pin low on the screen, where the card would cover it,
-## flies to the middle first.
+## While the card is open it stands over the map's panels and side keys; a pin low on the screen, where the card would
+## cover it, flies to the middle first.
 func _on_entry_card(open: bool) -> void:
 	_hud.move_child(_entry, -1 if open else 0)
 	_bottom.visible = not open; _locate.visible = not open; _profile_button.visible = not open
+	_home.visible = not open and _claims != null and _claims.has_home()
 	if not open: return
 	_camera.stop()
 	var at: Vector2 = _entry.screen_point()
@@ -621,10 +877,10 @@ func _open_host(farm: Dictionary) -> void:
 func _open_scene(path: String, args: Dictionary) -> void:
 	if _bridge == null or not _bridge.supports_surface_opacity() or not _bridge.set_map_occlusion_color(OCCLUSION_COLOR):
 		_render()
-		_message.text = "Use the latest Dynamic Farm preview build."; return
+		_set_hint("Use the latest Dynamic Farm preview build."); return
 	var router := get_node_or_null("/root/AppRouter")
 	if router == null or not router.has_method("open_instance"):
-		_message.text = "This preview is missing its scene router."; return
+		_set_hint("This preview is missing its scene router."); return
 	_opening = true; _render()
 	await router.open_instance(path, args)
 	_opening = false
