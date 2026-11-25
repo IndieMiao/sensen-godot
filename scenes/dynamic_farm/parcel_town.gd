@@ -9,6 +9,8 @@ extends Control
 ##   since C-149, sells carrot seeds through `buy` (the P0 keeper greeting's Trade, LOCK-16).
 ## - Scott gives one Coop Blueprint once the parcel has sold something (`claim_blueprint`, C-58 rules: C-30#29
 ##   question 5); it only goes into the bag, building comes later (0.4.4).
+## - Since C-152 Scott also upgrades the farm: his greeting's `Upgrade Farm` opens the upgrade sheet (parcel_upgrade.gd,
+##   P0's HOME-1 in the kit), whose Upgrade sends `upgrade_farm` (coins, Timber and Stone; more Max Energy and wells).
 ## The parcel save (store: read / send, parcel_farm_remote_store.gd or the local stand-in) is authoritative; this
 ## node draws what it answers. Coins are the parcel's own, separate from the main farm's.
 signal closed
@@ -16,6 +18,7 @@ signal closed
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const ParcelItems = preload("res://modules/dynamic_farm/parcel_items.gd")
 const Counter = preload("res://scenes/dynamic_farm/parcel_counter.gd")
+const Upgrade = preload("res://scenes/dynamic_farm/parcel_upgrade.gd")
 const Portraits = preload("res://modules/p0/p0_keeper_portraits.gd")
 const MARKET := "market"
 const CARPENTER := "carpenter"
@@ -37,6 +40,10 @@ const LINES := {
 	"scott_done": "Hope the coop plans come in handy.",
 	"scott_none": "Come back later.",
 	"unreachable": "Could not reach your farm.",
+	# C-152, drafted for PM to finalise (C-45): the greeting's key and the toast after an upgrade.
+	"upgrade_key": "Upgrade Farm",
+	"upgraded": "Farm Lv%d",
+	"upgraded_gift": "Farm Lv%d · Received %s ×%d",
 }
 const MET_PATH := "user://dynamic_farm_local/town.json"
 
@@ -49,6 +56,7 @@ var busy := false
 var stack: ModalStack
 var card: UiNpcCard
 var counter: Counter
+var upgrade_sheet: Upgrade
 var toast: ToastLayer
 ## A greeting's keys, by name (tests and the map read them).
 var keys := {}
@@ -109,6 +117,7 @@ func _adopt(result: Dictionary) -> bool:
 	farm = next
 	farm_version = int(result.get("farm_version", farm_version))
 	if counter != null and is_instance_valid(counter): counter.refresh(farm)
+	if upgrade_sheet != null and is_instance_valid(upgrade_sheet): upgrade_sheet.refresh(farm)
 	return true
 
 ## The keeper's greeting card: a fresh one each time it is shown (the read, a sale, the blueprint).
@@ -157,6 +166,13 @@ func _greet_carpenter() -> void:
 		take.activated.connect(claim_blueprint)
 		card.content.add_child(take)
 		keys.take = take
+	# C-152: the farm's upgrade, at Scott's whatever his blueprint line says (none in rules without farm levels).
+	if ParcelFarm.rules().get("farm_levels", []).is_empty(): return
+	var up := UiCommandButton.new(LINES.upgrade_key, UiCommandButton.Kind.SECONDARY if keys.has("take") else UiCommandButton.Kind.PRIMARY)
+	up.name = "UpgradeFarm"
+	up.activated.connect(open_upgrade)
+	card.content.add_child(up)
+	keys.upgrade = up
 
 func open_counter() -> void:
 	if farm.is_empty(): return
@@ -171,6 +187,33 @@ func open_counter() -> void:
 	stack.open_drawer(counter, {"scrim": UiTokens.OPACITY_SCRIM_COUNTER})
 	_switching = false
 	toast.anchor_above(counter)
+
+## C-152: Scott's upgrade sheet over the greeting, as Jasmine's counter opens over hers.
+func open_upgrade() -> void:
+	if farm.is_empty(): return
+	upgrade_sheet = Upgrade.new(farm)
+	upgrade_sheet.close_requested.connect(func(): stack.close_drawer())
+	upgrade_sheet.upgrade_requested.connect(upgrade)
+	upgrade_sheet.button.unavailable_pressed.connect(func(reason: String): toast.show_toast(reason, ToastLayer.Severity.INFO))
+	_switching = true
+	stack.open_drawer(upgrade_sheet)
+	_switching = false
+	toast.anchor_above(upgrade_sheet)
+
+## C-152: `upgrade_farm` at the rules' price (the server's own; none is sent). The sheet follows the answer, now the
+## next level's (or the top's); a toast names the new level and any blueprint it gave.
+func upgrade() -> Dictionary:
+	if busy: return {}
+	var before := ParcelFarm.farm_level(farm)
+	var gift: Dictionary = ParcelFarm.next_level(ParcelFarm.rules(), before).get("gift", {})
+	var result := await _send({"type": "upgrade_farm"})
+	if result.get("ok", false):
+		var level := ParcelFarm.farm_level(farm)
+		if gift.is_empty(): toast.show_toast(LINES.upgraded % level, ToastLayer.Severity.SUCCESS)
+		else:
+			var item: String = gift.keys()[0]
+			toast.show_toast(LINES.upgraded_gift % [level, ParcelItems.name_of(item), int(gift[item])], ToastLayer.Severity.SUCCESS)
+	return result
 
 func sell(item: String, count: int) -> Dictionary:
 	if busy or count <= 0: return {}
@@ -232,6 +275,7 @@ func _met() -> Dictionary:
 func _on_layer_closed(layer: int, _content: Control) -> void:
 	if layer == ModalStack.Layer.DRAWER:
 		counter = null
+		upgrade_sheet = null
 		if is_inside_tree(): _greet_again.call_deferred()
 	elif layer == ModalStack.Layer.CARD:
 		card = null

@@ -25,9 +25,14 @@
  * 服务端不知道人站在哪，“人在井边”由客户端限定；这里核实井已盖好、有水桶、桶里的次数、格子播下了还没浇。
  * 桶里的次数存在 pail_water，补发记录存在 grants，都是在 v1 上追加的字段：旧存档没有时按 0 次、没补发过算。
  * C-151 以前种下的作物没有 watered_at，按已浇过算，照原来的 ripe_at 成熟。
+ *
+ * 农场等级（C-152，照 P0 家园等级）：在 Scott 处升级（upgrade_farm），花 farm_levels 里下一级的金币和材料，不花体力；
+ * 材料或金币不够整批拒绝，存档不变。每级体力上限 +energy.per_level；某一级写了 buildings 的，从这一级起那类建筑能多盖
+ * （井：3 级 2 口、5 级 3 口），送的 gift（井的蓝图）升级时进背包。不限制开垦格数（所有者 SEN-C-137#10）。
+ * 等级存在 level，也是在 v1 上追加的字段：旧存档没有时按 1 级。换数据集不动等级。
  */
 import { dayKey, energyCost, maxEnergy, nextRollover, nextTickIn, settleEnergy, spendEnergy, type EnergyState } from './energy.js';
-import { gatherSourceOf, HOME_BUILDING, MAX_BUILDINGS, type ParcelRules } from './rules.js';
+import { buildingMax, gatherSourceOf, HOME_BUILDING, MAX_BUILDINGS, nextFarmLevel, type ParcelRules } from './rules.js';
 
 export const FARM_STATE_VERSION = 1;
 /** 格坐标上限与每类格数上限；地块总格数不超过 8192（客户端 parcel_metadata）。 */
@@ -90,6 +95,8 @@ export interface ParcelFarmState {
   pail_water: number;
   /** C-151：已发过的一次性补发编号 → 发放时间（rules.grants）。 */
   grants: Record<string, number>;
+  /** C-152：农场等级，从 1 起。 */
+  level: number;
 }
 
 export type FarmCommand =
@@ -108,7 +115,9 @@ export type FarmCommand =
   /** C-151：在编号为 building 的井旁把水桶打满。 */
   | { type: 'draw_water'; building: number }
   /** C-151：浇一格播下还没浇的作物。 */
-  | { type: 'water'; cell: string };
+  | { type: 'water'; cell: string }
+  /** C-152：在 Scott 处把农场升到下一级。 */
+  | { type: 'upgrade_farm' };
 
 /** 命令执行时服务端核实过的上下文：本人地块编号（来自 token 查到的那一行，不来自请求体）。 */
 export interface FarmContext { parcel_id: string }
@@ -120,12 +129,13 @@ export type FarmOutcome =
 /** 认领时的空农场：背包为空，赠品等首次进入时再发（认领和进入不是同一个动作）。 */
 export function emptyFarm(): ParcelFarmState {
   return { v: FARM_STATE_VERSION, buildings: [], house: null, cleared: [], tilled: [], crops: {}, bag: {}, welcomed_at: null,
-    coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, pail_water: 0, grants: {} };
+    coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, pail_water: 0, grants: {}, level: 1 };
 }
 
 /**
  * 旧存档兼容：C-31 时期写下的地块农场没有经济字段，按开局值补上（金币 0、没卖过、没采过、没领过）；
- * C-150 之前的存档没有 buildings，按 house 补上（见 withBuildings）；C-151 之前的没有水桶次数和补发记录，按 0 次、没发过补上。
+ * C-150 之前的存档没有 buildings，按 house 补上（见 withBuildings）；C-151 之前的没有水桶次数和补发记录，按 0 次、没发过补上；
+ * C-152 之前的没有等级，按 1 级补上。
  * 只补缺的，不动已有字段；返回新对象，不改入参。
  */
 export function withEconomy(state: ParcelFarmState): ParcelFarmState {
@@ -139,6 +149,7 @@ export function withEconomy(state: ParcelFarmState): ParcelFarmState {
   s.blueprints_claimed = map(s.blueprints_claimed);
   s.pail_water = count(s.pail_water);
   s.grants = map(s.grants);
+  s.level = Number.isInteger(s.level) && s.level >= 1 ? s.level : 1;
   return s;
 }
 
@@ -189,7 +200,8 @@ export function grant(rules: ParcelRules, state: ParcelFarmState, now: number): 
 /**
  * 换到新数据集（C-136，Q-168 rebase）：新数据集里同一块地是另一套格子，按格子记的进度放不上去，清空；
  * 和格子无关的保留。清空的是建筑、已清障碍、已开垦、作物和采集记录（采集冷却）；在地里的作物（不论熟没熟）
- * 每棵退一颗它的种子，每栋建筑退一张它那类的蓝图（C-150），可以重新盖。背包其余物品、金币、卖出次数、已领蓝图和赠品记录不动。
+ * 每棵退一颗它的种子，每栋建筑退一张它那类的蓝图（C-150），可以重新盖。背包其余物品、金币、卖出次数、已领蓝图、赠品记录
+ * 和农场等级（C-152）不动。
  * 规则里已没有的作物、建筑类型不知道该退什么，不退。返回新对象，不改入参。
  */
 export function rebaseFarm(rules: ParcelRules, state: ParcelFarmState): ParcelFarmState {
@@ -270,6 +282,9 @@ export function parseFarmCommands(raw: unknown): FarmCommand[] | null {
       case 'rest':
         out.push({ type: 'rest' });
         break;
+      case 'upgrade_farm':
+        out.push({ type: 'upgrade_farm' });
+        break;
       default:
         return null;
     }
@@ -345,8 +360,10 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         const type = c.type === 'place_house' ? HOME_BUILDING : c.building;
         const rule = Object.hasOwn(rules.buildings, type) ? rules.buildings[type] : undefined;
         if (!rule) return fail('UNKNOWN_BUILDING', { building: type });
-        if (s.buildings.filter(b => b.type === type).length >= rule.max)
-          return c.type === 'place_house' ? fail('HOUSE_PLACED') : fail('BUILDING_LIMIT', { building: type, max: rule.max });
+        // C-152：每类的上限随农场等级（井 3 级 2 口、5 级 3 口）。
+        const most = buildingMax(rules, type, s.level);
+        if (s.buildings.filter(b => b.type === type).length >= most)
+          return c.type === 'place_house' ? fail('HOUSE_PLACED') : fail('BUILDING_LIMIT', { building: type, max: most });
         if (s.buildings.length >= MAX_BUILDINGS) return fail('BUILDING_LIMIT', { max: MAX_BUILDINGS });
         if (!(s.bag[rule.blueprint] > 0)) return fail('NO_BLUEPRINT', { item: rule.blueprint });
         const id = s.buildings.reduce((m, b) => Math.max(m, b.id), 0) + 1;
@@ -490,6 +507,22 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         e.value += Math.min(rules.energy.rest_amount, max - e.value);
         e.rested_on = today;
         if (e.value >= max) e.at = now;
+        break;
+      }
+      case 'upgrade_farm': {
+        // 在 Scott 处升级（C-152）：服务端不知道人站在哪，“在 Scott 那里”由客户端限定。先核材料（按配置先后）再核金币，不花体力。
+        const next = nextFarmLevel(rules, s.level);
+        if (!next) return fail('MAX_LEVEL', { level: s.level });
+        for (const [item, need] of Object.entries(next.items)) {
+          const have = s.bag[item] ?? 0;
+          if (have < need) return fail('NOT_ENOUGH', { item, have, need });
+        }
+        if (s.coins < next.coins) return fail('NOT_ENOUGH_COINS', { coins: s.coins, need: next.coins });
+        for (const [item, n] of Object.entries(next.items)) take(s.bag, item, n);
+        s.coins -= next.coins;
+        for (const [item, n] of Object.entries(next.gift ?? {})) s.bag[item] = (s.bag[item] ?? 0) + n;
+        // 体力上限跟着加；体力已在本批开头结算到 now，满条时计时从 now 起，所以新加的上限从现在开始回。
+        s.level = next.level;
         break;
       }
     }

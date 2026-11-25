@@ -3,7 +3,7 @@ extends SceneTree
 ## `-- <base_url ending in /v1> <bearer token of the parcel's owner> <farm.json>`.
 ## The owner must already have claimed that parcel and not entered it yet. Takes ~70 s:
 ## it waits for the carrot to ripen on the server clock. C-151: the carrot is sown dry and the server does not ripen it;
-## Build Well, Fill at the well and Water start it, and it ripens 60 s after the watering.
+## Build Well, Fill at the well and Water start it, and it ripens 60 s after the watering. C-152: a short upgrade is refused.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const RemoteStore = preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -137,5 +137,9 @@ func _reopen(cell: Vector2i) -> void:
 	_check(farming.farm.bag.get("crop_carrot") == 1 and farming.last_gains == {"crop_carrot": 1}, "the harvest is in the bag")
 	var mine: ApiClient.Response = await client.request("GET", "/parcels/mine")
 	_check(mine.json.get("parcel", {}).get("farm", {}).get("bag", {}).get("crop_carrot") == 1.0, "and in the server save")
+	# C-152: Scott's upgrade without its Timber, Stone and coins: the server refuses it and the farm stays Lv1.
+	var upgrade: Dictionary = await farming.store.send(farming.farm_version, [{"type": "upgrade_farm"}])
+	_check(not upgrade.ok and upgrade.code == "NOT_ENOUGH" and upgrade.get("detail", {}).get("item") == "wood"
+		and ParcelFarm.farm_level(upgrade.get("farm", {})) == 1, "the server refuses an upgrade without its materials, still Lv1")
 	scene.queue_free()
 	await process_frame

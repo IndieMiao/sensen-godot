@@ -1,6 +1,7 @@
 extends SceneTree
 ## C-59: the market (Jasmine) and the carpenter (Scott), on the local stand-in for the
 ## parcel save (C-58 rules mirrored in parcel_farm.gd). Headless: portraits stay blank, the flow and saves are real.
+## C-152: Scott upgrades the farm (Upgrade Farm → the upgrade sheet → upgrade_farm).
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 ## Loaded at run time: these use autoloads (Avatar, Localization), which a preload here would compile before.
@@ -30,6 +31,7 @@ func _run() -> void:
 	await _market()
 	await _buy()
 	await _carpenter()
+	await _upgrade()
 	await _failures()
 	await _entries()
 	_portraits()
@@ -199,6 +201,54 @@ func _carpenter() -> void:
 	await process_frame
 	town = await _open(Town.CARPENTER, store)
 	_check(town.card.line == Town.LINES.scott_done and store.read().farm.bag.blueprint_coop == 1, "kept after reopening")
+	town.close()
+	await process_frame
+
+## C-152: Scott's Upgrade Farm opens the sheet; Upgrade pays the next level, the sheet moves on to the one after, a toast
+## names the level (and Lv3's well blueprint); short, the key shows the gap and the store refuses; kept after reopening.
+func _upgrade() -> void:
+	_clean()
+	var store := LocalStore.new(PARCEL, DIR)
+	store.now_ms = func() -> int: return T0
+	store._save(ParcelFarm.normalize({"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {"wood": 16, "stone": 12},
+		"welcomed_at": T0, "coins": 100}), 3)
+	var town := await _open(Town.CARPENTER, store)
+	_check(town.keys.has("upgrade") and town.keys.upgrade.label == "Upgrade Farm" and not town.keys.has("take"), "Scott offers Upgrade Farm")
+	_check(town.keys.upgrade.kind == UiCommandButton.Kind.PRIMARY, "alone it is the primary key")
+	town.keys.upgrade.activated.emit()
+	await process_frame
+	var sheet = town.upgrade_sheet
+	_check(sheet != null and town.stack.drawer() == sheet and sheet.title.text == "Farm Lv1 → Lv2", "the sheet opens over the greeting: Farm Lv1 → Lv2")
+	_check(sheet.button.reason == "" and sheet.footer.text == "Upgrading is free of Energy", "enough: Upgrade can go; no Energy")
+	var asked := [false]
+	sheet.upgrade_requested.connect(func(): asked[0] = true)
+	sheet.button.activated.emit()
+	_check(asked[0], "Upgrade reports")
+	for i in 3: await process_frame
+	_check(town.farm.level == 2 and town.farm.coins == 60 and town.farm.bag == {"wood": 10, "stone": 8}, "Lv2: 40 coins, 6 Timber, 4 Stone taken")
+	_check(town.toast.current_text() == "Farm Lv2", "the toast names the level")
+	_check(sheet.title.text == "Farm Lv2 → Lv3" and sheet.button.reason == "", "the sheet moves on to Lv3")
+	await town.upgrade()
+	_check(town.farm.level == 3 and town.farm.bag == {"blueprint_well": 1} and town.farm.coins == 0, "Lv3: its price taken, a well blueprint given")
+	_check(town.toast.current_text() == "Farm Lv3 · Received Well Blueprint ×1", "the toast names the blueprint")
+	_check(sheet.title.text == "Farm Lv3 → Lv4" and sheet.button.reason == "Need 14 more Timber", "short for Lv4: the gap on the key")
+	var refused: Dictionary = await town.upgrade()
+	_check(not refused.ok and refused.code == "NOT_ENOUGH" and store.read().farm.level == 3, "the store refuses a short upgrade, still Lv3")
+	sheet.close_requested.emit()
+	for i in 2: await process_frame
+	_check(town.upgrade_sheet == null and town.card != null and town.keys.has("upgrade"), "closing the sheet goes back to Scott")
+	town.close()
+	await process_frame
+	town = await _open(Town.CARPENTER, store)
+	_check(town.farm.level == 3 and store.read().farm.bag == {"blueprint_well": 1}, "kept after reopening")
+	town.close()
+	await process_frame
+	# After a sale Scott offers the blueprint first; Upgrade Farm stays, second.
+	_clean()
+	store = _store_with({"crop_carrot": 1})
+	store.send(3, [{"type": "sell", "item": "crop_carrot", "count": 1}])
+	town = await _open(Town.CARPENTER, store)
+	_check(town.keys.has("take") and town.keys.upgrade.kind == UiCommandButton.Kind.SECONDARY, "beside Take Blueprint, Upgrade Farm is secondary")
 	town.close()
 	await process_frame
 

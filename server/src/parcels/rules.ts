@@ -2,7 +2,8 @@
  * 动态农场（C-31）的可调数值：社区与数据集、首次进入自家地块的赠品、各类建筑的占地与蓝图（C-150）、作物成熟时间；
  * 以及地块经济（C-58）：出售价格、外围采集与刷新时间、领蓝图条件；买入价格（C-149：Jasmine 卖种子，胡萝卜种子 9 照 P0，
  * 所有者 C-137#15 第 3 题“照搬p0”）；体力（C-148，照搬 P0）：上限、恢复、休息和各动作的价；
- * 浇水（C-151）：哪类建筑是井、水桶和一桶浇几格，以及进农场时各发一次的补发（井的蓝图和水桶）。
+ * 浇水（C-151）：哪类建筑是井、水桶和一桶浇几格，以及进农场时各发一次的补发（井的蓝图和水桶）；
+ * 农场等级（C-152）：在 Scott 处升到下一级花的金币和材料、升到这一级后各类建筑最多几栋、升级时送的物品。
  * 默认值按所有者拍板 Q-39（C-34#14）与 Q-40（C-33#14），经济按 C-30#29 第 3–5 题（C-30#30 写入的推荐）。
  * 来源是 assets/farm/data/dynamic_farm.json；它不在 content_version 的指纹里，改它不影响旧农场存档。
  */
@@ -27,6 +28,18 @@ export interface BuildingRule { model: string; blueprint: string; width: number;
  * 打一桶水的体力在 energy.costs.draw_water，浇水不花体力。
  */
 export interface WateringRules { well: string; pail: string; pail_uses: number }
+/**
+ * 农场升到 level 级（C-152，照 P0 家园等级）：花 coins 金币和 items 里的材料（按列出的先后核对，先缺的先报）。
+ * buildings：从这一级起这类建筑最多几栋（盖过 buildings.<类>.max）；gift：升到这一级时放进背包的物品（多出的井的蓝图）。
+ * 体力上限每级加 energy.per_level，不在这里。
+ */
+export interface FarmLevelRule {
+  level: number;
+  coins: number;
+  items: Record<string, number>;
+  buildings?: Record<string, number>;
+  gift?: Record<string, number>;
+}
 /** 一次性领取的蓝图：卖成功过至少 min_sales 次后可领，只发一次。 */
 export interface BlueprintRule { item: string; amount: number; min_sales: number }
 export interface EconomyRules {
@@ -65,6 +78,8 @@ export interface ParcelRules {
    * 老玩家下次进入时拿到），发过的记在存档 grants 里，不再发。
    */
   grants: Record<string, Record<string, number>>;
+  /** C-152 农场等级：2 级起每一级一项，按级排列、连续；1 级是起点不收钱。没有这一项等于只有 1 级。 */
+  farm_levels: FarmLevelRule[];
   economy: EconomyRules;
 }
 
@@ -73,6 +88,8 @@ export const RULES_FILE = 'dynamic_farm.json';
 export const HOME_BUILDING = 'cottage';
 /** 一块地上所有建筑合计最多几栋；单类的 max 也不超过它。 */
 export const MAX_BUILDINGS = 64;
+/** 农场最高能配到几级（C-152 先做到 5 级）。 */
+export const MAX_FARM_LEVEL = 99;
 /** 建筑一边最多几格。 */
 export const MAX_BUILDING_SIDE = 16;
 const ID_RE = /^[a-z0-9_-]{1,64}$/;
@@ -114,8 +131,34 @@ export function parseParcelRules(raw: unknown): ParcelRules {
     if (!isId(id) || !items || typeof items !== 'object' || Array.isArray(items) || !Object.keys(items).length) fail(`grants.${id} 不对`);
     for (const [item, n] of Object.entries(items)) if (!isId(item) || !count(n, 1, 999)) fail(`grants.${id}.${item} 不对`);
   }
+  parseFarmLevels(r, fail);
   parseEconomy(r.economy, fail);
   return r;
+}
+
+/** 农场等级的边界：从 2 级起连续，金币 0–100000，材料和赠品每样 1–999，建筑上限是已有类型、不低于前一级。 */
+function parseFarmLevels(r: ParcelRules, fail: (what: string) => never): void {
+  if (r.farm_levels === undefined) r.farm_levels = [];
+  if (!Array.isArray(r.farm_levels) || r.farm_levels.length > MAX_FARM_LEVEL - 1) fail('farm_levels 不对');
+  const isMap = (v: unknown): v is Record<string, unknown> => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
+  const items = (v: unknown, where: string) => {
+    if (!isMap(v)) fail(`${where} 不对`);
+    for (const [id, n] of Object.entries(v as Record<string, unknown>)) if (!isId(id) || !count(n, 1, 999)) fail(`${where}.${id} 不对`);
+  };
+  const most: Record<string, number> = Object.fromEntries(Object.entries(r.buildings).map(([id, b]) => [id, b.max]));
+  for (const [i, l] of r.farm_levels.entries()) {
+    const where = `farm_levels[${i}]`;
+    if (!isMap(l) || l.level !== i + 2 || !count(l.coins, 0, 100_000)) fail(`${where} 不对`);
+    items(l.items, `${where}.items`);
+    if (l.gift !== undefined) items(l.gift, `${where}.gift`);
+    if (l.buildings !== undefined) {
+      if (!isMap(l.buildings)) fail(`${where}.buildings 不对`);
+      for (const [type, n] of Object.entries(l.buildings)) {
+        if (!Object.hasOwn(r.buildings, type) || !count(n, most[type], MAX_BUILDINGS)) fail(`${where}.buildings.${type} 不对`);
+        most[type] = n;
+      }
+    }
+  }
 }
 
 /** 价格、采集、蓝图条件的边界：卖出和买入单价 1–100000，刷新 1 秒–30 天，每次 1–99 个，模型名不跨类重复。 */
@@ -143,6 +186,18 @@ function parseEconomy(e: EconomyRules | undefined, fail: (what: string) => never
   if (!isMap(e!.blueprints)) fail('economy.blueprints 缺失');
   for (const [id, b] of Object.entries(e!.blueprints))
     if (!isId(id) || !isMap(b) || !isId(b.item) || !count(b.amount, 1, 99) || !count(b.min_sales, 0, 1000)) fail(`economy.blueprints.${id} 不对`);
+}
+
+/** 从 level 级升到下一级的规则；已经是配置里最高一级时为 null。 */
+export function nextFarmLevel(rules: ParcelRules, level: number): FarmLevelRule | null {
+  return rules.farm_levels.find(l => l.level === level + 1) ?? null;
+}
+
+/** level 级时这类建筑最多几栋：buildings.<类>.max，到了某一级的 buildings 写了它就按那一级的（C-152：井 1 级 1 口、3 级 2 口、5 级 3 口）。 */
+export function buildingMax(rules: ParcelRules, type: string, level: number): number {
+  let most = rules.buildings[type].max;
+  for (const l of rules.farm_levels) if (l.level <= level && l.buildings && Object.hasOwn(l.buildings, type)) most = l.buildings[type];
+  return most;
 }
 
 /** 模型名对应的外围物件类别（tree / flower / rock）；不可采的模型返回 null。 */

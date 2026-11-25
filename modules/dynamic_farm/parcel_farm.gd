@@ -18,13 +18,17 @@ extends RefCounted
 ## `watering.pail_uses` for 2 Energy, `water` uses one on a sown, unwatered cell and starts it growing then. A crop sown
 ## before watering (no `watered_at`) counts as watered. The rules' `grants` (the well blueprint and the pail) are given
 ## once per farm on entering; the save keeps the pail's water (`pail_water`) and what was granted (`grants`).
+## Farm levels (C-152, as P0's Homestead levels) mirror server/src/parcels/farm.ts: `upgrade_farm` (at Scott's) pays the
+## rules' `farm_levels` entry for the next level in coins and materials, for no Energy; each level adds `energy.per_level`
+## to Max Energy, and a level's `buildings` lets more of a type stand from it on (wells: 2 at Lv3, 3 at Lv5) with its
+## `gift` (a well blueprint) put in the bag. The save's `level` (absent before it: 1) is kept across dataset moves.
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
 const STATE_VERSION := 1
 const MAX_COORD := 1024
 const MAX_CELLS := 8192
 const MAX_BATCH := 50
 const COMMANDS := ["place_house", "place_building", "clear_obstacle", "till", "sow", "harvest", "sell", "buy", "claim_blueprint",
-	"gather", "rest", "draw_water", "water"]
+	"gather", "rest", "draw_water", "water", "upgrade_farm"]
 ## Commands priced by `energy.costs` (sowing is priced on the crop).
 const PRICED := ["clear_obstacle", "till", "gather", "draw_water"]
 ## A dry crop's `ripe_at` (C-151): the latest time a JS Date holds, never reached (server farm.ts NEVER).
@@ -35,6 +39,8 @@ const HOME_BUILDING := "cottage"
 ## Most buildings on one parcel, all types together; most cells along a building's side (server rules.ts).
 const MAX_BUILDINGS := 64
 const MAX_BUILDING_SIDE := 16
+## The highest level the rules may list (server rules.ts MAX_FARM_LEVEL).
+const MAX_FARM_LEVEL := 99
 const HOUSE_FIELDS := ["model", "x", "y", "width", "depth", "rotation", "built_at"]
 ## Server limits (C-58 farm.ts): the coin cap and the most one sell (C-149: buy) command may sell (buy).
 const MAX_COINS := 1000000000
@@ -95,7 +101,40 @@ static func parse_rules(raw: Variant) -> Dictionary:
 	for id in parsed.buildings:
 		for field in ["width", "depth", "max"]: parsed.buildings[id][field] = int(parsed.buildings[id][field])
 	parsed["economy"] = _parse_economy(raw.get("economy"))
+	var levels = _parse_levels(raw.get("farm_levels", []), parsed.buildings)
+	if levels == null: return {}
+	parsed["farm_levels"] = levels
 	return parsed
+
+## C-152 `farm_levels` with the server's bounds (rules.ts parseFarmLevels): from Lv2 on, one entry a level, coins 0–100000,
+## materials and gifts 1–999 each, a level's building limits for known types and never below the one before; null when
+## out of them. Integers made ints.
+static func _parse_levels(raw: Variant, buildings: Dictionary) -> Variant:
+	if not raw is Array or raw.size() > MAX_FARM_LEVEL - 1: return null
+	var most := {}
+	for type: String in buildings: most[type] = int(buildings[type].max)
+	var out: Array = []
+	for i in raw.size():
+		var l = raw[i]
+		if not l is Dictionary or not whole_in(l.get("level"), i + 2, i + 2) or not whole_in(l.get("coins"), 0, 100000): return null
+		var level := {"level": i + 2, "coins": int(l.coins)}
+		for field in ["items", "gift"]:
+			if field == "gift" and not l.has("gift"): continue
+			var items = l.get(field)
+			if not items is Dictionary: return null
+			level[field] = {}
+			for id in items:
+				if not id is String or not whole_in(items[id], 1, 999): return null
+				level[field][id] = int(items[id])
+		if l.has("buildings"):
+			if not l.buildings is Dictionary: return null
+			level.buildings = {}
+			for type in l.buildings:
+				if not type is String or not most.has(type) or not whole_in(l.buildings[type], int(most[type]), MAX_BUILDINGS): return null
+				most[type] = int(l.buildings[type])
+				level.buildings[type] = most[type]
+		out.append(level)
+	return out
 
 ## C-58 `economy`: sell prices and one-off blueprints; C-149 buy prices (Jasmine's shelf).
 ## {sell_prices:{}, buy_prices:{}, blueprints:{}} when absent.
@@ -137,7 +176,7 @@ static func _parse_energy(raw: Variant) -> Dictionary:
 
 static func empty_state() -> Dictionary:
 	return {"v": STATE_VERSION, "buildings": [], "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {}, "welcomed_at": null,
-		"coins": 0, "sales": 0, "gathered": {}, "blueprints_claimed": {}, "pail_water": 0, "grants": {}}
+		"coins": 0, "sales": 0, "gathered": {}, "blueprints_claimed": {}, "pail_water": 0, "grants": {}, "level": 1}
 
 ## A state as returned by the server, with JSON floats turned back into integers.
 ## Returns {} for anything that is not a v1 farm.
@@ -197,6 +236,8 @@ static func normalize(raw: Variant) -> Dictionary:
 		for id in raw[field]:
 			if not id is String or not _number(raw[field][id]): return {}
 			state[field][id] = int(raw[field][id])
+	# C-152: the farm level; a save from before it (or a malformed one, as the server reads it) is Lv1.
+	if whole_in(raw.get("level"), 1, 1 << 30): state.level = int(raw.level)
 	# C-148 Energy: kept when well formed; without it (or malformed, as the server reads it) the farm is at full Energy.
 	var energy = raw.get("energy")
 	if energy is Dictionary and whole_in(energy.get("value"), 0, 1 << 30) and _number(energy.get("at")) \
@@ -254,9 +295,23 @@ static func buildings_of(state: Dictionary) -> Array:
 
 # ------------------------------------------------------------------ Energy (C-148, server energy.ts)
 
-## Farm level (C-152 brings levels; level 1 until then).
-static func farm_level(_state: Dictionary) -> int:
-	return 1
+## Farm level (C-152); Lv1 for a save without one.
+static func farm_level(state: Dictionary) -> int:
+	return int(state.level) if whole_in(state.get("level"), 1, 1 << 30) else 1
+
+## The rules' entry for the level after `level` ({level, coins, items, gift?, buildings?}), or {} at the top.
+static func next_level(rule_set: Dictionary, level: int) -> Dictionary:
+	for l: Dictionary in rule_set.get("farm_levels", []):
+		if int(l.level) == level + 1: return l
+	return {}
+
+## How many of a building type may stand at `level`: its `buildings.<type>.max`, or the last level up to `level` that
+## names it (server rules.ts buildingMax: wells 1, 2 from Lv3, 3 from Lv5).
+static func building_max(rule_set: Dictionary, type: String, level: int) -> int:
+	var most := int(rule_set.buildings[type].max)
+	for l: Dictionary in rule_set.get("farm_levels", []):
+		if int(l.level) <= level and l.get("buildings", {}).has(type): most = int(l.buildings[type])
+	return most
 
 static func max_energy(rule_set: Dictionary, state: Dictionary) -> int:
 	return int(rule_set.energy.max_base) + int(rule_set.energy.per_level) * (farm_level(state) - 1)
@@ -399,6 +454,7 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 	var blank := empty_state()
 	for field in ["coins", "sales", "gathered", "blueprints_claimed", "pail_water", "grants"]:
 		if not next.has(field): next[field] = blank[field]
+	next.level = farm_level(next)
 	next.buildings = buildings_of(next).duplicate(true)
 	settle_energy(rule_set, next, now)
 	for index in commands.size():
@@ -415,7 +471,7 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 		elif command.type == "gather":
 			if not command.get("object") is String or str(command.object).length() > Gather.MAX_OBJECT_LENGTH:
 				return {"ok": false, "index": index, "code": "SCHEMA"}
-		elif command.type == "rest":
+		elif command.type == "rest" or command.type == "upgrade_farm":
 			pass
 		elif command.type == "draw_water":
 			if not whole_in(command.get("building"), 1, 1 << 30): return {"ok": false, "index": index, "code": "SCHEMA"}
@@ -586,6 +642,28 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 					e.value = int(e.value) + mini(int(rule_set.energy.rest_amount), top - int(e.value))
 					e.rested_on = today
 					if int(e.value) >= top: e.at = now
+			"upgrade_farm":
+				# At Scott's (the town keeps the key there): materials in the rules' order, then coins; no Energy.
+				var up := next_level(rule_set, int(next.level))
+				if up.is_empty():
+					failure = "MAX_LEVEL"
+					detail = {"level": int(next.level)}
+				else:
+					for item: String in up.items:
+						var have := int(next.bag.get(item, 0))
+						if have < int(up.items[item]):
+							failure = "NOT_ENOUGH"
+							detail = {"item": item, "have": have, "need": int(up.items[item])}
+							break
+					if failure.is_empty() and int(next.coins) < int(up.coins):
+						failure = "NOT_ENOUGH_COINS"
+						detail = {"coins": int(next.coins), "need": int(up.coins)}
+					if failure.is_empty():
+						for item: String in up.items: _take(next.bag, item, int(up.items[item]))
+						next.coins = int(next.coins) - int(up.coins)
+						for item: String in up.get("gift", {}): next.bag[item] = int(next.bag.get(item, 0)) + int(up.gift[item])
+						# Energy was settled to now above, so the higher top fills from the upgrade on.
+						next.level = int(up.level)
 		if failure == "NO_ENERGY":
 			detail = {"need": cost, "have": int(next.energy.value), "next_in": next_tick_in(rule_set, next, now)}
 		if not failure.is_empty():
@@ -607,8 +685,9 @@ static func _place(rule_set: Dictionary, next: Dictionary, command: Dictionary, 
 	for b: Dictionary in next.buildings:
 		if b.type == type: same += 1
 		id = maxi(id, int(b.id))
-	if same >= int(rule.max):
-		return {"code": "HOUSE_PLACED", "detail": {}} if old else {"code": "BUILDING_LIMIT", "detail": {"building": type, "max": int(rule.max)}}
+	var most := building_max(rule_set, type, farm_level(next))   # C-152: wells 2 from Lv3, 3 from Lv5
+	if same >= most:
+		return {"code": "HOUSE_PLACED", "detail": {}} if old else {"code": "BUILDING_LIMIT", "detail": {"building": type, "max": most}}
 	if next.buildings.size() >= MAX_BUILDINGS: return {"code": "BUILDING_LIMIT", "detail": {"max": MAX_BUILDINGS}}
 	if int(next.bag.get(rule.blueprint, 0)) <= 0: return {"code": "NO_BLUEPRINT", "detail": {"item": rule.blueprint}}
 	var building := {"id": id + 1, "type": type, "model": rule.model, "x": int(command.x), "y": int(command.y),

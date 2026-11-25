@@ -4,6 +4,7 @@ extends SceneTree
 ## C-138: the carrot's seven stages and the dry / wet soil blocks (ParcelCropArt).
 ## C-148: Energy, P0's numbers, the same cases as the server (fixtures/energy_cases.json), the key's price and Rest.
 ## C-151: watering, the same cases as the server (fixtures/watering_cases.json), the keys at the well and on dry crops.
+## C-152: farm levels, the same cases as the server (fixtures/level_cases.json), Scott's upgrade sheet and the Build key.
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -40,6 +41,9 @@ func _run() -> void:
 	_watering()
 	_watering_cases()
 	_watering_space()
+	_levels()
+	_level_cases()
+	_upgrade_sheet()
 	print("PARCEL_FARMING checks=%d failures=%d" % [checks, failures])
 	quit(1 if failures else 0)
 
@@ -137,6 +141,7 @@ func _buildings() -> void:
 	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH))
 	raw.buildings["well"] = {"model": "well", "blueprint": "blueprint_well", "width": 1, "depth": 1, "max": 3}
 	raw.buildings["coop"] = {"model": "coop", "blueprint": "blueprint_coop", "width": 4, "depth": 2, "max": 1}
+	raw.farm_levels = []   # C-152's well limits by level would sit below this copy's 3
 	var multi := ParcelFarm.parse_rules(raw)
 	_check(multi.buildings.coop.width == 4 and multi.buildings.well.max == 3, "buildings: per-type rules parse")
 	var no_home: Dictionary = raw.duplicate(true)
@@ -608,3 +613,115 @@ func _watering_space() -> void:
 	_check(Space.action(rules, data, path, {}, no_pail, Vector2i(36, 16), T0).refusal == Space.NO_PAIL
 		and Space.action(rules, data, path, {}, no_pail, Vector2i(36, 18), T0).refusal == Space.NO_PAIL, "no pail: Need a pail")
 	_check(Space.till_refusal(data, path, state, Vector2i(36, 16)) == Space.HOUSE, "no tilling under the well")
+
+## C-152: the shipped levels (SEN-C-152#14, for the owner to confirm), Max Energy and wells by level, the save's level,
+## the rules' bounds (server rules.ts parseFarmLevels) and upgrade_farm as the server (farm.test.ts 'farm levels (C-152)').
+func _levels() -> void:
+	var rules := ParcelFarm.rules()
+	_check(_ints(rules.farm_levels) == [{"level": 2, "coins": 40, "items": {"wood": 6, "stone": 4}},
+		{"level": 3, "coins": 60, "items": {"wood": 10, "stone": 8}, "buildings": {"well": 2}, "gift": {"blueprint_well": 1}},
+		{"level": 4, "coins": 70, "items": {"wood": 14, "stone": 12}},
+		{"level": 5, "coins": 80, "items": {"wood": 20, "stone": 16}, "buildings": {"well": 3}, "gift": {"blueprint_well": 1}}],
+		"levels: Lv2–5 as shipped")
+	var at := func(level: int) -> Dictionary:
+		var s := ParcelFarm.empty_state()
+		s.level = level
+		return s
+	_check([1, 2, 3, 4, 5].map(func(l): return ParcelFarm.max_energy(rules, at.call(l))) == [200, 210, 220, 230, 240], "levels: Max Energy +10 a level")
+	_check([1, 2, 3, 4, 5].map(func(l): return ParcelFarm.building_max(rules, "well", l)) == [1, 1, 2, 2, 3], "levels: wells 1 / 2 / 3 at Lv1 / 3 / 5")
+	_check(ParcelFarm.next_level(rules, 5).is_empty() and int(ParcelFarm.next_level(rules, 1).coins) == 40, "levels: Lv5 is the top")
+	_check(ParcelFarm.empty_state().level == 1, "levels: a new farm is Lv1")
+	var old := {"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {}, "welcomed_at": T0}
+	_check(ParcelFarm.normalize(old).level == 1 and ParcelFarm.normalize(old.merged({"level": 0})).level == 1, "levels: no level (or a bad one) reads as Lv1")
+	var three := ParcelFarm.normalize(JSON.parse_string(JSON.stringify(old.merged({"level": 3}))))
+	_check(three.level == 3 and ParcelFarm.normalize(JSON.parse_string(JSON.stringify(three))) == three, "levels: a JSON round trip keeps the level")
+	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH))
+	var bad := func(levels: Variant) -> bool:
+		var copy: Dictionary = raw.duplicate(true)
+		copy.farm_levels = levels
+		return ParcelFarm.parse_rules(copy).is_empty()
+	var lv2: Dictionary = raw.farm_levels[0]
+	var none: Dictionary = raw.duplicate(true)
+	none.erase("farm_levels")
+	_check(ParcelFarm.parse_rules(none).farm_levels == [], "levels: none in the rules is Lv1 only")
+	_check(bad.call({}) and bad.call([lv2.merged({"level": 3}, true)]) and bad.call([lv2, lv2]) and bad.call([lv2.merged({"coins": -1}, true)])
+		and bad.call([lv2.merged({"items": {"wood": 0}}, true)]) and bad.call([{"level": 2, "coins": 40}])
+		and bad.call([lv2.merged({"gift": {"x": 1000}}, true)]) and bad.call([lv2.merged({"buildings": {"castle": 2}}, true)])
+		and bad.call([lv2.merged({"buildings": {"well": 0}}, true)])
+		and bad.call([lv2.merged({"buildings": {"well": 3}}, true), (raw.farm_levels[1] as Dictionary).merged({"buildings": {"well": 2}}, true)]),
+		"levels: malformed levels are refused as the server does")
+	# upgrade_farm: the price taken, no Energy, a gift on Lv3; short is refused whole, materials before coins.
+	var start := ParcelFarm.welcome(rules, ParcelFarm.empty_state(), T0) as Dictionary
+	var paid: Dictionary = start.duplicate(true)
+	paid.bag.merge({"wood": 6, "stone": 4})
+	paid.coins = 40
+	var up := ParcelFarm.apply(rules, paid, [{"type": "upgrade_farm"}], T0)
+	_check(up.ok and up.state.level == 2 and up.state.coins == 0 and up.state.bag == start.bag and up.state.energy.value == 200,
+		"levels: Lv2 takes 40 coins, 6 Timber and 4 Stone, no Energy")
+	_check(ParcelFarm.max_energy(rules, up.state) == 210 and ParcelFarm.next_tick_in(rules, up.state, T0) != null, "levels: Lv2 tops at 210, filling from now")
+	var short := ParcelFarm.apply(rules, start.merged({"coins": 40}, true), [{"type": "upgrade_farm"}], T0)
+	_check(short.code == "NOT_ENOUGH" and short.detail == {"item": "wood", "have": 0, "need": 6}, "levels: no Timber, refused naming it")
+	var poor: Dictionary = paid.duplicate(true)
+	poor.coins = 39
+	_check(ParcelFarm.apply(rules, poor, [{"type": "upgrade_farm"}], T0).code == "NOT_ENOUGH_COINS", "levels: a coin short")
+	_check(ParcelFarm.apply(rules, paid, [{"type": "upgrade_farm"}, {"type": "upgrade_farm"}], T0).index == 1 and paid.get("level", 1) == 1,
+		"levels: a refused batch changes nothing")
+	var top: Dictionary = paid.duplicate(true)
+	top.level = 5
+	_check(ParcelFarm.apply(rules, top, [{"type": "upgrade_farm"}], T0).detail == {"level": 5}, "levels: none past Lv5")
+	# The local stand-in saves the level and reads it back.
+	var dir := "user://parcel_levels_test"
+	var store := LocalStore.new("block-levels", dir)
+	store.now_ms = func() -> int: return T0
+	store.enter()
+	var saved: Dictionary = store.read()
+	_check(store.send(int(saved.farm_version), [{"type": "upgrade_farm"}]).code == "NOT_ENOUGH", "levels: the local store refuses a short upgrade")
+	_check(store.read().farm.level == 1, "levels: the local store keeps Lv1 after it")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(dir.path_join("block-levels.json")))
+
+## The same level cases as the server (fixtures/level_cases.json): both sides must give the file's results.
+func _level_cases() -> void:
+	var rules := ParcelFarm.rules()
+	var shared = JSON.parse_string(FileAccess.get_file_as_string("res://tests/dynamic_farm/fixtures/level_cases.json"))
+	_check(shared is Dictionary and shared.cases.size() >= 20, "level cases: the shared fixture reads")
+	for c: Dictionary in shared.cases:
+		var farm := ParcelFarm.normalize(c.farm)
+		var r := ParcelFarm.apply(rules, farm, c.commands, int(c.now), shared.parcel_id)
+		var got := {"ok": true, "level": r.state.level, "coins": r.state.coins, "bag": r.state.bag,
+			"buildings": r.state.buildings.map(func(b): return b.type), "energy": r.state.energy} if r.ok \
+			else {"ok": false, "index": r.index, "code": r.code, "detail": r.get("detail", {})}
+		var want := JSON.stringify(_ints(c.expect), "", true)
+		_check(JSON.stringify(_ints(got), "", true) == want, "level case '%s': %s, server %s" % [c.name, JSON.stringify(_ints(got)), want])
+
+## Scott's upgrade sheet (parcel_upgrade.gd): the next level's needs and what changes, the first gap on the key; the top.
+func _upgrade_sheet() -> void:
+	var Upgrade = load("res://scenes/dynamic_farm/parcel_upgrade.gd")
+	var rules := ParcelFarm.rules()
+	var farm := ParcelFarm.empty_state()
+	farm.bag = {"wood": 2, "stone": 9}
+	farm.coins = 12
+	var m: Dictionary = Upgrade.model(rules, farm)
+	_check(m.title == "Farm Lv1 → Lv2" and not m.top, "sheet: Farm Lv1 → Lv2")
+	_check(m.tiles == [{"id": "wood", "name": "Timber", "have": 2, "need": 6}, {"id": "stone", "name": "Stone", "have": 9, "need": 4},
+		{"id": "coins", "name": "Coins", "have": 12, "need": 40}], "sheet: Timber, Stone, then Coins, have / need")
+	_check(m.reason == "Need 4 more Timber", "sheet: the first gap on the key, materials first: " + str(m.reason))
+	_check(m.changes == [{"icon": "energy", "text": "Max Energy 210", "note": "now 200"}], "sheet: Lv2 adds Max Energy only")
+	farm.bag.wood = 6
+	_check(Upgrade.model(rules, farm).reason == "Need 28 more coins", "sheet: then the coins")
+	farm.coins = 40
+	_check(Upgrade.model(rules, farm).reason == "", "sheet: enough, the key can go")
+	farm.level = 2
+	_check(Upgrade.model(rules, farm).changes == [{"icon": "energy", "text": "Max Energy 220", "note": "now 210"},
+		{"icon": "water", "text": "Wells 2", "note": "now 1"}], "sheet: Lv3 adds a well")
+	farm.level = 5
+	var top: Dictionary = Upgrade.model(rules, farm)
+	_check(top.title == "Farm Lv5" and top.top and top.tiles.is_empty(), "sheet: Lv5 is the top")
+	var sheet = Upgrade.new(farm)
+	root.add_child(sheet)
+	_check(not sheet.button.visible and sheet.subtitle.visible and sheet.subtitle.text == "Highest level for now", "sheet: no key at the top")
+	farm.level = 1
+	farm.coins = 0
+	sheet.refresh(farm)
+	_check(sheet.button.visible and sheet.button.reason == "Need 40 more coins" and sheet._tiles.get_child_count() == 3,
+		"sheet: refreshed to Lv1, three tiles and the gap on the key")
+	sheet.free()
