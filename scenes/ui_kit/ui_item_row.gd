@@ -39,7 +39,7 @@ func _init(fields: Dictionary = {}) -> void:
 	row.add_child(text)
 	_title = UiKit.label("", UiTokens.STYLE_ROW_TITLE_XB15)
 	_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	_state = UiKit.label("", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_PRIMARY)
+	_state = UiKit.label("", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_PRIMARY_INK)
 	_effect = UiKit.label("", UiTokens.STYLE_BODY_R14, UiTokens.COLOR_SECONDARY)
 	_effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	for l in [_title, _state, _effect]: text.add_child(l)

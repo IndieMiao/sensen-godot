@@ -39,7 +39,7 @@ func test_a_catch_card_without_actions_hides_buttons_note_and_strip() -> void:
 	assert_array(_texts(r)).contains_exactly(["Caught!", "Pond Crucian", "Common"])   # Plain: no quality badge
 
 func test_tones_colour_the_event_line() -> void:
-	var colours := {UiRewardMoment.Tone.REWARD: UiTokens.COLOR_PRIMARY, UiRewardMoment.Tone.NEUTRAL: UiTokens.COLOR_SECONDARY,
+	var colours := {UiRewardMoment.Tone.REWARD: UiTokens.COLOR_PRIMARY_INK, UiRewardMoment.Tone.NEUTRAL: UiTokens.COLOR_SECONDARY,
 		UiRewardMoment.Tone.MILESTONE: UiTokens.COLOR_TEXT}
 	for tone in colours:
 		var r := _card({tone = tone, event = "Mystery Dish", item_name = "Hmm… not a dish"})

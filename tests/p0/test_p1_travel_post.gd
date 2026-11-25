@@ -112,7 +112,7 @@ func test_trip_fares_reads_as_the_frame() -> void:
 		assert_float(bounds.get_global_rect().position.y - tier.get_global_rect().end.y).is_equal(2.0)
 		var fare: Label = row.find_child("Fare", true, false)
 		assert_str(fare.text).is_equal("Free")
-		assert_that(fare.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_PRIMARY)
+		assert_that(fare.get_theme_color(&"font_color")).is_equal(UiTokens.COLOR_PRIMARY_INK)
 		assert_float(fare.get_global_rect().end.x).is_equal(at.end.x)
 		assert_float(fare.get_global_rect().get_center().y).is_equal_approx(at.get_center().y, 0.5)
 	rt.ui.close_modal()

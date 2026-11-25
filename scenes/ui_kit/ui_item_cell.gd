@@ -516,7 +516,7 @@ func _build_kitchen_extras() -> void:
 	_chip.offset_bottom = _KITCHEN_CHIP_ROW.x + _KITCHEN_CHIP_ROW.y
 	var tag := _pill_tag(UiTokens.COLOR_SURFACE_RAISED, UiTokens.COLOR_BORDER, _KITCHEN_CHIP_RADIUS, _KITCHEN_CHIP_PAD)
 	tag.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_chip_label = UiKit.label("Try it", UiTokens.STYLE_C10_B, UiTokens.COLOR_PRIMARY)
+	_chip_label = UiKit.label("Try it", UiTokens.STYLE_C10_B, UiTokens.COLOR_PRIMARY_INK)
 	tag.add_child(_chip_label)
 	_chip.add_child(tag)
 	_surface.add_child(_chip)
@@ -625,7 +625,7 @@ func _paint_gain(empty: bool) -> void:
 	var hit := gain_hit and n > 0
 	var bg := UiTokens.COLOR_PRIMARY_TINT if hit else (UiTokens.COLOR_SURFACE_RAISED if n >= 0 else UiTokens.COLOR_DISABLED)
 	_gain.add_theme_stylebox_override(&"panel", UiStyleBox.make(bg, 8.0, _GAIN_OUTLINE, UiTokens.STROKE_DEFAULT).with_margins(5.0, 1.0, 5.0, 1.0))
-	_gain_label.add_theme_color_override(&"font_color", UiTokens.COLOR_PRIMARY if hit else UiTokens.COLOR_SECONDARY)
+	_gain_label.add_theme_color_override(&"font_color", UiTokens.COLOR_PRIMARY_INK if hit else UiTokens.COLOR_SECONDARY)
 	_gain_label.text = ("♥ +%d" % n) if n >= 0 else ("−%d" % -n)
 	_size_gain()
 
@@ -708,21 +708,25 @@ func _refresh_quick(s: State) -> void:
 	elif s == State.LIFTED: top = rest - UiTokens.SIZE_QUICK_SLOT_LIFT_DRAG
 	_surface.offset_top = top
 	_surface.offset_bottom = top + UiTokens.SIZE_QUICK_SLOT_SURFACE_H
-	var fill := UiTokens.COLOR_PIN_WARM if pinned else UiTokens.COLOR_SURFACE
+	# UI v3 glass slot (C-Q2, C-105): `glass/slot` on the bar's glass, no edge; selected / lifted take the 2
+	# `action/selected` outline, a drop target its dashes; an empty slot keeps its place, glass with a faint dashed
+	# outline. A pinned slot keeps its warm fill, amber strip and badge (LOCK-05) and its dark ink.
+	var warm := pinned and s not in [State.EMPTY, State.GHOST]
+	var fill := UiTokens.COLOR_PIN_WARM if warm else UiTokens.COLOR_GLASS_SLOT
 	var box: UiStyleBox
 	match s:
 		State.SELECTED, State.LIFTED:
-			box = UiStyleBox.make(fill, UiTokens.RADIUS_CELL, UiTokens.COLOR_PRIMARY, UiTokens.STROKE_SELECTED)
+			box = UiStyleBox.make(fill, UiTokens.RADIUS_MD, UiTokens.COLOR_ACTION_SELECTED, UiTokens.STROKE_SELECTED)
 			if s == State.LIFTED:
 				box.shadow_color = UiTokens.COLOR_LIFT_SHADOW
 				box.shadow_size = UiTokens.SIZE_LIFT_SHADOW_RADIUS
 				box.shadow_offset = Vector2(0.0, UiTokens.SIZE_LIFT_SHADOW_OFFSET_Y)
 		State.EMPTY, State.GHOST:
-			box = _dashed(UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CELL, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT), UiTokens.DASH_QUICK)
+			box = _dashed(UiStyleBox.make(fill, UiTokens.RADIUS_MD, UiTokens.COLOR_TEXT_ON_DARK_MUTED, UiTokens.STROKE_DEFAULT), UiTokens.DASH_QUICK)
 		State.DROP_TARGET:
-			box = _dashed(UiStyleBox.make(UiTokens.COLOR_PRIMARY_TINT, UiTokens.RADIUS_CELL, UiTokens.COLOR_PRIMARY, UiTokens.STROKE_SELECTED), UiTokens.DASH_DROP_TARGET)
+			box = _dashed(UiStyleBox.make(fill, UiTokens.RADIUS_MD, UiTokens.COLOR_ACTION_SELECTED, UiTokens.STROKE_SELECTED), UiTokens.DASH_DROP_TARGET)
 		_:
-			box = UiStyleBox.make(fill, UiTokens.RADIUS_CELL, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
+			box = UiStyleBox.make(fill, UiTokens.RADIUS_MD)
 	_surface.add_theme_stylebox_override(&"panel", box)
 	var empty := s == State.EMPTY
 	var name_top := float(UiTokens.SIZE_QUICK_SLOT_ICON) if _icon.visible else 0.0
@@ -749,8 +753,10 @@ func _refresh_quick(s: State) -> void:
 	_qty.visible = quantity != "" and not empty and not ghost
 	# The ghost's "Icon · dimmed" is the same 35 % as the ×0 icon (no separate token yet).
 	_icon.modulate.a = UiTokens.OPACITY_ZERO_ICON if s in [State.ZERO, State.GHOST] else 1.0
-	_name.add_theme_color_override(&"font_color", UiTokens.COLOR_SECONDARY if ghost else UiTokens.COLOR_TEXT)
-	_qty.add_theme_color_override(&"font_color", UiTokens.COLOR_SECONDARY if s == State.ZERO else UiTokens.COLOR_TEXT)
+	var ink := UiTokens.COLOR_TEXT if warm else UiTokens.COLOR_TEXT_ON_DARK
+	var quiet := UiTokens.COLOR_SECONDARY if warm else UiTokens.COLOR_TEXT_ON_DARK_MUTED
+	_name.add_theme_color_override(&"font_color", quiet if ghost else ink)
+	_qty.add_theme_color_override(&"font_color", quiet if s == State.ZERO else ink)
 	var show_pin := pinned and not empty and not ghost
 	_strip.visible = show_pin
 	_badge.visible = show_pin

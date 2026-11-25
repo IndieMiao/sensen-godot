@@ -1,0 +1,1076 @@
+{
+  "meta": {
+    "schema": 3,
+    "version": "3.0",
+    "status": "confirmed — 所有者 Q-121 按方案定稿（C-84 D-177）；由 C-105 接入 UiTokens",
+    "source": "C-82 概念稿视频 20261124-163029.mp4（sha256 e4ec32df…85b4）抽帧 attachment-576～584；现状：integration/dynamicfarm 653824ae",
+    "unit": "360 宽逻辑像素 = Godot UI 单位（与 v2 相同）",
+    "supersedes": [
+      "tokens-v2.json 2.1-draft (UiTokens)",
+      "GameUi 常量",
+      "DesignTokens + app_theme.tres"
+    ],
+    "author": "顾恺之·森（UI/UX 设计师）"
+  },
+  "font": {
+    "family": "Nunito（拉丁）+ Noto Sans SC（中文回退）",
+    "files": [
+      "res://assets/ui/fonts/Nunito.ttf",
+      "res://assets/ui/fonts/NotoSansSC-Regular.otf"
+    ],
+    "weights": {
+      "regular": 400,
+      "bold": 700,
+      "extrabold": 800
+    },
+    "styles": {
+      "display": {
+        "size": 28,
+        "weight": "extrabold",
+        "lineHeight": 1.2,
+        "use": "奖励弹窗标题、大数字",
+        "v2": "QuantityXB32（32→28）",
+        "designTokens": "—"
+      },
+      "title": {
+        "size": 20,
+        "weight": "extrabold",
+        "lineHeight": 1.25,
+        "use": "页面/面板标题、手机页头",
+        "v2": "TitleXB20",
+        "designTokens": "FONT_TITLE 22"
+      },
+      "headline": {
+        "size": 16,
+        "weight": "extrabold",
+        "lineHeight": 1.3,
+        "use": "卡片标题、分组标题",
+        "v2": "RowTitleXB15（15→16）",
+        "designTokens": "FONT_BODY 16"
+      },
+      "body": {
+        "size": 14,
+        "weight": "regular/bold",
+        "lineHeight": 1.4,
+        "use": "正文、NPC 台词（最多 3 行）",
+        "v2": "BodyR14 / BodyB14",
+        "designTokens": "FONT_LABEL 14"
+      },
+      "button": {
+        "size": 15,
+        "weight": "extrabold",
+        "lineHeight": 1.2,
+        "use": "按钮、CTA 条",
+        "v2": "ButtonXB15",
+        "designTokens": "FONT_PILL 15"
+      },
+      "label": {
+        "size": 13,
+        "weight": "bold",
+        "lineHeight": 1.2,
+        "use": "名牌、标签胶囊（Bag、Pip · Courier Kid）",
+        "v2": "C13B",
+        "designTokens": "—"
+      },
+      "hudNumber": {
+        "size": 13,
+        "weight": "extrabold",
+        "lineHeight": 1.0,
+        "use": "HUD 数值（200/200、1533）",
+        "v2": "C13XB",
+        "designTokens": "—"
+      },
+      "caption": {
+        "size": 12,
+        "weight": "bold",
+        "lineHeight": 1.3,
+        "use": "说明、关系等级、手机任务行",
+        "v2": "CaptionB12",
+        "designTokens": "FONT_CAPTION 12"
+      },
+      "micro": {
+        "size": 10,
+        "weight": "extrabold",
+        "lineHeight": 1.1,
+        "use": "数量角标（x22）、容量（2/20）、页签文字",
+        "v2": "C10XB",
+        "designTokens": "FONT_MICRO 10"
+      }
+    }
+  },
+  "color": {
+    "surface/paper": {
+      "value": "#F3F1EA",
+      "use": "面板正文底（背包、NPC 卡）",
+      "v2": "COLOR_SURFACE FBF8F1",
+      "gameUi": "PAPER fffdf8",
+      "designTokens": "SURFACE fffdf8",
+      "concept": "背包正文 #F1EFE7"
+    },
+    "surface/raised": {
+      "value": "#FFFFFF",
+      "use": "白色气泡、浮起卡片、输入框",
+      "v2": "COLOR_SURFACE_RAISED FFFFFF",
+      "gameUi": "CARD FFFFFF@0.97",
+      "designTokens": "—",
+      "concept": "对话“…”气泡"
+    },
+    "surface/sunken": {
+      "value": "#E6E4DC",
+      "use": "纸面上的凹槽行、分段控件底",
+      "v2": "COLOR_TILE_CORE F4EEE1",
+      "gameUi": "card_style f6f5ef",
+      "designTokens": "SURFACE_SUNK f0f1fc",
+      "concept": "—（推导）"
+    },
+    "surface/slot": {
+      "value": "#D6D7D2",
+      "use": "圆形物品格（背包）",
+      "v2": "—（v2 格子用描边）",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "背包空格 #D2D5D2"
+    },
+    "surface/header": {
+      "value": "#C4C63C",
+      "use": "面板标题色带（背包等）",
+      "v2": "—",
+      "gameUi": "LIME cafa91（近似）",
+      "designTokens": "—",
+      "concept": "背包标题条 #C5C534"
+    },
+    "surface/tag": {
+      "value": "#7A725E",
+      "use": "名牌/标签胶囊（Bag、NPC 名字），白字 4.8:1",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "Bag #938E7E（白字 3.1:1，加深）"
+    },
+    "glass/fill": {
+      "value": "#1E1C179E",
+      "use": "压在场景上的胶囊与快捷栏底",
+      "v2": "COLOR_SCRIM_DRAWER 2F3A33@0.18（用途不同）",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "快捷栏 #454239（叠在亮场景上）"
+    },
+    "glass/fillStrong": {
+      "value": "#1E1C17C7",
+      "use": "任务下拉行、离开按钮等小面积玻璃",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "任务行（01:12）"
+    },
+    "glass/slot": {
+      "value": "#0000002E",
+      "use": "快捷栏空格",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "快捷栏空格 #3D393B"
+    },
+    "glass/edge": {
+      "value": "#FFFFFF14",
+      "use": "玻璃件 1px 内描边（可选）",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "text/primary": {
+      "value": "#2B2A26",
+      "use": "浅底正文、标题",
+      "v2": "COLOR_TEXT 2F3A33",
+      "gameUi": "INK 232b30",
+      "designTokens": "INK 34416f",
+      "concept": "NPC 卡文字 #272621"
+    },
+    "text/secondary": {
+      "value": "#5E5C55",
+      "use": "浅底次要正文（NPC 台词）",
+      "v2": "COLOR_SECONDARY 5D6A62",
+      "gameUi": "MUTED 69716e",
+      "designTokens": "INK_SUB 56617d",
+      "concept": "—"
+    },
+    "text/muted": {
+      "value": "#706E66",
+      "use": "说明、关系等级、占位（对比度 4.5:1）",
+      "v2": "COLOR_MUTED 6E7B74",
+      "gameUi": "MUTED 69716e",
+      "designTokens": "INK_MUTED 7d86a5",
+      "concept": "Stranger #8B8B8B（3:1，加深）"
+    },
+    "text/onDark": {
+      "value": "#FFFFFF",
+      "use": "玻璃底、深色手机、主按钮上的文字",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "200/200、1533、x22"
+    },
+    "text/onDarkMuted": {
+      "value": "#FFFFFF99",
+      "use": "深色底上的次要文字、已完成任务",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "已完成任务（删除线）"
+    },
+    "action/primary": {
+      "value": "#94C242",
+      "use": "主操作（CTA 条、主按钮、选中环）",
+      "v2": "COLOR_PRIMARY 3E7D43",
+      "gameUi": "GREEN 5d8f2e / LIME_EDGE a6dc6c",
+      "designTokens": "ACCENT 239f9f",
+      "concept": "NPC 卡按钮条 #94C242"
+    },
+    "action/primaryPressed": {
+      "value": "#7DAA32",
+      "use": "主操作按下",
+      "v2": "COLOR_PRIMARY_PRESSED 2E6136",
+      "gameUi": "—",
+      "designTokens": "ACCENT_DEEP 167e88",
+      "concept": "—（主色 -12% 亮度）"
+    },
+    "action/primaryTint": {
+      "value": "#EAF4D8",
+      "use": "主色浅底（选中行、提示）",
+      "v2": "COLOR_PRIMARY_TINT ECF4E7",
+      "gameUi": "MINT f1f6e6",
+      "designTokens": "SURFACE_TINT e4eaff",
+      "concept": "—"
+    },
+    "action/disabled": {
+      "value": "#D6D5CE",
+      "use": "不可用按钮底",
+      "v2": "COLOR_DISABLED D6D5CE",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—（沿用 v2）"
+    },
+    "action/disabledInk": {
+      "value": "#8A918C",
+      "use": "不可用按钮文字",
+      "v2": "COLOR_DISABLED_INK 8A918C",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—（沿用 v2）"
+    },
+    "action/danger": {
+      "value": "#D9604A",
+      "use": "危险操作（丢弃、删除）",
+      "v2": "COLOR_DANGER 9C3F2E",
+      "gameUi": "CORAL d8787a",
+      "designTokens": "DANGER d8787a",
+      "concept": "—"
+    },
+    "action/selected": {
+      "value": "#F2E69A",
+      "use": "深色/玻璃底上的选中描边（快捷栏）",
+      "v2": "COLOR_GOLD F0D75E（近似）",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "快捷栏选中描边（00:23.5）"
+    },
+    "action/focus": {
+      "value": "#F2E69A",
+      "use": "键盘/手柄焦点环",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "hud/energyFill": {
+      "value": "#5FD86A",
+      "use": "体力胶囊填色",
+      "v2": "COLOR_ENERGY_HUD_FILL E3B341",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "体力条 #66E36A"
+    },
+    "hud/energyLow": {
+      "value": "#EE8A5B",
+      "use": "体力低于 20%",
+      "v2": "COLOR_FLOAT_ENERGY_COST C0563F（近似）",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "hud/energyBonus": {
+      "value": "#7FC66A",
+      "use": "超上限加成段",
+      "v2": "COLOR_ENERGY_BONUS 7FC66A",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—（沿用 v2）"
+    },
+    "hud/ringFrom": {
+      "value": "#58A8E8",
+      "use": "头像进度环渐变起点",
+      "v2": "COLOR_SKILL_FISHING 6FA8DC（近似）",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "头像环蓝段 #75B4E4"
+    },
+    "hud/ringTo": {
+      "value": "#6BD66F",
+      "use": "头像进度环渐变终点",
+      "v2": "COLOR_SKILL_FARMING 7FC66A（近似）",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "头像环绿段"
+    },
+    "hud/ringTrack": {
+      "value": "#FFFFFFE6",
+      "use": "头像进度环轨道",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "hud/coin": {
+      "value": "#F4C430",
+      "use": "金币图标主色（素材取色基准）",
+      "v2": "COLOR_GOLD F0D75E",
+      "gameUi": "GOLD b57a1b",
+      "designTokens": "—",
+      "concept": "金币"
+    },
+    "badge/notify": {
+      "value": "#F2B33D",
+      "use": "新内容提示点（手机、任务）",
+      "v2": "COLOR_PIN_AMBER E3B341",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "手机按钮角标"
+    },
+    "badge/unread": {
+      "value": "#E07A5F",
+      "use": "未读数字角标",
+      "v2": "COLOR_UNREAD_BADGE E07A5F",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—（沿用 v2）"
+    },
+    "progress/fill": {
+      "value": "#B5E77A",
+      "use": "关系/经验进度条填色",
+      "v2": "COLOR_ENERGY_BONUS 7FC66A（近似）",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "NPC 关系条 #DAFFB5（压暗前）"
+    },
+    "progress/track": {
+      "value": "#D5D5CF",
+      "use": "进度条轨道",
+      "v2": "COLOR_DISABLED D6D5CE",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "#D4D4D4"
+    },
+    "phone/bezel": {
+      "value": "#CDD0CE",
+      "use": "游戏内手机外框",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "手机外框（01:06）"
+    },
+    "phone/screen": {
+      "value": "#262D33",
+      "use": "手机屏幕底",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "#293138"
+    },
+    "phone/card": {
+      "value": "#2E363D",
+      "use": "手机内容卡",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "phone/row": {
+      "value": "#1F252A",
+      "use": "手机任务行、页签栏底",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "#212729"
+    },
+    "phone/notch": {
+      "value": "#191D21",
+      "use": "手机刘海",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "phone/text": {
+      "value": "#F2F4F3",
+      "use": "手机正文、选中页签文字",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "phone/textMuted": {
+      "value": "#8C9398",
+      "use": "手机未选中页签、已完成任务",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "phone/accent": {
+      "value": "#4A8FD4",
+      "use": "手机内链接、选中页签图标基准色",
+      "v2": "COLOR_INFO 426A88（近似）",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "Todo 图标 #4A83B8"
+    },
+    "world/bubble": {
+      "value": "#FFFFFF",
+      "use": "对话“…”气泡",
+      "v2": "COLOR_STATUS_AVAILABLE FBF8F1",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "00:02"
+    },
+    "world/bubbleNpc": {
+      "value": "#F2F8E6",
+      "use": "NPC 头像气泡底",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "01:10 头像气泡"
+    },
+    "world/actionFish": {
+      "value": "#6FA2D6",
+      "use": "交互气泡：钓鱼",
+      "v2": "COLOR_ROLE_TACKLE 2C6A8E（同族）",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "00:48 鱼钩气泡"
+    },
+    "world/actionCook": {
+      "value": "#C7A43E",
+      "use": "交互气泡：烹饪",
+      "v2": "COLOR_ROLE_TEA 2B7369（不同）",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "00:30 锅气泡"
+    },
+    "world/actionFeed": {
+      "value": "#8DAE4F",
+      "use": "交互气泡：喂养/茶壶",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "00:52 茶壶气泡"
+    },
+    "world/actionSit": {
+      "value": "#A7A5D8",
+      "use": "交互气泡：坐下/休息",
+      "v2": "COLOR_STATUS_EVENT_RING 8D75ED（同族）",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "00:32 椅子气泡"
+    },
+    "world/selection": {
+      "value": "#FFFFFFEB",
+      "use": "地块选中虚线框",
+      "v2": "DASH_QUICK 白色（用途不同）",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "00:23.5 白色虚线"
+    },
+    "scrim/modal": {
+      "value": "#17150F99",
+      "use": "模态面板遮罩（背包、NPC 卡）",
+      "v2": "COLOR_SCRIM_MODAL 2F3A33@0.32",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "遮罩 #211E1A（叠后）"
+    },
+    "scrim/phone": {
+      "value": "#17150F80",
+      "use": "手机遮罩",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "01:06"
+    },
+    "scrim/drawer": {
+      "value": "#17150F2E",
+      "use": "底部抽屉遮罩",
+      "v2": "COLOR_SCRIM_DRAWER 2F3A33@0.18",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—（沿用 v2 透明度）"
+    },
+    "float/default": {
+      "value": "#FFFFFF",
+      "use": "飘字默认（×1、+1），配描边",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "00:12 ×1 白字"
+    },
+    "float/outline": {
+      "value": "#1F2A178C",
+      "use": "飘字描边 2",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "float/coins": {
+      "value": "#F6C744",
+      "use": "飘字：金币",
+      "v2": "COLOR_FLOAT_COINS 806C0C",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "float/energyCost": {
+      "value": "#EE8A5B",
+      "use": "飘字：体力消耗",
+      "v2": "COLOR_FLOAT_ENERGY_COST C0563F",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "float/energyGain": {
+      "value": "#8EE06A",
+      "use": "飘字：体力恢复",
+      "v2": "COLOR_FLOAT_ENERGY_GAIN 3E7D43",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "float/xp": {
+      "value": "#6CC4E8",
+      "use": "飘字：经验",
+      "v2": "COLOR_FLOAT_XP 17808F",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "float/affinity": {
+      "value": "#F07AA5",
+      "use": "飘字：好感",
+      "v2": "COLOR_FLOAT_AFFINITY C04F7A",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    }
+  },
+  "colorInheritedFromV2": {
+    "rarity/*": {
+      "v2": "COLOR_RARITY_COMMON / FINE / RARE / LEGENDARY",
+      "use": "物品品质"
+    },
+    "family/*": {
+      "v2": "COLOR_FAMILY_FIELD / ORCHARD / SEASONING / WATER",
+      "use": "物品类别"
+    },
+    "status/*": {
+      "v2": "COLOR_STATUS_*（含 *_RING）",
+      "use": "场景状态徽章"
+    },
+    "heat/*": {
+      "v2": "COLOR_HEAT_NEAR / PAST / BURNT",
+      "use": "烹饪火候"
+    },
+    "role/*": {
+      "v2": "COLOR_ROLE_MARKET / POST / TACKLE / TEA（含 *_TINT）",
+      "use": "NPC 职业色"
+    },
+    "skill/*": {
+      "v2": "COLOR_SKILL_FARMING / FISHING",
+      "use": "技能色"
+    },
+    "quality/gold, new, newInk, info, warning(*Tint)": {
+      "v2": "同名 COLOR_*",
+      "use": "提示语义色"
+    }
+  },
+  "radius": {
+    "none": {
+      "value": 0,
+      "use": "贴边元素",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "xs": {
+      "value": 4,
+      "use": "小角标、提示点外的方形元素",
+      "v2": "RADIUS_TRACK 3",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "—"
+    },
+    "sm": {
+      "value": 8,
+      "use": "“…”对话气泡、小标签",
+      "v2": "RADIUS_CAPTION_PILL 8",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "“…”气泡约 7"
+    },
+    "md": {
+      "value": 12,
+      "use": "快捷栏格、离开按钮、手机内小卡",
+      "v2": "RADIUS_CELL 11 / RADIUS_HUD_CHIP 12",
+      "gameUi": "card_style 12 / surface 12",
+      "designTokens": "RADIUS_CARD 12",
+      "concept": "快捷栏格约 12"
+    },
+    "lg": {
+      "value": 16,
+      "use": "快捷栏底、NPC 卡、手机内容卡、Toast",
+      "v2": "RADIUS_CARD 14 / RADIUS_PIN_MENU 14",
+      "gameUi": "card_surface 16 / panel_style 14",
+      "designTokens": "RADIUS_SHEET 16",
+      "concept": "快捷栏约 16、NPC 卡约 16"
+    },
+    "xl": {
+      "value": 20,
+      "use": "模态面板（背包等）",
+      "v2": "RADIUS_SHEET 24 / BAG_DRAWER_TOP 24",
+      "gameUi": "panel_style 20",
+      "designTokens": "—",
+      "concept": "背包面板约 21.5"
+    },
+    "xxl": {
+      "value": 28,
+      "use": "手机屏幕内圆角",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "约 28"
+    },
+    "device": {
+      "value": 36,
+      "use": "手机外框圆角",
+      "v2": "—",
+      "gameUi": "—",
+      "designTokens": "—",
+      "concept": "约 38"
+    },
+    "pill": {
+      "value": 999,
+      "use": "胶囊：体力、金币、名牌、按钮、页签栏、进度条",
+      "v2": "RADIUS_PILL 22 / RADIUS_CHIP 13",
+      "gameUi": "—",
+      "designTokens": "RADIUS_PILL 24",
+      "concept": "全部胶囊为半圆端"
+    }
+  },
+  "space": {
+    "s0": {
+      "value": 0,
+      "use": "—",
+      "v2": "—",
+      "designTokens": "—"
+    },
+    "s1": {
+      "value": 2,
+      "use": "描边内缩、体力填色内缩",
+      "v2": "—",
+      "designTokens": "—"
+    },
+    "s2": {
+      "value": 4,
+      "use": "图标与数字、紧凑间距",
+      "v2": "SPACE_QUICK_BAR_GAP 4",
+      "designTokens": "SPACE_1 4"
+    },
+    "s3": {
+      "value": 6,
+      "use": "HUD 元素间距、标签内间距",
+      "v2": "SPACE_WITHIN 6",
+      "designTokens": "—"
+    },
+    "s4": {
+      "value": 8,
+      "use": "快捷栏格间距、行间距、安全区内缩",
+      "v2": "SPACE_HUD_ROW_GAP 8 / OVERLAY_BODY 8",
+      "designTokens": "SPACE_2 8"
+    },
+    "s5": {
+      "value": 12,
+      "use": "屏幕边距、列表行距",
+      "v2": "SPACE_ROW 12 / OVERLAY_BLOCK 12",
+      "designTokens": "SPACE_3 12"
+    },
+    "s6": {
+      "value": 16,
+      "use": "卡片内边距、背包格间距",
+      "v2": "SPACE_PAGE 16",
+      "designTokens": "SPACE_4 16"
+    },
+    "s7": {
+      "value": 20,
+      "use": "面板内边距、分组间距",
+      "v2": "SPACE_SECTION 20",
+      "designTokens": "—"
+    },
+    "s8": {
+      "value": 24,
+      "use": "大块分隔",
+      "v2": "—",
+      "designTokens": "SPACE_6 24"
+    },
+    "s9": {
+      "value": 32,
+      "use": "页面级留白",
+      "v2": "—",
+      "designTokens": "—"
+    }
+  },
+  "size": {
+    "screen/edge": {
+      "value": 12,
+      "use": "HUD 与屏幕左右边距",
+      "v2": "SIZE_HUD_X 8"
+    },
+    "screen/safeInset": {
+      "value": 8,
+      "use": "安全区内再缩进",
+      "v2": "SIZE_HUD_TOP 16（含状态栏估计）"
+    },
+    "touch/min": {
+      "value": 44,
+      "use": "最小点击区",
+      "v2": "SIZE_TOUCH 44"
+    },
+    "hud/rowH": {
+      "value": 52,
+      "use": "HUD 顶栏行高",
+      "v2": "SIZE_HUD_ROW1_H 46"
+    },
+    "hud/avatar": {
+      "value": 52,
+      "use": "头像外径（环 4、内盘 44）",
+      "v2": "SIZE_HUD_AVATAR 38 / SKILL_RING 44"
+    },
+    "hud/energyW": {
+      "value": 70,
+      "use": "体力胶囊宽",
+      "v2": "SIZE_ENERGY_CHIP_W 100"
+    },
+    "hud/energyH": {
+      "value": 20,
+      "use": "体力胶囊高",
+      "v2": "SIZE_ENERGY_CHIP_H 42（两行版）"
+    },
+    "hud/capsuleH": {
+      "value": 24,
+      "use": "金币等胶囊高",
+      "v2": "SIZE_HUD_CAPSULE_H 26"
+    },
+    "hud/coinIcon": {
+      "value": 18,
+      "use": "金币图标",
+      "v2": "—"
+    },
+    "hud/sideButton": {
+      "value": 36,
+      "use": "右侧竖排按钮视觉直径（点击区 44）",
+      "v2": "SIZE_INBOX 32"
+    },
+    "hud/sideGap": {
+      "value": 8,
+      "use": "右侧竖排按钮间距",
+      "v2": "—"
+    },
+    "quick/slotW": {
+      "value": 48,
+      "use": "快捷栏格宽",
+      "v2": "SIZE_QUICK_SLOT_W 52"
+    },
+    "quick/slotH": {
+      "value": 56,
+      "use": "快捷栏格高",
+      "v2": "SIZE_QUICK_SLOT_H 68"
+    },
+    "quick/icon": {
+      "value": 32,
+      "use": "快捷栏物品图标",
+      "v2": "SIZE_QUICK_SLOT_ICON 22"
+    },
+    "quick/pad": {
+      "value": 12,
+      "use": "快捷栏左右内边距（上下 10）",
+      "v2": "—"
+    },
+    "quick/bottom": {
+      "value": 16,
+      "use": "快捷栏距安全区底",
+      "v2": "SIZE_QUICK_BAR_BOTTOM 24"
+    },
+    "panel/w": {
+      "value": 288,
+      "use": "模态面板宽（背包类）",
+      "v2": "—"
+    },
+    "panel/headerH": {
+      "value": 40,
+      "use": "面板标题色带高",
+      "v2": "—"
+    },
+    "panel/pad": {
+      "value": 20,
+      "use": "面板内边距",
+      "v2": "SIZE_SHEET_PAD 16"
+    },
+    "panel/slot": {
+      "value": 72,
+      "use": "背包圆格直径",
+      "v2": "SIZE_INVENTORY_CELL 52"
+    },
+    "panel/slotIcon": {
+      "value": 48,
+      "use": "背包物品图标",
+      "v2": "SIZE_INVENTORY_ICON 27"
+    },
+    "panel/slotGap": {
+      "value": 16,
+      "use": "背包格列间距",
+      "v2": "—"
+    },
+    "panel/rowGap": {
+      "value": 28,
+      "use": "背包格行间距（容纳数量角标）",
+      "v2": "—"
+    },
+    "panel/padTop": {
+      "value": 28,
+      "use": "面板正文上内边距（下 24、左右 20）",
+      "v2": "—"
+    },
+    "panel/hero": {
+      "value": 80,
+      "use": "面板头图物件（突出标题条）",
+      "v2": "—"
+    },
+    "tag/h": {
+      "value": 28,
+      "use": "名牌/标签胶囊高",
+      "v2": "SIZE_CAPTION_PILL_H 18"
+    },
+    "npc/w": {
+      "value": 312,
+      "use": "NPC 卡宽",
+      "v2": "—"
+    },
+    "npc/portraitW": {
+      "value": 96,
+      "use": "NPC 立绘区宽（3D 渲染头像）",
+      "v2": "—"
+    },
+    "npc/portraitH": {
+      "value": 112,
+      "use": "NPC 立绘区高（上溢 28）",
+      "v2": "—"
+    },
+    "npc/ctaH": {
+      "value": 48,
+      "use": "NPC 卡底部操作条高",
+      "v2": "SIZE_COMMAND 48"
+    },
+    "phone/w": {
+      "value": 224,
+      "use": "手机外框宽",
+      "v2": "—"
+    },
+    "phone/h": {
+      "value": 436,
+      "use": "手机外框高",
+      "v2": "—"
+    },
+    "phone/bezel": {
+      "value": 9,
+      "use": "手机边框厚",
+      "v2": "—"
+    },
+    "phone/tabH": {
+      "value": 48,
+      "use": "手机页签栏高",
+      "v2": "SIZE_SEGMENT_TAB 44"
+    },
+    "todo/rowH": {
+      "value": 24,
+      "use": "任务下拉行高（勾选圆 20）",
+      "v2": "SIZE_TODAY_ROW_H 40"
+    },
+    "phone/rowH": {
+      "value": 28,
+      "use": "手机任务行高（勾选圆 20）",
+      "v2": "—"
+    },
+    "bubble/talkW": {
+      "value": 32,
+      "use": "“…”气泡宽（高 24）",
+      "v2": "—"
+    },
+    "bubble/npc": {
+      "value": 68,
+      "use": "NPC 头像气泡直径（白边 3，尾巴 8）",
+      "v2": "SIZE_STATUS_BADGE_NPC 36"
+    },
+    "bubble/action": {
+      "value": 40,
+      "use": "交互气泡直径（白边 2.5，图标 22，尾巴 6）",
+      "v2": "SIZE_STATUS_BADGE_WORLD 28"
+    },
+    "world/selectionStroke": {
+      "value": 2.5,
+      "use": "地块虚线框线宽（虚线 8 / 间隔 5）",
+      "v2": "DASH_DROP_TARGET 4/3"
+    }
+  },
+  "elevation": {
+    "e0": {
+      "color": null,
+      "blur": 0,
+      "offsetY": 0,
+      "use": "玻璃件、贴图件（不加投影）",
+      "v2": "—"
+    },
+    "e1": {
+      "color": "#1A140A2E",
+      "blur": 6,
+      "offsetY": 2,
+      "use": "白色小件：按钮、名牌",
+      "v2": "SHADOW_KEY 2E3B33@0.12 r6 y2"
+    },
+    "e2": {
+      "color": "#1A140A38",
+      "blur": 24,
+      "offsetY": 8,
+      "use": "卡片、模态面板、手机",
+      "v2": "SHADOW_CARD 2E3B33@0.16 r24 y8"
+    },
+    "e3": {
+      "color": "#1A140A40",
+      "blur": 8,
+      "offsetY": 3,
+      "use": "世界气泡、飘浮提示",
+      "v2": "SHADOW_FLOAT 2E3B33@0.16 r8 y3"
+    }
+  },
+  "motion": {
+    "duration": {
+      "instant": {
+        "ms": 80,
+        "use": "按下反馈",
+        "v2": "MOTION_JOYSTICK_FADE_IN_MS 80"
+      },
+      "fast": {
+        "ms": 120,
+        "use": "选中、页签内容淡入、遮罩淡出",
+        "v2": "MOTION_RADIAL_RETRACT_MS 120"
+      },
+      "quick": {
+        "ms": 160,
+        "use": "面板退出、抬起回弹",
+        "v2": "MOTION_DISSOLVE_MS 150"
+      },
+      "base": {
+        "ms": 200,
+        "use": "遮罩淡入、气泡出现、抖动",
+        "v2": "MOTION_RADIAL_FADE_MS 200 / SHAKE 200"
+      },
+      "moderate": {
+        "ms": 260,
+        "use": "面板进入",
+        "v2": "MOTION_DRAWER_MS 250"
+      },
+      "emphasis": {
+        "ms": 320,
+        "use": "手机滑入、头图跳出",
+        "v2": "—"
+      },
+      "slow": {
+        "ms": 400,
+        "use": "计数滚动",
+        "v2": "—"
+      },
+      "fly": {
+        "ms": 520,
+        "use": "奖励飞入",
+        "v2": "MOTION_QUICK_BAR_REFILL_MS 300（补位，保留）"
+      },
+      "float": {
+        "ms": 800,
+        "use": "飘字全程（上升 40）",
+        "v2": "MOTION_FLOAT_TEXT_MS 800 / RISE 40"
+      },
+      "loopBob": {
+        "ms": 1600,
+        "use": "气泡待机浮动周期",
+        "v2": "—"
+      }
+    },
+    "easing": {
+      "standard": {
+        "cubicBezier": "0.2, 0, 0, 1",
+        "godot": "TRANS_CUBIC + EASE_OUT",
+        "use": "进入、位移"
+      },
+      "exit": {
+        "cubicBezier": "0.4, 0, 1, 1",
+        "godot": "TRANS_CUBIC + EASE_IN",
+        "use": "退出"
+      },
+      "pop": {
+        "cubicBezier": "0.34, 1.56, 0.64, 1",
+        "godot": "TRANS_BACK + EASE_OUT",
+        "use": "弹出、回弹、图标跳出"
+      },
+      "emphasized": {
+        "cubicBezier": "0.16, 1, 0.3, 1",
+        "godot": "TRANS_QUART + EASE_OUT",
+        "use": "手机滑入、大位移"
+      },
+      "arc": {
+        "cubicBezier": "0.45, 0, 0.55, 1",
+        "godot": "TRANS_QUAD + EASE_IN_OUT",
+        "use": "奖励飞行轨迹"
+      },
+      "linear": {
+        "cubicBezier": "0, 0, 1, 1",
+        "godot": "TRANS_LINEAR",
+        "use": "遮罩透明度"
+      },
+      "loop": {
+        "cubicBezier": "0.37, 0, 0.63, 1",
+        "godot": "TRANS_SINE + EASE_IN_OUT",
+        "use": "待机循环"
+      }
+    },
+    "floatTextRise": 40,
+    "pressScale": 0.94,
+    "selectScale": 1.06,
+    "panelEnterScale": 0.88,
+    "phoneEnterOffsetY": 40,
+    "bobAmplitude": 2,
+    "shakeAmplitude": 4,
+    "staggerMs": {
+      "grid": 20,
+      "list": 40,
+      "float": 90
+    }
+  }
+}
