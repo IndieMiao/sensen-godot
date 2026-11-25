@@ -319,6 +319,21 @@ func _guide() -> void:
 	no_well_blueprint.buildings = no_well_blueprint.buildings.filter(func(b): return b.type != "well")
 	no_well_blueprint.crops["10,10"].watered_at = null
 	_check(Guide.step(no_well_blueprint, T0) == "", "guide: a dry carrot, no well and no blueprint -> nothing")
+	# A farm past the first ten minutes (sold, the coop blueprint claimed) still hears about a dry carrot.
+	var veteran: Dictionary = no_well_blueprint.duplicate(true)
+	veteran.sales = 3
+	veteran.blueprints_claimed = {"coop": T0}
+	_check(Guide.step(veteran, T0) == "", "guide: a veteran farm without well or blueprint stays quiet")
+	veteran.bag.blueprint_well = 1
+	_check(Guide.step(veteran, T0) == "well", "guide: a veteran farm with a dry carrot -> Build Well")
+	veteran.buildings = state.buildings.duplicate(true)
+	_check(Guide.step(veteran, T0) == "water", "guide: a veteran farm with a well and a dry carrot -> water")
+	veteran.crops["10,10"].watered_at = T0
+	veteran.crops["10,10"].ripe_at = T0 + 60000
+	_check(Guide.step(veteran, T0) == "", "guide: watered, the veteran farm is quiet again")
+	var mixed: Dictionary = state.duplicate(true)
+	mixed.crops["11,10"] = {"crop": "crop_carrot", "planted_at": T0, "ripe_at": ParcelFarm.NEVER, "watered_at": null}
+	_check(Guide.step(mixed, T0 + 60000) == "harvest", "guide: a ripe carrot beside a dry one -> Harvest first")
 	_check(Guide.step(state, T0 + 59999) == "", "guide: quiet while the carrot grows")
 	_check(Guide.step(state, T0 + 60000) == "harvest", "guide: a ripe carrot -> Harvest")
 	var harvested := ParcelFarm.apply(rules, state, [{"type": "harvest", "cell": "10,10"}], T0 + 60000)

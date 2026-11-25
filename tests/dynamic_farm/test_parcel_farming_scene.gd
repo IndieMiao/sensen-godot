@@ -778,6 +778,9 @@ func _watering_loop() -> void:
 	_check(_beside([well_cell]) and farming.farm.pail_water == 3 and farming.energy_value() == energy - 2 and "−2 Energy" in _floats(farming),
 		"Fill: beside the well, a full pail of 3, 2 Energy")
 	_check(seen.clips.has("pail/draw") and seen.pail, "Fill plays C-153's draw with the pail in hand")
+	var settle := Time.get_ticks_msec() + 5000   # the labour clip runs on frame time, the press on the clock
+	while scene._labour_left > 0.0 and Time.get_ticks_msec() < settle: await process_frame
+	await process_frame
 	var hand: Node3D = scene._rig.get_node_or_null("BucketGesture")
 	_check(hand != null and not hand.visible and (hand.get_node("Hand") as BoneAttachment3D).get_skeleton() == scene._rig.skeleton,
 		"the pail hangs from the rig's right wrist, put away once the action ends")

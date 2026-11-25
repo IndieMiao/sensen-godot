@@ -6,8 +6,9 @@ extends RefCounted
 ## the community map says where to go for the steps done off the parcel (`map_text`).
 ## The 0.4.3 copy is for PM to finalise (C-45 / Q-61; docs/plans/C-61.md); English only, as the parcel's UI. C-115: the
 ## map's Market and Carpenter buttons became the Washington Square pin (Jasmine and Scott in its room; C-115#30), so the lines name it.
-## C-151: a sown carrot needs water before it grows, so after sowing the guide asks for the well (while its blueprint
-## waits) and then for watering, until every carrot in the ground is watered. Their copy is for PM to finalise.
+## C-151: a sown carrot needs water before it grows, so while one waits dry the guide asks for the well (while its
+## blueprint waits) and then for watering, before any other step and also on farms past the first ten minutes (the
+## farms that get the well and the pail on their next entry). Their copy is for PM to finalise.
 
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
@@ -39,8 +40,19 @@ const MAP_TIPS := {
 
 ## The step to teach for `farm` (ParcelFarm.normalize) at server time `now_ms`: a TIPS key, or "".
 static func step(farm: Dictionary, now_ms: int) -> String:
-	if farm.is_empty() or farm.get("blueprints_claimed", {}).has(COOP): return ""
+	if farm.is_empty(): return ""
 	var bag: Dictionary = farm.get("bag", {})
+	var crops: Dictionary = farm.get("crops", {})
+	# A ripe carrot comes first (Harvest); a dry one asks for the well or for water.
+	var ripe := false
+	var dry := false
+	for key: String in crops:
+		ripe = ripe or int(crops[key].get("ripe_at", 0)) <= now_ms
+		dry = dry or ParcelFarm.is_dry(crops[key])
+	if dry and not ripe:
+		if not ParcelFarm.wells(ParcelFarm.rules(), farm).is_empty(): return "water"
+		if int(bag.get(WELL_BLUEPRINT, 0)) > 0: return "well"
+	if farm.get("blueprints_claimed", {}).has(COOP): return ""
 	if int(farm.get("sales", 0)) > 0:
 		if _holds_gathered(bag): return "sell_gathered"
 		if farm.get("gathered", {}).is_empty() and not Gather.rules().is_empty(): return "gather"
@@ -48,14 +60,9 @@ static func step(farm: Dictionary, now_ms: int) -> String:
 	if int(bag.get(CROP, 0)) > 0: return "sell"
 	if not farm.get("house") is Dictionary:
 		return "build" if int(bag.get(BLUEPRINT, 0)) > 0 else ""
-	var crops: Dictionary = farm.get("crops", {})
 	if not crops.is_empty():
 		for key: String in crops:
 			if int(crops[key].get("ripe_at", 0)) <= now_ms: return "harvest"
-		for key: String in crops:
-			if ParcelFarm.is_dry(crops[key]):
-				if not ParcelFarm.wells(ParcelFarm.rules(), farm).is_empty(): return "water"
-				return "well" if int(bag.get(WELL_BLUEPRINT, 0)) > 0 else ""
 		return ""
 	if int(bag.get(SEED, 0)) <= 0: return ""
 	for key in farm.get("tilled", []):

@@ -109,8 +109,8 @@ through the four turns, each refused spot, Build turned (three pop frames), the 
 
 `modules/dynamic_farm/parcel_guide.gd` reads the next step of the first ten minutes from the save alone, so a parcel
 reopened halfway picks up at the same step: a Cottage Blueprint and no house -> `build`, a house and seeds ->
-`till`, tilled soil with nothing on it -> `sow`, a dry carrot -> `well` (while its blueprint waits) or `water` (C-151),
-a ripe carrot -> `harvest`; nothing while the carrot grows and
+`till`, tilled soil with nothing on it -> `sow`, a dry carrot -> `well` (while its blueprint waits) or `water` (C-151,
+before any other step and on any farm, so older farms hear of it too), a ripe carrot -> `harvest`; nothing while the carrot grows and
 nothing once a carrot is in the bag or one has been sold. `ParcelFarming` shows it as the main farm's TipCard
 (`UiTipCard`), centred under the top bar; it hides while the house is placed or the bag is open, and a tap closes it
 until the next step. On the map, a package that enters one's own farm (`own_farm`) says where to go with nothing
