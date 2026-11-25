@@ -318,6 +318,29 @@ func loading_map_tap() -> void:
 	check(native.queries.size() == sent + 1 and native.queries.back()[2] == Vector2(.2, .8), "and is sent once the building layer loads")
 	controller.config.building_source = "mapbox"; controller.config.erase("buildings_url")
 	await controller.activate(); ready_signal()
+## C-130 V-362: the map entered below the selectable zoom (the starter zone's landing view). The parcel layers are not
+## drawn there, so they do not load: the map asks to zoom in instead of loading forever, and loads once zoomed in.
+func below_selectable_zoom_entry() -> void:
+	controller.pause(); controller.camera_changed(14.0)
+	var seen: Array = [] # [generation, generation of the last sources set] at each change
+	var on_changed := func(): seen.append([controller.generation, native.sources.back()[0] if not native.sources.is_empty() else -1])
+	controller.changed.connect(on_changed)
+	await controller.activate()
+	controller.changed.disconnect(on_changed)
+	check(seen.back() == [controller.generation, controller.generation], "the map's change for a new generation follows its sources, so the starter zone sent on it reaches native after them")
+	check(not controller.map_ready and not controller.busy and controller.message == Controller.ZOOM_IN, "entered below the selectable zoom: asks to zoom in, not loading")
+	native.parcel_ready.emit(controller.generation, 1, '{"source_ready":false,"error":""}')
+	check(controller.message == Controller.ZOOM_IN and not controller.busy, "native readiness without parcel data below the selectable zoom still asks to zoom in")
+	controller.camera_changed(16.5)
+	check(controller.message == Controller.LOADING, "zoomed in to the selectable zoom: the parcel layers load")
+	controller.camera_changed(14.5)
+	check(controller.message == Controller.ZOOM_IN, "zoomed out again before they loaded: asks to zoom in again")
+	controller.camera_changed(16.5); ready_signal()
+	check(controller.map_ready and controller.message == Controller.PROMPT, "once loaded at the selectable zoom the map is ready")
+	controller.camera_changed(14.0)
+	check(controller.map_ready and controller.message == Controller.PROMPT, "a loaded map zoomed out stays ready")
+	controller.camera_changed(18.0)
+
 func _run() -> void:
 	api = Api.new(); api.transport = transport; root.add_child(api)
 	native = Native.new(); controller = Controller.new(); controller.api = api; controller.bridge = native
@@ -380,6 +403,7 @@ func _run() -> void:
 	await map_error_retry()
 	await buildings_layer_timeout()
 	await loading_map_tap()
+	await below_selectable_zoom_entry()
 	check(paths.all(func(path: String): return path == "/client-manifest.json" or path.begins_with("/farms/")), "preview never requests claims or account/gameplay endpoints")
 	controller.queue_free(); await process_frame
 	api.queue_free(); await process_frame

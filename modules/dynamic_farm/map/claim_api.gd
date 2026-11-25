@@ -2,6 +2,7 @@ extends RefCounted
 ## C-31 parcel claim endpoints (`docs/plans/C-31.md`) over an ApiClient whose base already ends in /v1.
 ## Results are flat dictionaries: {ok, status, code, ...}. HTTP/transport details never leave this file.
 const Contract := preload("res://modules/dynamic_farm/map/geo_contract.gd")
+const Geo := preload("res://modules/dynamic_farm/map/geo_math.gd")
 const MAX_IDS := 200
 const MAX_BBOX_SPAN := 0.25
 var client: ApiClient
@@ -38,6 +39,37 @@ func claim(parcel_id: String, center: Array) -> Dictionary:
 		r["parcel"] = parcel if parcel is Dictionary else {}
 		r["ok"] = r.status in [200, 201] and not r.parcel.is_empty()
 	return r
+
+## C-130 starter zone of this dataset's community (public, no account needed). `zone` is {} when the server has it
+## switched off; otherwise {id, name, boundary, center, zoom, parcel_ids: {id: true}}. A malformed answer is SCHEMA.
+func starter_zone() -> Dictionary:
+	var r := await _call("GET", "/parcels/starter-zone?dataset_version=%s" % dataset.uri_encode())
+	if not r.ok: return r
+	var raw = r.json.get("zone")
+	if r.json.get("enabled") != true or raw == null:
+		return {"ok": true, "status": r.status, "code": "", "zone": {}}
+	var zone := parse_zone(raw)
+	if zone.is_empty(): return {"ok": false, "status": r.status, "code": "SCHEMA"}
+	return {"ok": true, "status": r.status, "code": "", "zone": zone}
+
+## The server's zone with every field checked; {} if anything is off (the map then keeps its old behaviour and the
+## server still decides every claim).
+static func parse_zone(raw: Variant) -> Dictionary:
+	if not raw is Dictionary: return {}
+	var ring = raw.get("boundary")
+	var ids = raw.get("parcel_ids")
+	var zoom = raw.get("zoom")
+	if not ring is Array or ring.size() < 4 or ring.size() > 512 or not Geo.valid_point(raw.get("center")): return {}
+	if not (zoom is float or zoom is int) or float(zoom) < 13 or float(zoom) > 21: return {}
+	if not ids is Array or ids.is_empty() or ids.size() > 5000: return {}
+	for point in ring:
+		if not Geo.valid_point(point): return {}
+	var set := {}
+	for id in ids:
+		if not Contract.valid_id(id): return {}
+		set[id] = true
+	return {"id": str(raw.get("id", "")), "name": str(raw.get("name", "")), "boundary": ring, "center": raw.center,
+		"zoom": float(zoom), "parcel_ids": set}
 
 ## Internal test builds only; the release server answers 403 RESELECT_DISABLED.
 func abandon() -> Dictionary:

@@ -3,8 +3,14 @@ extends Node
 ## mirrors it into the native own/claimed state channel and claimer-name layer, and never decides a claim.
 ## Colours (q(342); since C-112 on the parcel's buildings only, C-103#18): own green, someone else's red with their
 ## name, a claimable selection keeps C-28's yellow building fill. Selection itself stays with selection_controller.gd.
+## C-130: while the server has a starter zone on, a player without a home can only claim inside it. The zone (from the
+## server) is drawn by its own native layer and only hides the claim button outside it; the server still decides.
 signal changed
 const NO_NAME := "Claimed"
+const OUTSIDE_ZONE := "Not in the starter area."
+## The zone marker (its own native layer): UI v3 primary green dashed edge, the cream panel tone washing the map
+## outside it.
+const ZONE_STYLE := {"line_color": "#3E7D43", "line_width": 3.0, "mask_color": "#FBF8F1", "mask_opacity": 0.55}
 const SIGNED_OUT := ["LOGIN_REQUIRED", "UNAUTHENTICATED", "OFFLINE"]
 ## Area reads only add rows. Keep the map well under the native 3000-row state/name limits.
 const MAX_OWNERS := 1000
@@ -26,6 +32,11 @@ var _selected := ""
 var _pushed := {} # parcel_id -> [selected, claimed, own] last sent for _generation
 var _epoch := 0
 var _reading_mine := false
+## C-130 starter zone: {} when off or not (yet) known; see claim_api.gd parse_zone().
+var zone := {}
+var zone_known := false
+var _reading_zone := false
+var _zone_pushed := -1 # Generation the native zone layer was last sent for.
 
 func status(id: String) -> String:
 	if id.is_empty() or not owners.has(id): return "unknown"
@@ -43,10 +54,27 @@ func nickname(id: String) -> String:
 func has_home() -> bool:
 	return not mine.is_empty()
 
+## Whether a player without a home may claim this parcel. Unknown zone (still reading, or unreachable): the server
+## decides, so the button stays.
+func in_zone(id: String) -> bool:
+	return zone.is_empty() or zone.parcel_ids.has(id)
+
+## Reads the starter zone once per map visit (again after a failed read).
+func read_zone() -> void:
+	if _reading_zone or zone_known: return
+	var epoch := _epoch
+	_reading_zone = true
+	var r: Dictionary = await api.starter_zone()
+	if epoch != _epoch: return
+	_reading_zone = false
+	if r.ok: zone = r.zone; zone_known = true; _zone_pushed = -1
+	_sync(); changed.emit()
+
 ## Reads the player's own parcel; call on map entry and again after returning from a preview.
 func start() -> void:
 	var epoch := _epoch
 	_reading_mine = true
+	read_zone() # After _reading_mine: a zone answered at once must not let the map frame before the home is known.
 	var r: Dictionary = await api.mine()
 	if epoch != _epoch: return
 	_reading_mine = false
@@ -108,6 +136,9 @@ func claim(selection: Dictionary) -> void:
 				owners[id] = {"owner": "other", "nickname": ""}
 				message = "Someone just claimed this parcel."
 				refresh([id])
+			"OUTSIDE_STARTER_ZONE":
+				message = OUTSIDE_ZONE
+				zone_known = false; read_zone() # The server's zone changed under the map: read it again.
 			"LOGIN_REQUIRED", "UNAUTHENTICATED", "OFFLINE": signed_out = true
 			_: message = "Could not claim. Try again."
 	_sync(); changed.emit()
@@ -133,6 +164,7 @@ func abandon() -> void:
 func forget() -> void:
 	_epoch += 1; busy = false; _reading_mine = false
 	owners = {}; mine = {}; mine_known = false; signed_out = false; message = ""
+	_reading_zone = false # The zone is the same for every account; a read cut off here starts again below.
 	_sync(); changed.emit()
 	start()
 	if not _selected.is_empty(): refresh([_selected])
@@ -140,6 +172,7 @@ func forget() -> void:
 ## Leaving the map retires in-flight answers; native layers are cleared with the selector's generation.
 func pause() -> void:
 	_epoch += 1; busy = false; _reading_mine = false; _generation = -1; _pushed = {}; _selected = ""
+	_reading_zone = false; _zone_pushed = -1
 
 func _merge(rows: Dictionary) -> void:
 	for id in rows:
@@ -173,3 +206,18 @@ func _sync() -> void:
 	bridge.set_parcel_claims(_generation, JSON.stringify(names))
 	# Yellow means claimable: a selected parcel that is already owned shows its own colour instead.
 	if status(_selected) in ["mine", "other"]: bridge.set_parcel_building_highlight(_generation, "")
+	show_zone(_generation)
+
+## The starter zone marker for this map generation, once. It does not wait for the parcel layers (attach), which load
+## only from the selectable zoom: the map is entered below it at the starter zone's landing view (C-130 V-362).
+func show_zone(generation: int) -> void:
+	if bridge == null or generation <= 0 or _zone_pushed == generation: return
+	_zone_pushed = generation
+	bridge.set_starter_zone(generation, zone_payload(zone))
+
+## Native starter zone layer: the boundary ring and its style; "" clears it.
+static func zone_payload(z: Dictionary) -> String:
+	if z.is_empty(): return ""
+	var payload := ZONE_STYLE.duplicate()
+	payload["boundary"] = z.boundary
+	return JSON.stringify(payload)
