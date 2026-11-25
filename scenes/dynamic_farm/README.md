@@ -22,23 +22,25 @@ The first review package contains ordinary 328/424 scenes in Mobile and Compatib
 
 ## Own parcel farming (C-34)
 
-`setup({..., own_parcel:true, farm_store?})` opens the owner's parcel for farming instead of a preview (the host passes both keys through; `preview_only` is then not required). `ParcelFarming` (`parcel_farming.gd`) adds the main key, the bag row, toasts, tilled soil and carrots (main-farm `CropField`, read-only) and a target-cell marker. The target is the cell in front of the player; a short tap on the ground picks a cell until the player moves. One press clears a core obstacle, tills, sows or harvests (owner decision Q-39, C-34#14): no Energy or coins; carrots ripen 60 s after sowing by the store's clock; the first entry grants 1 Starter Hoe and 3 Carrot Seeds once. The scene asks the store to enter only after `preview_ready` (building the scene blocks the main thread for seconds, which timed out a request started earlier, V-123); a lost request is retried once before the key shows Retry. A cleared obstacle leaves the walker and is redrawn out of the core layer (`Scenery.build(..., bind=false)`, `Walk.remove_prop`).
+`setup({..., own_parcel:true, farm_store?})` opens the owner's parcel for farming instead of a preview (the host passes both keys through; `preview_only` is then not required). `ParcelFarming` (`parcel_farming.gd`) adds the main key, the bag row, toasts, tilled soil and carrots (`parcel_crop_art.gd`, C-138, below) and a target-cell marker. The target is the cell in front of the player; a short tap on the ground picks a cell until the player moves. One press clears a core obstacle, tills, sows or harvests (owner decision Q-39, C-34#14): no Energy or coins; carrots ripen 60 s after sowing by the store's clock; the first entry grants 1 Starter Hoe and 3 Carrot Seeds once. The scene asks the store to enter only after `preview_ready` (building the scene blocks the main thread for seconds, which timed out a request started earlier, V-123); a lost request is retried once before the key shows Retry. A cleared obstacle leaves the walker and is redrawn out of the core layer (`Scenery.build(..., bind=false)`, `Walk.remove_prop`).
 
-Rules and numbers: `assets/farm/data/dynamic_farm.json` (shared with the C-31 server; separate from the main farm) is read by `modules/dynamic_farm/parcel_farm.gd`, a copy of the server's farm state v1 and its commands. The server holds no parcel geometry, so `parcel_space.gd` keeps the spatial rules on the client: tilling only on core cells, refused outside the core (`Not farmland`), under the house (`House here`) and on the protected path (`On the path`). Schema 4 marks every core cell as reserved, so the protected path inside the core is derived: the shortest walk from the entry to the spawn widened by `PATH_HALF_WIDTH` (1) cell, plus the spawn's `SPAWN_CLEARANCE` (1) ring.
+Rules and numbers: `assets/farm/data/dynamic_farm.json` (shared with the C-31 server; separate from the main farm) is read by `modules/dynamic_farm/parcel_farm.gd`, a copy of the server's farm state v1 and its commands. The server holds no parcel geometry, so `parcel_space.gd` keeps the spatial rules on the client: tilling only on core cells, refused outside the core (`Not farmland`), under a building (`House here`) and on the protected path (`On the path`). Schema 4 marks every core cell as reserved, so the protected path inside the core is derived: the shortest walk from the entry to the spawn widened by `PATH_HALF_WIDTH` (1) cell, plus the spawn's `SPAWN_CLEARANCE` (1) ring.
 
-`farm_store` answers `enter()` and `send(base_version, commands)` with the farm, its version and `server_time`. By default the scene uses `parcel_farm_remote_store.gd`: C-31 `POST /parcels/mine/enter` and `/parcels/mine/commands` through `Net.client` (it needs a signed-in client; a reply about another parcel is refused). `parcel_farm_local_store.gd` keeps the save in `user://dynamic_farm_local/` with the device clock; it is used only by tests or with the development setting `sensen/dynamic_farm/local_farm_save`, and is not save or server-time evidence.
+`farm_store` answers `enter()` and `send(base_version, commands)` with the farm, its version and `server_time`. By default the scene uses `parcel_farm_remote_store.gd`: C-31 `POST /parcels/mine/enter` (naming the dataset of the farm being opened, so a claim on an older dataset moves onto it: C-136) and `/parcels/mine/commands` through `Net.client` (it needs a signed-in client; a reply about another parcel is refused). `parcel_farm_local_store.gd` keeps the save in `user://dynamic_farm_local/` with the device clock; it is used only by tests or with the development setting `sensen/dynamic_farm/local_farm_save`, and is not save or server-time evidence.
 
 Walking up and labour (C-73): a press walks the player beside the target before anything is sent. `modules/dynamic_farm/farm_path.gd` routes on the walker's own grid: a cell is open when the body fits at its centre (`Walk.clear_position`, the same parcel outline and fitted prop profiles the stick collides with) and a step between neighbouring centres, diagonals included, is taken only if the body fits all along it; legs are straightened where it still fits. The player stands on one of the 8 neighbours (sides preferred; for a tree, around its whole 2×2 block), faces the target and plays the main farm's labour clip for the verb (`AnimPlaceholders.clip_for`: `labour_clear`, `labour_till`, `labour_sow`, `labour_harvest`) for `ParcelFarming.LABOUR_S` (1.2 s), holding still. The command is sent as the clip starts and its result is shown as it ends. No route, or a walk that stalls, toasts `Can't reach it` and sends nothing; the stick cancels a walk. The parcel stays under a loading cover (`Loading your farm…`, or `Could not open your farm.` with Retry) until the save is applied, so cleared obstacles never show first. `tests/dynamic_farm/test_farm_path.gd` covers routes on a synthetic grid and on the r4 parcels.
 
-Farming UI (C-74) reuses the main farm's UI kit read-only, without P0Ui, P0Runtime or Energy. The top bar is the 44 px round back of ProfileTopBar / PageHeader and a surface chip with the parcel's name and status, at the HUD's place; on one's own parcel the parcel's coins (C-59) follow at its right in the main HUD's coins capsule (number and coin icon), updated from each reply. `ParcelFarming` places the main farm's `UiQuickBar` and `UiActionKey` (switch key hidden: one action) exactly as `P0Ui._place_controls`; the key's tool badge shows the hoe while the bag holds it. The bar lists the bag (hoe, seeds, carrots, then any other named item) with live counts from each reply; Bag or a slot opens a compact `UiDrawer` with the bar docked as its first row (its end reads Close), a `Bag` title, the tapped cell's name and a `UiInventoryGrid`; Close, a scrim tap, a drag down or Android Back (the host asks `close_modal()` first) close it. The bar follows the bag's order; its long-press drag (swap, Pin, Remove) is not supported here — the cells' drag gestures are not passed to the bar (C-74#39) — while taps and a swipe up still work. `announce_gains(gains, from)` shows one `UiFloatText` line per item (`+3 Carrot Seeds`, ITEM tone) and flies each item into the Bag (`UiItemFly`, which bumps as it lands): the first-entry gift from the player, a harvest from its cell, an outer gather (C-60) from the picked object. Later gains in the parcel scene should call it rather than add their own. Items take their names and icons from the P0 content table; parcel-only items are named in C-59's adapter `modules/dynamic_farm/parcel_items.gd` (the blueprints: `Cottage Blueprint`, C-74#33 / #34, and `Coop Blueprint`, with the existing recipe-card icon as a placeholder); items with no name anywhere are skipped. While the house is being placed (`held`), the quick bar and the action key are hidden and the drawer closes; the C-33 `Build Cottage` button is placed by `place_side_button` at the left on the action key's baseline, clear of the key and the bar. Refusals and errors stay toasts, above the bar.
+Farming UI (C-74) reuses the main farm's UI kit read-only, without P0Ui, P0Runtime or Energy. The top bar (UI v3 since C-105) is a Ø36 glass Back (`UiGlassButton`, 44 hit area) and a glass capsule with the parcel's name over its status (`UiGlassCapsule`), 12 from the screen's sides at safe top + 8; on one's own parcel the parcel's coins (C-59) follow at its right in the v3 glass coin capsule, updated from each reply. `ParcelFarming` places the main farm's `UiQuickBar` and `UiActionKey` (switch key hidden: one action) exactly as `P0Ui._place_controls`; the key's tool badge shows the hoe while the bag holds it. Item, coin, Bag-end and bag-hero art is C-86's UI v3 art (`UiArt`, `assets/ui/v3`, C-105). The bar lists the bag (hoe, seeds, carrots, then any other named item) with live counts from each reply; Bag or a slot opens the UI v3 bag panel (C-105, `UiModalPanel`): a `Bag` tag, the bag's items in round `UiBagSlot`s three to a row (at least three rows), the tapped one ringed and named under them; the quick bar slides away while it is open (M-16). ✕, a scrim tap or Android Back (the host asks `close_modal()` first) close it (M-05). The bar follows the bag's order; its long-press drag (swap, Pin, Remove) is not supported here — the cells' drag gestures are not passed to the bar (C-74#39) — while taps and a swipe up still work. `announce_gains(gains, from)` shows one v3 `UiGainFloat` line per item (`+3 Carrot Seeds`) and flies each item into the Bag (`UiItemFly`, which bumps as it lands): the first-entry gift from the player, a harvest from its cell, an outer gather (C-60) from the picked object. Later gains in the parcel scene should call it rather than add their own. Items take their names from the P0 content table; parcel-only items are named in C-59's adapter `modules/dynamic_farm/parcel_items.gd` (the blueprints: `Cottage Blueprint`, C-74#33 / #34, and `Coop Blueprint`, with the existing recipe-card icon as a placeholder); icons come from the UI v3 item art where it has the item (`ParcelItems.ART`), else P0's; items with no name anywhere are skipped. While the house is being placed (`held`), the quick bar and the action key are hidden and the bag closes; the C-33 `Build Cottage` button is placed by `place_side_button` at the left on the action key's baseline, clear of the key and the bar. Refusals and errors stay toasts, above the bar.
 
 Packaging must also include `assets/farm/data/dynamic_farm.json` and the P0 content table (`assets/p0/p0_content.json`, item names) with the P0 item icons; JSON is not found by static scene dependencies.
 
 Tests: `tests/dynamic_farm/test_parcel_farming.gd` (rules, commands, spatial rules, local save) and `test_parcel_farming_scene.gd` (the real scene; optional `-- <farm.json>`), both headless in the private preview project. `test_parcel_farming_server.gd -- <base …/v1> <owner token> <farm.json>` runs the scene against a running C-31 server on its real clock (~70 s; the owner has claimed that parcel and not entered it yet).
 
+Soil and carrot stages (C-138): `modules/dynamic_farm/parcel_crop_art.gd` draws every tilled cell as its own 1×1 soil block, dry or wet (wet is darker), and the carrot in seven stages after the owner's reference (C-134 attachment-1052, answer C-134#5 question 3): tilled soil (nothing sown), sowing, emergence, leaf growth, root shoulders, root thickening, maturity. Sowing to root thickening take a fifth of the growing time each (12 s of 60 s); maturity starts at `ripe_at`, exactly when Harvest opens. Stages come from the save's `planted_at` / `ripe_at` only, so the save format is unchanged and a carrot sown before the change lands in its stage. Seeds, growing time, yield and price are unchanged. Until watering exists (C-137) the game draws dry soil; the development setting `sensen/dynamic_farm/preview_wet_soil` draws it wet (`GATHER_QA_WET_SOIL=1` turns it on in the emulator QA package). The shapes are placeholders from the main farm's carrot meshes until C-139's art. Review captures: `tools/dev/dynamic_farm/crop_stages_probe.gd` (also writes a seeded save for the emulator package); notes in `docs/plans/C-138.md`.
+
 ## Market and carpenter (C-59)
 
-Two fixed entries on the community map, `Market` and `Carpenter`, open Jasmine and Scott over the map for a player with a home (`parcel_town.gd`; no shop pins at real places). Both read and write that home's parcel save through the same store as the parcel scene: `read()` (`GET /parcels/mine`, no welcome gift) and `send()`. Jasmine introduces coins once per parcel on this device (`user://dynamic_farm_local/town.json`), then her `Sell` counter (`parcel_counter.gd`, built from the main counter's kit pieces; the main `P0CounterDrawer` is untouched) sells with the C-58 `sell` command at the rules' prices. Scott gives one Coop Blueprint with `claim_blueprint` once the parcel has sold something. Their looks are existing avatar parts, drawn by `P0KeeperPortraits.register_look`. The parcel's coins show in its top bar (C-74). Details and the copy draft: `docs/plans/C-59.md`; tests: `tests/dynamic_farm/test_parcel_town.gd`; review pictures: `tools/dev/dynamic_farm/town_shots.gd`.
+Jasmine and Scott (`parcel_town.gd`) first opened over the map from two fixed entries, `Market` and `Carpenter`; since C-115 they stand in the Washington Square room (below). Both read and write that home's parcel save through the same store as the parcel scene: `read()` (`GET /parcels/mine`, no welcome gift) and `send()`. Jasmine introduces coins once per parcel on this device (`user://dynamic_farm_local/town.json`), then her `Sell` counter (`parcel_counter.gd`, built from the main counter's kit pieces; the main `P0CounterDrawer` is untouched) sells with the C-58 `sell` command at the rules' prices. Scott gives one Coop Blueprint with `claim_blueprint` once the parcel has sold something. Their looks are existing avatar parts, drawn by `P0KeeperPortraits.register_look`. The parcel's coins show in its top bar (C-74). Details and the copy draft: `docs/plans/C-59.md`; tests: `tests/dynamic_farm/test_parcel_town.gd`; review pictures: `tools/dev/dynamic_farm/town_shots.gd`.
 
 ## Outer gathering (C-60)
 
@@ -51,27 +53,39 @@ Object ids follow C-58's contract (`docs/plans/C-58.md`): `<block id>:<outer_gro
 ## First house (C-33, Q-40)
 
 Built on the own-parcel farm above (Q-44: one entry, save and protected path for both). The welcome gift's
-`blueprint_cottage` comes with the first entry only. While the bag holds it and no house stands, `Build Cottage` opens
-placement (the farming key is held meanwhile): a press or drag moves the see-through `house_cottage` (its middle cell
-under the finger); its 3×3 cells fill green or red, grid lines fade over three core cells round it, and the protected
-path's cells in reach show sand. The bottom is the shared `UiPlaceBar` (`Cancel · Build`); the main key shows why a
-spot is refused. The preview starts on the valid spot nearest the player. Build sends `place_house` through
-`ParcelFarming.send`; the cottage stands at once (no construction time). A refused Build (`CELL_OCCUPIED`) keeps the
-preview, judged again on the farm the reply brought. A successful Build (C-114) pops the cottage in and puffs dust with
-the main farm's look-swap effect (`P0Fence.pop_in` / `P0Fence.dust`, read-only): one puff at the middle and one at each
-corner and edge middle of the footprint (`House.rim`), each `HOUSE_DUST_SCALE` (4) times the main farm's size. A house
-that comes with the save (reopening, a refused Build) just stands there.
+`blueprint_cottage` comes with the first entry only. C-150 (0.4.5) makes this any building type: the save keeps a
+`buildings` list (type, lowest cell, quarter turns 0–3, the footprint it was built with, an id) and the rules'
+`buildings` give each type its model name, blueprint, unturned footprint and limit per parcel; the client's
+`modules/dynamic_farm/farm_building.gd` `KINDS` gives each type its model asset, wall profile and name. Only the
+cottage (3×3, one per parcel) exists so far. While the bag holds a type's blueprint and the type is under its limit,
+`Build <name>` (`Build Cottage`) opens placement (the farming key is held meanwhile): a press or drag moves the
+see-through model (its middle cell under the finger); its cells fill green or red, grid lines fade over three core
+cells round it, and the protected path's cells in reach show sand. The bottom is the shared `UiPlaceBar`
+(`Cancel · Rotate · Build`, the three-key bar P0's Decorate uses); Rotate turns the preview a quarter in place
+(0, 90, 180, 270°, the owner's SEN-C-134#22 question 3), a turn swapping the footprint's width and depth; the reason a
+spot is refused shows above the bar. The preview starts unturned on the valid spot nearest the player. Build sends
+`place_building` (type, cell, turn) through `ParcelFarming.send`; it stands at once (no construction time). A refused
+Build (`CELL_OCCUPIED`, `BUILDING_OVERLAP`) keeps the preview, judged again on the farm the reply brought. A
+successful Build (C-114) pops the building in and puffs dust with the main farm's look-swap effect (`P0Fence.pop_in` /
+`P0Fence.dust`, read-only): one puff at the middle and one at each corner and edge middle of the footprint
+(`FarmBuilding.rim`), each `HOUSE_DUST_SCALE` (4) times the main farm's size. Buildings that come with the save
+(reopening, a refused Build) just stand there.
 
-Rules (`modules/dynamic_farm/farm_house.gd`, the save's `house.x/y` is the footprint's lowest cell): every cell
-core (`Outside your yard`); none under an uncleared core obstacle (`ParcelFarming.obstacle_cells()`, every role, weeds
-too), a tilled cell or a crop (`Space taken`); none on `ParcelFarming.protected_path()` (the same path tilling keeps
-clear), and every other walk cell still reaching spawn (`Keep the path clear`). The walls block through a
-model-fitted box (walls and plinth below the eaves; C-19's walker), so the player walks along them and stops at
-contact; the eaves, bench, woodpile and doorstep are not walls. A player standing where the walls go steps out to the
-nearest clear point. Without `own_parcel` (the art preview) nothing of this shows.
+Rules (`modules/dynamic_farm/farm_building.gd`, a building's `x/y` is the footprint's lowest cell): every cell core
+(`Outside your yard`); none under an uncleared core obstacle (`ParcelFarming.obstacle_cells()`, every role, weeds
+too), another building, a tilled cell or a crop (`Space taken`); none on `ParcelFarming.protected_path()` (the same
+path tilling keeps clear), and every other walk cell still reaching spawn with the standing buildings counted
+(`Keep the path clear`). The server (`server/src/parcels/farm.ts`) checks the same buildings, tilled cells and crops
+(it has no parcel geometry), with the turned footprint. The walls block through a model-fitted profile per type (the
+cottage: walls and plinth below the eaves; C-19's walker), turned with the model, so the player walks along them and
+stops at contact; the eaves, bench, woodpile and doorstep are not walls. A player standing where the walls go steps
+out to the nearest clear point. Tilling is refused under every building (`House here`). A save from before C-150 has
+only `house`: it reads as cottage 1 where it stood and facing as it did, and the server keeps `house` as the cottage's
+mirror for 0.4.4 and older clients (their `place_house` is still the cottage). Without `own_parcel` (the art preview)
+nothing of this shows.
 
-`tools/dev/dynamic_farm/house_probe.gd` drives the real scene on the local save: entry, a valid and each refused spot,
-Build (three pop frames), the wall, reopen (`--headless`: states only).
+`tools/dev/dynamic_farm/building_probe.gd` drives the real scene on the local save: entry, a valid spot turned
+through the four turns, each refused spot, Build turned (three pop frames), the wall, reopen (`--headless`: states only).
 
 ## First-visit guide (C-35, 0.4.2; C-61, 0.4.3)
 
@@ -87,12 +101,32 @@ shows the preview's `Explore and walk. Farming actions come later.` Copy and scr
 0.4.3 (C-61) goes on from the first carrot, still from the save alone: a carrot in the bag and nothing sold yet ->
 `sell` (at the Market); sold once and nothing gathered -> `gather`; something gathered in the bag that the Market buys
 -> `sell_gathered`; gathered and sold -> `blueprint` (the Carpenter's coop blueprint); nothing once it is claimed. The
-parcel's card says where to go; the map reads the home's save (`GET /parcels/mine`, no gift) on each return and keeps
-the save the Market or Carpenter last saw, and its bottom card names the step done off the parcel (`Tap Market to sell
-your carrot.` …), with nothing selected or added under `Your home`. A tap on Market or Carpenter reads `Loading…` on
-that entry and is drawn (`RenderingServer.frame_post_draw`) before the town loads; the town's script (and the P0
-keeper-portrait code it pulls in, ~1.3 s to compile on a desktop) loads on a thread once the player has a home, and a
-tap before it is done waits for it frame by frame with `Loading…` showing (not under Compatibility, `AppRouter.sync_loads`;
-a map freed with the load still running hands it to `AppRouter`, which takes it once done without holding the main thread
-and waits for it only when Godot quits, so a quitting Godot has none left on its thread). The map prints `DYNAMIC_TOWN_OPEN` with the
-times from the tap to `Loading…` drawn, the script ready, the town opened and the town on screen. Copy and screenshots: `docs/plans/C-61.md`.
+parcel's card says where to go; the map reads the home's save (`GET /parcels/mine`, no gift) on each return, and its
+bottom card names the step done off the parcel (`Tap Washington Square to sell your carrot.` … since C-115), with nothing
+selected or added under `Your home`. Copy and screenshots: `docs/plans/C-61.md`.
+
+## Washington Square room (C-115)
+
+The owner on C-103#17: no place icons on the map, one fixed 3D space entry in San Francisco, its look and interaction
+after farm-dev. The C-59 `Market` and `Carpenter` buttons are gone. `town_entry.gd` draws farm-dev's Travel Post pin at
+Washington Square Park in North Beach (37.8008, -122.4103, the park's centre; moved there from farm-dev's own Union
+Square spot on C-115#30, beside C-130's starter area; `UiMapDestination` with the post's i-travel glyph and the short
+name `Washington Square`), placed each frame through `geo_native_camera.gd`'s `geo_screen` (screen_geo's inverse, tilted too).
+The map takes a tap on the pin before its building pick and opens the place card farm-dev opens for an outpost
+(P0PlaceSheet's layout from the same kit pieces, without P0Ui): `Washington Square Travel Post`, `Market · Carpenter`, the
+Distance from home and `Go`, × above its corner, a tap outside or Back closes it; the pin grows while selected. Without a
+home the card says `Claim a home first.` and has no Go. Only in packages with `own_farm`.
+
+Go opens `parcel_outpost.tscn` through AppRouter, as Enter my farm opens the parcel (the map goes opaque only once the
+router pushes it). The room extends farm-dev's `P0Outpost` read only, with `use_runtime = false`: the post_office kit, the
+post anchors, the door, the room camera and walking are farm-dev's (its top bar names it after the pin); no P0Runtime, P0Ui, session, online room or
+voice starts, and no file of the main farm changes. Jasmine stands behind the counter (`npc_keeper`) and Scott where Sam
+stands (`npc_sam`), in their C-59 looks; nobody else. The room drives itself: P0Ui's scene touchpad rebuilt on
+`GestureArbiter` (stick, tap, double tap recenter, pinch), `p0_frame` each frame and the world prompts (UiNpcNameTag over
+the heads, the door's i-door button opening into its `Map` strip; one open at a time, LOCK-07 v2). A tap on Jasmine or her
+counter walks to the counter and opens her greeting (LOCK-16), Sell her counter; a tap on Scott walks to him and opens his
+greeting; both trade through the home's parcel save as before (`store`). Back closes a greeting first, then walks out
+through the door (farm-dev's rule); the door or the top bar's back returns to the map, which reads the save again.
+Lock scope (C-115#9): LOCK-07 / 16 as on the main farm; Scott is no resident (no dialogue bar, LOCK-18) and the room
+holds both roles (LOCK-19 is the main farm's). Tests: `tests/dynamic_farm/test_parcel_outpost.gd`, the map's pin and card
+in `test_claim_controller.gd`, `geo_screen` in `test_map_camera.gd`.

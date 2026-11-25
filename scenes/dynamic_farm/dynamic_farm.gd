@@ -18,10 +18,11 @@ const Cliff = preload("res://modules/dynamic_farm/island_cliff.gd")
 const SKY_SHADER = preload("res://modules/dynamic_farm/island_sky.gdshader")
 const Controls = preload("res://scenes/dynamic_farm/dynamic_controls.gd")
 const MergedAssembler = preload("res://modules/avatar/assembly/assembler_merged.gd")
-const House = preload("res://modules/dynamic_farm/farm_house.gd")
+const Building = preload("res://modules/dynamic_farm/farm_building.gd")
+const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Art = preload("res://modules/farm/farm_art.gd")
-const Placement = preload("res://scenes/dynamic_farm/house_placement.gd")
-## The main farm's pop and dust (a Homestead look swapped in), reused for the house just built (C-114).
+const Placement = preload("res://scenes/dynamic_farm/building_placement.gd")
+## The main farm's pop and dust (a Homestead look swapped in), reused for a building just built (C-114).
 const Fence = preload("res://scenes/p0/p0_fence.gd")
 const HOUSE_DUST_SCALE := 4.0
 const Farming = preload("res://scenes/dynamic_farm/parcel_farming.gd")
@@ -80,9 +81,12 @@ var _summary := {}
 var _hint: Label
 var _farming: Node3D
 var _facing := Vector3.BACK
-# The first house (C-33) on the owner's parcel, through ParcelFarming's save; none in the art preview.
-var _house: Node3D
+# The buildings (C-33 the first house, C-150 any type) on the owner's parcel, through ParcelFarming's save, by
+# building id: {node, proxy, wire}; none in the art preview.
+var _buildings := {}
 var _build: UiCommandButton
+## The type the Build key places (build_choice()), "" when it is hidden.
+var _build_type := ""
 var _placement: Placement
 var _sending := false
 var _paths: RefCounted
@@ -91,6 +95,8 @@ var _route: Array[Vector3] = []
 var _route_stuck_s := 0.0
 ## A labour clip is playing; the player holds still until it ends.
 var _labour_left := 0.0
+## The Energy card's `Show home` (C-148) holds the camera on the cottage until the player moves.
+var _showing_house := false
 
 func setup(args: Dictionary) -> void:
 	_args = args.duplicate(true)
@@ -185,6 +191,9 @@ func _ready() -> void:
 		_hint.hide()
 		_farming.state_changed.connect(_on_farm_changed)
 		_farming.place_side_button(_build)
+		# C-148: the parcel's Energy in the top bar, P0's chip just before the coins.
+		_header.add_child(_farming.energy_chip)
+		_header.move_child(_farming.energy_chip, _coins_capsule.get_index())
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_summary = {"schema":4,"dataset":_data.dataset_version,"block_id":_data.block_id,
@@ -210,26 +219,39 @@ func _ready() -> void:
 		"layout_sha256":_edge_plan.get("layout_sha256",""),"covered_cells":_edge_plan.get("covered_cells",0),
 		"perimeter_cells":_edge_plan.get("perimeter_cells",0),"clusters":_edge_plan.get("clusters",[]).size()}
 
-## Every save reply (ParcelFarming): the house once it stands, the Build key while a blueprint waits.
+## Every save reply (ParcelFarming): the buildings as they stand, the Build key while a blueprint waits.
 func _on_farm_changed(farm: Dictionary) -> void:
 	if _failed: return
 	_coins.text = str(int(farm.get("coins", 0)))
 	_coins_capsule.visible = true
-	if farm.get("house") is Dictionary and _house == null: _build_house(farm.house)
+	_sync_buildings(farm)
 	_refresh_build()
 
-func blueprints() -> int:
-	if _farming == null: return 0
-	return int((_farming.farm.get("bag", {}) as Dictionary).get(House.BLUEPRINT, 0))
+## The saved buildings (ParcelFarm.buildings_of), or [] without the owner's farm.
+func buildings_state() -> Array:
+	return ParcelFarm.buildings_of(_farming.farm) if _farming != null else []
 
-func house_state() -> Variant:
-	return _farming.farm.get("house") if _farming != null else null
+## The first type of the rules' `buildings` whose blueprint is in the bag, still under its limit and with art here;
+## "" when there is none. Only the cottage exists so far, so this is Build Cottage while its blueprint waits.
+func build_choice() -> String:
+	if _farming == null: return ""
+	var bag: Dictionary = _farming.farm.get("bag", {})
+	var types: Dictionary = ParcelFarm.rules().get("buildings", {})
+	var built := buildings_state()
+	for type: String in types:
+		if int(bag.get(types[type].blueprint, 0)) <= 0 or Building.kind(type).is_empty(): continue
+		if built.filter(func(b): return b.type == type).size() < int(types[type].max): return type
+	return ""
 
 func _refresh_build() -> void:
-	_build.visible = _farming != null and _house == null and _placement == null and blueprints() > 0
+	_build_type = build_choice() if _placement == null else ""
+	_build.visible = _build_type != ""
+	if _build.visible: _build.label = "Build %s" % Building.kind(_build_type).name
 
-func begin_house_placement() -> void:
+func begin_placement() -> void:
 	if not _build.visible: return
+	var type := _build_type
+	var base := Building.base_of(ParcelFarm.rules().buildings[type])
 	# A press still walking to its cell is given up; one already working finishes under the preview.
 	if not _route.is_empty(): _end_route("cancelled")
 	_movement = Vector2.ZERO
@@ -237,23 +259,27 @@ func begin_house_placement() -> void:
 	_controls.process_mode = Node.PROCESS_MODE_DISABLED
 	_farming.held = true
 	var obstacles: Dictionary = _farming.obstacle_cells()
-	var taken := House.blocked(obstacles, _farming.farm)
-	var walk_blocked: Dictionary = House.solid(_plan.core_obstacles.layout, obstacles).merged(_walk.reserved)
+	var taken := Building.blocked(obstacles, _farming.farm)
+	var walk_blocked := _walk_blocked(obstacles)
 	var path: Dictionary = _farming.protected_path()
-	var start = House.nearest(_data, _walk.cell_at(_actor.position), taken, path, walk_blocked)
+	var start = Building.nearest(_data, _walk.cell_at(_actor.position), base, taken, path, walk_blocked)
 	_placement = Placement.new()
 	add_child(_placement)
-	_placement.setup(_data, _walk, _camera, _canvas, taken, path, walk_blocked,
-		start if start != null else _walk.cell_at(_actor.position) - Vector2i.ONE)
+	_placement.setup(type, base, _data, _walk, _camera, _canvas, taken, path, walk_blocked,
+		start if start != null else _walk.cell_at(_actor.position) - Building.middle(base))
 	_placement.confirmed.connect(_on_place_confirmed)
-	_placement.cancelled.connect(end_house_placement)
+	_placement.cancelled.connect(end_placement)
 	_refresh_build()
 	_play("idle")
-	_focus = House.center(_walk, _placement.at)
+	_focus = Building.center(_walk, _placement.at, base)
 	_overview = false
 	_place_camera()
 
-func end_house_placement() -> void:
+## Cells walking cannot use besides a new footprint: solid core obstacles, the buildings standing and reserved cells.
+func _walk_blocked(obstacles: Dictionary) -> Dictionary:
+	return Building.solid(_plan.core_obstacles.layout, obstacles).merged(_walk.reserved).merged(ParcelFarm.building_cells(_farming.farm))
+
+func end_placement() -> void:
 	if _placement == null: return
 	_placement.queue_free()
 	_placement = null
@@ -263,49 +289,80 @@ func end_house_placement() -> void:
 	_controls.reset()
 	_refresh_build()
 
-## Build: the place_house command through ParcelFarming's save (Q-44); the reply builds the house (state_changed).
+## Build: the place_building command through ParcelFarming's save (Q-44); the reply builds it (state_changed).
 func _on_place_confirmed(at: Vector2i, rotation_steps: int) -> void:
 	if _sending or _farming.busy: return
 	_sending = true
-	var reply: Dictionary = await _farming.send({"type":"place_house", "x":at.x, "y":at.y, "rotation":rotation_steps})
+	var type := _placement.type
+	var before := _buildings.keys()
+	var reply: Dictionary = await _farming.send({"type":"place_building", "building":type, "x":at.x, "y":at.y,
+		"rotation":rotation_steps})
 	_sending = false
-	if reply.get("ok", false) and is_inside_tree(): _pop_house()
+	if reply.get("ok", false) and is_inside_tree():
+		for b: Dictionary in buildings_state():
+			if not before.has(int(b.id)): _pop(b)
 	if not is_inside_tree() or _placement == null: return
 	# A refused spot keeps the preview, judged again on the farm the reply brought; anything else ends it.
-	if reply.get("ok", false) or str(reply.get("code", "")) != "CELL_OCCUPIED":
-		end_house_placement()
+	if reply.get("ok", false) or str(reply.get("code", "")) not in ["CELL_OCCUPIED", "BUILDING_OVERLAP"]:
+		end_placement()
 	else:
-		_placement.retake(House.blocked(_farming.obstacle_cells(), _farming.farm))
+		var obstacles: Dictionary = _farming.obstacle_cells()
+		_placement.retake(Building.blocked(obstacles, _farming.farm), _walk_blocked(obstacles))
 
-## Build succeeded (C-114): the cottage the reply just built grows in with the main farm's overshoot and puffs dust
-## round its footprint. A house that comes with the save (reopening, a refused Build) only stands there.
+## Build succeeded (C-114): the building the reply just built grows in with the main farm's overshoot and puffs
+## dust round its footprint. One that comes with the save (reopening, a refused Build) only stands there.
 ## The main farm's puffs are sized for a fence post; round the 2.4 m cottage each one is HOUSE_DUST_SCALE times
 ## larger, so they read as the clouds of the owner's reference (C-103 screenshot 704).
-func _pop_house() -> void:
-	var house = house_state()
-	if _house == null or not house is Dictionary: return
+func _pop(building: Dictionary) -> void:
+	var node = _buildings.get(int(building.id), {}).get("node")
+	if not node is Node3D: return
 	var before := get_child_count()
-	Fence.pop_in(self, [_house])
-	for point in House.rim(_walk, House.at_of(house), int(house.get("rotation", 0))): Fence.dust(self, point)
+	Fence.pop_in(self, [node])
+	for point in Building.rim(_walk, Building.at_of(building), Building.base_of(building), int(building.rotation)):
+		Fence.dust(self, point)
 	for i in range(before, get_child_count()):
 		var puff := get_child(i) as CPUParticles3D
 		if puff == null: continue
 		puff.scale_amount_min *= HOUSE_DUST_SCALE
 		puff.scale_amount_max *= HOUSE_DUST_SCALE
 
-## The built cottage and its wall profile (C-19's model-fitted walking); a player standing on the new walls steps out.
-func _build_house(house: Dictionary) -> void:
-	var at := House.at_of(house)
-	var turns := int(house.get("rotation", 0))
-	_house = Node3D.new()
-	_house.name = "House"
-	_house.transform = House.transform(_walk, at, turns)
-	_house.add_child(Art.instance(House.ASSET))
-	add_child(_house)
-	var proxy := House.proxy(_walk, at, turns)
-	_walk.add_prop(proxy)
-	if get_tree().debug_collisions_hint:
-		var wire := MeshInstance3D.new()
+## The scene follows the save's buildings: new ones stand (no pop; Build pops its own), gone ones leave with their
+## walls. A building is matched by id and its spot, so one the save moved or turned is built again.
+func _sync_buildings(farm: Dictionary) -> void:
+	var wanted := {}
+	for b: Dictionary in ParcelFarm.buildings_of(farm): wanted[int(b.id)] = b
+	for id: int in _buildings.keys():
+		if wanted.has(id) and _spot(wanted[id]) == _spot(_buildings[id].state): continue
+		var built: Dictionary = _buildings[id]
+		if built.proxy != null: _walk.remove_prop(built.proxy)
+		for node in [built.node, built.wire]:
+			if is_instance_valid(node): node.queue_free()
+		_buildings.erase(id)
+	for id: int in wanted:
+		if not _buildings.has(id): _build_building(wanted[id])
+
+static func _spot(b: Dictionary) -> String:
+	return "%s %d %d %d %d %d" % [b.type, int(b.x), int(b.y), int(b.width), int(b.depth), int(b.rotation)]
+
+## A saved building, its model (if this client has art for its type) and wall profile (C-19's model-fitted walking);
+## a player standing on the new walls steps out. A type without art here still keeps its cells from farming
+## (ParcelFarm.building_cells) but has nothing to show or bump into.
+func _build_building(building: Dictionary) -> void:
+	var type := str(building.type)
+	var at := Building.at_of(building)
+	var base := Building.base_of(building)
+	var turns := int(building.rotation)
+	var node := Node3D.new()
+	node.name = "Building%d" % int(building.id)
+	node.transform = Building.transform(_walk, at, base, turns)
+	var asset = Building.kind(type).get("asset")
+	if asset is String: node.add_child(Art.instance(asset))
+	add_child(node)
+	var proxy := Building.proxy(_walk, type, at, base, turns)
+	var wire: MeshInstance3D = null
+	if proxy != null: _walk.add_prop(proxy)
+	if proxy != null and get_tree().debug_collisions_hint:
+		wire = MeshInstance3D.new()
 		wire.mesh = proxy.debug_wire()
 		var material := StandardMaterial3D.new()
 		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -314,6 +371,7 @@ func _build_house(house: Dictionary) -> void:
 		wire.material_override = material
 		wire.transform = proxy.pose
 		add_child(wire)
+	_buildings[int(building.id)] = {"state": building.duplicate(), "node": node, "proxy": proxy, "wire": wire}
 	if _actor != null and not _walk.clear_position(_walk.position):
 		_walk.position = _step_out(_walk.position)
 		_actor.position = _walk.position
@@ -425,12 +483,24 @@ func _process(delta: float) -> void:
 	if _farming != null:
 		_farming.update(dt, _walk.cell_at(_actor.position + _facing * _walk.cell_m * 0.8), steering,
 			_actor.position, _facing)
-	if not _overview:
+	if steering: _showing_house = false
+	if not _overview and not _showing_house:
 		var size := get_viewport().get_visible_rect().size
 		var safe := Rect2(size*Vector2(0.23,0.26),size*Vector2(0.54,0.48))
 		_focus += CameraRules.follow_shift(_camera,_actor.position,safe)
 		if input.is_zero_approx() and _route.is_empty(): _focus = _focus.lerp(_actor.position,minf(dt*2.8,1.0))
 		_place_camera()
+
+## The Energy card's Rest tile (`Show home`, C-148): the camera turns to the cottage and stays there until the
+## player moves; it never walks the player there or rests for them (LOCK-09: tiles only guide).
+func show_house() -> void:
+	var home := ParcelFarm.home_building(_farming.farm) if _farming != null else {}
+	var node = _buildings.get(int(home.get("id", -1)), {}).get("node")
+	if not node is Node3D: return
+	_focus = node.position
+	_overview = false
+	_showing_house = true
+	_place_camera()
 
 ## Walks the player beside `cells` (8 neighbours, sides preferred) and turns them to face the
 ## cells, along a route around everything the walker collides with (C-73). Returns "ok" there,
@@ -564,56 +634,45 @@ func _build_ui() -> void:
 			_focus = _actor.position
 			_overview = false
 			_place_camera())
-	# Top bar in the main farm's UI kit (C-74): the 44 round back of ProfileTopBar / PageHeader (LOCK-22) and a
-	# surface chip with the parcel's name over its status line, at the HUD's place (x 10, y 16 + safe top).
+	# Top bar (C-74; UI v3 since C-105, docs/design/ui-v3-2026-11-24 §4.1 / C-L2): over the scene, in glass (S-2):
+	# a Ø36 glass Back in its 44 hit area, the parcel's name over its status in a glass capsule, and on one's own
+	# parcel its coins (C-59) in the C-H4 glass coin capsule at the right. 12 from the screen's sides, safe top + 8.
 	_header = HBoxContainer.new()
 	_header.name = "TopBar"
 	_header.theme = UiKit.theme()
-	_header.add_theme_constant_override(&"separation", UiTokens.SPACE_WITHIN)
+	_header.add_theme_constant_override(&"separation", UiTokens.SPACE_S3)
 	_header.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	_header.offset_left = UiTokens.SIZE_TODAY_PANEL_X
-	_header.offset_right = -UiTokens.SIZE_TODAY_PANEL_X
-	_header.offset_top = UiTokens.SIZE_HUD_TOP + _safe_top()
+	_header.offset_left = UiTokens.SIZE_SCREEN_EDGE - (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5
+	_header.offset_right = -UiTokens.SIZE_SCREEN_EDGE
+	_header.offset_top = UiTokens.SIZE_SCREEN_SAFE_INSET + _safe_top()
 	_header.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_canvas.add_child(_header)
-	var back := UiProfileTopBar._Round.new(UiProfileTopBar._Round.Glyph.BACK)
+	var back := UiGlassButton.new(null, UiGlassButton.Glyph.BACK)
 	back.name = "Back"
 	back.tooltip_text = "Back"
 	back.pressed.connect(_request_back)
 	_header.add_child(back)
-	var chip := PanelContainer.new()
+	var chip := UiGlassCapsule.new()
 	chip.name = "Place"
 	chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chip.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CHIP,
-		UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT).with_margins(12, 5, 12, 6))
 	_header.add_child(chip)
-	var labels := VBoxContainer.new()
-	labels.add_theme_constant_override(&"separation", 0)
-	labels.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chip.add_child(labels)
-	_title = UiKit.label("Dynamic farm", UiTokens.STYLE_C14_XB)
-	_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	_title.custom_minimum_size.x = 120
-	labels.add_child(_title)
-	_status = UiKit.label("Loading preview…", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
-	_status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	labels.add_child(_status)
-	# One's own parcel: its coins (C-59, apart from the main farm's) in the main HUD's coins capsule, at the right.
-	_coins_capsule = UiHud._capsule()
+	_title = chip.label()
+	_title.theme_type_variation = UiTokens.STYLE_TYPE_LABEL_ON_DARK
+	# The place capsule takes the room left (on 360 that is ~110 beside the Energy chip and coins); its lines cut with …
+	_title.custom_minimum_size.x = 0
+	chip.text = "Dynamic farm"
+	chip.detail = "Loading preview…"
+	_status = chip.detail_label()
+	# One's own parcel: its coins (C-59, apart from the main farm's) in the v3 coin capsule, at the right.
+	_coins_capsule = UiGlassCapsule.coins(UiArt.COIN)
 	_coins_capsule.name = "Coins"
 	_coins_capsule.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_coins_capsule.visible = false
-	var coins_row := _coins_capsule.get_child(0) as HBoxContainer
-	_coins = UiKit.label("0", UiTokens.STYLE_C11_XB)
-	_coins.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	coins_row.add_child(_coins)
-	var coin := UiKit.icon(UiHud.ICON_COIN, UiHud._ICON_COIN)
-	coin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	coins_row.add_child(coin)
+	_coins = (_coins_capsule as UiGlassCapsule).label()
+	_coins.text = "0"
 	_header.add_child(_coins_capsule)
-	_controls.top_exclusion_y = UiTokens.SIZE_HUD_TOP + _safe_top() + UiTokens.SIZE_CLOSE + UiTokens.SPACE_PAGE
+	_controls.top_exclusion_y = UiTokens.SIZE_SCREEN_SAFE_INSET + _safe_top() + UiTokens.SIZE_TOUCH_MIN + UiTokens.SPACE_PAGE
 	_hint = UiKit.label("Art preview · Walk and explore", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
 	_hint.theme = UiKit.theme()
 	_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
@@ -623,12 +682,12 @@ func _build_ui() -> void:
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_canvas.add_child(_hint)
 	_build = UiCommandButton.new("Build Cottage", UiCommandButton.Kind.PRIMARY)
-	_build.name = "BuildCottage"
+	_build.name = "Build"
 	_build.theme = UiKit.theme()
 	# 180 × 48; ParcelFarming places it beside the action key (place_side_button), clear of the key and quick bar.
 	_build.custom_minimum_size = Vector2(180, 48)
 	_build.visible = false
-	_build.activated.connect(begin_house_placement)
+	_build.activated.connect(begin_placement)
 	_canvas.add_child(_build)
 
 ## Top system inset (status bar, notch) in UI units; 0 on desktop (as P0Ui.safe_top).
@@ -656,7 +715,7 @@ func _on_tapped(at: Vector2) -> void:
 func _request_back() -> void:
 	if _back_sent: return
 	_back_sent = true
-	end_house_placement()
+	end_placement()
 	_movement = Vector2.ZERO
 	_controls.reset()
 	back_requested.emit()
@@ -666,13 +725,13 @@ func is_back_navigation_locked() -> bool:
 	_request_back()
 	return true
 
-## Closes the farming UI's open drawer (the bag); false when none was open.
+## Closes the farming UI's open drawer (the bag) or Energy card / panel; false when none was open.
 func close_modal() -> bool:
-	return _farming != null and _farming.close_bag()
+	return _farming != null and (_farming.close_energy() or _farming.close_bag())
 
 func suspend() -> void:
 	_suspended = true
-	end_house_placement()
+	end_placement()
 	if not _route.is_empty(): _end_route("cancelled")
 	_labour_left = 0.0
 	_movement = Vector2.ZERO

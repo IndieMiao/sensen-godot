@@ -96,5 +96,10 @@ func set_parcel_claims(generation: int, _claims_json: String) -> void:
 func set_parcel_building_highlight(generation: int, _key: String, _parcel_id := "") -> void:
 	parcel_error.emit(generation, 0, "unsupported")
 
+## C-130 dynamic farm starter zone: its own native layer (boundary ring and style JSON; "" clears it). Bridges
+## without it simply show no marker; the server still holds claims to the zone.
+func set_starter_zone(_generation: int, _zone_json: String) -> void:
+	pass
+
 func clear_parcel_layers(_generation: int) -> void:
 	pass

@@ -186,4 +186,21 @@ class ParcelLayerStateTest {
         assertEquals(setOf("parcels", "gensen-buildings-datasf-3"), ParcelQuerySettle.sourcesFor("parcels", true, "gensen-buildings-datasf-3"))
         assertEquals(emptySet<String>(), ParcelQuerySettle.sourcesFor("parcels", true, null)) // Mapbox refused the copy.
     }
+    @Test fun sourceTimeoutCountsOnlyWhileTheParcelLayersAreDrawn() { // C-130 V-362
+        val timeout = ParcelSourceTimeout()
+        assertNull(timeout.update(awaited = true, drawn = false)) // Entered below the selectable zoom: nothing to load.
+        assertFalse(timeout.armed)
+        val first = assertNotNull(timeout.update(awaited = true, drawn = true)) // Zoomed in: the count starts.
+        assertNull(timeout.update(awaited = true, drawn = true)) // Further camera changes keep the same count.
+        assertTrue(timeout.fires(first))
+        assertNull(timeout.update(awaited = true, drawn = false)) // Zoomed out again before loading: stopped.
+        assertFalse(timeout.fires(first))
+        val second = assertNotNull(timeout.update(awaited = true, drawn = true)) // A fresh, full count.
+        assertFalse(timeout.fires(first)); assertTrue(timeout.fires(second))
+        assertNull(timeout.update(awaited = false, drawn = true)) // Loaded.
+        assertFalse(timeout.fires(second))
+        val third = assertNotNull(timeout.update(awaited = true, drawn = true))
+        timeout.reset() // Reinstalled (new sources or style): the old countdown is retired.
+        assertFalse(timeout.fires(third))
+    }
 }

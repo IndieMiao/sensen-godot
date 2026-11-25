@@ -14,6 +14,10 @@ internal data class ParcelSourceConfig(
     /** C-124: set by the player's Retry or the building load timeout; a building copy still loading is fetched again. */
     val refetchBuildings: Boolean = false,
 )
+/** C-130: the dynamic farm starter zone marker, its own layer: the zone's boundary ring ([lng, lat], closed) and style. */
+internal data class StarterZoneMarker(
+    val ring: List<Pair<Double, Double>>, val lineColor: String, val lineWidth: Double, val maskColor: String, val maskOpacity: Double,
+)
 internal object ParcelPayload {
     const val EMPTY_COLLECTION = "{\"type\":\"FeatureCollection\",\"features\":[]}"
     private val idPattern = Regex("p-[A-Za-z0-9._:*-]{1,126}")
@@ -137,6 +141,58 @@ internal object ParcelPayload {
         ids(states) { it.own && !it.selected } to OWN_OPACITY, ids(states) { it.own && it.selected } to OWN_SELECTED_OPACITY,
         ids(states) { it.claimed && !it.own && !it.selected } to TAKEN_OPACITY, ids(states) { it.claimed && !it.own && it.selected } to TAKEN_SELECTED_OPACITY,
     ), 0.0)
+    /** C-130 (C-129#6): drawn under the DataSF buildings at the parcel zooms, so the visible building is the DataSF
+     *  footprint that every colour fills; buildings outside the dataset stay visible, lighter. */
+    const val MAPBOX_BUILDING_UNDER_DATASF = 0.3
+    /** Mapbox Streets v12 `building` paint, if the style has none to copy. */
+    const val BUILDING_BASE_COLOR = "hsl(20, 15%, 85%)"
+    const val BUILDING_BASE_OUTLINE = "hsl(20, 10%, 79%)"
+    /** Mapbox's building fill-opacity while parcels show: its own fade-in up to the parcel zoom, then [MAPBOX_BUILDING_UNDER_DATASF]. */
+    fun mapboxBuildingOpacity(minZoom: Double): String =
+        """["interpolate",["linear"],["zoom"],15,0,${maxOf(15.5, minZoom)},$MAPBOX_BUILDING_UNDER_DATASF]"""
+
+    private val colorPattern = Regex("#[0-9A-Fa-f]{6}")
+    /** C-130 starter zone: "" clears the marker (null); anything malformed fails, so a bad zone never half-draws. */
+    fun starterZone(raw: String): StarterZoneMarker? {
+        if (raw.isEmpty()) return null
+        require(raw.length <= 65536)
+        val input = JsonParser.parseString(raw).asJsonObject
+        val ring = input.getAsJsonArray("boundary").map { point ->
+            val pair = point.asJsonArray
+            require(pair.size() == 2)
+            val lng = pair[0].asDouble; val lat = pair[1].asDouble
+            require(lng.isFinite() && lat.isFinite() && lng in -180.0..180.0 && lat in -85.0..85.0)
+            lng to lat
+        }
+        require(ring.size in 4..512 && ring.first() == ring.last()) { "closed_ring_required" }
+        fun color(key: String) = input.get(key).asString.also { require(colorPattern.matches(it)) }
+        fun number(key: String, range: ClosedFloatingPointRange<Double>) = input.get(key).asDouble.also { require(it.isFinite() && it in range) }
+        return StarterZoneMarker(ring, color("line_color"), number("line_width", 0.5..12.0), color("mask_color"), number("mask_opacity", 0.0..1.0))
+    }
+    /** Twice the signed area in degrees (positive = counter-clockwise with north up). */
+    internal fun signedArea(ring: List<Pair<Double, Double>>): Double =
+        ring.zipWithNext().sumOf { (a, b) -> a.first * b.second - b.first * a.second }
+    /**
+     * The zone's two features: "mask" washes everything outside the zone (a world polygon with the zone as its hole,
+     * wound opposite to the outer ring so Mapbox reads it as a hole) and "edge" is the boundary line.
+     */
+    fun starterZoneGeoJson(zone: StarterZoneMarker): String {
+        fun ring(points: List<Pair<Double, Double>>) = JsonArray().apply { points.forEach { (x, y) -> add(JsonArray().apply { add(x); add(y) }) } }
+        val world = listOf(-180.0 to -85.0, 180.0 to -85.0, 180.0 to 85.0, -180.0 to 85.0, -180.0 to -85.0) // Counter-clockwise.
+        val hole = if (signedArea(zone.ring) > 0) zone.ring.reversed() else zone.ring // Clockwise.
+        fun feature(kind: String, type: String, coordinates: JsonArray) = JsonObject().apply {
+            addProperty("type", "Feature")
+            add("properties", JsonObject().apply { addProperty("kind", kind) })
+            add("geometry", JsonObject().apply { addProperty("type", type); add("coordinates", coordinates) })
+        }
+        return JsonObject().apply {
+            addProperty("type", "FeatureCollection")
+            add("features", JsonArray().apply {
+                add(feature("mask", "Polygon", JsonArray().apply { add(ring(world)); add(ring(hole)) }))
+                add(feature("edge", "LineString", ring(zone.ring)))
+            })
+        }.toString()
+    }
     /** DataSF highlight: every footprint of one parcel, since its farm core is all of them (C-43 V-199). "" matches none. */
     fun buildingFilter(parcelId: String): String = JsonArray().apply {
         add("=="); add(JsonArray().apply { add("get"); add("block_id") }); add(if (validId(parcelId)) parcelId else "")

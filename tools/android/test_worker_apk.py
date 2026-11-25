@@ -152,7 +152,7 @@ class WorkerAPK(unittest.TestCase):
                 with self.subTest(setting=setting, target=target), self.assertRaisesRegex(ValueError, 'pre-existing'):
                     farm.staged_project(source, target, release)
 
-    def test_release_project_is_fixed_to_production_with_own_farm_and_the_full_account_panel(self):
+    def test_release_project_is_fixed_to_production_with_own_farm_and_the_email_account_panel(self):
         release = exported_settings('dynamic-farm-release')
         self.assertEqual(farm.RELEASE_TARGET, 'https://farm.sensenjoy.cn/dynamicfarm/v1')
         for key in ('sensen/network/base_url', 'sensen/network/mobile_base_url'):
@@ -161,8 +161,9 @@ class WorkerAPK(unittest.TestCase):
         self.assertIs(release['sensen/network/online_qa'], True)
         for key in ('sensen/dynamic_farm/own_farm', 'sensen/dynamic_farm/account_restore', 'sensen/network/fixed_server'):
             self.assertIs(release[key], True)
-        # C-101: no account/* setting, so the account panel offers email sign-up, password reset and Google.
-        self.assertEqual([key for key in release if key.startswith('sensen/account/')], [])
+        # C-101: the only account/* setting hides Google (C-137#18, Q-243); email sign-up and password reset stay.
+        self.assertEqual([key for key in release if key.startswith('sensen/account/')], ['sensen/account/google_off'])
+        self.assertIs(release['sensen/account/google_off'], True)
         # Install-and-play (C-100) stays out until the owner decides to open it.
         for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/fake_claims', 'sensen/dynamic_farm/local_farm_save',
                     'sensen/dynamic_farm/guest_play'):
@@ -195,10 +196,23 @@ class WorkerAPK(unittest.TestCase):
         audiences = re.search(r'(?m)^ {6}GOOGLE_CLIENT_IDS: (.+)$', compose).group(1)
         self.assertIn(web_client, [audience.strip() for audience in audiences.split(',')])
 
+    def test_every_dynamic_farm_package_hides_google_sign_in_and_only_they_do(self):
+        # Owner C-137#18 ("注册可以先用邮箱,googleplay可以再往后放"), Q-243: Google stays in the code but hidden.
+        for variant in farm.PACKAGES:
+            with self.subTest(variant=variant):
+                self.assertIs(exported_settings(variant)['sensen/account/google_off'], True)
+        self.assertNotIn('sensen/account/google_off', exported_settings('android'))
+        self.assertNotRegex(PROJECT, r'(?m)^account/google_off')
+        for setting in ('account/google_off=true', 'account/google_off=false', 'account/google_off.android=false'):
+            for target, release in ((None, False), (TARGET, False), (None, True)):
+                with self.subTest(setting=setting, target=target, release=release), \
+                        self.assertRaisesRegex(ValueError, 'pre-existing'):
+                    farm.staged_project(PROJECT.replace('[sensen]', '[sensen]\n' + setting), target, release)
+
     def test_release_preset_upgrades_the_preview_package_with_the_same_version(self):
         preset, identity = worker_preset(PRESETS, 'dynamic-farm-release')
         self.assertEqual(identity, dict(self.identity, package=farm.PACKAGE))
-        self.assertEqual(identity['package'], 'com.sensen.dynamicfarm.cardigan')
+        self.assertEqual(identity['package'], 'com.gensen.mapfarm')  # The owner's name (C-142#7, Q-171).
         self.assertEqual(worker_preset(preset, 'dynamic-farm-release'), (preset, identity))
         self.assertIn('package/name="Dynamic Farm"', preset)
         self.assertIn('package/signed=false', preset)
@@ -220,6 +234,34 @@ class WorkerAPK(unittest.TestCase):
         for variant in (True, 'android-internal'):  # A bool is an old caller's signature.
             with self.subTest(variant=variant), self.assertRaisesRegex(ValueError, 'unknown package variant'):
                 worker_preset(PRESETS, variant)
+
+    def test_dynamic_packages_show_no_sensen_and_use_the_p0_launcher_icon(self):
+        # C-142 (owner's C-101#91): package, display name, project name, icon and file name carry no "sensen".
+        self.assertEqual((farm.PACKAGE, farm.INTERNAL_PACKAGE), ('com.gensen.mapfarm', 'com.gensen.mapfarm.internal'))
+        for variant in farm.PACKAGES:
+            preset, identity = worker_preset(PRESETS, variant)
+            options = preset.split('[preset.0.options]')[1]
+            with self.subTest(variant=variant):
+                self.assertNotIn('sensen', identity['package'].lower())
+                self.assertNotIn('sensen', farm.NAMES[variant].lower())
+                for key, path in farm.LAUNCHER_ICONS.items():
+                    self.assertIn(f'launcher_icons/{key}="{path}"', options.splitlines())
+                    self.assertTrue((ROOT / path.removeprefix('res://')).is_file(), path)
+                settings = exported_settings(variant)
+                self.assertEqual(settings['application/config/name'], farm.NAMES[variant])
+                name = farm.apk_filename(variant, identity['version_name'], identity['version_code'], 'ab' * 20)
+                self.assertNotIn('sensen', name.lower())
+                self.assertTrue(name.endswith('-abababab-unsigned.apk'), name)
+        # The tracked Android preset itself (Journey) is untouched: no icon, its own name.
+        self.assertIn('launcher_icons/main_192x192=""', self.cfg.splitlines())
+        self.assertEqual(farm.apk_filename('dynamic-farm-release', '0.4.4', '2026112501', '7607d38f' * 5, True),
+                         'mapfarm-0.4.4-2026112501-7607d38f-signed.apk')
+        self.assertEqual(farm.apk_filename('dynamic-farm-internal', '0.4.4', 2026112501, '7607d38f'),
+                         'mapfarm-internal-0.4.4-2026112501-7607d38f-unsigned.apk')
+        for bad in [('android', '0.4.4', '1', 'ab' * 20), ('dynamic-farm', '0.4.4', '1', 'HEAD'),
+                    ('dynamic-farm', '0.4/../x', '1', 'ab' * 20), ('dynamic-farm', '0.4.4', '1x', 'ab' * 20)]:
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                farm.apk_filename(*bad)
 
     def test_readback_checks_each_variants_exported_configuration(self):
         for variant, files in [('android', FILES), ('dynamic-farm', FARM_FILES), ('dynamic-farm-internal', FARM_FILES),
@@ -293,6 +335,13 @@ class WorkerAPK(unittest.TestCase):
                ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/network/fixed_server': True})),
                ('android', dict(exported_settings('android'), **{'sensen/network/fixed_server': True})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/account/invite_only': True})),
+               # Google sign-in stays hidden in every dynamic farm package (C-101) and only there.
+               ('dynamic-farm-release', {k: v for k, v in release.items() if k != 'sensen/account/google_off'}),
+               ('dynamic-farm-release', dict(release, **{'sensen/account/google_off': False})),
+               ('dynamic-farm-internal', {k: v for k, v in internal.items() if k != 'sensen/account/google_off'}),
+               ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/account/google_off': False})),
+               ('android', dict(exported_settings('android'), **{'sensen/account/google_off': True})),
+               ('dynamic-farm-release', dict(release, **{'sensen/account/google_off.android': False})),
                ('android', dict(exported_settings('android'), **{'sensen/account/invite_only': True})),
                ('android', dict(exported_settings('android'), **{'sensen/network/mobile_base_url': farm.RELEASE_TARGET}))]
         for variant, settings in bad:
@@ -475,6 +524,9 @@ class WorkerAPK(unittest.TestCase):
         subprocess.run([bt / 'zipalign', '-P', '16', '4', self.apk, aligned], check=True)
         result = inspect(aligned, self.identity, bt)
         self.assertEqual(result['sha256'], hashlib.sha256(aligned.read_bytes()).hexdigest())
+        self.assertNotIn('filename', result)
+        # Only a dynamic farm APK with its source commit gets a delivered file name (C-142).
+        self.assertNotIn('filename', inspect(aligned, self.identity, bt, commit='ab' * 20))
         with self.assertRaisesRegex(ValueError, 'identity differ'):
             inspect(aligned, dict(self.identity, version_code='1'), bt)
         subprocess.run([bt / 'apksigner', 'version'], check=True, stdout=subprocess.DEVNULL)

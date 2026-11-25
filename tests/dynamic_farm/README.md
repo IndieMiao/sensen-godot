@@ -41,15 +41,26 @@ needed Avatar/AppRouter symbols, and use an isolated package/userdir. The scene'
 setting check is only an additional guard, not a replacement for build isolation.
 No stage-two APK or 3D-scene acceptance is claimed here.
 
-`modules/dynamic_farm/map/config.json` pins the hosted r6 read-only dataset (C-43#152):
-`https://oss2.sensenjoy.cn/sensen/dynamicfarm/data/r6-6c3733e3b025/`,
-`sf-dynamic-farm-20261124-r6`, client SHA (of `client-manifest.json`)
-`727ff59ae8a94c6af4620dd5ecdf605233f2c5f86ddcc11a98d93f908b9d0cb5`; that
-client-manifest names the full `manifest.json` SHA `6c3733e3…9376`. r6 is r5
-without its degenerate building rings (V-167); r5 was never shipped. The map uses
-the dataset's DataSF buildings (`building_source: datasf`), the same footprints
-the farm cores are rasterized from. Claims send the same `dataset_version`, which
+`modules/dynamic_farm/map/config.json` pins the hosted r8 read-only dataset (C-113):
+`https://oss2.sensenjoy.cn/sensen/dynamicfarm/data/r8-ce232c99c9c8/`,
+`sf-dynamic-farm-20261125-r8`, client SHA (of `client-manifest.json`)
+`063700f3ef7db2bb0c4642f58a6b63df8b68e6930cb578924e683c1ccc8b32ae`; that
+client-manifest names the full `manifest.json` SHA `ce232c99…28e9`. r8 is r6's
+parcels with OpenStreetMap buildings where DataSF has none, built by the C-92
+generator. The map uses the dataset's buildings (`building_source: datasf`: the
+dataset's own `buildings.geojson`), the same footprints the farm cores are rasterized
+from. New claims send the same `dataset_version`, which
 `assets/farm/data/dynamic_farm.json` registers on the server.
+`releases` lists earlier releases that still serve their farms (r6, C-43#152:
+`r6-6c3733e3b025/`, client SHA `727ff59a…0cb5`). A home claimed on one of them is
+entered in that release's farm, because its save's cells belong to that grid (Q-172);
+"My home" selects such a home from that farm, so it can be entered even where r8 has
+no farm for the parcel. A home on an unlisted release opens in r8.
+Entering names the release of the farm opened (C-136): an r6 home names r6 and stays
+on r6; an r4 home opens in r8, names r8 and the server moves it there (Q-168).
+The starter zone list (`assets/farm/data/dynamic_farm_starter_zone.json`) is rebuilt
+from r8's `index.geojson` by `server/tools/starter_zone_build.ts`: 4190 parcels, 536 too small.
+The map credits the OpenStreetMap buildings r8 adds (ODbL) beside the DataSF parcels.
 The service is ready; the complete 3D candidate still requires its own reviewed
 scene integration and actual package verification. The packager must take exact source config, not
 silently replace URL/hash. Include five native runtime Kotlin files (no *Test),
@@ -326,7 +337,9 @@ packages only; reloads the saved account token through `Net.restore_saved_accoun
 calls `/users/me` and nothing else), `sensen/dynamic_farm/guest_play` (internal test packages only, C-100:
 when no saved account was restored, `Net.dynamic_farm_sign_in()` signs in anonymously with the installation key;
 the server's `PARCEL_GUEST_WRITES` decides whether that guest may claim and farm) and `sensen/dynamic_farm/fake_claims` (+ optional
-`fake_player`, default `fake-a`) for development without the C-31 server. None is
+`fake_player`, default `fake-a`) for development without the C-31 server, and
+`sensen/dynamic_farm/profile_outfit_wait_seconds` (C-135, default 5: how long a profile tap waits for the saved
+outfit's parts before the profile opens all the same; `PARCEL_PROFILE_WAIT` logs `timed_out`). None is
 set in `project.godot`, so release builds show no give-up entry and keep the normal
 `Net` boot. A signed-out player gets a "Sign in" button that opens the existing
 `AccountPanel`; ownership is re-read for the new identity.

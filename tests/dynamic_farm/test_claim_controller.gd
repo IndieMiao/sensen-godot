@@ -3,12 +3,14 @@ extends SceneTree
 ## logic only; it is not evidence of a real claim, a save or device rendering.
 const Claims := preload("res://modules/dynamic_farm/map/claim_controller.gd")
 const ClaimApi := preload("res://modules/dynamic_farm/map/claim_api.gd")
+const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const FakeServer := preload("res://modules/dynamic_farm/map/fake_parcel_server.gd")
 const Fixture := preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
 const OWN_FARM := "sensen/dynamic_farm/own_farm"
 const LOCAL_SAVE := "sensen/dynamic_farm/local_farm_save"
 const Farm := preload("res://modules/dynamic_farm/parcel_farm.gd")
+const RouterFixture := preload("res://tests/dynamic_farm/app_router_fixture.gd")
 class Native extends MapBridge:
 	var states := {} # block_id -> {selected, claimed, own}, as native ParcelLayerState keeps them
 	var batches: Array = []
@@ -22,6 +24,17 @@ class Native extends MapBridge:
 			else: states.erase(row.block_id)
 	func set_parcel_claims(_gen: int, claims: String) -> void: names = JSON.parse_string(claims)
 	func set_parcel_building_highlight(gen: int, key: String, parcel := "") -> void: highlights.append([gen, key, parcel])
+	var zones: Array = [] # [generation, zone JSON] as sent (C-130)
+	func set_starter_zone(gen: int, json: String) -> void: zones.append([gen, json])
+## The map's 3D opening needs a bridge that can make the map opaque (C-115's room opens like the parcel).
+class OpaqueBridge extends MapBridge:
+	func supports_surface_opacity() -> bool: return true
+	func set_map_occlusion_color(_rgb: String) -> bool: return true
+	func set_godot_surface_opaque(_opaque: bool) -> bool: return true
+class Router extends Node:
+	var opened: Array = []
+	func open_instance(path: String, args: Dictionary) -> void: opened.append([path, args])
+	func top_instance() -> Node: return null
 class Selector extends Node:
 	signal changed
 	var selection := {}
@@ -32,7 +45,14 @@ class Selector extends Node:
 	var manifest := {"native_map": {"minzoom": 16}}
 	var _options: Array = []
 	var opened := 0
-	func open_farm() -> void: opened += 1
+	var releases_opened: Array = []
+	var releases := {} # Earlier releases still serving their farms (selection_controller.release_base).
+	var homes: Array = []
+	func open_farm(release := "") -> void: opened += 1; releases_opened.append(release)
+	func home_release(claimed: String) -> String: return claimed if releases.has(claimed) else str(manifest.get("dataset_version", ""))
+	func select_home(id: String, release: String) -> void: homes.append([id, release])
+	var taps := 0
+	func tap(_point: Vector2, _zoom: float) -> void: taps += 1
 	func pause() -> void: pass
 	func activate() -> void: pass
 var checks := 0
@@ -51,7 +71,6 @@ func controller(server: RefCounted, token: String, native: Native) -> Node:
 	return c
 
 func _run() -> void:
-	await _town_load_on_free()
 	await _server_contract()
 	await _first_home_flow()
 	await _map_card()
@@ -59,7 +78,9 @@ func _run() -> void:
 	await _account_kept_on_server_errors()
 	await _account_row()
 	await _home_framing()
+	await _earlier_release_home()
 	await _guest_play_sign_in()
+	await _starter_zone()
 	print("DYNAMIC CLAIM ", checks - failures, "/", checks)
 	quit(1 if failures else 0)
 
@@ -185,10 +206,25 @@ func _map_card() -> void:
 	# C-35: with nothing selected the card says where to go next, only in a package that enters one's own farm.
 	selector.selection = {}
 	page._render()
-	check(page._details.text == page.PICK_PREVIEW, "preview package, nothing selected: 'Choose a parcel to explore in 3D.'")
+	check(page._message.text == page.PICK_PREVIEW and page._hint.visible and not page._card.visible,
+		"preview package, nothing selected: the hint says 'Choose a parcel to explore in 3D.' and no card shows")
 	ProjectSettings.set_setting(OWN_FARM, true)
 	page._render()
-	check(page._details.text == page.PICK_FIRST, "no home yet, nothing selected: 'Tap a building to choose your first home.'")
+	check(page._message.text == page.PICK_FIRST, "no home yet, nothing selected: 'Tap a building to choose your first home.'")
+	# C-88#5: the selector's idle prompt and the next step said the same thing at the top and the bottom; one line now.
+	selector.message = Selection.PROMPT
+	page._render()
+	var said := func(text: String) -> int: return page.find_children("*", "Label", true, false).filter(func(l): return l.text == text and l.is_visible_in_tree()).size()
+	check(page._message.text == page.PICK_FIRST and said.call(page.PICK_FIRST) == 1 and said.call(Selection.PROMPT) == 0,
+		"with no home the map says 'Tap a building to choose your first home.' once and not the idle prompt as well")
+	selector.message = Selection.QUERY_FAILED
+	page._render()
+	check(page._error_card.visible and page._error_line.text == Selection.QUERY_FAILED and not page._hint.visible and page._retry.visible,
+		"a failed read shows its line with Retry on the load-failure card, not in the hint")
+	selector.message = "Zoom in to choose a farm."
+	page._render()
+	check(not page._error_card.visible and page._message.text == "Zoom in to choose a farm.", "what the map is doing reads in the hint")
+	selector.message = ""
 	var farming_page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
 	root.add_child(farming_page)
 	check(page.find_children("*", "Label", true, false).any(func(l): return l.text.begins_with("Explore and walk.")) \
@@ -198,14 +234,21 @@ func _map_card() -> void:
 	selector.selection = Fixture.metadata(ids[0]); selector.selection.block_id = ids[0]
 	page._render(); await process_frame
 	check(page._claim.visible and not page._claim.disabled and not page._enter.visible and page._open.visible, "free parcel shows 'Make this my first home'")
+	check(page._card.visible and not page._hint.visible and page._card_tag.text == "Parcel" and page._details.text == "Not claimed"
+		and page._card_name.text == str(selector.selection.name), "the parcel card names the parcel, says it is not claimed, and the hint steps aside")
 	page._claim.pressed.emit()
 	check(page._confirm.visible and not page._claim.visible, "claim asks for confirmation first")
 	page._claim_selection(); await process_frame
 	check(page._enter.visible and not page._claim.visible and not page._open.visible, "after claiming the card offers 'Enter my farm'")
+	check(page._card_tag.text == "Your home" and page._details.text == "Your home" and not page._confirm.visible and not page._claim_toast.visible,
+		"the claimed parcel's card reads 'Your home'")
+	page._claims.message = "Could not claim. Try again."; page._render()
+	check(page._claim_toast.visible and page._claim_note.text == "Could not claim. Try again.", "a claim failure shows on a toast")
+	page._claims.message = ""; page._render()
 	var picked: Dictionary = selector.selection
 	selector.selection = {}
 	page._render()
-	check(page._details.text == page.PICK_HOME, "with a home, nothing selected: 'Tap your green parcel, then Enter my farm.'")
+	check(page._message.text == page.PICK_HOME, "with a home, nothing selected: 'Tap your green parcel, then Enter my farm.'")
 	await _map_guide(page, selector, picked)
 	ProjectSettings.set_setting(OWN_FARM, false)
 	selector.selection = picked
@@ -218,15 +261,25 @@ func _map_card() -> void:
 	check(selector.opened == 2 and page._entering.is_empty(), "'Preview in 3D' opens a read-only preview")
 	page._claims.reselect = true; page._render()
 	check(page._reselect.visible, "internal package shows 'Give up and choose again'")
+	# Q-156: the server refuses a guest's give-up, so a guest (no account) has no give-up entry; signing in shows it.
+	var account: AccountSession = root.get_node("Net").account
+	page._sync_guest(); page._render()
+	check(page._claims.guest and not page._reselect.visible and page._enter.visible, "a guest with a home sees no give-up entry")
+	page._claims.abandon(); await process_frame
+	check(page._claims.has_home() and not page._claims.busy, "a guest's give-up is not sent")
+	account.token = "fake-a"; account.user_id = "user-a"
+	page._sync_guest(); page._render()
+	check(not page._claims.guest and page._reselect.visible, "after signing in the give-up entry appears")
+	account.token = ""; account.user_id = ""
 	selector.selection = Fixture.metadata(ids[1]); selector.selection.block_id = ids[1]
 	page._render(); await process_frame
-	check(not page._claim.visible and page._details.text.ends_with("You already have a home."), "a second free parcel cannot be claimed")
+	check(not page._claim.visible and page._details.text == "You already have a home.", "a second free parcel cannot be claimed")
 	selector.selection = Fixture.metadata(taken); selector.selection.block_id = taken
 	page._render(); await process_frame
-	check(not page._claim.visible and page._open.visible and page._details.text.ends_with("Claimed by " + FakeServer.NEIGHBOUR), "someone else's parcel is view-only with the claimer's name")
+	check(not page._claim.visible and page._open.visible and page._details.text == "Claimed by " + FakeServer.NEIGHBOUR, "someone else's parcel is view-only with the claimer's name")
 	page._claims.owners[taken].nickname = "" # An owner without a display name, or a PARCEL_TAKEN race before the re-read.
 	page._render()
-	check(page._details.text.ends_with("\nClaimed") and native.names.any(func(row): return row.block_id == taken and row.nickname == "Claimed"), "an owner without a name reads 'Claimed' on the card and on the map")
+	check(page._details.text == "Claimed" and native.names.any(func(row): return row.block_id == taken and row.nickname == "Claimed"), "an owner without a name reads 'Claimed' on the card and on the map")
 	page._claims.owners[taken].nickname = FakeServer.NEIGHBOUR
 	page._claims.reselect = true
 	selector.selection = Fixture.metadata(ids[0]); selector.selection.block_id = ids[0]
@@ -238,7 +291,7 @@ func _map_card() -> void:
 	page._claims = guest; guest.changed.connect(page._render)
 	selector.selection = Fixture.metadata(ids[1]); selector.selection.block_id = ids[1]
 	page._render(); await process_frame
-	check(guest.status(ids[1]) == "unknown" and page._details.text.ends_with("Sign in to claim a home.") and not page._claim.visible, "signed-out player sees 'Sign in to claim a home.' even though ownership can't be read")
+	check(guest.status(ids[1]) == "unknown" and page._details.text == "Sign in to claim a home." and not page._claim.visible, "signed-out player sees 'Sign in to claim a home.' even though ownership can't be read")
 	check(page._account_button.visible and page._account_button.text == "Sign in", "signed-out player gets a 'Sign in' button")
 	page._account_button.pressed.emit(); await process_frame
 	var panels: Array = page.find_children("*", "AccountPanel", true, false)
@@ -251,99 +304,87 @@ func _map_card() -> void:
 	check(not guest.signed_out and guest.mine_known and guest.status(ids[1]) == "none" and page._claim.visible, "after signing in the card re-reads ownership and offers the claim")
 	page.queue_free(); selector.queue_free(); guest.queue_free()
 	await process_frame
-	await _orphan_loads_taken()
-	check(ResourceLoader.load_threaded_get_status("res://scenes/dynamic_farm/parcel_town.gd") == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
-		"with the map gone no load of the town is left running")
 
-## C-61: the card names the next step done off the parcel (the home's save), and Market / Carpenter answer a tap at
-## once with Loading… before the town loads.
+## C-61: the card names the next step done off the parcel (the home's save). C-115: Market and Carpenter are gone; the
+## Washington Square pin opens its place card and Go opens the 3D room through the router, with the home's parcel save.
 func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	var home := str(page._claims.mine.parcel_id)
 	var carrot := {"v": 1, "house": {"x": 4, "y": 4, "width": 3, "depth": 3, "rotation": 0}, "cleared": [], "tilled": [],
 		"crops": {}, "bag": {"crop_carrot": 1}, "welcomed_at": 0}
 	page.home_farm = Farm.normalize(carrot); page._farm_parcel = "p-elsewhere"
 	page._render()
-	check(page._details.text == page.PICK_HOME, "a save of another parcel says nothing about this home")
+	check(page._message.text == page.PICK_HOME, "a save of another parcel says nothing about this home")
 	page._farm_parcel = home
-	var lines := [[{}, "Tap Market to sell your carrot."],
+	var lines := [[{}, "Tap Washington Square to sell your carrot."],
 		[{"sales": 1, "bag": {}}, "Enter my farm and gather from trees, flowers and rocks."],
-		[{"sales": 1, "bag": {"wood": 2}, "gathered": {"x": 1}}, "Tap Market to sell what you gathered."],
-		[{"sales": 2, "bag": {}, "gathered": {"x": 1}}, "Tap Carpenter to get your coop blueprint."],
+		[{"sales": 1, "bag": {"wood": 2}, "gathered": {"x": 1}}, "Tap Washington Square to sell what you gathered."],
+		[{"sales": 2, "bag": {}, "gathered": {"x": 1}}, "Tap Washington Square to get your coop blueprint."],
 		[{"sales": 2, "bag": {}, "gathered": {"x": 1}, "blueprints_claimed": {"coop": 1}}, page.PICK_HOME]]
 	for row: Array in lines:
 		var save: Dictionary = carrot.duplicate(true)
 		save.merge(row[0], true)
 		page.home_farm = Farm.normalize(save)
 		page._render()
-		check(page._details.text == row[1], "nothing selected, %s: '%s' (got '%s')" % [row[0], row[1], page._details.text])
+		check(page._message.text == row[1], "nothing selected, %s: '%s' (got '%s')" % [row[0], row[1], page._message.text])
 	page.home_farm = Farm.normalize(carrot)
 	selector.selection = home_pick
 	page._render()
-	check(page._details.text.ends_with("\nYour home\nTap Market to sell your carrot."), "the home selected: its card adds the next step")
+	check(page._details.text == "Your home" and page._guide.visible and page._guide.text == "Tap Washington Square to sell your carrot.", "the home selected: its card adds the next step")
 	selector.selection = {}
-	ProjectSettings.set_setting(LOCAL_SAVE, true) # the town reads the device save, not a server
 	page._render(); await process_frame
-	check(not page._carpenter.disabled and page._carpenter.text == "Carpenter", "with a home, Carpenter can be tapped")
-	page._carpenter.pressed.emit()
-	check(page._carpenter.text == page.TOWN_LOADING and page._carpenter.disabled and page._market.disabled and page._town == null,
-		"a tap shows Loading… on the entry at once, before the town loads")
-	page._market.pressed.emit()
-	check(page._market.text == "Market", "the other entry waits meanwhile")
+	check(not page.find_children("*", "Button", true, false).any(func(b): return b.text in ["Market", "Carpenter", "Loading…"]),
+		"the map has no Market or Carpenter button")
+	var entry: Control = page._entry
+	page._camera.frame_center(entry.LON, entry.LAT, 17.5)
+	page._render(); await process_frame
+	var at: Vector2 = entry.screen_point()
+	check(entry.visible and entry.pin.visible and entry.pin.text == "Washington Square", "the Washington Square pin shows in San Francisco")
+	check(at.distance_to(page._camera.size * 0.5) < 1.0, "the pin stands on its own spot (here the map's centre)")
+	var taps: int = selector.taps
+	page._on_map_tap((at + Vector2(0, 200)) / page._camera.size)
+	check(selector.taps == taps + 1 and not entry.is_open(), "a tap elsewhere still picks a building")
+	page._on_map_tap((at - Vector2(0, 16)) / page._camera.size)
 	await process_frame
-	check(page._town == null and page._carpenter.text == page.TOWN_LOADING, "Loading… stays for the frame that draws it")
-	check(not page._account_button.visible or page._account_button.disabled, "the account entry waits while the town loads")
-	# The town's script compiles on a worker thread, so wait on the clock, not a frame count.
-	var started := Time.get_ticks_msec()
-	var deadline := started + 30000
-	while page._town == null and Time.get_ticks_msec() < deadline: await process_frame
-	check(page._town != null and page._town.who == "carpenter" and not page._hud.visible and page._town_script != null,
-		"once its script is loaded the carpenter opens over the map (%d ms)" % (Time.get_ticks_msec() - started))
-	if page._town == null:
-		ProjectSettings.set_setting(LOCAL_SAVE, null)
-		return
-	deadline = Time.get_ticks_msec() + 10000
-	while page._town.busy and Time.get_ticks_msec() < deadline: await process_frame
-	var seen: Dictionary = page._town.farm.duplicate(true)
-	page._town.close(); await process_frame
-	check(page._town == null and page._hud.visible and page._carpenter.text == "Carpenter" and not page._carpenter.disabled,
-		"closing the town brings the map's entries back")
-	check(page._farm_parcel == home and not seen.is_empty() and page.home_farm == seen, "the map keeps the save the town read for its line")
+	check(selector.taps == taps + 1 and entry.is_open() and not page._bottom.visible, "a tap on the pin opens its place card instead")
+	check(not page._locate.visible and not page._profile_button.visible and not page._home.visible,
+		"the round locate, My home and profile keys step aside for the card")
+	var labels: Array = entry.card.find_children("*", "Label", true, false).map(func(l): return l.text)
+	check(labels.has("Washington Square Travel Post") and labels.has("Market · Carpenter") and labels.has("Distance")
+		and entry.card.find_child("Primary", true, false) != null, "the card: name, Market · Carpenter, Distance from home, Go (%s)" % [labels])
+	check(page.is_back_navigation_locked() and not entry.is_open() and page._bottom.visible and page._profile_button.visible
+		and page._locate.visible and page._home.visible,
+		"Back closes the card first; the keys come back")
+	page._camera.frame_center(entry.LON, entry.LAT + 0.0004, 17.5) # the pin low on the screen, where the card goes
+	await process_frame
+	var low: Vector2 = entry.screen_point()
+	page._on_map_tap((low - Vector2(0, 16)) / page._camera.size)
+	check(low.y > page._camera.size.y * page.PIN_CLEAR_OF_CARD and entry.is_open() and page._camera.flying(),
+		"a pin low on the screen flies to the middle as its card opens")
+	entry.close_card(); page._camera.stop(); page._camera.frame_center(entry.LON, entry.LAT, 17.5)
+	await process_frame
+	var router := Router.new()
+	var real_router := RouterFixture.install(root, router)
+	page._bridge = OpaqueBridge.new()
+	ProjectSettings.set_setting(LOCAL_SAVE, true) # the room trades through the device save, not a server
+	page._on_map_tap((at - Vector2(0, 16)) / page._camera.size)
+	await process_frame
+	(entry.card.find_child("Primary", true, false) as UiCommandButton).activated.emit()
+	await process_frame
+	var opened: Array = router.opened.back() if not router.opened.is_empty() else ["", {}]
+	check(opened[0] == "res://scenes/dynamic_farm/parcel_outpost.tscn" and str(opened[1].get("parcel_id")) == home
+		and opened[1].get("store") != null and opened[1].store.block_id == home and not entry.is_open(),
+		"Go opens the 3D room with the home's parcel save")
+	RouterFixture.restore(root, router, real_router)
+	page._bridge = null
 	ProjectSettings.set_setting(LOCAL_SAVE, null)
+	# Without a home the card says so and has no Go.
+	entry.home_center = []
+	entry.open_card()
+	check(entry.card.find_child("Primary", true, false) == null and entry.card.find_children("*", "Label", true, false).any(
+		func(l): return l.text == "Claim a home first."), "without a home: Claim a home first., no Go")
+	entry.close_card()
 	page.home_farm = {}; page._farm_parcel = ""
 	page._render()
-
-## C-125 (C-61, Q-139): a map freed while the town's script still loads on a thread does not wait for it there (Back
-## from a map pushed over another page held the main thread until the town had loaded): AppRouter takes the load once
-## it is done, so none is left running for a quitting Godot either.
-func _town_load_on_free() -> void:
-	var router: Node = root.get_node("AppRouter")
-	var page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
-	root.add_child(page)
-	var town: String = page.TOWN
-	page._prepare_town()
-	check(page._town_prepared and ResourceLoader.load_threaded_get_status(town) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
-		"the town's script loads on a thread before any tap")
-	var freeing := Time.get_ticks_usec()
-	page.free()
-	print("TOWN_LOAD_ON_FREE ", JSON.stringify({"free_ms": (Time.get_ticks_usec() - freeing) / 1000.0,
-		"still_loading": ResourceLoader.load_threaded_get_status(town) == ResourceLoader.THREAD_LOAD_IN_PROGRESS}))
-	check(router._orphan_loads == [town], "a map freed meanwhile hands that load to AppRouter instead of waiting for it")
-	await _orphan_loads_taken()
-	check(ResourceLoader.load_threaded_get_status(town) == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
-		"AppRouter takes it once done, leaving no load of it running")
-	page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
-	root.add_child(page)
-	page._prepare_town()
-	page._town_router = null
-	page.free()
-	check(ResourceLoader.load_threaded_get_status(town) == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
-		"without AppRouter a freed map still takes the load itself")
-
-## Frames until AppRouter has taken every load a freed map left it (at most 60 s, far above the town's ~1.3 s compile).
-func _orphan_loads_taken() -> void:
-	var router: Node = root.get_node("AppRouter")
-	var deadline := Time.get_ticks_msec() + 60000
-	while not router._orphan_loads.is_empty() and Time.get_ticks_msec() < deadline: await process_frame
 
 ## Parcel ids the fake neighbour does not own.
 func _free_ids(server: RefCounted, count: int) -> Array:
@@ -424,7 +465,8 @@ func _account_kept_on_server_errors() -> void:
 	check(not await net.restore_saved_account() and not net.account.signed_in() and net.client.token.is_empty() and not FileAccess.file_exists(path) and str(net.get("restore_error")).is_empty(), "401: saved account and its file are cleared")
 	net.use_transport(gone, "https://restore.test/v1", "user://test_account.json")
 
-## C-110: the top panel always shows who is signed in with Sign in / Sign out, selected parcel or not.
+## C-110: the account chip always shows who is signed in with Sign in / Sign out, selected parcel or not (C-106: the
+## chip at the top right, C-85 ⑤ D).
 func _account_row() -> void:
 	var net = root.get_node_or_null("Net")
 	if net == null:
@@ -445,30 +487,34 @@ func _account_row() -> void:
 	page._claims = controller(server, "nobody", Native.new()); page._claims.changed.connect(page._render)
 	await page._claims.start()
 	page._render()
-	check(page._account_line.visible and page._account_line.text == page.NOT_SIGNED_IN and page._account_button.visible and page._account_button.text == "Sign in", "signed out, nothing selected: 'Not signed in' with 'Sign in'")
+	check(page._account_button.visible and page._account_button.text == "Sign in" and not page._avatar.visible and not page._account_button.disabled,
+		"signed out, nothing selected: the chip reads 'Sign in'")
 	page._restoring = true; page._render()
-	check(page._account_line.text == page.CHECKING and not page._account_button.visible, "while the saved account is checked: 'Checking your account…' and no button")
+	check(page._account_button.text == page.BUSY_DOTS and page._account_button.disabled, "while the saved account is checked: • • • on the chip and no tap")
 	page._restoring = false
 	net.account.adopt({"token": "row-token", "user_id": "u1", "player_id": "p1", "display_name": "Ash"}, path)
 	net.client.token = "row-token"
 	page._render()
-	check(page._account_line.text == "Signed in as Ash" and page._account_button.text == "Sign out" and not page._account_note.visible, "signed in: 'Signed in as Ash' with 'Sign out'")
+	check(page._account_button.text == "Ash" and page._avatar.visible and not page._account_toast.visible, "signed in: the chip shows the avatar and 'Ash'")
 	selector.selection = Fixture.metadata(_free_ids(server, 1)[0]); selector.selection.block_id = _free_ids(server, 1)[0]
 	page._render()
-	check(page._account_line.visible and page._account_button.visible and page._account_button.text == "Sign out", "the account entry stays while a parcel is selected")
+	check(page._account_button.visible and page._account_button.text == "Ash", "the account entry stays while a parcel is selected")
 	net.restore_error = "HTTP_503"; page._render()
-	check(page._account_note.visible and page._account_note.text == page.ACCOUNT_KEPT and page._account_button.text == "Sign out", "an account kept through a server error says so and can still sign out")
+	check(page._account_toast.visible and page._account_note.text == page.ACCOUNT_KEPT and page._account_button.text == "Ash" and not page._account_button.disabled,
+		"an account kept through a server error says so and can still sign out")
 	net.restore_error = ""
 	page._account_button.pressed.emit(); await process_frame
-	check(page._sign_out_confirm.visible and not page._account_button.visible and net.account.signed_in(), "'Sign out' asks first; nothing is cleared yet")
-	page._sign_out_confirm.get_child(1).get_child(1).pressed.emit(); await process_frame
+	check(page._sign_out_confirm.visible and net.account.signed_in(), "a tap on the chip asks 'Sign out on this phone?' first; nothing is cleared yet")
+	var answer := func(text: String) -> Button: return page._sign_out_confirm.find_children("*", "Button", true, false).filter(func(b): return b.text == text)[0]
+	check(answer.call("Sign out").theme_type_variation == UiTokens.BUTTON_CMD_DESTRUCTIVE, "'Sign out' is the danger key")
+	answer.call("Cancel").pressed.emit(); await process_frame
 	check(not page._sign_out_confirm.visible and page._account_button.visible and net.account.signed_in(), "'Cancel' keeps the account")
 	page._account_button.pressed.emit(); await process_frame
 	calls.clear()
 	await page._sign_out()
 	check(not net.account.signed_in() and not FileAccess.file_exists(path) and net.client.token.is_empty(), "'Sign out' clears this phone's account and its file")
 	check(calls.size() >= 1 and calls[0] == ["DELETE", "/auth/token", true] and not calls.any(func(c): return c[1] == "/auth/anonymous"), "sign-out revokes this phone's token and does not sign in as a guest")
-	check(page._account_line.text == page.NOT_SIGNED_IN and page._account_button.text == "Sign in", "after signing out the panel offers 'Sign in' again")
+	check(page._account_button.text == "Sign in" and not page._avatar.visible and not page._sign_out_confirm.visible, "after signing out the chip offers 'Sign in' again")
 	# C-100: an install-and-play package (guest_play) goes on as this installation's guest after signing out.
 	net.account.adopt({"token": "row-token", "user_id": "u1", "player_id": "p1", "display_name": "Ash"}, path)
 	net.client.token = "row-token"
@@ -509,7 +555,7 @@ func _home_framing() -> void:
 	page._restoring = false
 	await page._claims.start()
 	check(page._framed and near.call(page._camera, home_center, page.HOME_ZOOM), "with a home, the map opens on the home")
-	check(page._home.visible and not page._home.disabled and page._places.visible, "'My home' is shown for a player with a home")
+	check(page._home.visible and not page._home.disabled, "'My home' is shown for a player with a home")
 	page._camera.frame_center(-122.43, 37.76, 16.0); page._camera.user_moved.emit()
 	page._render()
 	check(near.call(page._camera, [-122.43, 37.76], 16.0), "later renders do not pull a moved camera back")
@@ -556,6 +602,39 @@ func _home_framing() -> void:
 	page.queue_free(); pair[1].queue_free()
 	await process_frame
 
+## C-113 Q-172: with the map on r8, a home claimed on r6 is entered in its r6 farm, from the card or from "My home"
+## (r8 has no farm for a few r6 parcels, so its building may not be on the map); a home claimed on r8 enters r8.
+func _earlier_release_home() -> void:
+	const R6 := "sf-dynamic-farm-20261124-r6"
+	const R8 := "sf-dynamic-farm-20261125-r8"
+	ProjectSettings.set_setting(OWN_FARM, true)
+	for case in [[R6, R6, "r6"], [R8, R8, "r8"], ["sf-dynamic-farm-20261118-r4", R8, "an unlisted r4"]]:
+		var server := FakeServer.new(); server.dataset = case[0]
+		var home_id: String = _free_ids(server, 1)[0]
+		await ClaimApi.new(server.client("fake-a"), case[0]).claim(home_id, [-122.4101, 37.7801])
+		var page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
+		root.add_child(page)
+		var selector := Selector.new(); root.add_child(selector)
+		selector.manifest = {"dataset_version": R8, "native_map": {"minzoom": 16, "center": [-122.45, 37.73], "initial_zoom": 16.5}}
+		selector.releases = {R6: "https://old.invalid/r6/"}
+		page._selector = selector; page._camera = CameraInput.new(); page.add_child(page._camera)
+		page._framed = true; page._area_generation = selector.generation
+		page._claims = controller(server, "fake-a", Native.new()); page._claims.changed.connect(page._render)
+		await page._claims.start()
+		page._home.pressed.emit()
+		check(selector.homes == ([[home_id, R6]] if case[1] == R6 else []), "home claimed on %s: 'My home' %s" % [case[2],
+			"also selects it from its r6 farm" if case[1] == R6 else "only flies there"])
+		selector.selection = Fixture.metadata(home_id); selector.selection.block_id = home_id
+		page._render()
+		check(page._enter.visible, "home claimed on %s: the card offers 'Enter my farm'" % case[2])
+		page._enter.pressed.emit()
+		check(selector.releases_opened == [case[1]] and page._entering == home_id, "home claimed on %s: 'Enter my farm' opens its %s farm" % [case[2], "r6" if case[1] == R6 else "r8"])
+		page._preview()
+		check(selector.releases_opened.back() == "", "a 3D preview always reads the map's release")
+		page.queue_free(); selector.queue_free()
+		await process_frame
+	ProjectSettings.set_setting(OWN_FARM, false)
+
 func _write(path: String, text: String) -> void:
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	f.store_string(text); f.close()
@@ -594,3 +673,97 @@ func _guest_play_sign_in() -> void:
 	calls.clear()
 	check(await net.dynamic_farm_sign_in(false, true) and net.client.token == "guest-token", "a package that does not restore accounts plays as a guest")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+## C-130 starter zone: the server's zone (fake stand-in with the same answers) decides where a player without a home may
+## claim; the map lands there, hides the claim button outside it and sends the zone to its own native layer.
+const ZONE_CENTER := [-122.40732, 37.79925]
+func _zone(ids: Array) -> Dictionary:
+	return {"id": "north-beach", "name": "North Beach", "community_id": "sf", "dataset_version": "x",
+		"boundary": [[-122.409202, 37.800444], [-122.406038, 37.800839], [-122.405498, 37.79802], [-122.408632, 37.797627], [-122.409202, 37.800444]],
+		"center": ZONE_CENTER, "zoom": 17, "parcel_ids": ids}
+
+func _starter_zone() -> void:
+	var server := FakeServer.new()
+	var ids := _free_ids(server, 3)
+	var api := ClaimApi.new(server.client("fake-a"))
+	var off: Dictionary = await api.starter_zone()
+	check(off.ok and off.zone.is_empty(), "zone switched off: an empty zone")
+	server.zone = _zone([ids[0], ids[1]])
+	var on: Dictionary = await ClaimApi.new(server.client("nobody")).starter_zone()
+	check(on.ok and on.zone.parcel_ids.has(ids[0]) and not on.zone.parcel_ids.has(ids[2]) and on.zone.zoom == 17.0, "the zone is public and parsed")
+	for bad in [{"boundary": []}, {"center": [0, 99]}, {"zoom": 30}, {"parcel_ids": ["3139001"]}, {"parcel_ids": []}]:
+		var broken := _zone([ids[0]]); broken.merge(bad, true)
+		check(ClaimApi.parse_zone(broken).is_empty(), "a malformed zone is refused: %s" % JSON.stringify(bad))
+	var outside: Dictionary = await api.claim(ids[2], [-122.45, 37.73])
+	check(not outside.ok and outside.status == 403 and outside.code == "OUTSIDE_STARTER_ZONE", "the stand-in refuses a claim outside the zone like the server")
+	# Controller: the zone is read with the home and sent to its own native layer for every generation.
+	var native := Native.new()
+	var c := controller(server, "fake-b", native)
+	await c.start(); await process_frame
+	check(c.zone_known and c.in_zone(ids[0]) and not c.in_zone(ids[2]), "the controller knows which parcels are in the zone")
+	c.attach(4, "")
+	var sent: Dictionary = JSON.parse_string(native.zones.back()[1])
+	check(native.zones.back()[0] == 4 and sent.boundary.size() == 5 and sent.line_color == "#3E7D43" and sent.mask_opacity == 0.55, "the zone goes to the native layer with its style")
+	var count := native.zones.size()
+	c.attach(4, ids[0]); await process_frame
+	check(native.zones.size() == count, "the zone is not resent for the same generation")
+	c.show_zone(4)
+	check(native.zones.size() == count, "nor by the marker's own entry")
+	c.show_zone(6)
+	check(native.zones.size() == count + 1 and native.zones.back()[0] == 6 and native.zones.back()[1] == native.zones[count - 1][1], "its own entry sends it for a generation whose parcel layers are not ready yet")
+	c.attach(5, ids[0]); await process_frame
+	check(native.zones.back()[0] == 5, "a new generation gets the zone again")
+	await c.claim({"block_id": ids[2], "center": [-122.45, 37.73]})
+	check(not c.has_home() and c.message == Claims.OUTSIDE_ZONE, "a claim outside the zone says so and gives no home")
+	await process_frame
+	await c.claim({"block_id": ids[0], "center": [-122.45, 37.73]})
+	check(c.has_home() and c.status(ids[0]) == "mine", "a claim inside the zone gives the home")
+	c.queue_free()
+	var plain := Native.new()
+	var unzoned := controller(FakeServer.new(), "fake-a", plain)
+	await unzoned.start(); unzoned.attach(4, "")
+	check(unzoned.in_zone(ids[2]) and plain.zones.back() == [4, ""], "without a zone every parcel may be claimed and the layer is cleared")
+	unzoned.queue_free()
+	# Map: lands on the zone without a home, offers claiming only inside it.
+	var page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
+	root.add_child(page)
+	var selector := Selector.new(); root.add_child(selector)
+	selector.manifest = {"native_map": {"minzoom": 16, "center": [-122.4519, 37.7294], "initial_zoom": 16.5}}
+	page._selector = selector; page._camera = CameraInput.new(); page.add_child(page._camera)
+	page._camera.user_moved.connect(func(): page._player_moved = true)
+	page._area_generation = selector.generation
+	var other := FakeServer.new(); other.zone = _zone([ids[0], ids[1]])
+	var page_native := Native.new()
+	page._claims = controller(other, "fake-b", page_native); page._claims.changed.connect(page._render)
+	page._camera.frame_center(-122.50, 37.80, 15.0)
+	selector.map_ready = false # C-130 V-362: below the selectable zoom the parcel layers do not load.
+	await page._claims.start(); await process_frame
+	check(not page_native.zones.is_empty() and page_native.zones.back()[0] == selector.generation and not page_native.zones.back()[1].is_empty(), "the starter zone marker is drawn before the parcel layers are ready")
+	check(page_native.batches.is_empty(), "parcel colours still wait for the parcel layers")
+	selector.map_ready = true
+	var near := func(point: Array, zoom: float) -> bool:
+		return absf(page._camera.center[0] - point[0]) < 1e-6 and absf(page._camera.center[1] - point[1]) < 1e-6 and is_equal_approx(page._camera.zoom, zoom)
+	check(page._framed and near.call(ZONE_CENTER, 17.0), "without a home the map opens on the starter zone")
+	ProjectSettings.set_setting(OWN_FARM, true)
+	selector.selection = Fixture.metadata(ids[2]); selector.selection.block_id = ids[2]
+	page._render(); await process_frame
+	check(not page._claim.visible and page._details.text.ends_with(Claims.OUTSIDE_ZONE) and page._open.visible, "a free parcel outside the zone: no claim button, 'Not in the starter area.', preview still offered")
+	selector.selection = Fixture.metadata(ids[1]); selector.selection.block_id = ids[1]
+	page._render(); await process_frame
+	check(page._claim.visible and not page._details.text.ends_with(Claims.OUTSIDE_ZONE), "a free parcel inside the zone can be claimed")
+	page._camera.frame_center(-122.43, 37.76, 18.0); page._camera.user_moved.emit()
+	page._locate.pressed.emit()
+	await create_timer(page._camera.FLIGHT_MAX_S + 0.3).timeout
+	check(near.call(ZONE_CENTER, 17.0), "without a home the locate key goes back to the starter zone")
+	ProjectSettings.set_setting(OWN_FARM, false)
+	page.queue_free(); selector.queue_free()
+	# A home outside the zone (claimed before it) is still the home: the map opens there, never on the zone.
+	var before := FakeServer.new()
+	var far_home := [-122.4101, 37.7801]
+	await ClaimApi.new(before.client("fake-a")).claim(ids[2], far_home)
+	before.zone = _zone([ids[0]])
+	var kept := controller(before, "fake-a", Native.new())
+	await kept.start()
+	check(kept.has_home() and kept.mine.parcel_id == ids[2], "a home outside the zone is kept")
+	kept.queue_free()
+	await process_frame

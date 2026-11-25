@@ -41,9 +41,6 @@ const _INBOX_GAP := 7             # coins → bell
 const _CHIP_PAD := 8              # chips: left padding
 const _CHIP_PAD_END := 6          # chips: right padding before the chevron
 const _CAPSULE_PAD := 7           # coins capsule padding, icon gap 4
-const _ENERGY_PAD := Vector2(8, 2)   # Figma 8 / 3 with 2 px gaps; Godot line boxes are taller, so 2 / 1 keeps 42
-const _ENERGY_GAP := 1
-const _ICON_ENERGY := 12
 const _ICON_COIN := 13
 const _ICON_BELL := 18
 const _SKILL_GAP := 4.0           # degrees each skill half stops short of 12 and 6 o'clock
@@ -78,12 +75,11 @@ var show_balances := true: set = set_show_balances
 
 var _frame: Control
 var _ring: _SkillRing
-var _energy_chip: _Chip
+## The Energy chip is UiEnergyChip (C-148: the same chip stands alone in the dynamic farm); its number label.
+var _energy_chip: UiEnergyChip
 var _energy_value: Label
 var _energy_tween: Tween
 var _energy_shown := -1.0
-var _energy_track: _Track
-var _energy_regen: Label
 var _buff: PanelContainer
 var _buff_icon: TextureRect
 var _buff_left: Label
@@ -242,33 +238,9 @@ func _build_row1() -> void:
 	_ring.add_child(portrait)
 	row.add_child(avatar)
 	row.add_child(_gap(_AVATAR_GAP))
-	_energy_chip = _Chip.new(UiTokens.RADIUS_HUD_CHIP, UiTokens.SIZE_ENERGY_CHIP_H)
-	_energy_chip.custom_minimum_size.x = UiTokens.SIZE_ENERGY_CHIP_W
+	_energy_chip = UiEnergyChip.new()
 	_energy_chip.pressed.connect(func(): energy_pressed.emit())
-	_energy_chip.body.add_theme_constant_override(&"margin_left", int(_ENERGY_PAD.x))
-	_energy_chip.body.add_theme_constant_override(&"margin_top", int(_energy_chip.margin_y() + _ENERGY_PAD.y))
-	var col := VBoxContainer.new()
-	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	col.add_theme_constant_override(&"separation", _ENERGY_GAP)
-	col.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	_energy_chip.body.add_child(col)
-	var top := HBoxContainer.new()
-	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	top.add_theme_constant_override(&"separation", _ENERGY_GAP)
-	var bolt := UiKit.icon(ICON_ENERGY, _ICON_ENERGY)
-	bolt.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	top.add_child(bolt)
-	_energy_value = UiKit.label("", UiTokens.STYLE_C14_XB)
-	top.add_child(_energy_value)
-	col.add_child(top)
-	_energy_track = _Track.new()
-	_energy_track.hud = self
-	_energy_track.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_energy_track.custom_minimum_size = Vector2(UiTokens.SIZE_ENERGY_TRACK_W, UiTokens.SIZE_ENERGY_TRACK_H)
-	_energy_track.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	col.add_child(_energy_track)
-	_energy_regen = UiKit.label("", UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY)
-	col.add_child(_energy_regen)
+	_energy_value = _energy_chip.value_label
 	row.add_child(_energy_chip)
 	row.add_child(_gap(_BUFF_GAP))
 	_buff = _capsule()
@@ -276,7 +248,7 @@ func _build_row1() -> void:
 	_buff_icon = UiKit.icon(null, _ICON_BUFF)
 	_buff_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	bh.add_child(_buff_icon)
-	_buff_left = UiKit.label("", UiTokens.STYLE_C11_XB, UiTokens.COLOR_PRIMARY)
+	_buff_left = UiKit.label("", UiTokens.STYLE_C11_XB, UiTokens.COLOR_PRIMARY_INK)
 	_buff_left.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	bh.add_child(_buff_left)
 	row.add_child(_buff)
@@ -404,14 +376,7 @@ static func _capsule() -> PanelContainer:
 
 func _refresh() -> void:
 	if _place_suffix == null: return
-	var e := energy_state()
-	_energy_value.text = "%d/%d" % [roundi(_energy_shown) if _energy_shown >= 0.0 else int(data.energy), int(data.energy_max)]
-	var ink := UiTokens.COLOR_TEXT
-	if e == Energy.LOW: ink = UiTokens.COLOR_WARNING
-	elif e == Energy.EMPTY: ink = UiTokens.COLOR_DANGER
-	_energy_value.add_theme_color_override(&"font_color", ink)
-	_energy_regen.text = str(data.regen)
-	_energy_track.queue_redraw()
+	_energy_chip.show_energy(int(data.energy), int(data.energy_max), str(data.regen), int(data.next_cost), _energy_shown)
 	_ring.farming = clampf(float(data.skills.get("farming", 0.0)), 0.0, 1.0)
 	_ring.fishing = clampf(float(data.skills.get("fishing", 0.0)), 0.0, 1.0)
 	_ring.queue_redraw()
@@ -524,25 +489,6 @@ class _SkillRing extends Control:
 			var p := get_child(0) as Control
 			p.position = (Vector2(UiTokens.SIZE_SKILL_RING, size.y) - p.size) * 0.5
 
-## Energy bar: green fill (amber when Low, none at 0); Bonus draws the over-cap part in light green.
-class _Track extends Control:
-	var hud: UiHud
-
-	func _draw() -> void:
-		var rect := Rect2(Vector2.ZERO, size)
-		var radius := size.y * 0.5
-		draw_style_box(UiStyleBox.make(UiTokens.COLOR_BORDER, radius), rect)
-		var e := hud.energy_state()
-		if e == UiHud.Energy.EMPTY: return
-		var mx := maxf(1.0, float(hud.data.energy_max))
-		var pct := clampf(float(hud.data.energy) / mx, 0.0, 1.0)
-		var fill := UiTokens.COLOR_ENERGY_HUD_FILL if e == UiHud.Energy.LOW else UiTokens.COLOR_PRIMARY
-		draw_style_box(UiStyleBox.make(fill, radius), Rect2(Vector2.ZERO, Vector2(maxf(size.y, size.x * pct), size.y)))
-		if e == UiHud.Energy.BONUS:
-			var over := clampf((float(hud.data.energy) - mx) / mx, 0.0, 1.0)
-			var w := maxf(size.y, size.x * over)
-			draw_rect(Rect2(Vector2(size.x - w, 0.0), Vector2(w, size.y)), UiTokens.COLOR_ENERGY_BONUS)
-
 ## The priest's buffs (q(300) ⑨): `buffs` [{icon, remaining "18:20", progress 0..1}], left to right; display only.
 ## Laid out by hand: the pills are wider than the circles and set the slots, the circles' centres 40 apart.
 class _BuffRings extends Control:
@@ -595,7 +541,7 @@ class _BuffRings extends Control:
 		var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, _BUFF_PILL_H * 0.5, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
 		pill.add_theme_stylebox_override(&"panel", box.with_margins(_BUFF_PILL_PAD, 0, _BUFF_PILL_PAD, 0))
 		pill.custom_minimum_size.y = _BUFF_PILL_H
-		var label := UiKit.label("", UiTokens.STYLE_C10_XB, UiTokens.COLOR_PRIMARY)
+		var label := UiKit.label("", UiTokens.STYLE_C10_XB, UiTokens.COLOR_PRIMARY_INK)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		pill.add_child(label)

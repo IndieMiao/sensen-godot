@@ -5,14 +5,24 @@ extends SceneTree
 ## faces it and plays the labour clip; the result shows as the clip ends; a cell with nowhere to
 ## stand says so and sends nothing; the stick cancels a walk; the parcel stays covered until the
 ## save is applied. C-33: opening the house placement gives up a press still walking. C-114: Build pops the
-## cottage in with dust round it; reopening shows it still, without dust. Run in the private preview project (README), optionally
+## cottage in with dust round it; reopening shows it still, without dust. C-138: the carrot's stage and the dry soil block
+## are drawn; the development switch draws the soil wet. C-136: a claim made on an older dataset opens on the
+## server save once the enter request names the opened farm's dataset (Q-168), the lost first try included. C-113: with
+## the map on r8, an r6 home opens its r6 farm and its enter names r6 (Q-172: not moved); an r4 home opens in r8 and its
+## enter names r8 (moved, Q-168). Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
+const RemoteStore = preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
-const House = preload("res://modules/dynamic_farm/farm_house.gd")
+const Building = preload("res://modules/dynamic_farm/farm_building.gd")
+## Pixels the quick bar's global rect may sit off its rest after M-16's slide back (C-147). Control only refreshes its
+## cached global transform when the position moves by more than is_equal_approx (relative 1e-5, about 0.006 px at
+## y 600), so a tween's last sub-0.006 px step leaves get_global_rect() one frame behind, for good. Far below the
+## 24 px slide (UiMotion.BAR_HIDE_Y) the assertion has to catch.
+const BAR_REST_TOLERANCE_PX := 0.1
 var checks := 0
 var failures := 0
 var raw: Dictionary
@@ -42,6 +52,26 @@ class FlakyStore extends RefCounted:
 		return inner.enter()
 	func send(base_version: int, commands: Array) -> Dictionary: return inner.send(base_version, commands)
 
+## C-136 stand-in for the server's /parcels/mine endpoints holding the player's claim on an older dataset: an enter
+## naming a dataset moves the claim to it (Q-168 rebase; the cell progress is gone, the bag kept); anything else answers
+## the claim as it is. The first `drop` requests are lost like a dropped connection.
+class OldClaimServer extends RefCounted:
+	var block_id: String
+	var dataset: String
+	var farm: Dictionary
+	var drop := 0
+	var enters: Array = [] # Bodies of the enter requests that reached the server, lost ones included.
+	func handle(method: String, url: String, _headers: PackedStringArray, body: String) -> ApiClient.Response:
+		var data = JSON.parse_string(body) if not body.is_empty() else {}
+		if method == "POST" and url.ends_with("/parcels/mine/enter"):
+			enters.append(data)
+			if data is Dictionary and data.get("dataset_version") is String: dataset = data.dataset_version
+		if drop > 0:
+			drop -= 1
+			return ApiClient.Response.new(false, 0, {}, "transport error")
+		return ApiClient.Response.new(true, 200, {"granted": false, "server_time": int(Time.get_unix_time_from_system() * 1000.0),
+			"parcel": {"parcel_id": block_id, "dataset_version": dataset, "farm_version": 5, "farm": farm}})
+
 func _initialize() -> void:
 	_run.call_deferred()
 
@@ -59,6 +89,11 @@ func _run() -> void:
 	await _reopen()
 	await _placement_takes_over()
 	await _house_pops_once()
+	await _placement_turns()
+	await _energy_short_and_rest()
+	await _energy_comes_back()
+	await _older_dataset_claim()
+	await _release_named_on_enter()
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
 	print("PARCEL_FARMING_SCENE checks=%d failures=%d" % [checks, failures])
@@ -69,9 +104,13 @@ func _store() -> RefCounted:
 	store.now_ms = func() -> int: return int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
 	return store
 
-func _open(store: RefCounted = null) -> Node:
+## `farm` defaults to the fixture; `net_store` leaves the save to the scene's own server store, as the map opens it.
+func _open(store: RefCounted = null, farm: Dictionary = {}, net_store := false) -> Node:
+	var opened := raw if farm.is_empty() else farm
+	var args := {"farm": opened, "dataset": opened.dataset_version, "block_id": opened.block_id, "own_parcel": true}
+	if not net_store: args.farm_store = store if store != null else _store()
 	scene = (load(SCENE_PATH) as PackedScene).instantiate()
-	scene.setup({"farm": raw, "dataset": raw.dataset_version, "block_id": raw.block_id, "own_parcel": true, "farm_store": store if store != null else _store()})
+	scene.setup(args)
 	if store is FlakyStore: store.scene = scene
 	var state := {"ready": false}
 	scene.preview_ready.connect(func(_summary): state.ready = true)
@@ -132,10 +171,11 @@ func _obstacle_instances(farming: Node) -> int:
 	return count
 
 func _first_visit() -> void:
-	# Stand-in for C-33: a cottage already placed in the save before the first entry.
+	# Stand-in for C-33: a cottage already placed in a save from before C-150 (only `house`, no `buildings`).
 	var data: Dictionary = scene_data()
 	var house_at := _free_block(data)
 	var seeded := ParcelFarm.empty_state()
+	seeded.erase("buildings")
 	seeded.house = {"model": "cottage", "x": house_at.x, "y": house_at.y, "width": 3, "depth": 3, "rotation": 0, "built_at": 0}
 	DirAccess.make_dir_recursive_absolute(dir)
 	var file := FileAccess.open(dir.path_join(raw.block_id.validate_filename() + ".json"), FileAccess.WRITE)
@@ -172,6 +212,10 @@ func _first_visit() -> void:
 	_check(_tip(farming) == "", "a tap closes the card")
 	_check(farming._bar.visible and _bar_counts(farming) == {"hoe_starter": 1, "seed_carrot": 3, "blueprint_cottage": 1}, "quick bar shows hoe, seeds and the blueprint")
 	_check(farming._bar.slots[2].icon == load("res://modules/dynamic_farm/parcel_items.gd").icon_of("blueprint_cottage"), "the blueprint has the parcel adapter's placeholder icon (C-59)")
+	_check(farming._bar.slots[0].icon == UiArt.item("row_tool") and farming._bar.slots[1].icon == UiArt.item("seed_carrot"),
+		"the hoe and the seeds show C-86's v3 item art (C-105)")
+	_check(farming._bar.bag_icon == UiArt.SYS_BAG and (scene._coins_capsule as UiGlassCapsule).icon == UiArt.COIN,
+		"the Bag end and the coins capsule show the v3 bag and coin (C-105)")
 	_check(scene._coins_capsule.visible and scene._coins.text == "0", "the top bar shows the parcel's coins, 0 on a new parcel (C-59)")
 	scene._on_farm_changed(farming.farm.merged({"coins": 12}, true))
 	_check(scene._coins.text == "12", "the coins follow the save")
@@ -194,7 +238,7 @@ func _first_visit() -> void:
 	var key: Array
 	var all_clear := block.size() == 4
 	for at: Vector2i in block:
-		all_clear = all_clear and farming.obstacle_cells().has(at) and await _key(farming, at) == ["Clear", "Free", UiSceneAction.State.DEFAULT]
+		all_clear = all_clear and farming.obstacle_cells().has(at) and await _key(farming, at) == ["Clear", "2 Energy", UiSceneAction.State.DEFAULT]
 	_check(all_clear, "every cell under the tree offers Clear, none Till")
 	_check(not _beside(block), "the tree starts out of reach")
 	# The stick cancels the walk: nothing is sent.
@@ -217,20 +261,29 @@ func _first_visit() -> void:
 	for at: Vector2i in block:
 		freed = freed and not farming.obstacle_cells().has(at) and (await _key(farming, at))[0] != "Clear"
 	_check(freed and walk.clear_position(walk.point(obstacle)), "and frees the whole block and the walk")
-	_check(farming.farm.bag.get("hoe_starter") == 1, "clearing costs nothing")
+	_check(farming.farm.bag.get("hoe_starter") == 1 and farming.energy_value() == 198, "clearing uses no item, 2 Energy (C-148)")
+	_check("−2 Energy" in _floats(farming), "the Energy it cost floats up: %s" % [_floats(farming)])
 	# Till, sow, wait, harvest.
 	var cell := _free_cell(data, farming)
-	_check(await _key(farming, cell) == ["Till", "Free", UiSceneAction.State.DEFAULT], "a free core cell offers Till")
+	_check(await _key(farming, cell) == ["Till", "2 Energy", UiSceneAction.State.DEFAULT], "a free core cell offers Till for 2 Energy")
 	seen = await _press(farming, cell)
 	_check(_beside([cell]) and seen.clips.has("labour_till") and not seen.early, "till: beside the cell, facing it, the till clip")
-	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._soil.counts().get("soil", 0) == 1, "one press tills, soil drawn")
+	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crop_art.counts().soil == {"dry": 1, "wet": 0}, "one press tills, one dry soil block drawn")
 	_check(_tip(farming) == "Press Sow to plant Carrot Seeds in your soil.", "the next step's card comes back after tilling: " + _tip(farming))
-	_check(await _key(farming, cell) == ["Sow", "Carrot", UiSceneAction.State.DEFAULT], "tilled soil offers Sow")
+	_check(await _key(farming, cell) == ["Sow", "3 Energy", UiSceneAction.State.DEFAULT], "tilled soil offers Sow for 3 Energy")
 	seen = await _press(farming, cell)
 	_check(seen.moved < 0.01 and seen.clips.has("labour_sow"), "already beside it: no walk, the sow clip")
 	var crop: Dictionary = farming.farm.crops.get(ParcelFarm.key(cell), {})
 	_check(crop.get("ripe_at", 0) - crop.get("planted_at", 0) == 60000 and farming.farm.bag.seed_carrot == 2, "sown: 60 s to ripen, one seed used")
+	_check(farming.energy_value() == 193 and scene._header.get_node("Energy").value_label.text == "193/200", "clear 2 + till 2 + sow 3: the top bar's chip reads 193/200")
 	_check(_bar_counts(farming).get("seed_carrot") == 2, "the quick bar's seed count follows at once")
+	_check(farming._crop_art.counts().stages == [0, 1, 0, 0, 0, 0, 0], "C-138: the sown carrot shows its sowing stage at once")
+	_check(not farming.wet_soil_preview and farming._crop_art.counts().soil == {"dry": 1, "wet": 0}, "C-138: no watering yet, the soil is dry")
+	farming.wet_soil_preview = true
+	farming._draw_crops()
+	_check(farming._crop_art.counts().soil == {"dry": 0, "wet": 1}, "C-138: the development switch previews wet soil")
+	farming.wet_soil_preview = false
+	farming._draw_crops()
 	_check(_tip(farming) == "", "no card while the carrot grows")
 	key = await _key(farming, cell)
 	_check(key[0] == "Growing" and key[1] in ["Ready in 1:00", "Ready in 0:59", "Ready in 0:58"] and key[2] == UiSceneAction.State.UNAVAILABLE, "growing counts down")
@@ -240,7 +293,7 @@ func _first_visit() -> void:
 	_check(await _key(farming, _outside_cell(data)) == ["Till", "Not farmland", UiSceneAction.State.UNAVAILABLE], "outside the core refuses")
 	_check(await _key(farming, data.spawn) == ["Till", "On the path", UiSceneAction.State.UNAVAILABLE], "the protected path refuses")
 	var under_house := house_at
-	for at: Vector2i in ParcelFarm.house_cells(farming.farm):
+	for at: Vector2i in ParcelFarm.building_cells(farming.farm):
 		if not farming._obstacles.has(at): under_house = at
 	_check(await _key(farming, under_house) == ["Till", "House here", UiSceneAction.State.UNAVAILABLE], "the house refuses")
 	version = farming.farm_version
@@ -263,16 +316,17 @@ func _first_visit() -> void:
 	_check(walk.position == at_start, "and the player stays put")
 	shift[0] += 60000
 	farming._clock_offset_ms += 60000
-	_check(await _key(farming, cell) == ["Harvest", "Free", UiSceneAction.State.DEFAULT], "ripe after 60 s")
+	_check(await _key(farming, cell) == ["Harvest", "", UiSceneAction.State.DEFAULT], "ripe after 60 s; harvesting is free, no price (LOCK-02)")
 	await create_timer(farming.get_script().REDRAW_S * 2).timeout
 	_check(_tip(farming) == "Your carrot is ripe. Press Harvest!", "a ripe carrot brings the harvest card: " + _tip(farming))
+	_check(farming._crop_art.counts().stages == [0, 0, 0, 0, 0, 0, 1], "C-138: the ripe carrot is drawn mature")
 	seen = await _press(farming, cell)
 	_check(_beside([cell]) and seen.clips.has("labour_harvest") and not seen.early, "harvest: beside the cell, the harvest clip")
 	_check(farming.farm.bag.get("crop_carrot") == 1 and farming.last_gains == {"crop_carrot": 1}, "harvest goes to the bag")
 	_check("+1 Carrot" in _floats(farming) and _flights(farming) >= 1, "the harvest floats up and flies into the bag")
 	_check(_bar_counts(farming).get("crop_carrot") == 1, "the quick bar shows the carrot")
-	_check(_tip(farming) == "Head back to the map and tap Market to sell your carrot.", "after the first harvest the card sends the carrot to the Market (C-61): " + _tip(farming))
-	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crops.counts().get("C", 0) == 0, "the soil stays tilled, the carrot is gone")
+	_check(_tip(farming) == "Head back to the map and tap Washington Square to sell your carrot.", "after the first harvest the card sends the carrot to the Market (C-61, C-115: at Washington Square): " + _tip(farming))
+	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crop_art.counts().stages == [1, 0, 0, 0, 0, 0, 0], "the soil stays tilled, the carrot is gone")
 	await _press(farming, cell)
 	await _press(farming, cell)
 	_check(farming.farm.crops.has(ParcelFarm.key(cell)), "sow again for the reopen check")
@@ -309,7 +363,7 @@ func _reopen() -> void:
 	names = farming._bar.cells().slice(0, 3).map(func(c): return str(c.get("_name").text).replace("\n", " "))
 	_check(names == ["Starter Hoe", "Carrot Seeds", "Carrot"], "resumed, quick bar names stay English: %s" % [names])
 	_check(farming.farm.cleared.size() == 1 and _obstacle_instances(farming) == farming._core_plan.layout.size() - 1, "the cleared obstacle stays gone")
-	_check(farming._soil.counts().get("soil", 0) == 1, "tilled soil is still drawn")
+	_check(farming._crop_art.counts().soil == {"dry": 1, "wet": 0}, "tilled soil is still drawn")
 	var key: Array
 	for crop_key: String in farming.farm.crops:
 		key = await _key(farming, ParcelFarm.parse_key(crop_key))
@@ -336,8 +390,86 @@ func _full_bag(farming: Node) -> void:
 	_check(screen.encloses(scene._header.get_global_rect()) and scene._coins.text == "1234", "the top bar with 1234 coins stays on screen: %s" % scene._header.get_global_rect())
 	farming.open_bag()
 	await process_frame
-	_check(farming._grid.items.size() == 8, "the Bag lists all 8: %d" % farming._grid.items.size())
+	_check(farming._bag_slots.size() == 8 and farming._slots.get_child_count() == 9, "the Bag lists all 8: %d" % farming._bag_slots.size())
 	farming.close_bag()
+
+## C-148: a save short of Energy: the chip, the amber key that opens P0's Energy card instead of sending, its tiles,
+## Rest at the cottage's door (+60 once a player day) and the chip's panel.
+func _energy_short_and_rest() -> void:
+	var data: Dictionary = scene_data()
+	var house_at := _free_block(data)
+	var now: int = int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
+	var seeded := ParcelFarm.empty_state()
+	# C-150 save: the cottage is building 1 of the building list (house is only its mirror for older clients).
+	var cottage := {"model": "cottage", "x": house_at.x, "y": house_at.y, "width": 3, "depth": 3, "rotation": 0, "built_at": 0}
+	seeded.buildings = [cottage.merged({"id": 1, "type": "cottage"})]
+	seeded.house = cottage
+	seeded.welcomed_at = now - 8 * 86400000
+	seeded.bag = {"hoe_starter": 1, "seed_carrot": 3}
+	seeded.energy = {"value": 1, "at": now, "rested_on": null}
+	var energy_dir := dir + "_energy"
+	DirAccess.make_dir_recursive_absolute(energy_dir)
+	var file := FileAccess.open(energy_dir.path_join(raw.block_id.validate_filename() + ".json"), FileAccess.WRITE)
+	file.store_string(JSON.stringify({"block_id": raw.block_id, "farm_version": 3, "farm": seeded}))
+	file.close()
+	var store := LocalStore.new(raw.block_id, energy_dir)
+	store.now_ms = func() -> int: return int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
+	var farming := await _open(store)
+	var chip: UiEnergyChip = scene._header.get_node_or_null("Energy")
+	_check(chip != null and chip.visible and chip.get_index() == scene._coins_capsule.get_index() - 1, "the top bar shows P0's Energy chip before the coins")
+	_check(chip.value_label.text == "1/200" and chip.regen_text().begins_with("+1 in "), "the chip: 1/200, +1 in m:ss: %s %s" % [chip.value_label.text, chip.regen_text()])
+	var screen: Rect2 = farming._ui.get_global_rect()
+	_check(screen.encloses(scene._header.get_global_rect()), "the top bar with the chip stays on screen: %s" % scene._header.get_global_rect())
+	var cell := _free_cell(data, farming)
+	_check(await _key(farming, cell) == ["Till", "Need 2 Energy", UiSceneAction.State.INSUFFICIENT], "short: the key turns amber, Need 2 Energy (LOCK-10)")
+	_check(chip.state() == UiHud.Energy.LOW, "short of the next action the chip is amber too (LOCK-06)")
+	var version: int = farming.farm_version
+	farming._key.pressed_down.emit()
+	await process_frame
+	_check(farming.energy_modal == "card" and farming.farm_version == version and not farming.busy, "the press opens the Energy card and sends nothing")
+	var card := farming._ui.find_child("EnergyCard", true, false) as UiEnergyCard
+	_check(card != null and (card.find_child("Fact", true, false) as Label).text == "Till needs 2 Energy · you have 1",
+		"the card says what it needs and what there is (LOCK-09)")
+	var tiles := card.find_children("*", "UiEnergyTile", true, false)
+	var on := tiles.filter(func(t): return t.available)
+	_check(tiles.size() == 4 and on.size() == 1, "four RECOVER tiles; only Rest can be used here: %d" % on.size())
+	_check(card.find_child("Free", true, false) is UiCommandButton, "one button: Free to do now")
+	card.tile_pressed.emit("home")
+	await process_frame
+	var home_node = scene._buildings.get(1, {}).get("node")
+	_check(farming.energy_modal == "" and scene._showing_house and home_node is Node3D
+		and scene._focus.is_equal_approx(home_node.position), "the Rest tile only turns the camera to the cottage")
+	# Rest at the cottage's door.
+	var door = load("res://modules/dynamic_farm/parcel_space.gd").door_cell(farming.farm)
+	_check(await _key(farming, door) == ["Rest", "+60 Energy", UiSceneAction.State.DEFAULT], "at the cottage's door: Rest +60 Energy")
+	var seen := await _press(farming, door)
+	_check(farming.energy_value() == 61 and farming.farm.energy.rested_on != null, "one press rests: 1 -> 61")
+	_check("+60 Energy" in _floats(farming), "the Energy it gave floats up")
+	_check(seen.moved > 0.0 or _beside([door]), "the player stands at the door")
+	_check(await _key(farming, door) == ["Rest", "Rested today", UiSceneAction.State.UNAVAILABLE], "once a player day")
+	_check(await _key(farming, cell) == ["Till", "2 Energy", UiSceneAction.State.DEFAULT], "with Energy again the key works")
+	chip.pressed.emit()
+	await process_frame
+	var panel := farming._ui.find_child("EnergyPanel", true, false) as UiEnergyCard
+	_check(farming.energy_modal == "panel" and panel != null, "a tap on the chip opens P0's Energy panel")
+	_check(scene.close_modal() and farming.energy_modal == "", "Back closes it")
+	scene.queue_free()
+	await process_frame
+
+## C-148: away for a while, the Energy that came back by server time is there on return (offline regen).
+func _energy_comes_back() -> void:
+	var energy_dir := dir + "_energy"
+	var store := LocalStore.new(raw.block_id, energy_dir)
+	store.now_ms = func() -> int: return int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
+	var before := int(store.read().farm.energy.value)
+	shift[0] += 8 * 60000 + 1000
+	var farming := await _open(store)
+	_check(farming.energy_value() == before + 2, "8 minutes away: +2 (%d -> %d)" % [before, farming.energy_value()])
+	_check(scene._header.get_node("Energy").value_label.text == "%d/200" % (before + 2), "the chip shows it")
+	scene.queue_free()
+	await process_frame
+	for name in DirAccess.get_files_at(energy_dir): DirAccess.remove_absolute(energy_dir.path_join(name))
+	DirAccess.remove_absolute(energy_dir)
 
 ## The guide's card text on screen (C-35), "" when it is hidden.
 func _tip(farming: Node) -> String:
@@ -345,7 +477,7 @@ func _tip(farming: Node) -> String:
 
 ## Texts of the gain floats on screen.
 func _floats(farming: Node) -> Array:
-	return farming._ui.get_children().filter(func(n): return n is UiFloatText).map(func(n): return n.text)
+	return farming._ui.get_children().filter(func(n): return n is UiGainFloat).map(func(n): return n.text)
 
 func _flights(farming: Node) -> int:
 	return farming._ui.get_children().filter(func(n): return n is UiItemFly).size()
@@ -370,28 +502,38 @@ func _held(farming: Node) -> void:
 	await process_frame
 	farming.held = true
 	await process_frame
-	_check(not farming.bag_open() and not farming._keys.visible and not farming._bar.visible, "held: no key, no quick bar, drawer closed")
+	_check(not farming.bag_open() and not farming._keys.visible and not farming._bar.visible, "held: no key, no quick bar, bag closed")
 	farming.held = false
 	await process_frame
 	_check(farming._keys.visible and farming._bar.visible, "released: key and quick bar back")
 
-## The Bag end opens the compact drawer with the bar docked in it; a cell shows its name; Close and Back close it.
+## The Bag end opens the UI v3 bag panel (C-105): the quick bar slides away (M-16) and comes back where it was; a
+## slot shows its name; ✕, Back and a tap on the dimmed area close it.
 func _bag_drawer(farming: Node) -> void:
-	var home: Node = farming._bar.get_parent()
 	farming._bar.bag_requested.emit()
 	await process_frame
-	_check(farming.bag_open() and farming._bar.get_parent().get_parent() == farming._drawer.body and farming._bar.bag_open, "Bag opens the drawer, the quick bar docked on top")
-	var ids: Array = farming._grid.shown_items().map(func(it): return it.id)
-	_check(ids == ["hoe_starter", "seed_carrot", "blueprint_cottage"] and farming._grid.shown_items()[1].qty == 3, "the drawer lists the bag")
-	farming._grid.select("seed_carrot")
-	_check(farming._picked_name.text == "Carrot Seeds ×3", "a tapped cell shows its name")
-	farming._bar.close_requested.emit()
+	_check(farming.bag_open() and farming._bag.title == "Bag" and farming._bag.hero == UiArt.HERO_BAG, "Bag opens the bag panel, C-86's bag as its hero")
+	var ids: Array = farming._bag_slots.keys()
+	_check(ids == ["hoe_starter", "seed_carrot", "blueprint_cottage"] and farming._bag_slots.seed_carrot.item.qty == 3,
+		"the panel lists the bag: %s" % [ids])
+	_check(farming._slots.get_child_count() == 9 and farming._slots.columns == 3, "three rows of three round slots")
+	farming._bag_slots.seed_carrot.tapped.emit("seed_carrot")
+	_check(farming._picked_name.text == "Carrot Seeds ×3" and farming.bag_selected == "seed_carrot"
+		and farming._bag_slots.seed_carrot.state == UiBagSlot.State.SELECTED, "a tapped slot is selected and named")
+	await create_timer(0.35).timeout
+	_check(not farming._bar.visible, "the quick bar is hidden while the bag is open (M-16)")
+	var panel: UiModalPanel = farming._bag
+	panel.close_button().pressed.emit()
 	await process_frame
-	_check(not farming.bag_open() and farming._bar.get_parent() == home and not farming._bar.bag_open, "Close puts the bar back")
+	_check(not farming.bag_open() and panel.closing, "✕ closes it")
+	await create_timer(0.4).timeout
+	_check(not is_instance_valid(panel), "…and the panel frees itself after its exit")
 	var bar_rect: Rect2 = farming._bar.get_global_rect()
 	var ui_rect: Rect2 = farming._ui.get_global_rect()
-	_check(is_equal_approx(bar_rect.end.y, ui_rect.end.y - UiTokens.SIZE_QUICK_BAR_BOTTOM) and is_equal_approx(bar_rect.position.x, UiTokens.SIZE_QUICK_BAR_X),
-		"…at the bottom, where it was: %s in %s" % [bar_rect, ui_rect])
+	_check(farming._bar.visible and is_equal_approx(farming._bar.modulate.a, 1.0)
+		and absf(bar_rect.end.y - (ui_rect.end.y - UiTokens.SIZE_QUICK_BAR_BOTTOM)) <= BAR_REST_TOLERANCE_PX
+		and absf(bar_rect.position.x - UiTokens.SIZE_QUICK_BAR_X) <= BAR_REST_TOLERANCE_PX,
+		"the quick bar comes back at the bottom, where it was: %s in %s" % [bar_rect, ui_rect])
 	# No long-press drag on this bar (no swap, Pin or Remove, C-74#39); a swipe up still opens the bag.
 	var cell: UiItemCell = farming._bar.cells()[0]
 	cell.gesture.emit({"kind": &"lift", "pos": cell.get_global_rect().get_center()})
@@ -404,21 +546,22 @@ func _bag_drawer(farming: Node) -> void:
 	await process_frame
 	farming._bar.slot_tapped.emit("seed_carrot")
 	await process_frame
-	_check(farming.bag_open() and farming._grid.selected_id == "seed_carrot", "a slot opens the drawer on its item")
-	_check(scene.is_back_navigation_locked() and not farming.bag_open() and not scene._back_sent, "Back closes the drawer first, the farm stays")
+	_check(farming.bag_open() and farming.bag_selected == "seed_carrot", "a slot opens the bag on its item")
+	_check(scene.is_back_navigation_locked() and not farming.bag_open() and not scene._back_sent, "Back closes the bag first, the farm stays")
 	await process_frame
-	# C-111: a tap on the dimmed area closes the drawer. 0.4.2 used the scrim after close_bag() had cleared it: a
+	# C-111: a tap on the dimmed area closes the bag. 0.4.2 used the scrim after close_bag() had cleared it: a
 	# SCRIPT ERROR here, a native crash (SIGSEGV in Control::accept_event) in the release package.
 	farming._bar.bag_requested.emit()
 	await process_frame
-	var scrim: Control = farming._scrim
+	panel = farming._bag
+	var scrim: Control = panel.scrim
 	var release := InputEventMouseButton.new()
 	release.button_index = MOUSE_BUTTON_LEFT
 	release.pressed = false
 	release.position = scrim.get_global_rect().position + Vector2(40, 40)
 	scrim.gui_input.emit(release)
-	_check(not farming.bag_open() and farming._scrim == null and farming._bar.get_parent() == home, "a tap on the dimmed area closes the drawer")
-	await process_frame
+	_check(not farming.bag_open() and farming._bag == null, "a tap on the dimmed area closes the bag")
+	await create_timer(0.4).timeout
 	_check(not is_instance_valid(scrim), "…and frees its scrim")
 
 ## C-33 on a fresh save (the welcome blueprint, no house): Build Cottage while a press is still
@@ -444,7 +587,7 @@ func _placement_takes_over() -> void:
 	_check(_tip(farming) == "", "no card while the house is being placed")
 	_check(scene._walk.position == at and farming.farm_version == version and farming.farm.tilled.is_empty(),
 		"the player holds still and nothing was sent")
-	scene.end_house_placement()
+	scene.end_placement()
 	scene.queue_free()
 	await process_frame
 	for name in DirAccess.get_files_at(house_dir): DirAccess.remove_absolute(house_dir.path_join(name))
@@ -459,15 +602,15 @@ func _house_pops_once() -> void:
 	scene._build.activated.emit()
 	await process_frame
 	scene._placement._bar.confirmed.emit()
-	var built = scene.house_state()
-	var house: Node3D = scene._house
+	var built = scene.buildings_state()[0] if scene.buildings_state().size() == 1 else null
+	var house: Node3D = scene._buildings.get(1, {}).get("node")
 	_check(built is Dictionary and house != null and house.scale.x < 0.1, "Build starts the cottage small")
 	var dust: Array = _dust()
 	_check(dust.size() == 9, "Build puffs dust at the middle and round the footprint (%d)" % dust.size())
 	_check(dust.all(func(d): return d.scale_amount_min >= 0.2 and d.emitting),
 		"the puffs are sized for the cottage and emitting")
 	if built is Dictionary:
-		var rim := House.rim(scene._walk, House.at_of(built), int(built.rotation))
+		var rim := Building.rim(scene._walk, Building.at_of(built), Building.base_of(built), int(built.rotation))
 		var far := 0.0
 		for p: Vector3 in rim:
 			var near := INF
@@ -481,14 +624,128 @@ func _house_pops_once() -> void:
 	scene.queue_free()
 	await process_frame
 	await _open(LocalStore.new(raw.block_id, house_dir))
-	_check(scene._house != null and scene._house.scale == Vector3.ONE, "reopening shows the cottage at full size")
+	var reopened: Node3D = scene._buildings.get(1, {}).get("node")
+	_check(reopened != null and reopened.scale == Vector3.ONE, "reopening shows the cottage at full size")
 	_check(_dust().is_empty(), "reopening puffs no dust")
 	await create_timer(0.1).timeout
-	_check(scene._house.scale == Vector3.ONE and _dust().is_empty(), "nothing pops after reopening")
+	_check(reopened.scale == Vector3.ONE and _dust().is_empty(), "nothing pops after reopening")
 	scene.queue_free()
 	await process_frame
 	for name in DirAccess.get_files_at(house_dir): DirAccess.remove_absolute(house_dir.path_join(name))
 	DirAccess.remove_absolute(house_dir)
+
+## C-150: the placement bar is Cancel · Rotate · Build; each Rotate turns the preview a quarter about its middle
+## (0, 90, 180, 270°, then 0 again) and Build sends place_building with that turn. The cottage stands turned, keeps
+## it after reopening, and the player still stops at its walls.
+func _placement_turns() -> void:
+	var turn_dir := dir + "_turn"
+	await _open(LocalStore.new(raw.block_id, turn_dir))
+	_check(scene._build.label == "Build Cottage", "the Build key names the cottage")
+	scene._build.activated.emit()
+	await process_frame
+	var p = scene._placement
+	_check(p._bar.secondary == "Rotate" and p._bar.confirm == "Build" and p._bar.cancel == "Cancel", "the bar: Cancel · Rotate · Build")
+	_check(p.type == "cottage" and p.base == Vector2i(3, 3), "the cottage's footprint from the rules")
+	var start: Vector2i = p.at
+	var turns: Array = []
+	var still := true
+	for i in 4:
+		p._bar.secondary_pressed.emit()
+		turns.append(p.rotation_steps)
+		var facing: Vector3 = p._ghost.transform.basis.z
+		still = still and p.at == start and facing.is_equal_approx(Vector3.BACK.rotated(Vector3.UP, p.rotation_steps * PI * 0.5))
+	_check(turns == [1, 2, 3, 0] and still, "Rotate turns the preview a quarter in place each press (%s)" % [turns])
+	p._bar.secondary_pressed.emit()
+	p._bar.secondary_pressed.emit()
+	var reason: String = p.reason
+	p._bar.confirmed.emit()
+	for _i in 3: await process_frame
+	var built: Array = scene.buildings_state()
+	_check(reason == "" and built.size() == 1 and int(built[0].rotation) == 2 and Building.at_of(built[0]) == start and built[0].type == "cottage",
+		"Build places the cottage turned half way round: %s" % [built])
+	_check(not scene._build.visible and scene._placement == null, "one cottage: the Build key goes")
+	scene.queue_free()
+	await process_frame
+	await _open(LocalStore.new(raw.block_id, turn_dir))
+	var node: Node3D = scene._buildings.get(1, {}).get("node")
+	var middle := Building.center(scene._walk, start, Vector2i(3, 3), 2)
+	_check(node != null and node.transform.basis.z.is_equal_approx(Vector3.FORWARD) and node.position.is_equal_approx(middle),
+		"reopened, the cottage stands where and as it was turned")
+	_check(not scene._walk.clear_position(middle) and scene._buildings[1].proxy != null, "its walls still stop the player")
+	scene.queue_free()
+	await process_frame
+	for name in DirAccess.get_files_at(turn_dir): DirAccess.remove_absolute(turn_dir.path_join(name))
+	DirAccess.remove_absolute(turn_dir)
+
+func _older_dataset_claim() -> void:
+	var server := OldClaimServer.new()
+	server.block_id = raw.block_id
+	server.dataset = "sf-dynamic-farm-older"
+	var bag := {"hoe_starter": 1, "seed_carrot": 2, "blueprint_cottage": 1, "blueprint_coop": 1}
+	server.farm = ParcelFarm.empty_state()
+	server.farm.bag = bag; server.farm.welcomed_at = 0; server.farm.coins = 12; server.farm.sales = 1
+	var client := ApiClient.new("https://fake.invalid/v1", server.handle)
+	client.token = "player"
+	# Before C-136 nothing named the dataset: the reply is about the claim's older dataset and is refused.
+	var old: Dictionary = await RemoteStore.new(client, raw.block_id, raw.dataset_version).read()
+	_check(not old.ok and old.code == "OTHER_PARCEL", "a reply on the claim's older dataset is still refused")
+	server.drop = 1
+	var farming := await _open(RemoteStore.new(client, raw.block_id, raw.dataset_version))
+	var deadline := Time.get_ticks_msec() + 30000
+	while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
+	_check(server.enters.size() == 2 and server.enters.all(func(b): return b is Dictionary and b.get("dataset_version") == raw.dataset_version),
+		"each enter, the lost one and its retry, names the opened farm's dataset")
+	_check(farming.loaded() and not farming.unavailable and not farming._cover.visible, "the moved claim opens: no Could not open your farm")
+	_check(farming.farm.get("bag") == bag and farming.farm.get("coins") == 12 and farming.farm.get("house", 0) == null and farming.farm.get("tilled") == [],
+		"the moved save shows the kept bag and coins on fresh cells")
+	scene.queue_free()
+	await process_frame
+	# Retry from the cover goes the same way: both tries lost, then the key's Retry opens it.
+	server.drop = 2
+	server.enters.clear()
+	server.dataset = "sf-dynamic-farm-older"
+	farming = await _open(RemoteStore.new(client, raw.block_id, raw.dataset_version))
+	deadline = Time.get_ticks_msec() + 30000
+	while farming.busy and Time.get_ticks_msec() < deadline: await process_frame
+	_check(farming.unavailable and farming._cover.visible and farming._cover_label.text == "Could not open your farm.", "two lost tries leave the cover up")
+	farming._on_key()
+	deadline = Time.get_ticks_msec() + 30000
+	while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
+	_check(server.enters.size() == 3 and server.enters[2].get("dataset_version") == raw.dataset_version and farming.loaded() and not farming.unavailable,
+		"Retry names the dataset and opens the moved claim")
+	scene.queue_free()
+	await process_frame
+
+## C-113: the scene's own server store (the one the map's "Enter my farm" gets) names the release of the farm file it
+## opened, not the map's: an r6 home's r6 farm names r6, so the server leaves it on r6 (Q-172); an r4 home opens in r8
+## and names r8, so the server moves it (Q-168).
+func _release_named_on_enter() -> void:
+	var net = root.get_node_or_null("Net")
+	if net == null:
+		_check(false, "Net autoload is present"); return
+	var was_client = net.client
+	var was_local = ProjectSettings.get_setting("sensen/dynamic_farm/local_farm_save", false)
+	ProjectSettings.set_setting("sensen/dynamic_farm/local_farm_save", false)
+	for case in [["sf-dynamic-farm-20261124-r6", "sf-dynamic-farm-20261124-r6", "an r6 home opened in its r6 farm names r6 and stays on r6"],
+			["sf-dynamic-farm-20261118-r4", "sf-dynamic-farm-20261125-r8", "an r4 home opened in r8 names r8 and moves to r8"]]:
+		var server := OldClaimServer.new()
+		server.block_id = raw.block_id
+		server.dataset = case[0]
+		server.farm = ParcelFarm.empty_state()
+		server.farm.bag = {"hoe_starter": 1}; server.farm.welcomed_at = 0
+		net.client = ApiClient.new("https://fake.invalid/v1", server.handle)
+		net.client.token = "player"
+		var farm := raw.duplicate(true)
+		farm.dataset_version = case[1]
+		var farming := await _open(null, farm, true)
+		var deadline := Time.get_ticks_msec() + 30000
+		while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
+		_check(server.enters.size() == 1 and server.enters[0].get("dataset_version") == case[1] and server.dataset == case[1]
+			and farming.loaded() and not farming.unavailable, case[2])
+		scene.queue_free()
+		await process_frame
+	net.client = was_client
+	ProjectSettings.set_setting("sensen/dynamic_farm/local_farm_save", was_local)
 
 func _dust() -> Array:
 	return scene.get_children().filter(func(n): return n is CPUParticles3D)
@@ -510,7 +767,7 @@ func _free_block(data: Dictionary) -> Vector2i:
 	return Vector2i(-1, -1)
 
 func _free_cell(data: Dictionary, farming: Node, except: Array = []) -> Vector2i:
-	var house := ParcelFarm.house_cells(farming.farm)
+	var house := ParcelFarm.building_cells(farming.farm)
 	var obstacles: Dictionary = farming.obstacle_cells()
 	for cell: Dictionary in data.cells:
 		var at := Vector2i(cell.x, cell.y)

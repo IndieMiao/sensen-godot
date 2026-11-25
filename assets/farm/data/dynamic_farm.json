@@ -3,7 +3,7 @@
   "communities": [
     {
       "id": "sf",
-      "datasets": ["sf-dynamic-farm-20261118-r4", "sf-dynamic-farm-20261124-r6"]
+      "datasets": ["sf-dynamic-farm-20261118-r4", "sf-dynamic-farm-20261124-r6", "sf-dynamic-farm-20261125-r8"]
     }
   ],
   "welcome_gift": {
@@ -12,17 +12,40 @@
     "blueprint_cottage": 1
   },
   "till_tool": "hoe_starter",
-  "house": {
-    "model": "cottage",
-    "blueprint": "blueprint_cottage",
-    "width": 3,
-    "depth": 3
+  "buildings": {
+    "cottage": {
+      "model": "cottage",
+      "blueprint": "blueprint_cottage",
+      "width": 3,
+      "depth": 3,
+      "max": 1
+    }
   },
   "crops": {
     "crop_carrot": {
       "seed": "seed_carrot",
       "grow_seconds": 60,
-      "yield": 1
+      "yield": 1,
+      "energy": 3
+    }
+  },
+  "energy": {
+    "max_base": 200,
+    "per_level": 10,
+    "regen_ms": 240000,
+    "rest_amount": 60,
+    "blessing": {
+      "days": 7,
+      "regen_mult": 1.5
+    },
+    "day": {
+      "utc_offset_hours": -8,
+      "rollover_hour": 4
+    },
+    "costs": {
+      "clear_obstacle": 2,
+      "till": 2,
+      "gather": 2
     }
   },
   "economy": {

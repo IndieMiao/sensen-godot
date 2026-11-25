@@ -18,8 +18,22 @@ const MONTHS := ["January", "February", "March", "April", "May", "June", "July",
 const MIN_AGE := 13
 ## Lines kept free for the status message; the longest current message wraps to two at the narrowest width.
 const STATUS_LINES := 2
+## UI v3 look (C-106, C-85 ④): the dynamic farm map opens the panel with it; see account_v3_look.gd.
+const Look := preload("res://scenes/account/account_v3_look.gd")
+const HERO := "res://assets/ui/v3/hero/hero_signin.png"
+const BUSY_DOTS := "• • •"
+## Step links drawn as text links in the v3 look; the other secondary actions are white keys.
+const LINKS := ["to_sign_up", "to_sign_in", "to_forgot", "resend_reset", "resend_verify", "later"]
+## Errors that are about no one field: a toast at the bottom in the v3 look (C-85 ④ B), not the line under the fields.
+const TOAST_CODES := ["TRANSPORT", "RATE_LIMITED", "CODE_COOLDOWN", "GOOGLE_NO_ACCOUNT", "GOOGLE_UNAVAILABLE",
+	"APPLE_UNAVAILABLE", "GOOGLE_FAILED", "APPLE_FAILED", "UNKNOWN"]
 
 var mode := "sign_in"
+## UI v3 look (C-106); set by open() before the panel is built.
+var v3 := false
+## English only (C-144): the dynamic farm's map (English-only UI copy) shows the panel in its English source copy
+## whatever the locale, as C-85 ④ approved it; the main farm keeps the translated panel. Set by open().
+var english := false
 var reason := ""
 var busy := false
 ## 从"我的账号"进入的子页面，保存 / 返回后回到账号页；从登录流程进入的则直接关闭。
@@ -54,9 +68,16 @@ var _scroll: ScrollContainer
 var _step := ""
 var _fields: VBoxContainer
 var _field_list: Array[Control] = []
+var _primary_id := ""
+var _toast: PanelContainer
+var _toast_line: Label
+var _error_field: Control
+var _card: Control
 
-static func open(host: Node, p_mode := "sign_in", p_reason := "") -> AccountPanel:
+static func open(host: Node, p_mode := "sign_in", p_reason := "", look_v3 := false, english_only := false) -> AccountPanel:
 	var panel := AccountPanel.new()
+	panel.v3 = look_v3
+	panel.english = english_only
 	panel.reason = p_reason
 	panel.mode = p_mode if p_mode in MODES else "sign_in"
 	host.add_child(panel)
@@ -64,7 +85,323 @@ static func open(host: Node, p_mode := "sign_in", p_reason := "") -> AccountPane
 
 func _ready() -> void:
 	layer = 70
+	if english: auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	GameUi.register_modal(self)
+	var column := _build_v3() if v3 else _build_classic()
+	_fields = VBoxContainer.new()
+	_fields.add_theme_constant_override("separation", 8)
+	column.add_child(_fields)
+	_nickname = _line("Nickname", "Nickname (2–24 characters)")
+	_nickname.max_length = 24
+	_email = _line("Email", "Email", false, LineEdit.KEYBOARD_TYPE_EMAIL_ADDRESS)
+	_password = _line("Password", "Password", true)
+	_code = _line("Code", "6-digit code", false, LineEdit.KEYBOARD_TYPE_NUMBER)
+	_code.max_length = 6
+	_new_password = _line("NewPassword", "New password (8+ characters)", true)
+	_confirm_password = _line("ConfirmPassword", "Confirm password", true)
+	_gender = _option("Gender", ["Gender (optional)"] + AccountSession.GENDERS.map(func(g): return g[1]))
+	_gender.item_selected.connect(func(_i): _gender_custom.visible = _selected_gender() == "self_describe")
+	_gender_custom = _line("GenderCustom", "How do you describe your gender?")
+	_gender_custom.max_length = 32
+	_birthday = HBoxContainer.new()
+	_birthday.name = "Birthday"
+	_birthday.add_theme_constant_override("separation", 6)
+	_fields.add_child(_birthday)
+	_field_list.append(_birthday)
+	var this_year: int = Time.get_date_dict_from_system().year
+	_month = _option("Month", ["Month"] + MONTHS, _birthday)
+	var days := ["Day"]
+	for d in range(1, 32): days.append(str(d))
+	_day = _option("Day", days, _birthday)
+	var years := ["Year"]
+	for y in range(this_year - MIN_AGE, this_year - 121, -1): years.append(str(y))
+	_year = _option("Year", years, _birthday)
+	for o in [_month, _day, _year]: o.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_show_passwords = CheckBox.new()
+	_show_passwords.name = "ShowPasswords"
+	_show_passwords.text = _t("Show passwords")
+	_show_passwords.focus_mode = Control.FOCUS_NONE
+	# A plain checkbox, not the theme's filled toggle look.
+	for state in ["normal", "hover", "pressed", "hover_pressed", "focus", "disabled"]:
+		_show_passwords.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	_show_passwords.add_theme_color_override("font_color", GameUi.MUTED)
+	_show_passwords.add_theme_color_override("font_pressed_color", GameUi.MUTED)
+	_show_passwords.add_theme_color_override("font_hover_color", GameUi.INK)
+	_show_passwords.add_theme_font_size_override("font_size", 13)
+	_show_passwords.toggled.connect(func(on: bool):
+		for f in [_password, _confirm_password, _new_password]: f.secret = not on)
+	_fields.add_child(_show_passwords)
+	_field_list.append(_show_passwords)
+	_status = GameUi.label("", 13, GameUi.CORAL)
+	_status.name = "Status"
+	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# Always laid out with room for STATUS_LINES lines, blank until there is a message: a message appearing
+	# after a tap used to push "Sign in" and every button below it down a line (C-78).
+	column.add_child(_status)
+	_status.custom_minimum_size = Vector2(260, STATUS_LINES * _status.get_line_height())
+	_actions = VBoxContainer.new()
+	_actions.name = "Actions"
+	_actions.add_theme_constant_override("separation", 10)
+	column.add_child(_actions)
+	if v3: _dress_v3()
+	if Net and Net.account.signed_in() and mode in ["sign_in", "sign_up"]: mode = "account"
+	if Net and Net.account.signed_in(): _email.text = Net.account.email
+	set_mode(mode)
+
+## UI v3 shell (C-106, C-85 ④ as approved in Q-124): the scene blurred under a light scrim, then a 312 wide paper card
+## held near the top (the soft keyboard rises from the bottom) with the `surface/header` band, the sign-post hero over
+## its top edge, the step's name in a tag pill and ✕ at the right. Same nodes as the classic look: Card, Close, Status,
+## Actions, the fields by name.
+func _build_v3() -> VBoxContainer:
+	var scrim := ColorRect.new()
+	scrim.name = "Scrim"
+	scrim.color = UiTokens.COLOR_SURFACE_PAPER
+	scrim.mouse_filter = Control.MOUSE_FILTER_STOP
+	scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	scrim.theme = UiKit.theme()
+	add_child(scrim)
+	var background_path := "res://assets/ui/backgrounds/map-social.png"
+	if ResourceLoader.exists(background_path):
+		var scenery := TextureRect.new()
+		scenery.name = "Scenery"
+		scenery.texture = Look.blurred(load(background_path))
+		scenery.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		scenery.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		scenery.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		scenery.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		scenery.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		scrim.add_child(scenery)
+	var veil := ColorRect.new()
+	veil.name = "Veil"
+	veil.color = UiTokens.COLOR_SCRIM_DRAWER
+	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	scrim.add_child(veil)
+	_scroll = TouchScrollContainer.new()
+	_scroll.name = "Scroll"
+	_scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scrim.add_child(_scroll)
+	var margin := MarginContainer.new()
+	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	margin.add_theme_constant_override("margin_left", int(UiTokens.SPACE_S5))
+	margin.add_theme_constant_override("margin_right", int(UiTokens.SPACE_S5))
+	margin.add_theme_constant_override("margin_top", int(72 + Look.HERO_OVER))
+	margin.add_theme_constant_override("margin_bottom", int(UiTokens.SPACE_S8))
+	_scroll.add_child(margin)
+	var holder := VBoxContainer.new()
+	margin.add_child(holder)
+	KeyboardAvoider.attach(_scroll, 64.0)
+	_card = Control.new()
+	_card.name = "Card"
+	_card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_card.custom_minimum_size.x = Look.CARD_W
+	holder.add_child(_card)
+	var panel := PanelContainer.new()
+	panel.name = "Surface"
+	panel.add_theme_stylebox_override("panel", Look.card_box())
+	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	panel.minimum_size_changed.connect(func(): _card.custom_minimum_size.y = panel.get_combined_minimum_size().y)
+	_card.add_child(panel)
+	_card.add_child(Look.band())
+	var hero := UiKit.icon(load(HERO) if ResourceLoader.exists(HERO) else null, UiTokens.SIZE_PANEL_HERO)
+	hero.name = "Hero"
+	hero.position = Vector2(UiTokens.SPACE_S5, UiTokens.SIZE_PANEL_HEADER_H + UiTokens.SPACE_S4 - UiTokens.SIZE_PANEL_HERO)
+	_card.add_child(hero)
+	var tag := UiTagPill.new()
+	tag.name = "Tag"
+	tag.position = Vector2(UiTokens.SPACE_S5 + UiTokens.SIZE_PANEL_HERO, (UiTokens.SIZE_PANEL_HEADER_H - UiTokens.SIZE_TAG_H) * 0.5)
+	_card.add_child(tag)
+	_title = tag.label()
+	_close = Look.close_glyph()
+	_close.name = "Close"
+	_close.tooltip_text = _t("Close")
+	_close.pressed.connect(func(): dismiss())
+	_close.position = Vector2(Look.CARD_W - UiTokens.SPACE_S5 - 7.0 - UiTokens.SIZE_TOUCH_MIN * 0.5,
+		(UiTokens.SIZE_PANEL_HEADER_H - UiTokens.SIZE_TOUCH_MIN) * 0.5)
+	_close.size = _close.custom_minimum_size
+	_card.add_child(_close)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", int(UiTokens.SPACE_S5))
+	panel.add_child(column)
+	_subtitle = UiKit.label("", UiTokens.STYLE_TYPE_BODY, UiTokens.COLOR_TEXT_SECONDARY)
+	_subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_subtitle.custom_minimum_size.x = Look.CARD_W - 2.0 * UiTokens.SIZE_PANEL_PAD
+	column.add_child(_subtitle)
+	# Errors about no single field (no network, too many tries, Google unavailable): a toast at the bottom.
+	_toast = PanelContainer.new()
+	_toast.name = "Toast"
+	_toast.visible = false
+	_toast.add_theme_stylebox_override("panel", Look.toast_box())
+	_toast.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_toast.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_toast.offset_left = UiTokens.SIZE_SCREEN_EDGE
+	_toast.offset_right = -UiTokens.SIZE_SCREEN_EDGE
+	_toast.offset_bottom = -UiTokens.SPACE_S8
+	scrim.add_child(_toast)
+	var line := HBoxContainer.new()
+	line.add_theme_constant_override("separation", int(UiTokens.SPACE_S4))
+	_toast.add_child(line)
+	var alert := UiKit.icon(load("res://assets/ui/icons/lucide/circle-alert.svg"), 20)
+	alert.modulate = UiTokens.COLOR_ACTION_DANGER
+	alert.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	line.add_child(alert)
+	_toast_line = UiKit.label("", UiTokens.STYLE_TYPE_BODY_BOLD)
+	_toast_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_toast_line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line.add_child(_toast_line)
+	return column
+
+## After the shared fields are built: the v3 field look, an in-field Show key on each password field (the classic
+## "Show passwords" box is kept, hidden, and still switches them all), the 6-box code entry, the error line's type.
+func _dress_v3() -> void:
+	_fields.add_theme_constant_override("separation", int(UiTokens.SPACE_S5))
+	_birthday.add_theme_constant_override("separation", int(UiTokens.SPACE_S4))
+	for f in _field_list:
+		if f is LineEdit or f is OptionButton: Look.style_field(f)
+	for o in [_month, _day, _year]: Look.style_field(o)
+	for f in [_password, _new_password, _confirm_password]:
+		Look.style_field(f, false, Look.SHOW_W)
+		var show := Look.link(_t("Show"), UiTokens.COLOR_TEXT_SECONDARY)
+		show.name = "Show"
+		show.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
+		show.offset_left = -Look.SHOW_W
+		show.add_theme_font_size_override("font_size", UiKit.theme().get_font_size("font_size", UiTokens.STYLE_TYPE_CAPTION))
+		show.pressed.connect(func(): _show_passwords.button_pressed = not _show_passwords.button_pressed)
+		f.add_child(show)
+	_code.custom_minimum_size.y = Look.FIELD_H + 4.0
+	for st in ["normal", "focus", "read_only", "hover"]: _code.add_theme_stylebox_override(st, StyleBoxEmpty.new())
+	for slot in ["font_color", "font_placeholder_color", "caret_color", "selection_color", "font_selected_color"]:
+		_code.add_theme_color_override(slot, Color.TRANSPARENT)
+	_code.selecting_enabled = false
+	_code.context_menu_enabled = false
+	var boxes := Control.new()
+	boxes.name = "CodeBoxes"
+	boxes.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	boxes.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	boxes.draw.connect(func(): Look.draw_code(boxes, _code))
+	for sig in [_code.focus_entered, _code.focus_exited]: sig.connect(boxes.queue_redraw)
+	_code.text_changed.connect(func(_t): boxes.queue_redraw())
+	_code.add_child(boxes)
+	_status.theme_type_variation = UiTokens.STYLE_TYPE_CAPTION
+	_status.custom_minimum_size = Vector2(Look.CARD_W - 2.0 * UiTokens.SIZE_PANEL_PAD, STATUS_LINES * _status.get_line_height())
+	_actions.add_theme_constant_override("separation", int(UiTokens.SPACE_S4))
+	for f in _field_list:
+		if f is LineEdit: (f as LineEdit).text_changed.connect(func(_t): if _error_field == f: _clear_v3_error())
+
+## v3 actions: the primary in lime (or the danger red), step links as text links ("Forgot password?" right-aligned above
+## the primary), the other secondary actions as white keys, providers under an "or" rule as full-width keys.
+## Node names stay the action ids.
+func _set_actions_v3(list: Array) -> void:
+	var forgot: Array = []
+	for spec in list:
+		if spec[0] == "to_forgot": forgot = spec
+	if not forgot.is_empty():
+		var row := HBoxContainer.new()
+		row.name = "ForgotRow"
+		row.alignment = BoxContainer.ALIGNMENT_END
+		var b := Look.link(_t(forgot[1]))
+		b.name = "to_forgot"
+		b.pressed.connect(_on_action.bind("to_forgot"))
+		row.add_child(b)
+		_actions.add_child(row)
+	# The error line under "Forgot password?" and over the primary key (C-85 ④ B), its two lines kept free (C-78).
+	if _status.get_parent() != null: _status.get_parent().remove_child(_status)
+	_actions.add_child(_status)
+	for spec in list:
+		var id := str(spec[0])
+		var style: String = spec[2] if spec.size() > 2 else ""
+		if id == "to_forgot": continue
+		if style == "providers":
+			_actions.add_child(_provider_row_v3(spec[1]))
+			continue
+		var b: Button
+		match style:
+			"accent": b = Look.command(_t(spec[1]), UiTokens.BUTTON_CMD_PRIMARY)
+			"danger": b = Look.command(_t(spec[1]), UiTokens.BUTTON_CMD_DESTRUCTIVE)
+			"danger_link": b = Look.link(_t(spec[1]), UiTokens.COLOR_ACTION_DANGER)
+			_: b = Look.link(_t(spec[1])) if id in LINKS else Look.command(_t(spec[1]), UiTokens.BUTTON_CMD_SECONDARY)
+		b.name = id
+		b.pressed.connect(_on_action.bind(id))
+		_actions.add_child(b)
+
+func _provider_row_v3(providers: Array) -> Control:
+	var box := VBoxContainer.new()
+	box.name = "Providers"
+	box.add_theme_constant_override("separation", int(UiTokens.SPACE_S4))
+	var rule := HBoxContainer.new()
+	rule.add_theme_constant_override("separation", int(UiTokens.SPACE_S4))
+	box.add_child(rule)
+	for i in 3:
+		if i == 1:
+			rule.add_child(UiKit.label(_t("or"), UiTokens.STYLE_TYPE_CAPTION, UiTokens.COLOR_TEXT_MUTED))
+			continue
+		var hr := HSeparator.new()
+		hr.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		hr.add_theme_color_override("color", UiTokens.COLOR_BORDER)
+		rule.add_child(hr)
+	var row := VBoxContainer.new()
+	row.name = "Row"
+	row.add_theme_constant_override("separation", int(UiTokens.SPACE_S4))
+	box.add_child(row)
+	for spec in providers:
+		var id: String = spec[0]
+		var b := Look.command(_t(spec[1]), UiTokens.BUTTON_CMD_SECONDARY)
+		b.name = id
+		b.icon = load(BRAND_ICONS[id]) as Texture2D
+		b.add_theme_constant_override("icon_max_width", 20)
+		b.add_theme_constant_override("h_separation", int(UiTokens.SPACE_S4))
+		for key in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color", "icon_hover_pressed_color", "icon_disabled_color"]:
+			b.add_theme_color_override(key, Color.WHITE)
+		if id == "apple": _paint_solid(b, Color.BLACK)
+		b.pressed.connect(_on_action.bind(id))
+		row.add_child(b)
+	return box
+
+## v3 errors (C-85 ④ B): a field error outlines its field in red with the line under the fields; one about no field
+## goes on the bottom toast; "Signing in…" is not written (the primary key reads • • •).
+func _say_v3(message: String, ok: bool) -> void:
+	_clear_v3_error()
+	if ok:
+		if busy: _status.text = ""
+		return
+	if message.is_empty(): return
+	if _toast_message(message):
+		_status.text = ""
+		_toast_line.text = _t(message)
+		_toast.visible = true
+		return
+	_error_field = _field_for(message)
+	if _error_field != null:
+		Look.style_field(_error_field, true, Look.SHOW_W if _error_field in [_password, _new_password, _confirm_password] else UiTokens.SPACE_S6)
+
+func _clear_v3_error() -> void:
+	if _toast != null: _toast.visible = false
+	if _error_field != null and is_instance_valid(_error_field):
+		Look.style_field(_error_field, false, Look.SHOW_W if _error_field in [_password, _new_password, _confirm_password] else UiTokens.SPACE_S6)
+	_error_field = null
+
+static func _toast_message(message: String) -> bool:
+	for code in TOAST_CODES:
+		if AccountSession.describe(code) == message: return true
+	return false
+
+## The field a local or server error is about, if one: shown in red (C-85 ④ B).
+func _field_for(message: String) -> Control:
+	var candidates := []
+	if message == AccountSession.describe("INVALID_EMAIL") or message == AccountSession.describe("EMAIL_TAKEN"): candidates = [_email]
+	elif message == AccountSession.describe("INVALID_CREDENTIALS") or message == "Enter your password.": candidates = [_password]
+	elif message == AccountSession.describe("WEAK_PASSWORD") or message == AccountSession.describe("SAME_PASSWORD"): candidates = [_new_password, _password]
+	elif message == AccountSession.describe("PASSWORD_MISMATCH"): candidates = [_confirm_password]
+	elif message in [AccountSession.describe("CODE_INVALID"), AccountSession.describe("CODE_EXPIRED"), AccountSession.describe("CODE_LOCKED"), "Enter the 6-digit code."]: candidates = []
+	elif message == AccountSession.describe("INVALID_NAME"): candidates = [_nickname]
+	elif message == AccountSession.describe("INVALID_GENDER"): candidates = [_gender_custom]
+	for c in candidates:
+		if c.visible: return c
+	return null
+
+## The main farm's look (SGODOT-135): the scenery, a paper card with the account glyph, title and ✕.
+func _build_classic() -> VBoxContainer:
 	var scrim := ColorRect.new()
 	scrim.name = "Scrim"
 	scrim.color = GameUi.PAPER
@@ -120,7 +457,7 @@ func _ready() -> void:
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	head.add_child(_title)
-	_close = GameUi.button("x", "", L10n.text("Close"))
+	_close = GameUi.button("x", "", _t("Close"))
 	_close.name = "Close"
 	_close.pressed.connect(func(): dismiss())
 	head.add_child(_close)
@@ -128,64 +465,7 @@ func _ready() -> void:
 	_subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_subtitle.custom_minimum_size.x = 260
 	column.add_child(_subtitle)
-	_fields = VBoxContainer.new()
-	_fields.add_theme_constant_override("separation", 8)
-	column.add_child(_fields)
-	_nickname = _line("Nickname", "Nickname (2–24 characters)")
-	_nickname.max_length = 24
-	_email = _line("Email", "Email", false, LineEdit.KEYBOARD_TYPE_EMAIL_ADDRESS)
-	_password = _line("Password", "Password", true)
-	_code = _line("Code", "6-digit code", false, LineEdit.KEYBOARD_TYPE_NUMBER)
-	_code.max_length = 6
-	_new_password = _line("NewPassword", "New password (8+ characters)", true)
-	_confirm_password = _line("ConfirmPassword", "Confirm password", true)
-	_gender = _option("Gender", ["Gender (optional)"] + AccountSession.GENDERS.map(func(g): return g[1]))
-	_gender.item_selected.connect(func(_i): _gender_custom.visible = _selected_gender() == "self_describe")
-	_gender_custom = _line("GenderCustom", "How do you describe your gender?")
-	_gender_custom.max_length = 32
-	_birthday = HBoxContainer.new()
-	_birthday.name = "Birthday"
-	_birthday.add_theme_constant_override("separation", 6)
-	_fields.add_child(_birthday)
-	_field_list.append(_birthday)
-	var this_year: int = Time.get_date_dict_from_system().year
-	_month = _option("Month", ["Month"] + MONTHS, _birthday)
-	var days := ["Day"]
-	for d in range(1, 32): days.append(str(d))
-	_day = _option("Day", days, _birthday)
-	var years := ["Year"]
-	for y in range(this_year - MIN_AGE, this_year - 121, -1): years.append(str(y))
-	_year = _option("Year", years, _birthday)
-	for o in [_month, _day, _year]: o.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_show_passwords = CheckBox.new()
-	_show_passwords.name = "ShowPasswords"
-	_show_passwords.text = L10n.text("Show passwords")
-	_show_passwords.focus_mode = Control.FOCUS_NONE
-	# A plain checkbox, not the theme's filled toggle look.
-	for state in ["normal", "hover", "pressed", "hover_pressed", "focus", "disabled"]:
-		_show_passwords.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	_show_passwords.add_theme_color_override("font_color", GameUi.MUTED)
-	_show_passwords.add_theme_color_override("font_pressed_color", GameUi.MUTED)
-	_show_passwords.add_theme_color_override("font_hover_color", GameUi.INK)
-	_show_passwords.add_theme_font_size_override("font_size", 13)
-	_show_passwords.toggled.connect(func(on: bool):
-		for f in [_password, _confirm_password, _new_password]: f.secret = not on)
-	_fields.add_child(_show_passwords)
-	_field_list.append(_show_passwords)
-	_status = GameUi.label("", 13, GameUi.CORAL)
-	_status.name = "Status"
-	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	# Always laid out with room for STATUS_LINES lines, blank until there is a message: a message appearing
-	# after a tap used to push "Sign in" and every button below it down a line (C-78).
-	column.add_child(_status)
-	_status.custom_minimum_size = Vector2(260, STATUS_LINES * _status.get_line_height())
-	_actions = VBoxContainer.new()
-	_actions.name = "Actions"
-	_actions.add_theme_constant_override("separation", 10)
-	column.add_child(_actions)
-	if Net and Net.account.signed_in() and mode in ["sign_in", "sign_up"]: mode = "account"
-	if Net and Net.account.signed_in(): _email.text = Net.account.email
-	set_mode(mode)
+	return column
 
 func _line(node_name: String, placeholder: String, secret := false, keyboard := LineEdit.KEYBOARD_TYPE_DEFAULT) -> LineEdit:
 	# Once a field has text its placeholder is gone, so a small caption above keeps it identifiable.
@@ -195,7 +475,7 @@ func _line(node_name: String, placeholder: String, secret := false, keyboard := 
 	_fields.add_child(caption)
 	var edit := LineEdit.new()
 	edit.name = node_name
-	edit.placeholder_text = L10n.text(placeholder)
+	edit.placeholder_text = _t(placeholder)
 	edit.secret = secret
 	edit.virtual_keyboard_type = LineEdit.KEYBOARD_TYPE_PASSWORD if secret else keyboard
 	edit.custom_minimum_size = Vector2(260, 44)
@@ -213,7 +493,7 @@ func _sync_caption(edit: LineEdit) -> void:
 	# Showing it on the first keystroke used to push every field and button below it down, so taps
 	# meant for "Sign in" landed on "Show passwords" (C-66). An empty label keeps its one-line height, and
 	# a screen reader has nothing to read twice next to the field's placeholder (C-78).
-	caption.visible = edit.visible
+	caption.visible = edit.visible and not v3 # v3: the board's fields have no caption line (C-85 ④ B)
 	caption.text = "" if edit.text.is_empty() else edit.placeholder_text
 
 func _option(node_name: String, labels: Array, parent: Control = null) -> OptionButton:
@@ -222,7 +502,7 @@ func _option(node_name: String, labels: Array, parent: Control = null) -> Option
 	o.custom_minimum_size = Vector2(0, 44)
 	o.focus_mode = Control.FOCUS_NONE
 	o.fit_to_longest_item = false
-	for label in labels: o.add_item(L10n.text(str(label)))
+	for label in labels: o.add_item(_t(str(label)))
 	GameUi.register_modal(o.get_popup())
 	if parent == null:
 		_fields.add_child(o)
@@ -242,10 +522,11 @@ func set_mode(next: String) -> void:
 		_scroll.scroll_vertical = 0
 	_status.text = ""
 	_status.add_theme_color_override("font_color", GameUi.CORAL)
+	if v3: _clear_v3_error()
 	_email.editable = mode in ["sign_in", "sign_up", "forgot"]
-	_password.placeholder_text = L10n.text("Password (8+ characters)" if mode == "sign_up" else "Current password" if mode == "password" else "Password")
-	_new_password.placeholder_text = L10n.text("New password (8+ characters)")
-	_confirm_password.placeholder_text = L10n.text("Confirm new password" if mode in ["forgot", "password"] else "Confirm password")
+	_password.placeholder_text = _t("Password (8+ characters)" if mode == "sign_up" else "Current password" if mode == "password" else "Password")
+	_new_password.placeholder_text = _t("New password (8+ characters)")
+	_confirm_password.placeholder_text = _t("Confirm new password" if mode in ["forgot", "password"] else "Confirm password")
 	var account := Net.account if Net else AccountSession.new()
 	for f in [_password, _new_password, _confirm_password]: _sync_caption(f)
 	match mode:
@@ -268,7 +549,7 @@ func set_mode(next: String) -> void:
 				_set_actions([["send_reset", "Send code", "accent"], ["to_sign_in", "Back to sign in"]])
 		"verify":
 			_show([_code])
-			_texts("Verify email", L10n.format_text("We sent a 6-digit code to %s.", account.email))
+			_texts("Verify email", _tf("We sent a 6-digit code to %s.", account.email))
 			_set_actions([["verify", "Verify", "accent"], ["resend_verify", "Send a new code"], ["later", "Later"]])
 		"profile":
 			_show([_nickname, _gender, _gender_custom, _birthday])
@@ -293,7 +574,7 @@ func set_mode(next: String) -> void:
 			_set_actions(actions)
 		"delete":
 			_password.text = ""
-			_password.placeholder_text = L10n.text("Password")
+			_password.placeholder_text = _t("Password")
 			if account.has_password:
 				_show([_password])
 				_texts("Delete account?", "This permanently deletes your account and your farm. Enter your password to confirm.")
@@ -308,12 +589,12 @@ func set_mode(next: String) -> void:
 func _account_summary(account: AccountSession) -> String:
 	var lines := []
 	if not account.display_name.is_empty(): lines.append(account.display_name)
-	lines.append(account.email if not account.email.is_empty() else L10n.text("Signed in with Apple"))
+	lines.append(account.email if not account.email.is_empty() else _t("Signed in with Apple"))
 	var extra := []
-	if not account.email.is_empty(): extra.append(L10n.text("Verified" if account.email_verified else "Not verified yet"))
+	if not account.email.is_empty(): extra.append(_t("Verified" if account.email_verified else "Not verified yet"))
 	var g := AccountSession.gender_label(account.gender, account.gender_custom)
-	if not g.is_empty(): extra.append(L10n.text(g) if account.gender != "self_describe" else g)
-	if account.age >= 0: extra.append(L10n.format_text("Age %d", account.age))
+	if not g.is_empty(): extra.append(_t(g) if account.gender != "self_describe" else g)
+	if account.age >= 0: extra.append(_tf("Age %d", account.age))
 	if not extra.is_empty(): lines.append(" · ".join(extra))
 	return "\n".join(lines)
 
@@ -341,10 +622,14 @@ func _show(visible_fields: Array) -> void:
 		if f is LineEdit: _sync_caption(f)
 	if _gender in visible_fields: _gender_custom.visible = _selected_gender() == "self_describe"
 	_fields.visible = not visible_fields.is_empty()
+	if v3: _show_passwords.visible = false # each password field has its own Show key
 
 func _texts(title: String, subtitle: String) -> void:
-	_title.text = L10n.text(title)
-	_subtitle.text = L10n.text(subtitle)
+	_title.text = _t(title)
+	_subtitle.text = _t(subtitle)
+	# v3 (C-85 ④ A / D): signing in, creating an account and the profile show no line under the title unless it says
+	# why the panel opened (a reason).
+	if v3: _subtitle.visible = not (mode in ["sign_in", "sign_up", "profile"] and reason.is_empty())
 
 ## iOS 上登录 / 注册页都给 Apple 登录，紧跟主按钮（App Store 4.8：与其它登录方式同等显眼）。
 func _with_apple(list: Array) -> Array:
@@ -363,7 +648,7 @@ func _provider_row(providers: Array) -> Control:
 	var box := VBoxContainer.new()
 	box.name = "Providers"
 	box.add_theme_constant_override("separation", 8)
-	var divider := GameUi.label(L10n.text("or"), 12, GameUi.MUTED)
+	var divider := GameUi.label(_t("or"), 12, GameUi.MUTED)
 	divider.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(divider)
 	var row := HBoxContainer.new()
@@ -375,7 +660,7 @@ func _provider_row(providers: Array) -> Control:
 		var id: String = spec[0]
 		var b := Button.new()
 		b.name = id
-		b.tooltip_text = L10n.text(spec[1])
+		b.tooltip_text = _t(spec[1])
 		b.custom_minimum_size = Vector2(56, 56)
 		b.focus_mode = Control.FOCUS_NONE
 		b.icon = load(BRAND_ICONS[id]) as Texture2D
@@ -399,15 +684,22 @@ func _provider_row(providers: Array) -> Control:
 
 ## 每项 [动作 id, 文案, 样式]：accent 主按钮、danger 红色主按钮、danger_link 红字次按钮。
 func _set_actions(list: Array) -> void:
+	if _status.get_parent() == _actions: _actions.remove_child(_status) # v3 keeps the error line among the keys
 	for c in _actions.get_children():
 		_actions.remove_child(c)
 		c.queue_free()
+	_primary_id = ""
+	for spec in list:
+		if spec.size() > 2 and spec[2] in ["accent", "danger"] and _primary_id.is_empty(): _primary_id = str(spec[0])
+	if v3:
+		_set_actions_v3(list)
+		return
 	for spec in list:
 		var style: String = spec[2] if spec.size() > 2 else ""
 		if style == "providers":
 			_actions.add_child(_provider_row(spec[1]))
 			continue
-		var b := GameUi.button("trash-2" if style == "danger_link" else "", L10n.text(spec[1]), "", style == "accent")
+		var b := GameUi.button("trash-2" if style == "danger_link" else "", _t(spec[1]), "", style == "accent")
 		b.name = spec[0]
 		b.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.custom_minimum_size.y = 48 if style in ["accent", "danger"] else 44
@@ -431,19 +723,33 @@ func _paint_solid(b: Button, fill: Color) -> void:
 
 func action_button(id: String) -> Button:
 	var b := _actions.get_node_or_null(id) as Button
+	if b == null: b = _actions.get_node_or_null("ForgotRow/" + id) as Button # v3: "Forgot password?" above the primary
 	return b if b else _actions.get_node_or_null("Providers/Row/" + id) as Button
 
 func _submit_primary() -> void:
-	if _actions.get_child_count() > 0: _on_action(str(_actions.get_child(0).name))
+	if not _primary_id.is_empty(): _on_action(_primary_id)
+	elif _actions.get_child_count() > 0: _on_action(str(_actions.get_child(0).name))
+
+func _t(source: String) -> String:
+	return source if english else L10n.text(source)
+
+func _tf(source: String, values: Variant) -> String:
+	return source % values if english else L10n.format_text(source, values)
 
 func _say(message: String, ok := false) -> void:
-	_status.text = L10n.text(message)
+	_status.text = _t(message)
 	_status.add_theme_color_override("font_color", GameUi.GREEN if ok else GameUi.CORAL)
+	if v3: _say_v3(message, ok)
 
 func _set_busy(value: bool) -> void:
 	busy = value
 	_close.disabled = value
 	for b in _actions.find_children("*", "Button", true, false): (b as Button).disabled = value
+	# v3 (C-85 ④ C): the primary key reads • • • while busy, at the same width.
+	var primary := action_button(_primary_id) if v3 and not _primary_id.is_empty() else null
+	if primary != null:
+		if value: primary.set_meta("label", primary.text); primary.text = BUSY_DOTS
+		elif primary.has_meta("label"): primary.text = primary.get_meta("label")
 
 func set_gate(on: bool) -> void:
 	gate = on

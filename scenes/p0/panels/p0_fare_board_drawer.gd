@@ -61,7 +61,7 @@ func _row(r: Dictionary, n: int) -> Control:
 	text.add_child(bounds)
 	row.add_child(text)
 	var free := bool(r.get("free", true))
-	var fare := UiKit.label(str(r.get("fare", "")), UiTokens.STYLE_BODY_XB14, UiTokens.COLOR_PRIMARY if free else UiTokens.COLOR_TEXT)
+	var fare := UiKit.label(str(r.get("fare", "")), UiTokens.STYLE_BODY_XB14, UiTokens.COLOR_PRIMARY_INK if free else UiTokens.COLOR_TEXT)
 	fare.name = "Fare"
 	fare.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	fare.size_flags_vertical = Control.SIZE_SHRINK_CENTER

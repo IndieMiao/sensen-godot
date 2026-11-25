@@ -92,8 +92,10 @@ static func ready_at(gather: Dictionary, state: Dictionary, id: String, now: int
 
 ## The server's `gather` command on `state` (changed in place on success): {code, detail}, code "" when
 ## gathered. `parcel_id` is the owner's parcel (the server reads it from the locked row); `in_core` says
-## the cell is under the house, tilled, sown or a cleared obstacle (the core cells the server knows).
-static func take(gather: Dictionary, state: Dictionary, object: String, parcel_id: String, in_core: bool, now: int) -> Dictionary:
+## the cell is under a building, tilled, sown or a cleared obstacle (the core cells the server knows).
+## `short`: the player has not the Energy for it (C-148); after every other check, as the server, it is NO_ENERGY.
+static func take(gather: Dictionary, state: Dictionary, object: String, parcel_id: String, in_core: bool, now: int,
+		short := false) -> Dictionary:
 	var o = parse_id(object)
 	if o == null or gather.is_empty(): return {"code": "UNKNOWN_OBJECT", "detail": {}}
 	if parcel_id.is_empty() or o.parcel_id != parcel_id: return {"code": "NOT_YOUR_PARCEL", "detail": {}}
@@ -115,6 +117,7 @@ static func take(gather: Dictionary, state: Dictionary, object: String, parcel_i
 		var other = parse_id(key)
 		if other != null and other.model in src.models: live += 1
 	if live >= int(src.max_objects): return {"code": "TOO_MANY_OBJECTS", "detail": {"max": src.max_objects}}
+	if short: return {"code": "NO_ENERGY", "detail": {}}
 	gathered[id] = now
 	state.bag[src.item] = int(state.bag.get(src.item, 0)) + int(src.amount)
 	return {"code": "", "detail": {}}

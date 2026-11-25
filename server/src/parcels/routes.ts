@@ -6,9 +6,11 @@
  */
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { PlayerRow } from '../http/store.js';
-import { applyFarmCommands, emptyFarm, parseFarmCommands, welcome, withEconomy } from './farm.js';
-import { communityOf, type ParcelRules } from './rules.js';
-import { DEFAULT_LAYER, type OwnedParcel, type ParcelStore } from './store.js';
+import { energyOf } from './energy.js';
+import { applyFarmCommands, emptyFarm, parseFarmCommands, rebaseFarm, welcome, withEconomy } from './farm.js';
+import { communityOf, isNewerDataset, type ParcelRules } from './rules.js';
+import { activeZone, zoneView, type StarterZones } from './starter_zone.js';
+import { DEFAULT_LAYER, sameParcel, type OwnedParcel, type ParcelStore } from './store.js';
 
 export interface ParcelRouteDeps {
   store: ParcelStore;
@@ -18,6 +20,8 @@ export interface ParcelRouteDeps {
   reselect: boolean;
   /** 装上即建号（C-100，PARCEL_GUEST_WRITES=1）：游客也能认领、进入和存档；默认关，对外开放由所有者另定。 */
   guestWrites?: boolean;
+  /** 起步区（C-130）：开着时新玩家只能认领区内地块；不传等于不限制。 */
+  starterZones?: StarterZones;
 }
 
 interface Auth {
@@ -56,13 +60,19 @@ function parseBbox(raw: unknown): [number, number, number, number] | null {
   return [w, s, e, n];
 }
 
-const parcelView = (p: OwnedParcel) => ({
-  community_id: p.community_id, layer: p.layer, parcel_id: p.parcel_id, dataset_version: p.dataset_version,
-  center: [p.center.lng, p.center.lat], claimed_at: p.claimed_at, farm_version: p.farm_version, farm: withEconomy(p.farm),
-});
+/** 农场按当前字段补齐后给客户端：缺的经济字段补开局值，缺的体力补满（C-148，energyOf；只补显示，不写回）。 */
+const farmView = (rules: ParcelRules, farm: OwnedParcel['farm'], at: number) => {
+  const f = withEconomy(farm);
+  f.energy = energyOf(rules, f, at);
+  return f;
+};
 
 export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps, { auth, writer }: Auth): void {
   const now = deps.now;
+  const parcelView = (p: OwnedParcel) => ({
+    community_id: p.community_id, layer: p.layer, parcel_id: p.parcel_id, dataset_version: p.dataset_version,
+    center: [p.center.lng, p.center.lat], claimed_at: p.claimed_at, farm_version: p.farm_version, farm: farmView(deps.rules, p.farm, now()),
+  });
   /** 认领、进入、地块内命令用它：装上即建号打开时游客也能写自己的地块；关着时与其它写接口一样要账号。 */
   const parcelWriter: Auth['writer'] = !deps.guestWrites ? writer : async (req, reply) => {
     const p = await auth(req);
@@ -78,6 +88,8 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
   });
 
   /** 认领：每人一块免费地，只能认领无主地块，认领后永久归属。重复认领自己那块返回 200。
+   * 起步区开着时（C-130），没有地块的玩家只能认领区内地块，区外 403 OUTSIDE_STARTER_ZONE，
+   * 区内太小的 403 PARCEL_TOO_SMALL（C-143）。
    * 认领只建空农场；赠品在首次进入（/mine/enter）时发。 */
   app.post('/v1/parcels/claim', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (req, reply) => {
     const p = await parcelWriter(req, reply);
@@ -89,15 +101,41 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
     const community = communityOf(deps.rules, b.dataset_version);
     if (!community) return reply.code(422).send({ code: 'UNKNOWN_DATASET', server_time: now() });
     const at = now();
-    const out = await deps.store.claim(p.id, {
-      community_id: community, layer: DEFAULT_LAYER, parcel_id: b.parcel_id, dataset_version: b.dataset_version, center,
-    }, emptyFarm(), at);
+    const claim = { community_id: community, layer: DEFAULT_LAYER, parcel_id: b.parcel_id, dataset_version: b.dataset_version, center };
+    // C-130 起步区：区外地块不进存储层，所以绝不会为它新建认领。已有地块的玩家照旧拿到自己的地块
+    // （重试认领自己那块 200，换一块 409 ALREADY_CLAIMED），不因起步区被误拒；区内认领存数据集里的中心点。
+    // C-143：区内太小的地块（客户端不给认领键）同样不进存储层，已认领的照旧。
+    const zone = activeZone(deps.starterZones, community);
+    if (zone) {
+      const inZone = zone.parcels.get(b.parcel_id);
+      if (!inZone || zone.too_small.has(b.parcel_id)) {
+        const own = await deps.store.mine(p.id);
+        if (own && sameParcel(own, claim)) return reply.send({ parcel: parcelView(own), server_time: at });
+        if (own) return reply.code(409).send({ code: 'ALREADY_CLAIMED', parcel: parcelView(own), server_time: at });
+        return reply.code(403).send({ code: inZone ? 'PARCEL_TOO_SMALL' : 'OUTSIDE_STARTER_ZONE', starter_zone: zone.id, server_time: at });
+      }
+      claim.center = { lng: inZone[0], lat: inZone[1] };
+    }
+    const out = await deps.store.claim(p.id, claim, emptyFarm(), at);
     switch (out.kind) {
       case 'claimed': return reply.code(201).send({ parcel: parcelView(out.parcel), server_time: at });
       case 'already_mine': return reply.send({ parcel: parcelView(out.parcel), server_time: at });
       case 'player_has_parcel': return reply.code(409).send({ code: 'ALREADY_CLAIMED', parcel: parcelView(out.parcel), server_time: at });
       default: return reply.code(409).send({ code: 'PARCEL_TAKEN', server_time: at });
     }
+  });
+
+  /**
+   * 起步区（C-130）：地图默认落点、标识边界和区内地块编号。公开配置，不要账号；关闭或该数据集所属社区没有起步区时
+   * enabled=false、zone=null，地图照旧落在数据集中心，认领不限制。
+   */
+  app.get('/v1/parcels/starter-zone', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (req, reply) => {
+    const q = req.query as { dataset_version?: unknown };
+    if (typeof q.dataset_version !== 'string') return reply.code(400).send({ code: 'SCHEMA', server_time: now() });
+    const community = communityOf(deps.rules, q.dataset_version);
+    if (!community) return reply.code(422).send({ code: 'UNKNOWN_DATASET', server_time: now() });
+    const zone = activeZone(deps.starterZones, community);
+    return reply.send({ enabled: zone !== null, zone: zone ? zoneView(zone) : null, server_time: now() });
   });
 
   /**
@@ -133,13 +171,30 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
   /**
    * 进入自家地块（客户端每次打开自己的地块都调用）：第一次发 welcome_gift（Q-39 锄头与萝卜种子、Q-40 首栋住宅蓝图），
    * granted=true；之后重开、重试都只返回当前状态，granted=false，不重发。
+   * C-136（Q-168 rebase）：请求体可带 dataset_version（客户端这次打开农场用的数据集）。认领的数据集比它旧、同属这块地的社区、
+   * 两个都已登记时，在同一次加锁写入里把认领换到这个数据集，按格子记的进度清空并退还（rebaseFarm）；
+   * 换过之后认领已是新版本，重试、并发请求都不会再换一次。不带或条件不满足时与以前一样。
    */
   app.post('/v1/parcels/mine/enter', { config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (req, reply) => {
     const p = await parcelWriter(req, reply);
     if (!p) return;
+    const want = (req.body as { dataset_version?: unknown } | undefined | null)?.dataset_version;
+    if (want !== undefined && (typeof want !== 'string' || want.length > 128)) return reply.code(400).send({ code: 'SCHEMA', server_time: now() });
     const at = now();
-    const out = await deps.store.enter(p.id, farm => welcome(deps.rules, farm, at), at);
+    let rebased = null as { from: string; buildings: number; cleared: number; tilled: number; crops: number } | null;
+    const out = await deps.store.enter(p.id, parcel => {
+      rebased = null;
+      let farm = parcel.farm, dataset = parcel.dataset_version;
+      if (want !== undefined && communityOf(deps.rules, want) === parcel.community_id && isNewerDataset(deps.rules, dataset, want)) {
+        rebased = { from: dataset, buildings: withEconomy(farm).buildings.length, cleared: farm.cleared.length, tilled: farm.tilled.length, crops: Object.keys(farm.crops).length };
+        farm = rebaseFarm(deps.rules, farm);
+        dataset = want;
+      }
+      const gifted = welcome(deps.rules, farm, at);
+      return gifted || rebased ? { farm: gifted ?? farm, dataset_version: dataset, granted: Boolean(gifted) } : null;
+    }, at);
     if (out.kind === 'no_parcel') return reply.code(404).send({ code: 'NO_PARCEL', server_time: at });
+    if (rebased) req.log.info({ parcel_id: out.parcel.parcel_id, to: out.parcel.dataset_version, ...rebased }, 'parcel rebased to a newer dataset');
     return reply.send({ granted: out.granted, parcel: parcelView(out.parcel), server_time: at });
   });
 

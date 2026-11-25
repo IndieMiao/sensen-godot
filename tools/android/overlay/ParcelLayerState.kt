@@ -148,3 +148,24 @@ internal class ParcelQuerySettle {
         }
     }
 }
+
+/**
+ * C-130 (V-362): the parcel source's load timeout. Mapbox loads a source only where one of its layers is drawn, so below
+ * the selectable zoom nothing loads and a fixed timeout fired on every map entered there (the starter zone's landing view).
+ * The count runs only while the source is awaited and drawn; stopping it (zoomed out, loaded, reinstalled) retires any
+ * countdown already posted, and drawing it again starts a fresh one.
+ */
+internal class ParcelSourceTimeout {
+    private var token = 0L
+    var armed = false; private set
+    /** The token of a newly started countdown, or null when none starts (already counting, or not awaited/drawn). */
+    fun update(awaited: Boolean, drawn: Boolean): Long? {
+        if (!awaited || !drawn) { if (armed) reset(); return null }
+        if (armed) return null
+        armed = true
+        return ++token
+    }
+    fun reset() { armed = false; token++ }
+    /** Whether the countdown started with [token] is still the running one. */
+    fun fires(token: Long): Boolean = armed && token == this.token
+}

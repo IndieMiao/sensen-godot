@@ -9,6 +9,9 @@ var nicknames := {"fake-a": "Ash", "fake-b": "Birch"}
 var reselect := true
 var dataset := Contract.DATASET # The only release this stand-in answers for.
 var claims := {} # parcel_id -> {player, center}
+## C-130 starter zone as the server would publish it ({} = switched off): claims by a player without a parcel
+## outside `zone.parcel_ids` are refused with 403 OUTSIDE_STARTER_ZONE, as on the server.
+var zone := {}
 var _seeded := {}
 
 func client(token := "fake-a") -> ApiClient:
@@ -20,13 +23,16 @@ func handle(method: String, url: String, headers: PackedStringArray, body: Strin
 	var player := ""
 	for header in headers:
 		if header.begins_with("authorization: Bearer "): player = header.trim_prefix("authorization: Bearer ")
-	if not nicknames.has(player): return _reply(401, {"code": "UNAUTHENTICATED"})
 	var path := url.trim_prefix("https://fake.invalid/v1")
 	var query := {}
 	if "?" in path:
 		for pair in path.get_slice("?", 1).split("&"):
 			query[pair.get_slice("=", 0)] = pair.get_slice("=", 1).uri_decode()
 		path = path.get_slice("?", 0)
+	if method == "GET" and path == "/parcels/starter-zone": # Public, like the server's.
+		if query.get("dataset_version") != dataset: return _reply(422, {"code": "UNKNOWN_DATASET"})
+		return _reply(200, {"enabled": not zone.is_empty(), "zone": zone if not zone.is_empty() else null})
+	if not nicknames.has(player): return _reply(401, {"code": "UNAUTHENTICATED"})
 	var data = JSON.parse_string(body) if not body.is_empty() else {}
 	if not data is Dictionary: return _reply(400, {"code": "SCHEMA"})
 	match [method, path]:
@@ -49,6 +55,8 @@ func _claim(player: String, data: Dictionary) -> ApiClient.Response:
 	var mine := _mine(player)
 	if mine == id: return _reply(200, {"parcel": _parcel(id)})
 	if not mine.is_empty(): return _reply(409, {"code": "ALREADY_CLAIMED", "parcel": _parcel(mine)})
+	if not zone.is_empty() and not id in zone.get("parcel_ids", []):
+		return _reply(403, {"code": "OUTSIDE_STARTER_ZONE", "starter_zone": zone.get("id", "")})
 	if claims.has(id): return _reply(409, {"code": "PARCEL_TAKEN"})
 	claims[id] = {"player": player, "center": data.center}
 	return _reply(201, {"parcel": _parcel(id)})

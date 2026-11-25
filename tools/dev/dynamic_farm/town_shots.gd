@@ -90,6 +90,17 @@ func _parcel(path: String) -> void:
 	while not state.ready and Time.get_ticks_msec() < deadline: await process_frame
 	for i in 90: await process_frame
 	await _shot("07_parcel_coins")
+	# UI v3 (C-105): the bag panel with an item picked, then a gain float rising over the scene.
+	var farming: Node = scene._farming
+	if farming != null and farming.has_method("open_bag"):
+		farming.open_bag("crop_carrot" if farming.bag_ids().has("crop_carrot") else "")
+		for i in 40: await process_frame
+		await _shot("08_parcel_bag")
+		farming.close_bag()
+		for i in 40: await process_frame
+		farming.announce_gains({"wood": 1, "seed_carrot": 2}, Vector2(180, 420))
+		for i in 12: await process_frame
+		await _shot("09_parcel_gain")
 	scene.queue_free()
 
 func _settle(_town: Control) -> void:

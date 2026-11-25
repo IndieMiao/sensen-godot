@@ -6,7 +6,7 @@
  */
 import type pg from 'pg';
 import type { FarmOutcome, ParcelFarmState } from './farm.js';
-import { sameParcel, type ClaimOutcome, type EnterOutcome, type FarmUpdateOutcome, type OwnedParcel, type OwnerQuery, type ParcelClaim, type ParcelStore, type ReclaimedParcel } from './store.js';
+import { sameParcel, type ClaimOutcome, type EnterChange, type EnterOutcome, type FarmUpdateOutcome, type OwnedParcel, type OwnerQuery, type ParcelClaim, type ParcelStore, type ReclaimedParcel } from './store.js';
 
 const rowToParcel = (r: Record<string, unknown>): OwnedParcel => ({
   community_id: r.community_id as string,
@@ -83,21 +83,21 @@ export class PgParcelStore implements ParcelStore {
     }
   }
 
-  async enter(playerId: string, grant: (farm: ParcelFarmState) => ParcelFarmState | null, now: number): Promise<EnterOutcome> {
+  async enter(playerId: string, change: (parcel: OwnedParcel) => EnterChange | null, now: number): Promise<EnterOutcome> {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
       const r = await client.query("SELECT * FROM parcel_claims WHERE player_id = $1 AND kind = 'free' FOR UPDATE", [playerId]);
       if (!r.rows[0]) { await client.query('ROLLBACK'); return { kind: 'no_parcel' }; }
       const row = rowToParcel(r.rows[0]);
-      const next = grant(structuredClone(row.farm));
+      const next = change(structuredClone(row));
       if (!next) { await client.query('ROLLBACK'); return { kind: 'entered', granted: false, parcel: row }; }
       const updated = await client.query(
-        `UPDATE parcel_claims SET farm_state = $4, farm_version = farm_version + 1, updated_at = $5
+        `UPDATE parcel_claims SET farm_state = $4, dataset_version = $5, farm_version = farm_version + 1, updated_at = $6
          WHERE community_id = $1 AND layer = $2 AND parcel_id = $3 RETURNING *`,
-        [row.community_id, row.layer, row.parcel_id, JSON.stringify(next), now]);
+        [row.community_id, row.layer, row.parcel_id, JSON.stringify(next.farm), next.dataset_version, now]);
       await client.query('COMMIT');
-      return { kind: 'entered', granted: true, parcel: rowToParcel(updated.rows[0]) };
+      return { kind: 'entered', granted: next.granted, parcel: rowToParcel(updated.rows[0]) };
     } catch (error) {
       await client.query('ROLLBACK').catch(() => undefined);
       throw error;
@@ -114,7 +114,7 @@ export class PgParcelStore implements ParcelStore {
   /**
    * 一条语句完成挑选、删除和存档：挑选时锁住地块行（SKIP LOCKED，正在写的跳过），删除和写入 parcel_reclaims 同在这一条语句里，
    * 要么都成，要么都不成。最后活动时间 = GREATEST(players.last_seen_at, 该玩家 token 的最大 last_used_at)；
-   * 两者都早于 cutoff 才算闲置，tokens 有 (player_id, last_used_at) 索引。
+   * 两者都早于 cutoff 才算闲置，tokens 有 (player_id, last_used_at) 索引。删掉的 token 的使用时间已记在 last_seen_at 上（deleteTokensSql）。
    */
   async reclaimIdle(cutoff: number, now: number, limit: number): Promise<ReclaimedParcel[]> {
     const r = await this.pool.query(

@@ -27,7 +27,9 @@ var options: Array = []
 var hold := false
 var hold_manifest := false
 var wrong_farm := false
+var stale_release := false
 signal release
+const R6 := "sf-dynamic-farm-20261124-r6"
 func _initialize() -> void: _run.call_deferred()
 func check(value: bool, text: String) -> void:
 	checks += 1
@@ -39,6 +41,8 @@ func transport(path: String) -> Dictionary:
 		if hold_manifest: await release
 		return Fixture.manifest()
 	var data: Dictionary = Fixture.farm("p-B" if wrong_farm else path.get_file().get_basename())
+	# An earlier release's directory (full URL, C-113) serves that release's farms.
+	if path.begins_with("https://") and not stale_release: data.dataset_version = R6
 	if hold: await release
 	return data
 func ready_signal(style := 1) -> void:
@@ -249,6 +253,135 @@ func burst_errors() -> void:
 	check(native.sources.size() == boots and controller.message == Controller.MAP_FAILED, "reported map failure stays until the player retries")
 	controller.retry(); for i in 4: await process_frame
 	ready_signal()
+## C-113 Q-172: a home claimed on an earlier release keeps opening that release's farm (its save's cells belong to that
+## grid), read from the release's own directory; everything else uses the map's release.
+func earlier_release() -> void:
+	hold = false
+	controller.config.releases = {R6: "https://old.invalid/r6/", "sf-dynamic-farm-20261118-r9": "http://plain.invalid/r9/"}
+	await controller.activate(); ready_signal()
+	var current := str(controller.manifest.dataset_version)
+	check(controller.home_release(R6) == R6 and controller.home_release(current) == current, "a home claimed on r6 opens in r6; one on the map's release opens in it")
+	check(controller.home_release("sf-dynamic-farm-20261118-r9") == current and controller.home_release("sf-dynamic-farm-20261020-r3") == current and controller.home_release("") == current,
+		"a release without an https directory, or not listed, opens in the map's release")
+	reply("building", [Fixture.metadata()], "opaque")
+	var opened := farms.size(); paths.clear()
+	await controller.open_farm(R6)
+	check(paths == ["https://old.invalid/r6/farms/p-A.json"] and farms.size() == opened + 1 and farms.back().dataset_version == R6, "the own farm of an r6 home is read from r6's directory and stays an r6 farm")
+	await controller.open_farm(current)
+	check(paths.back() == "/farms/p-A.json" and farms.size() == opened + 2 and farms.back().dataset_version == current, "a home claimed on the map's release opens the map's farm")
+	await controller.open_farm("sf-dynamic-farm-20261020-r3")
+	check(paths.back() == "/farms/p-A.json" and farms.back().dataset_version == current, "a home on an unlisted release opens the map's farm")
+	stale_release = true; await controller.open_farm(R6); stale_release = false
+	check(farms.size() == opened + 3 and controller.message == "This farm could not load. Please try again.", "a farm of another release cannot open as the r6 farm")
+	# "My home" where the map's release has no farm for the parcel (r8 dropped a few r6 farms).
+	controller.camera_changed(); paths.clear()
+	await controller.select_home("p-Z", R6)
+	check(paths == ["https://old.invalid/r6/farms/p-Z.json"] and controller.selection.block_id == "p-Z" and controller.selection.release == R6, "'My home' selects an r6 home from r6's farm")
+	check(controller.selection.name == "424 TEST AVE" and controller.selection.core_cell_count == 800 and controller.selection.extension_cell_count == 544, "the selected home shows its r6 name and cells")
+	check(native.highlights.back()[1] == "", "no building of the map's release is highlighted for it")
+	await controller.open_farm(R6)
+	check(farms.back().block_id == "p-Z" and farms.back().dataset_version == R6, "the selected r6 home opens its r6 farm")
+	var asked := paths.size()
+	await controller.select_home("p-Z", current); await controller.select_home("p-Z", "sf-dynamic-farm-20261020-r3")
+	check(paths.size() == asked and controller.selection.block_id == "p-Z", "'My home' on the map's release or an unlisted one fetches nothing")
+	stale_release = true; await controller.select_home("p-Z", R6); stale_release = false
+	check(controller.selection.is_empty() and controller.message == "Your home could not load. Tap My home again.", "a farm of another release is not taken as the r6 home")
+	hold = true; controller.select_home("p-Z", R6); await process_frame
+	reply("building", [Fixture.metadata()], "opaque")
+	hold = false; release.emit(); await process_frame
+	check(controller.selection.block_id == "p-A" and not controller.selection.has("release"), "a tap while the home loads wins over it")
+## C-94: a tap while the map is still loading ("Loading map details…", e.g. right after Retry) waits instead of being dropped.
+func loading_map_tap() -> void:
+	await controller.activate()
+	check(not controller.map_ready and not controller.busy and controller.message == "Loading map details…", "the map is loading its details")
+	var sent := native.queries.size()
+	controller.tap(Vector2(.35, .65), 17.5)
+	check(native.queries.size() == sent and controller.message == "Finding parcel…", "a tap while the map loads waits with the finding hint instead of being ignored")
+	native.parcel_ready.emit(controller.generation, 1, '{"source_ready":false,"error":""}')
+	check(native.queries.size() == sent and controller.message == "Finding parcel…", "a not-yet-ready report keeps the tap waiting")
+	ready_signal()
+	check(native.queries.size() == sent + 1 and native.queries.back()[1] == controller.generation and native.queries.back()[2] == Vector2(.35, .65), "the waiting tap is sent once, at its point, when the map is ready")
+	answer("", [Fixture.metadata()])
+	check(controller.selection.get("block_id") == "p-A" and controller.message == "Ready to preview this farm.", "the tap made while loading selects without a second tap")
+	ready_signal(controller.style_generation)
+	check(native.queries.size() == sent + 1 and controller.message == "Ready to preview this farm.", "later readiness does not send the tap again")
+	# Retry after a map failure (C-83's case): the first tap during the reload's loading selects.
+	controller.tap(Vector2(.3, .7), 18); map_error(); await reload(); map_error()
+	check(controller.message == Controller.MAP_FAILED and not controller.busy, "the map failed")
+	sent = native.queries.size()
+	controller.tap(Vector2(.3, .7), 18)
+	check(native.queries.size() == sent and controller.message == Controller.MAP_FAILED, "a failed map still ignores taps until Retry")
+	controller.retry(); for i in 4: await process_frame
+	check(controller.message == "Loading map details…", "Retry loads the map again")
+	controller.tap(Vector2(.45, .55), 17.5); ready_signal()
+	check(native.queries.size() == sent + 1 and native.queries.back()[2] == Vector2(.45, .55), "the first tap after Retry is sent when the map is ready")
+	answer("loading"); controller._process(controller.retry_delay() + .01)
+	check(native.queries.size() == sent + 2, "it keeps its one quiet re-query")
+	answer("", [Fixture.metadata("p-B")])
+	check(controller.selection.get("block_id") == "p-B", "the first tap after Retry selects")
+	# Below the selectable zoom the tap is not queued.
+	await controller.activate(); sent = native.queries.size()
+	controller.tap(Vector2(.3, .7), 15)
+	check(controller.message == "Zoom in to choose a farm.", "a tap below the selectable zoom while loading asks to zoom in")
+	ready_signal()
+	check(native.queries.size() == sent and controller.message == Controller.PROMPT, "and sends nothing when the map is ready")
+	# A camera move cancels the waiting tap: its point is no longer where the player tapped.
+	await controller.activate(); sent = native.queries.size()
+	controller.tap(Vector2(.3, .7), 18); controller.camera_changed(18.0)
+	check(controller.message == "Loading map details…", "a camera move cancels the waiting tap and shows the loading state again")
+	ready_signal()
+	check(native.queries.size() == sent and controller.message == Controller.PROMPT, "the cancelled tap is not sent")
+	# Pause cancels it too.
+	await controller.activate(); sent = native.queries.size()
+	controller.tap(Vector2(.3, .7), 18); controller.pause(); await controller.activate(); ready_signal()
+	check(native.queries.size() == sent and controller.message == Controller.PROMPT, "pause cancels a tap waiting for the map")
+	# A map error while the tap waits reloads once and keeps the tap.
+	await controller.activate(); sent = native.queries.size()
+	controller.tap(Vector2(.3, .7), 18); map_error()
+	check(controller.busy and controller.message == "Finding parcel…", "a map error while the tap waits reloads and keeps the finding hint")
+	await reload(); ready_signal()
+	check(native.queries.size() == sent + 1 and native.queries.back()[1] == controller.generation, "the reloaded map answers the waiting tap")
+	answer("", [Fixture.metadata()])
+	check(controller.selection.get("block_id") == "p-A", "and it selects")
+	# A tap waiting on the automatic reload's load does not get a second automatic reload.
+	await controller.activate(); map_error(); await reload()
+	controller.tap(Vector2(.3, .7), 18); map_error()
+	check(controller.message == Controller.MAP_FAILED and not controller.busy, "the map's one automatic reload is not given back to a tap made during it")
+	controller.retry()
+	for i in 4: await process_frame
+	ready_signal()
+	# DataSF: the tap made while loading also waits for the building layer.
+	controller.config.building_source = "datasf"; controller.config.buildings_url = "https://demo.invalid/buildings.geojson"
+	await controller.activate(); sent = native.queries.size()
+	controller.tap(Vector2(.2, .8), 17.5); ready_signal()
+	check(native.queries.size() == sent and controller.message == "Finding parcel…", "with DataSF the tap made while loading waits for the building layer too")
+	native.parcel_ready.emit(controller.generation, controller.style_generation, '{"source_ready":true,"buildings_source_ready":true,"error":""}')
+	check(native.queries.size() == sent + 1 and native.queries.back()[2] == Vector2(.2, .8), "and is sent once the building layer loads")
+	controller.config.building_source = "mapbox"; controller.config.erase("buildings_url")
+	await controller.activate(); ready_signal()
+## C-130 V-362: the map entered below the selectable zoom (the starter zone's landing view). The parcel layers are not
+## drawn there, so they do not load: the map asks to zoom in instead of loading forever, and loads once zoomed in.
+func below_selectable_zoom_entry() -> void:
+	controller.pause(); controller.camera_changed(14.0)
+	var seen: Array = [] # [generation, generation of the last sources set] at each change
+	var on_changed := func(): seen.append([controller.generation, native.sources.back()[0] if not native.sources.is_empty() else -1])
+	controller.changed.connect(on_changed)
+	await controller.activate()
+	controller.changed.disconnect(on_changed)
+	check(seen.back() == [controller.generation, controller.generation], "the map's change for a new generation follows its sources, so the starter zone sent on it reaches native after them")
+	check(not controller.map_ready and not controller.busy and controller.message == Controller.ZOOM_IN, "entered below the selectable zoom: asks to zoom in, not loading")
+	native.parcel_ready.emit(controller.generation, 1, '{"source_ready":false,"error":""}')
+	check(controller.message == Controller.ZOOM_IN and not controller.busy, "native readiness without parcel data below the selectable zoom still asks to zoom in")
+	controller.camera_changed(16.5)
+	check(controller.message == Controller.LOADING, "zoomed in to the selectable zoom: the parcel layers load")
+	controller.camera_changed(14.5)
+	check(controller.message == Controller.ZOOM_IN, "zoomed out again before they loaded: asks to zoom in again")
+	controller.camera_changed(16.5); ready_signal()
+	check(controller.map_ready and controller.message == Controller.PROMPT, "once loaded at the selectable zoom the map is ready")
+	controller.camera_changed(14.0)
+	check(controller.map_ready and controller.message == Controller.PROMPT, "a loaded map zoomed out stays ready")
+	controller.camera_changed(18.0)
+
 func _run() -> void:
 	api = Api.new(); api.transport = transport; root.add_child(api)
 	native = Native.new(); controller = Controller.new(); controller.api = api; controller.bridge = native
@@ -310,7 +443,10 @@ func _run() -> void:
 	await first_tap_retry()
 	await map_error_retry()
 	await buildings_layer_timeout()
+	await loading_map_tap()
+	await below_selectable_zoom_entry()
 	check(paths.all(func(path: String): return path == "/client-manifest.json" or path.begins_with("/farms/")), "preview never requests claims or account/gameplay endpoints")
+	await earlier_release()
 	controller.queue_free(); await process_frame
 	api.queue_free(); await process_frame
 	print("DYNAMIC SELECTION ", checks - failures, "/", checks)

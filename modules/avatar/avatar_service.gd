@@ -17,6 +17,8 @@ var cache := PartCache.new()
 var store := LocalOutfitStore.new()
 var loader: PartLoader
 var user_id := "local"
+## The parts warm_saved_outfit last asked for.
+var _warming: Array[String] = []
 
 func _ready() -> void:
 	catalog = PartCatalog.load_from_file(MANIFEST_PATH)
@@ -71,6 +73,36 @@ func save_outfit(config: AvatarConfig) -> Error:
 	var error := store.save_outfit(user_id, config)
 	if error == OK: outfit_saved.emit(config.duplicate_config())
 	return error
+
+## Starts loading the saved outfit's parts into the cache on the loader's threads, so the first rig to wear it later
+## shows at once instead of waiting for a cold load (C-133: the dynamic farm map has no player of its own, so after a
+## cold start its profile's figure waited ~3 s). Nothing is applied or saved; a part already cached is not asked for
+## again, and one still loading is joined, not loaded twice (PartLoader). Not under Compatibility
+## (AppRouter.sync_loads), where the loader would load on the main thread. The parts asked for, by id.
+func warm_saved_outfit() -> Array[String]:
+	var asked: Array[String] = []
+	var router := get_node_or_null("/root/AppRouter")
+	if loader == null or (router != null and router.sync_loads): return asked
+	var cfg := load_outfit()
+	for slot in slot_table.slot_names():
+		var id := String(cfg.slots.get(slot, ""))
+		if id.is_empty() or asked.has(id) or cache.get_part(id) != null: continue
+		loader.request_part(id)
+		asked.append(id)
+	_warming = asked
+	if not asked.is_empty() and is_inside_tree(): _log_warmed(asked)
+	return asked
+
+## The QA log says when the warmed parts have loaded: `AVATAR_OUTFIT_WARM {"parts":…,"ms":…}`. Here, not in the
+## caller: this service stays while a scene that asked may go.
+func _log_warmed(asked: Array[String]) -> void:
+	var start := Time.get_ticks_msec()
+	while is_same(_warming, asked) and warming(): await get_tree().process_frame
+	if is_same(_warming, asked): print("AVATAR_OUTFIT_WARM ", JSON.stringify({"parts": asked.size(), "ms": Time.get_ticks_msec() - start}))
+
+## Whether a part warm_saved_outfit asked for is still loading (once each is cached or has failed, false).
+func warming() -> bool:
+	return loader != null and _warming.any(func(id: String): return loader.loading(id))
 
 ## Local player rigs follow committed outfits; editor drafts and remote rigs do not.
 func follow_saved_outfit(rig: AvatarRig) -> void:

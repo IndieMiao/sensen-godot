@@ -1,7 +1,7 @@
 extends RefCounted
 ## Where the owner may farm inside their own parcel (Q-39, C-34#14). The server holds no
 ## parcel geometry (C-31), so these spatial rules are the client's: tilling only on free
-## core cells, never under the house, on the protected path or outside the core.
+## core cells, never under a building (C-150; the refusal still reads "House here"), on the protected path or outside the core.
 ##
 ## Schema 4 marks every core cell "no solid decor", so the protected path inside the core
 ## is derived here: the shortest walk from the entry to the spawn, widened by
@@ -19,6 +19,9 @@ const HOUSE := "house"
 const NO_TOOL := "no_tool"
 const NO_SEED := "no_seed"
 const NOT_RIPE := "not_ripe"
+## Rest at the cottage (C-148): once a player day, nothing to gain when full.
+const RESTED := "rested"
+const FULL := "full"
 
 ## Core cells of the protected path, as {Vector2i: true}.
 static func protected_path(data: Dictionary) -> Dictionary:
@@ -56,7 +59,7 @@ static func _mark_core(data: Dictionary, into: Dictionary, center: Vector2i, rad
 ## Why an empty cell cannot be tilled, or "" when it can (the hoe is checked separately).
 static func till_refusal(data: Dictionary, path: Dictionary, state: Dictionary, cell: Vector2i) -> String:
 	if not Data.permits(data, cell, "till"): return OUTSIDE
-	if ParcelFarm.house_cells(state).has(cell): return HOUSE
+	if ParcelFarm.building_cells(state).has(cell): return HOUSE
 	if path.has(cell): return PATH
 	return ""
 
@@ -67,6 +70,7 @@ static func till_refusal(data: Dictionary, path: Dictionary, state: Dictionary, 
 static func action(rules: Dictionary, data: Dictionary, path: Dictionary, obstacles: Dictionary,
 		state: Dictionary, cell: Vector2i, now: int) -> Dictionary:
 	if not data.by_cell.has(cell): return {}
+	if door_row(state).has(cell): return rest_action(rules, state, now)
 	var key := ParcelFarm.key(cell)
 	if obstacles.has(cell):
 		var anchor := ParcelFarm.key(obstacles[cell])
@@ -87,3 +91,36 @@ static func action(rules: Dictionary, data: Dictionary, path: Dictionary, obstac
 	if refusal.is_empty() and int(state.bag.get(rules.till_tool, 0)) <= 0: refusal = NO_TOOL
 	return {"verb": "till", "refusal": refusal,
 		"command": {"type": "till", "cell": key} if refusal.is_empty() else {}}
+
+## The cottage's cells along its door (C-148: Rest is at the door). The cottage is the first of the save's buildings
+## of type ParcelFarm.HOME_BUILDING (C-150). The model's +Z, the door, turns a quarter per rotation step
+## (FarmBuilding.transform): rotation 0 faces −y on the grid, 1 +x, 2 +y, 3 −x. {} without a cottage.
+static func door_row(state: Dictionary) -> Dictionary:
+	var row := {}
+	var home := ParcelFarm.home_building(state)
+	if home.is_empty(): return row
+	var turn := int(home.rotation) % 4
+	var cells := ParcelFarm.building_footprint(home)
+	var at := Vector2i(int(home.x), int(home.y))
+	var last := at
+	for cell: Vector2i in cells: last = Vector2i(maxi(last.x, cell.x), maxi(last.y, cell.y))
+	for cell: Vector2i in cells:
+		if (turn == 0 and cell.y == at.y) or (turn == 2 and cell.y == last.y) or (turn == 1 and cell.x == last.x) \
+				or (turn == 3 and cell.x == at.x):
+			row[cell] = true
+	return row
+
+## The middle of the door row: where a Rest press walks the player to (they stand just outside it).
+static func door_cell(state: Dictionary) -> Variant:
+	var row := door_row(state).keys()
+	if row.is_empty(): return null
+	row.sort()
+	return row[row.size() / 2]
+
+## The key at the cottage's door: Rest with what it gives now (`gain`), refused once rested today or when full.
+static func rest_action(rules: Dictionary, state: Dictionary, now: int) -> Dictionary:
+	var probe := state.duplicate()
+	var energy := ParcelFarm.settle_energy(rules, probe, now)
+	var gain := mini(int(rules.energy.rest_amount), ParcelFarm.max_energy(rules, probe) - int(energy.value))
+	var refusal := RESTED if ParcelFarm.rested_today(rules, probe, now) else FULL if gain <= 0 else ""
+	return {"verb": "rest", "refusal": refusal, "command": {"type": "rest"} if refusal.is_empty() else {}, "gain": maxi(0, gain)}

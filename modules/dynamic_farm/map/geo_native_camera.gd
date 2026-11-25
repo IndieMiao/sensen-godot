@@ -75,6 +75,17 @@ func ground_offset(offset:Vector2) -> Vector2:
 	return Vector2(t*offset.x,eye*sin(phi)+t*(dy*cos(phi)-eye*sin(phi)))
 func screen_geo(point:Vector2) -> PackedFloat64Array:
 	return Geo.unproject(size*.5+ground_offset(point-size*.5),center,size,scale_pixels())
+## The screen point over a ground point, screen_geo's inverse (C-115: the Washington Square pin rides on it); Vector2.INF
+## where a tilted view does not show the ground (past the clipped horizon).
+func geo_screen(lon:float,lat:float) -> Vector2:
+	var g:=Geo.project(lon,lat,center,size,scale_pixels())-size*.5
+	if pitch<=0.01 or size.y<=0:return size*.5+g
+	var phi:=deg_to_rad(pitch);var eye:=EYE_HEIGHTS*size.y;var c:=cos(phi);var s:=sin(phi)
+	var denom:=eye-g.y*s
+	if denom<=0.0:return Vector2.INF
+	var dy:=eye*c*g.y/denom
+	if dy<-eye*c/s*HORIZON_CLIP:return Vector2.INF
+	return size*.5+Vector2(g.x*(eye*c+dy*s)/(eye*c),dy)
 func setup_map(map_bridge:MapBridge,token:String) -> void:
 	bridge=map_bridge;_desktop=bridge==null or not bridge.has_mapbox()
 	if bridge:
