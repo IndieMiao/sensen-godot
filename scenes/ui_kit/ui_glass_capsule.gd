@@ -39,7 +39,6 @@ func _init() -> void:
 	_lines.add_theme_constant_override(&"separation", 0)
 	_row.add_child(_lines)
 	_label = UiKit.label("", UiTokens.STYLE_TYPE_HUD_NUMBER_ON_DARK)
-	_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_lines.add_child(_label)
 	_detail = UiKit.label("", UiTokens.STYLE_TYPE_CAPTION_ON_DARK, UiTokens.COLOR_TEXT_ON_DARK_MUTED)
@@ -61,6 +60,8 @@ func set_detail(v: String) -> void:
 	if _detail != null:
 		_detail.text = v
 		_detail.visible = v != ""
+		# Two lines take what room is left beside the other controls and cut with …; a one-line number never cuts.
+		_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS if v != "" else TextServer.OVERRUN_NO_TRIMMING
 		_restyle()
 
 func set_icon(v: Texture2D) -> void:

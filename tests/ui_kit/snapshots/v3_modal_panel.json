@@ -133,8 +133,8 @@
                                         {
                                           "type": "TextureRect",
                                           "rect": [
-                                            76,
-                                            175,
+                                            52,
+                                            151,
                                             48,
                                             48
                                           ]
@@ -164,8 +164,8 @@
                                         {
                                           "type": "TextureRect",
                                           "rect": [
-                                            164,
-                                            175,
+                                            140,
+                                            151,
                                             51,
                                             51
                                           ]
@@ -372,7 +372,7 @@
                   "rect": [
                     112,
                     77,
-                    25,
+                    48,
                     28
                   ],
                   "variation": "TagPill",
@@ -382,7 +382,7 @@
                       "rect": [
                         124,
                         81,
-                        1,
+                        24,
                         19
                       ],
                       "variation": "TypeLabelOnDark",

@@ -187,10 +187,17 @@ func _apply() -> void:
 		custom_minimum_size = Vector2(min_width, UiTokens.SIZE_NPC_CTA_H)
 		modulate.a = UiTokens.OPACITY_PENDING if phase == CommandLifecycle.State.PENDING else 1.0
 		return
+	_outline_when_enabled()
 	if compact:
 		custom_minimum_size = Vector2(min_width, 0.0)
 		UiKit.ensure_hit_area(self)
 	else:
 		custom_minimum_size = Vector2(maxf(UiTokens.SIZE_TOUCH, min_width), UiTokens.SIZE_COMMAND)
 	modulate.a = UiTokens.OPACITY_PENDING if phase == CommandLifecycle.State.PENDING else 1.0
+	_outline_when_enabled()
 	if fit_text or visual_inset_x > 0.0: _fit()
+
+## The v3 white-on-colour outline (§2.1) is for the live key; a disabled one's grey ink goes without it.
+func _outline_when_enabled() -> void:
+	if disabled: add_theme_constant_override(&"outline_size", 0)
+	else: remove_theme_constant_override(&"outline_size")

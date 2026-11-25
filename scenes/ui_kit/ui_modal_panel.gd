@@ -86,6 +86,7 @@ func _init(title_ := "", hero_: Texture2D = null) -> void:
 	_tag = UiTagPill.new()
 	_tag.name = "Tag"
 	frame.add_child(_tag)
+	_tag.minimum_size_changed.connect(_place_parts)
 	_close = _Close.new()
 	_close.name = "Close"
 	_close.pressed.connect(func(): if not closing: close_requested.emit())
@@ -142,7 +143,7 @@ func _fit() -> void:
 	_place_parts()
 
 func _place_parts() -> void:
-	if frame == null: return
+	if frame == null or _close == null: return
 	var band := UiTokens.SIZE_PANEL_HEADER_H
 	var left := _HERO_LEFT
 	if _hero.visible:

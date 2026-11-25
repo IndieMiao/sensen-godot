@@ -72,7 +72,7 @@
                   "rect": [
                     62,
                     82,
-                    192,
+                    181,
                     45
                   ],
                   "variation": "Glass",
@@ -82,7 +82,7 @@
                       "rect": [
                         74,
                         86,
-                        168,
+                        157,
                         37
                       ],
                       "children": [
@@ -91,7 +91,7 @@
                           "rect": [
                             74,
                             86,
-                            168,
+                            157,
                             37
                           ],
                           "children": [
@@ -100,7 +100,7 @@
                               "rect": [
                                 74,
                                 86,
-                                168,
+                                157,
                                 19
                               ],
                               "variation": "TypeHudNumberOnDark",
@@ -111,7 +111,7 @@
                               "rect": [
                                 74,
                                 105,
-                                168,
+                                157,
                                 18
                               ],
                               "variation": "TypeCaptionOnDark",
@@ -126,9 +126,9 @@
                 {
                   "type": "UiGlassCapsule",
                   "rect": [
-                    260,
+                    249,
                     92,
-                    56,
+                    67,
                     24
                   ],
                   "variation": "Glass",
@@ -136,27 +136,27 @@
                     {
                       "type": "HBoxContainer",
                       "rect": [
-                        270,
+                        259,
                         92,
-                        43,
+                        54,
                         24
                       ],
                       "children": [
                         {
                           "type": "VBoxContainer",
                           "rect": [
-                            270,
+                            259,
                             94,
-                            21,
+                            32,
                             19
                           ],
                           "children": [
                             {
                               "type": "Label",
                               "rect": [
-                                270,
+                                259,
                                 94,
-                                21,
+                                32,
                                 19
                               ],
                               "variation": "TypeHudNumberOnDark",

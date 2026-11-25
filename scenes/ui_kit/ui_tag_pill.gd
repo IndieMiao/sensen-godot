@@ -14,7 +14,6 @@ func _init(text_ := "") -> void:
 	custom_minimum_size.y = UiTokens.SIZE_TAG_H
 	_label = UiKit.label("", UiTokens.STYLE_TYPE_LABEL_ON_DARK)
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	add_child(_label)
 	text = text_
 

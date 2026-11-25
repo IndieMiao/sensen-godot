@@ -718,7 +718,6 @@ func _refresh_quick(s: State) -> void:
 		State.SELECTED, State.LIFTED:
 			box = UiStyleBox.make(fill, UiTokens.RADIUS_MD, UiTokens.COLOR_ACTION_SELECTED, UiTokens.STROKE_SELECTED)
 			if s == State.LIFTED:
-				box.bg_color = UiTokens.COLOR_GLASS_FILL_STRONG
 				box.shadow_color = UiTokens.COLOR_LIFT_SHADOW
 				box.shadow_size = UiTokens.SIZE_LIFT_SHADOW_RADIUS
 				box.shadow_offset = Vector2(0.0, UiTokens.SIZE_LIFT_SHADOW_OFFSET_Y)

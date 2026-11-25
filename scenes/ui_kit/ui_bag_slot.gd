@@ -29,6 +29,7 @@ func _init(item_ := {}) -> void:
 	custom_minimum_size = Vector2.ONE * UiTokens.SIZE_PANEL_SLOT
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_icon = UiKit.icon(null, UiTokens.SIZE_PANEL_SLOT_ICON)
+	_icon.size = Vector2.ONE * UiTokens.SIZE_PANEL_SLOT_ICON
 	_icon.set_anchors_and_offsets_preset(Control.PRESET_CENTER, Control.PRESET_MODE_KEEP_SIZE)
 	add_child(_icon)
 	_qty = UiKit.label("", UiTokens.STYLE_TYPE_MICRO, UiTokens.COLOR_TEXT_PRIMARY)

@@ -179,7 +179,7 @@
               "rect": [
                 120,
                 95,
-                25,
+                125,
                 28
               ],
               "variation": "TagPill",
@@ -189,7 +189,7 @@
                   "rect": [
                     132,
                     99,
-                    1,
+                    101,
                     19
                   ],
                   "variation": "TypeLabelOnDark",
@@ -201,7 +201,7 @@
               "type": "Button",
               "rect": [
                 279,
-                105,
+                95,
                 44,
                 44
               ],

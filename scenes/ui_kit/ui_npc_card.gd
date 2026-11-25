@@ -98,6 +98,7 @@ func _init(portrait_: Texture2D = null, title_ := "", line_ := "") -> void:
 	_tag = UiTagPill.new()
 	_tag.name = "NameTag"
 	add_child(_tag)
+	_tag.minimum_size_changed.connect(_place_parts)
 	_close = UiModalPanel._Close.new()
 	_close.name = "Close"
 	_close.pressed.connect(func(): close_requested.emit())
@@ -174,14 +175,15 @@ func _fit() -> void:
 	_place_parts()
 
 func _place_parts() -> void:
-	if _tag == null: return
+	if _tag == null or _close == null: return
 	var s := _tag.get_combined_minimum_size()
 	_tag.size = s
 	_tag.position = Vector2(_TEXT_LEFT, -_TAG_OVER)
 	var hit := UiTokens.SIZE_TOUCH_MIN
 	_close.size = Vector2(hit, hit)
+	# the glyph in the card's top margin, clear of the text column's first line
 	_close.position = Vector2(UiTokens.SIZE_NPC_W - UiTokens.SPACE_S5 - UiModalPanel._CLOSE_GLYPH * 0.5 - hit * 0.5,
-		_TEXT_TOP - hit * 0.5 + UiTokens.SPACE_S1)
+		_TEXT_TOP * 0.5 + 1.0 - hit * 0.5)
 
 ## The C-N4 relation meter: a 56 × 6 pill, `progress/fill` on `progress/track`.
 class _Meter extends Control:
