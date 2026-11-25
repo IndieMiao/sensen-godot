@@ -229,6 +229,16 @@ func _map_card() -> void:
 	check(selector.opened == 2 and page._entering.is_empty(), "'Preview in 3D' opens a read-only preview")
 	page._claims.reselect = true; page._render()
 	check(page._reselect.visible, "internal package shows 'Give up and choose again'")
+	# Q-156: the server refuses a guest's give-up, so a guest (no account) has no give-up entry; signing in shows it.
+	var account: AccountSession = root.get_node("Net").account
+	page._sync_guest(); page._render()
+	check(page._claims.guest and not page._reselect.visible and page._enter.visible, "a guest with a home sees no give-up entry")
+	page._claims.abandon(); await process_frame
+	check(page._claims.has_home() and not page._claims.busy, "a guest's give-up is not sent")
+	account.token = "fake-a"; account.user_id = "user-a"
+	page._sync_guest(); page._render()
+	check(not page._claims.guest and page._reselect.visible, "after signing in the give-up entry appears")
+	account.token = ""; account.user_id = ""
 	selector.selection = Fixture.metadata(ids[1]); selector.selection.block_id = ids[1]
 	page._render(); await process_frame
 	check(not page._claim.visible and page._details.text.ends_with("You already have a home."), "a second free parcel cannot be claimed")
@@ -304,10 +314,12 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	page._on_map_tap((at - Vector2(0, 16)) / page._camera.size)
 	await process_frame
 	check(selector.taps == taps + 1 and entry.is_open() and not page._bottom.visible, "a tap on the pin opens its place card instead")
+	check(not page._locate.visible and not page._profile_button.visible, "the round locate and profile keys step aside for the card")
 	var labels: Array = entry.card.find_children("*", "Label", true, false).map(func(l): return l.text)
 	check(labels.has("Washington Square Travel Post") and labels.has("Market · Carpenter") and labels.has("Distance")
 		and entry.card.find_child("Primary", true, false) != null, "the card: name, Market · Carpenter, Distance from home, Go (%s)" % [labels])
-	check(page.is_back_navigation_locked() and not entry.is_open() and page._bottom.visible, "Back closes the card first")
+	check(page.is_back_navigation_locked() and not entry.is_open() and page._bottom.visible and page._profile_button.visible,
+		"Back closes the card first; the keys come back")
 	page._camera.frame_center(entry.LON, entry.LAT + 0.0004, 17.5) # the pin low on the screen, where the card goes
 	await process_frame
 	var low: Vector2 = entry.screen_point()

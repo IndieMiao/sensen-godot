@@ -50,6 +50,17 @@ const rowToUser = (r: Record<string, unknown>): UserRow => ({
   gender_custom: (r.gender_custom ?? null) as string | null, birth_date: (r.birth_date ?? null) as string | null,
 });
 
+/**
+ * 删 token 的语句（C-120）：同一条语句里把删掉的 token 的最后使用时间记到玩家身上（players.last_seen_at 取较晚的）。
+ * 闲置回收按 GREATEST(players.last_seen_at, 现存 token 的最大 last_used_at) 判定，token 被撤销或过期后这段活动不能跟着丢。
+ * where 只能引用 tokens 的列，参数从 $1 起。
+ */
+export const deleteTokensSql = (where: string) =>
+  `WITH gone AS (DELETE FROM tokens WHERE ${where} RETURNING player_id, last_used_at)
+   UPDATE players p SET last_seen_at = g.last_used_at
+     FROM (SELECT player_id, max(last_used_at) AS last_used_at FROM gone GROUP BY player_id) g
+    WHERE p.id = g.player_id AND p.last_seen_at < g.last_used_at`;
+
 export class PgStore implements Store {
   constructor(private d: PgStoreDeps) {}
 
@@ -158,6 +169,7 @@ export class PgStore implements Store {
         'INSERT INTO tokens (id, player_id, token_hash, created_at, last_used_at) VALUES ($1,$2,$3,$4,$4)',
         [randomUUID(), id, tokenHash(token), now]);
       // 上限与淘汰在同一事务里做，否则并发签发会突破 5 个（Codex 三审 O-M2）。
+      // 淘汰的 token 不用记到玩家身上（deleteTokensSql）：last_seen_at 刚设成 now，比它们都晚。
       await client.query(
         `DELETE FROM tokens WHERE player_id = $1 AND id NOT IN (
            SELECT id FROM tokens WHERE player_id = $1 ORDER BY last_used_at DESC, id DESC LIMIT $2)`,
@@ -282,7 +294,7 @@ export class PgStore implements Store {
     } finally { client.release(); }
   }
   async revokeUserTokens(userId: string) {
-    await this.d.pool.query('DELETE FROM tokens WHERE player_id IN (SELECT id FROM players WHERE user_id = $1)', [userId]);
+    await this.d.pool.query(deleteTokensSql('player_id IN (SELECT id FROM players WHERE user_id = $1)'), [userId]);
   }
   async saveEmailCode(email: string, purpose: string, hash: string, now: number, ttlMs: number, resendMs: number) {
     // One statement: a concurrent resend either replaces an expired cooldown or sees the fresh row.
@@ -349,10 +361,10 @@ export class PgStore implements Store {
   }
 
   async revokeToken(hash: string) {
-    await this.d.pool.query('DELETE FROM tokens WHERE token_hash = $1', [hash]);
+    await this.d.pool.query(deleteTokensSql('token_hash = $1'), [hash]);
   }
   async revokeAllTokens(playerId: string) {
-    await this.d.pool.query('DELETE FROM tokens WHERE player_id = $1', [playerId]);
+    await this.d.pool.query(deleteTokensSql('player_id = $1'), [playerId]);
   }
   async rotateInstallKey(playerId: string, newHmac: string) {
     await this.d.pool.query('UPDATE players SET install_key_hmac = $2 WHERE id = $1', [playerId, newHmac]);
@@ -374,7 +386,7 @@ export class PgStore implements Store {
     if (!r.rowCount) return null;
     const row = r.rows[0];
     if (now - Number(row.last_used_at) > TOKEN_IDLE_MS) {
-      await this.d.pool.query('DELETE FROM tokens WHERE token_hash = $1', [hash]);
+      await this.d.pool.query(deleteTokensSql('token_hash = $1'), [hash]);
       return null;
     }
     await this.d.pool.query('UPDATE tokens SET last_used_at = $2 WHERE token_hash = $1', [hash, now]);

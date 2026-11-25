@@ -12,6 +12,8 @@ extends Control
 ## The guide (C-35, C-61) says on the bottom card where the next step is, from the home's parcel save (ParcelGuide).
 ## C-112: farm-dev's camera feel (geo_native_camera.gd) and its round locate key, over the bottom card at the right;
 ## My home, San Francisco and the locate key fly there. Only buildings are coloured (ParcelMapController.kt).
+## C-128 (0.4.4): a round profile key at the left, level with the locate key, opens the main farm's profile over the
+## map, and from it Settings and the dressing room (parcel_profile.gd).
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
@@ -26,6 +28,7 @@ const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
 ## The 3D space the Washington Square pin opens (C-115).
 const ROOM := "res://scenes/dynamic_farm/parcel_outpost.tscn"
 const TownEntry := preload("res://scenes/dynamic_farm/town_entry.gd")
+const PROFILE := "res://scenes/dynamic_farm/parcel_profile.gd"
 const LocalFarmStore := preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const RemoteFarmStore := preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
 const ParcelFarm := preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -46,6 +49,13 @@ const PIN_CLEAR_OF_CARD := 0.55
 ## over the bottom card. It flies back to the player's home, or to the dataset's area without one.
 const LOCATE_ICON := "res://assets/p0/icons/locate.svg"
 const LOCATE_GAP := 12.0
+## The profile key (C-128): the same round key at the left, with the account glyph; it opens the profile.
+const PROFILE_ICON := "res://assets/ui/icons/lucide/user-round.svg"
+## How long a profile tap waits for the saved outfit's parts at most (C-135), in seconds; then the profile opens all the
+## same and its figure may show late or stay blank. 5 s: a cold start's load took ~3 s on the phone (C-133), and a
+## stuck loader must not keep the profile and Settings out of reach. Overridden by the project setting below.
+const PROFILE_WAIT_SECONDS := 5.0
+const PROFILE_WAIT_SETTING := "sensen/dynamic_farm/profile_outfit_wait_seconds"
 const CHECKING := "Checking your account…"
 const SIGNED_IN := "Signed in as %s"
 const SIGNED_IN_NO_NAME := "Signed in"
@@ -76,6 +86,13 @@ var _home: Button
 var _locate: Button
 var _bottom: Control
 var _entry: Control # The Washington Square pin and its place card (TownEntry).
+var _profile_button: Button
+## The profile and the pages opened from it, over the map (parcel_profile.gd), else null.
+var _profile: Control
+## A tap on the profile key waiting for the saved outfit's parts to load (C-133); the key is held meanwhile.
+var _profile_waiting := false
+## The most a profile tap waits for the outfit (PROFILE_WAIT_SECONDS).
+var profile_wait_seconds := float(ProjectSettings.get_setting(PROFILE_WAIT_SETTING, PROFILE_WAIT_SECONDS))
 ## The home's parcel save as last read or seen (the guide's line) and the parcel it belongs to; read again after
 ## a visit to the parcel.
 var home_farm := {}
@@ -102,6 +119,7 @@ var _player_moved := false # The player moved the camera since the last account 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build_ui()
+	_warm_outfit()
 	# The isolated build must set this BEFORE Net's autoload _ready, not from this scene.
 	if not bool(ProjectSettings.get_setting("sensen/network/online_qa", false)):
 		_message.text = "Use the isolated Dynamic Farm preview build."; return
@@ -144,12 +162,18 @@ func _start_claims() -> void:
 		await net.dynamic_farm_sign_in(bool(ProjectSettings.get_setting("sensen/dynamic_farm/account_restore", false)),
 			_guest_play())
 		_restoring = false
+		_sync_guest()
 	if is_inside_tree() and not _suspended: _claims.start()
 	if is_inside_tree(): _render()
 
 ## Install-and-play (C-100): this installation plays as a guest when no account is signed in.
 func _guest_play() -> bool:
 	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/guest_play", false))
+
+## Without an account the player is this installation's guest (or signed out): no give-up entry (Q-156).
+func _sync_guest() -> void:
+	var net := get_node_or_null("/root/Net")
+	if _claims != null and net != null and not _fake_claims(): _claims.guest = not net.account.signed_in()
 
 func _own_farm_entry() -> bool:
 	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/own_farm", false))
@@ -215,16 +239,20 @@ func _build_ui() -> void:
 	for item in [["© Mapbox", "https://www.mapbox.com/about/maps/"], ["© OpenStreetMap", "https://www.openstreetmap.org/copyright"]]:
 		var credit := _button(item[0], ExternalLink.open.bind(item[1])); credit.flat = true; credits.add_child(credit)
 	bottom.add_child(_label("Parcels: DataSF · PDDL / CC0", 10))
-	_locate = _locate_key(); _hud.add_child(_locate)
+	_locate = _round_key(LOCATE_ICON); _locate.name = "MapLocate"; _locate.disabled = true
+	_locate.pressed.connect(_locate_player); _hud.add_child(_locate)
+	_profile_button = _round_key(PROFILE_ICON, UiTokens.COLOR_TEXT); _profile_button.name = "MapProfile"
+	_profile_button.pressed.connect(_open_profile); _hud.add_child(_profile_button)
 	_entry = TownEntry.new(); _entry.visible = false; _hud.add_child(_entry); _hud.move_child(_entry, 0)
 	_entry.go_requested.connect(_open_town)
 	_entry.card_changed.connect(_on_entry_card)
 	_bottom.item_rect_changed.connect(_place_locate); _hud.resized.connect(_place_locate)
 	_render_account()
 
-## farm-dev's round locate key, styled as P0 styles it (Close round, floating shadow, the locate glyph).
-func _locate_key() -> Button:
-	var b := Button.new(); b.name = "MapLocate"; b.focus_mode = Control.FOCUS_NONE
+## farm-dev's round locate key, styled as P0 styles it (Close round, floating shadow, the glyph as drawn). `tint`
+## colours a white glyph (lucide's) the text colour the locate glyph is drawn in.
+func _round_key(glyph: String, tint := Color.WHITE) -> Button:
+	var b := Button.new(); b.focus_mode = Control.FOCUS_NONE
 	b.theme = UiKit.theme(); b.theme_type_variation = UiTokens.BUTTON_CLOSE_ROUND
 	for state in [&"normal", &"hover", &"focus", &"disabled", &"pressed", &"hover_pressed"]:
 		var sb := b.get_theme_stylebox(state).duplicate() as StyleBoxFlat
@@ -233,16 +261,16 @@ func _locate_key() -> Button:
 			sb.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
 			sb.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
 			b.add_theme_stylebox_override(state, sb)
-		b.add_theme_color_override(StringName("icon_%s_color" % state), Color.WHITE)
-	b.icon = load(LOCATE_ICON); b.expand_icon = true; b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.add_theme_color_override(StringName("icon_%s_color" % state), tint)
+	b.icon = load(glyph); b.expand_icon = true; b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	b.add_theme_constant_override(&"icon_max_width", 22)
 	b.custom_minimum_size = Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE); b.size = b.custom_minimum_size
-	b.disabled = true; b.pressed.connect(_locate_player)
 	return b
 
 func _place_locate() -> void:
 	if _locate == null or _bottom == null: return
 	_locate.position = Vector2(_hud.size.x - _locate.size.x - LOCATE_GAP, _bottom.position.y - _locate.size.y - LOCATE_GAP)
+	_profile_button.position = Vector2(LOCATE_GAP, _locate.position.y)
 
 func _panel(bottom: bool) -> VBoxContainer:
 	var panel := PanelContainer.new(); _hud.add_child(panel)
@@ -280,7 +308,7 @@ func _render() -> void:
 	var state: String = _claims.status(id)
 	var idle: bool = not _selector.busy and _selector.map_ready and not _opening and not _claims.busy
 	_open.disabled = not idle or id.is_empty()
-	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy
+	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy and _profile == null
 	if id.is_empty(): _details.text = _no_selection()
 	else:
 		var p: Dictionary = _selector.selection
@@ -299,7 +327,7 @@ func _render() -> void:
 	_claim.visible = claimable and not _confirm.visible; _claim.disabled = not idle
 	_enter.visible = state == "mine"; _enter.disabled = not idle
 	_open.visible = state != "mine"
-	_reselect.visible = state == "mine" and _claims.reselect; _reselect.disabled = not idle
+	_reselect.visible = state == "mine" and _claims.can_give_up(); _reselect.disabled = not idle
 	_home.visible = _claims.has_home()
 	_home.disabled = _selector.manifest.is_empty() or _opening
 	_locate.disabled = _home.disabled
@@ -344,6 +372,7 @@ func _locate_player() -> void:
 ## Development builds on the in-memory claim stand-in have no account and hide it.
 func _render_account() -> void:
 	if _account_line == null: return
+	_profile_button.disabled = _opening or _profile != null or _profile_waiting or (_selector != null and _selector.busy)
 	var net := get_node_or_null("/root/Net")
 	var shown := net != null and not _fake_claims()
 	_account_line.visible = shown
@@ -384,6 +413,7 @@ func _sign_out() -> void:
 ## Ownership and the framed home were relative to the previous account.
 func _account_changed() -> void:
 	_framed_home = ""; _player_moved = false
+	_sync_guest()
 	if _claims != null: _claims.forget()
 	_render()
 
@@ -482,7 +512,7 @@ func _on_map_tap(point: Vector2) -> void:
 ## flies to the middle first.
 func _on_entry_card(open: bool) -> void:
 	_hud.move_child(_entry, -1 if open else 0)
-	_bottom.visible = not open; _locate.visible = not open
+	_bottom.visible = not open; _locate.visible = not open; _profile_button.visible = not open
 	if not open: return
 	_camera.stop()
 	var at: Vector2 = _entry.screen_point()
@@ -492,11 +522,47 @@ func _on_entry_card(open: bool) -> void:
 ## Go on the Washington Square card: the 3D room above the map (AppRouter, as "Enter my farm"), trading through the home's
 ## parcel save. Back or the room's door returns here; the map then reads the save again for the guide's line.
 func _open_town() -> void:
-	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _opening: return
+	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _opening or _profile != null: return
 	var home: Dictionary = _claims.mine
 	_entry.close_card()
 	await _open_scene(ROOM, {"store": _farm_store(str(home.parcel_id), str(home.get("dataset_version", ""))),
 		"parcel_id": str(home.parcel_id), "return_context": {"center": Array(_camera.center), "zoom": _camera.zoom}})
+
+## The map has no player of its own, so after a cold start nothing had loaded the saved outfit and the profile's figure
+## stayed blank ~3 s on its first open (C-133): its parts start loading on the loader's threads as the map opens.
+func _warm_outfit() -> void:
+	var avatar := get_node_or_null("/root/Avatar")
+	if avatar != null: avatar.warm_saved_outfit()
+
+## The profile over the map (C-128): the map's panels hide and its camera holds still until it closes.
+## A tap while the saved outfit is still loading (just after a cold start) holds the key until it has loaded, frame
+## by frame, so the profile opens with its figure, never with an empty frame for it (C-133). It waits
+## profile_wait_seconds at most: a load that never ends opens the profile all the same (C-135).
+func _open_profile() -> void:
+	if _profile != null or _opening or _leaving or _suspended or _profile_waiting: return
+	var avatar := get_node_or_null("/root/Avatar")
+	if avatar != null and avatar.warming():
+		_profile_waiting = true; _render()
+		var start := Time.get_ticks_msec()
+		var limit := int(profile_wait_seconds * 1000.0)
+		while is_inside_tree() and avatar.warming() and Time.get_ticks_msec() - start < limit: await get_tree().process_frame
+		_profile_waiting = false
+		var timed_out: bool = is_inside_tree() and avatar.warming()
+		print("PARCEL_PROFILE_WAIT ", JSON.stringify({"ms": Time.get_ticks_msec() - start, "timed_out": timed_out}))
+		if not is_inside_tree(): return
+		_render()
+		if _profile != null or _opening or _leaving or _suspended: return
+	var view := Vector3.ZERO
+	if _camera != null: view = Vector3(float(_camera.center[1]), float(_camera.center[0]), float(_camera.zoom))
+	_profile = load(PROFILE).open(self, view)
+	_profile.closed.connect(_profile_closed)
+	_hud.hide()
+	if _camera != null: _camera.input_enabled = false
+
+func _profile_closed() -> void:
+	_profile = null
+	if _suspended or _leaving: return
+	_hud.show(); _render()
 
 ## The same save the parcel scene uses: the server, or the device stand-in with the development setting.
 func _farm_store(block_id: String, dataset: String) -> RefCounted:
@@ -566,7 +632,8 @@ func _suspend_map(committing_preview: bool) -> void:
 
 func resume() -> void:
 	if _leaving: return
-	_suspended = false; process_mode = Node.PROCESS_MODE_INHERIT; _hud.show()
+	_suspended = false; process_mode = Node.PROCESS_MODE_INHERIT
+	_hud.visible = _profile == null # Back from the dressing room: the profile is still over the map.
 	_farm_fresh = false # Back from the parcel: its save has moved on.
 	_presentation_epoch += 1
 	if _bridge != null:
@@ -616,6 +683,9 @@ func _quit_preview() -> void:
 	get_tree().quit()
 
 func is_back_navigation_locked() -> bool:
+	if is_instance_valid(_profile):
+		_profile.back()
+		return true
 	if _entry != null and _entry.is_open():
 		_entry.close_card(); return true
 	_leave(); return true

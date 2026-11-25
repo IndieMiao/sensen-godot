@@ -18,7 +18,10 @@ NAMES = {'dynamic-farm': 'Dynamic Farm Preview', 'dynamic-farm-internal': 'Dynam
 MAP_SCENE = 'res://scenes/dynamic_farm/dynamic_farm_map.tscn'
 RAW_FILES = ('modules/dynamic_farm/map/config.json', 'assets/dynamic_farm/499-art-inventory.json',
              'assets/dynamic_farm/499-art-recipe.json', 'assets/dynamic_farm/499-edge-decor-v2.json',
-             'assets/avatar/parts_manifest.json', 'assets/avatar/demo_denylist.json', 'assets/avatar/npc_only.json')
+             'assets/avatar/parts_manifest.json', 'assets/avatar/demo_denylist.json', 'assets/avatar/npc_only.json',
+             # Settings › Licenses (C-128): the main farm's credits and the texts they open.
+             'assets/p0/legal/licenses.json', 'assets/p0/legal/mapbox-maps-android-LICENSE.md',
+             'assets/p0/legal/odbl-1.0.txt', 'assets/p0/legal/cc-by-4.0.txt', 'assets/p0/legal/unicode-license-v3.txt')
 DISABLED = 'http://127.0.0.1:9'
 # The isolated Journey test service confirmed in C-38#46 (tailnet only). Anything else is refused:
 # production, devserver, P0 and every other address.
