@@ -128,6 +128,15 @@ func restore_saved_account() -> bool:
 	if not account.load_saved(account_path): return false
 	return await _resume_account()
 
+## 动态农场地图进场（C-32 / C-100）：restore 时先读回本机保存的账号 token；没有可用账号、且包带
+## `sensen/dynamic_farm/guest_play`（装上即建号）时，用本机安装密钥匿名登录（已登录过就沿用）。
+## 返回是否有可用的身份。游客能不能认领和存档由服务端决定（PARCEL_GUEST_WRITES）。
+func dynamic_farm_sign_in(restore: bool, guest_play: bool) -> bool:
+	if restore and await restore_saved_account(): return true
+	if not guest_play: return false
+	if not client.token.is_empty(): return true
+	return await session.login()
+
 ## 联机只对账号开放：游客探测得到 401，online_available 保持 false。
 func _probe_online() -> void:
 	var capabilities := await client.request("GET", "/online/status")

@@ -56,6 +56,7 @@ func _run() -> void:
 	await _account_kept_on_server_errors()
 	await _account_row()
 	await _home_framing()
+	await _guest_play_sign_in()
 	print("DYNAMIC CLAIM ", checks - failures, "/", checks)
 	quit(1 if failures else 0)
 
@@ -371,6 +372,14 @@ func _account_row() -> void:
 	check(not net.account.signed_in() and not FileAccess.file_exists(path) and net.client.token.is_empty(), "'Sign out' clears this phone's account and its file")
 	check(calls.size() >= 1 and calls[0] == ["DELETE", "/auth/token", true] and not calls.any(func(c): return c[1] == "/auth/anonymous"), "sign-out revokes this phone's token and does not sign in as a guest")
 	check(page._account_line.text == page.NOT_SIGNED_IN and page._account_button.text == "Sign in", "after signing out the panel offers 'Sign in' again")
+	# C-100: an install-and-play package (guest_play) goes on as this installation's guest after signing out.
+	net.account.adopt({"token": "row-token", "user_id": "u1", "player_id": "p1", "display_name": "Ash"}, path)
+	net.client.token = "row-token"
+	ProjectSettings.set_setting("sensen/dynamic_farm/guest_play", true)
+	calls.clear()
+	await page._sign_out()
+	ProjectSettings.set_setting("sensen/dynamic_farm/guest_play", null)
+	check(not net.account.signed_in() and calls.size() >= 2 and calls[0][1] == "/auth/token" and calls.any(func(c): return c[1] == "/auth/anonymous"), "with guest_play, sign-out revokes the account token and signs in as this installation's guest")
 	page.queue_free(); selector.queue_free()
 	await process_frame
 	net.use_transport(transport, "https://row.test/v1", "user://test_account.json")
@@ -453,3 +462,38 @@ func _home_framing() -> void:
 func _write(path: String, text: String) -> void:
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	f.store_string(text); f.close()
+
+## C-100 install-and-play: Net.dynamic_farm_sign_in signs in anonymously only with guest_play and only when no saved
+## account was restored; a restored account is never replaced by a guest, and an existing guest token is reused.
+func _guest_play_sign_in() -> void:
+	var net = root.get_node_or_null("Net")
+	if net == null:
+		check(false, "Net autoload is present"); return
+	var calls: Array = []
+	var transport := func(method: String, url: String, headers: PackedStringArray, body: String) -> ApiClient.Response:
+		var path := url.trim_prefix("https://guest.test/v1")
+		calls.append([method, path])
+		if path == "/auth/anonymous":
+			var key = JSON.parse_string(body).get("install_key", "") if JSON.parse_string(body) is Dictionary else ""
+			return ApiClient.Response.new(true, 200, {"player_id": "g-" + str(key).left(6), "token": "guest-token"})
+		if path == "/users/me":
+			return ApiClient.Response.new(true, 200, {"user_id": "u1", "player_id": "p1"}) if "authorization: Bearer saved-token" in headers else ApiClient.Response.new(true, 401, {"code": "UNAUTHENTICATED"})
+		return ApiClient.Response.new(true, 404, {"code": "NOT_FOUND"})
+	var path := "user://c100_guest_account.json"
+	if FileAccess.file_exists(path): DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	net.use_transport(transport, "https://guest.test/v1", path)
+	check(not await net.dynamic_farm_sign_in(true, false) and calls.is_empty() and net.client.token.is_empty(), "without guest_play nothing signs in anonymously")
+	check(await net.dynamic_farm_sign_in(true, true) and net.client.token == "guest-token", "with guest_play and no saved account the installation signs in as a guest")
+	check(calls.size() == 1 and calls[0] == ["POST", "/auth/anonymous"], "the guest sign-in is one anonymous login with the installation key")
+	calls.clear()
+	check(await net.dynamic_farm_sign_in(true, true) and calls.is_empty(), "an existing guest token is reused, not signed in again")
+	net.use_transport(transport, "https://guest.test/v1", path)
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify({"token": "saved-token", "user_id": "u1", "player_id": "p1"})); f.close()
+	calls.clear()
+	check(await net.dynamic_farm_sign_in(true, true) and net.client.token == "saved-token", "a saved account wins over guest play")
+	check(calls.all(func(c): return c[1] != "/auth/anonymous"), "no anonymous login when the account was restored")
+	net.use_transport(transport, "https://guest.test/v1", path)
+	calls.clear()
+	check(await net.dynamic_farm_sign_in(false, true) and net.client.token == "guest-token", "a package that does not restore accounts plays as a guest")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))

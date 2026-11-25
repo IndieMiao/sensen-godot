@@ -18,7 +18,8 @@ import { googleIdJwksFetcher } from './accounts/google_token.js';
 import { CachedJwks } from './accounts/firebase_token.js';
 import { PgParcelStore } from './parcels/pg_store.js';
 import { loadParcelRules } from './parcels/rules.js';
-import { parcelReselectFromEnv } from './parcels/routes.js';
+import { parcelGuestWritesFromEnv, parcelReselectFromEnv } from './parcels/routes.js';
+import { parcelIdleDaysFromEnv, scheduleIdleReclaim } from './parcels/reclaim.js';
 import { signupClosedFromEnv } from './accounts/routes.js';
 
 const need = (k: string): string => {
@@ -29,6 +30,10 @@ const need = (k: string): string => {
 
 const signupClosed = signupClosedFromEnv(process.env);
 if (signupClosed === null) { console.error('ACCOUNT_SIGNUP 只能是 open 或 closed'); process.exit(1); }
+const parcelGuestWrites = parcelGuestWritesFromEnv(process.env);
+if (parcelGuestWrites === null) { console.error('PARCEL_GUEST_WRITES 只能是 0 或 1'); process.exit(1); }
+const parcelIdleDays = parcelIdleDaysFromEnv(process.env);
+if (parcelIdleDays === null) { console.error('PARCEL_IDLE_RECLAIM_DAYS 只能是 0–3650 的整数'); process.exit(1); }
 
 const ROOT = process.env.ASSET_ROOT ?? path.resolve(process.cwd(), '..');
 const CONTENT_DIR = path.join(ROOT, 'assets', 'farm', 'data');
@@ -95,6 +100,7 @@ function googleConfig() {
   return { audiences, keys: jwks.keys, refreshKeys: jwks.refresh };
 }
 
+const parcelStore = new PgParcelStore(pool);
 const app = await buildApp({
   store, content, contentVersion: cv,
   blueprintDir: BLUEPRINT_DIR, regionsFile: path.join(CONTENT_DIR, 'regions.json'),
@@ -117,8 +123,12 @@ const app = await buildApp({
   guestWrites: process.env.GUEST_WRITES === '1',
   // Dynamic farm parcels (C-31). "Abandon and pick again" is for the internal test server only: it stays off unless
   // DYNAMIC_FARM_RESELECT=1 is set there; production never sets it.
-  parcels: { store: new PgParcelStore(pool), rules: loadParcelRules(CONTENT_DIR), reselect: parcelReselectFromEnv(process.env) },
+  // Install-and-play (C-100): PARCEL_GUEST_WRITES=1 lets guests claim, enter and save their own parcel only. Off unless set.
+  parcels: { store: parcelStore, rules: loadParcelRules(CONTENT_DIR), reselect: parcelReselectFromEnv(process.env), guestWrites: parcelGuestWrites },
 });
+// Guests' parcels idle over PARCEL_IDLE_RECLAIM_DAYS (default 30, 0 = never) return to the map (C-100).
+const stopReclaim = scheduleIdleReclaim(parcelStore, parcelIdleDays, () => Date.now(), line => console.log(line));
+app.addHook('onClose', async () => { stopReclaim(); });
 
 // Only one room writer may serve this database. HTTP-only replicas set REALTIME_ENABLED=0.
 // A lost lock connection closes the gateway instead of allowing two authorities to diverge.
@@ -138,4 +148,4 @@ if (process.env.REALTIME_ENABLED !== '0') {
 
 const port = Number(process.env.PORT ?? 3000);
 await app.listen({ port, host: '0.0.0.0' });
-console.log(`farm-server listening on ${port} content=${cv} cities=${cities.size} ip_city=${ipLocator ? 'on' : 'off'} guest_writes=${process.env.GUEST_WRITES === '1'} parcel_reselect=${parcelReselectFromEnv(process.env)} signup=${signupClosed ? 'closed' : 'open'}`);
+console.log(`farm-server listening on ${port} content=${cv} cities=${cities.size} ip_city=${ipLocator ? 'on' : 'off'} guest_writes=${process.env.GUEST_WRITES === '1'} parcel_reselect=${parcelReselectFromEnv(process.env)} parcel_guest_writes=${parcelGuestWrites} parcel_idle_days=${parcelIdleDays} signup=${signupClosed ? 'closed' : 'open'}`);

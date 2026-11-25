@@ -178,14 +178,17 @@ choose a production signing identity, install an app or authorize publication.
    **Internal test package (C-39).** Only when explicitly selected,
    `--dynamic-farm-internal TARGET` builds `com.sensen.dynamicfarm.internal` from the same
    staging, but points both Journey URLs at `TARGET` and sets
-   `sensen/dynamic_farm/reselect`, `sensen/dynamic_farm/account_restore` (C-32) and
-   `sensen/dynamic_farm/own_farm` (C-34: "Enter my farm" opens the farmable own parcel). `TARGET`
+   `sensen/dynamic_farm/reselect`, `sensen/dynamic_farm/account_restore` (C-32),
+   `sensen/dynamic_farm/own_farm` (C-34: "Enter my farm" opens the farmable own parcel) and
+   `sensen/dynamic_farm/guest_play` (C-100: install-and-play). `TARGET`
    must exactly equal an entry of `APPROVED_TARGETS` in `dynamic_farm_export.py`: today only
    the isolated C-38 test service `https://aliyun-sh-plane.taildf0ff5.ts.net:8443/v1`
    (tailnet only). Production, devserver, P0 and any other address are refused before staging.
-   `online_qa` stays on, so `Net` never boots or signs in anonymously; the map only reloads a
-   token the tester saved by signing in on the device. No account or credential goes into
-   the package. Use it for internal testing only: no signing or distribution.
+   `online_qa` stays on, so `Net` never boots. The map reloads a token the tester saved by signing in
+   on the device; without one, `guest_play` signs in anonymously with this installation's key, and
+   the server decides whether that guest may claim and farm (`PARCEL_GUEST_WRITES`, off by default;
+   otherwise the map asks the player to sign in). No account or credential goes into the package.
+   The release package below never carries `guest_play` until the owner decides to open install-and-play. Use it for internal testing only: no signing or distribution.
 
    ```sh
    tools/android/build_worker_apk.sh --dynamic-farm-internal \

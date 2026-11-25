@@ -2,7 +2,7 @@
 
 `dynamic-farm` is the isolated preview: Journey endpoints are disabled. `dynamic-farm-internal` is the
 internal test package (C-39): Journey points only at an approved isolated test service, and the map's
-internal-only settings (C-32) are on. `dynamic-farm-release` is the invite-only release package (C-98): the
+internal-only settings (C-32; install-and-play guest sign-in, C-100) are on. `dynamic-farm-release` is the invite-only release package (C-98): the
 preview's package (it upgrades 0.4.1 in place), Journey fixed to the US West dynamic farm production service,
 one's own farm and the saved sign-in on, reselect off. None carries an account or credential.
 """
@@ -26,8 +26,11 @@ APPROVED_TARGETS = ('https://aliyun-sh-plane.taildf0ff5.ts.net:8443/v1',)
 # The dynamic farm production service in US West (C-96 materials, C-97 entry). The release package uses
 # exactly this address; it is not a build argument.
 RELEASE_TARGET = 'https://farm.sensenjoy.cn/dynamicfarm/v1'
-# Read by the map (C-32; own_farm: C-34 Q-72); only the internal package may set all of them.
-INTERNAL_SETTINGS = ('dynamic_farm/reselect', 'dynamic_farm/account_restore', 'dynamic_farm/own_farm')
+# Read by the map (C-32; own_farm: C-34 Q-72; guest_play: C-100); only the internal package may set all of them.
+# guest_play signs in anonymously when no account was restored (install-and-play); the server decides whether a
+# guest may claim and farm (PARCEL_GUEST_WRITES). The release package does not carry it until the owner opens it.
+GUEST_PLAY = 'dynamic_farm/guest_play'
+INTERNAL_SETTINGS = ('dynamic_farm/reselect', 'dynamic_farm/account_restore', 'dynamic_farm/own_farm', GUEST_PLAY)
 # The release package: one's own farm and the saved sign-in, never reselect; the account panel only signs in
 # with an invite account (C-98, server ACCOUNT_SIGNUP=closed). Only the release package may set invite_only.
 INVITE_ONLY = 'account/invite_only'
@@ -154,6 +157,8 @@ def exported_config(settings, variant):
             raise ValueError('release package must keep Net from signing in anonymously and enable its settings')
         if 'dynamic_farm/reselect' in s:
             raise ValueError('reselect in the release package')
+        if GUEST_PLAY in s:
+            raise ValueError('install-and-play in the release package')
         if urls != [RELEASE_TARGET, RELEASE_TARGET]:
             raise ValueError('release package must point only at the production service')
         if [settings.get(key) for key in USER_DIR_KEYS] != [True, PREVIEW_USER_DIR]:

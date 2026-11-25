@@ -118,19 +118,26 @@ func _ready() -> void:
 	_selector.activate()
 	_start_claims()
 
-## Isolated test builds skip Net's boot. Internal and release packages may reload the saved account token only
-## (`sensen/dynamic_farm/account_restore`); nothing here signs in anonymously.
+## Isolated test builds skip Net's boot. Internal and release packages may reload the saved account token
+## (`sensen/dynamic_farm/account_restore`). Only a package with `sensen/dynamic_farm/guest_play` (install-and-play,
+## C-100) then signs in anonymously with this installation's key when no account was restored; the server decides
+## whether that guest may claim and farm (PARCEL_GUEST_WRITES), otherwise the map asks the player to sign in.
 ## Only an explicit 401 drops the saved account (Net._resume_account); a server error, rate limit or lost network
 ## keeps it and the top panel says so (C-110).
 func _start_claims() -> void:
 	if _restoring: return
 	var net := get_node_or_null("/root/Net")
-	if net != null and not _fake_claims() and bool(ProjectSettings.get_setting("sensen/dynamic_farm/account_restore", false)):
+	if net != null and not _fake_claims():
 		_restoring = true; _render()
-		await net.restore_saved_account()
+		await net.dynamic_farm_sign_in(bool(ProjectSettings.get_setting("sensen/dynamic_farm/account_restore", false)),
+			_guest_play())
 		_restoring = false
 	if is_inside_tree() and not _suspended: _claims.start()
 	if is_inside_tree(): _render()
+
+## Install-and-play (C-100): this installation plays as a guest when no account is signed in.
+func _guest_play() -> bool:
+	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/guest_play", false))
 
 func _own_farm_entry() -> bool:
 	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/own_farm", false))
@@ -347,13 +354,14 @@ func _account_action() -> void:
 	if net.account.signed_in(): _sign_out_confirm.show(); _render()
 	else: _open_sign_in()
 
-## Revokes this phone's token and clears the saved account; no anonymous guest sign-in follows.
+## Revokes this phone's token and clears the saved account. Only an install-and-play package
+## (`sensen/dynamic_farm/guest_play`, C-100) then continues as this installation's guest; others stay signed out.
 func _sign_out() -> void:
 	_sign_out_confirm.hide()
 	var net := get_node_or_null("/root/Net")
 	if net == null or _signing_out or _restoring: return
 	_signing_out = true; _render()
-	await net.sign_out(false)
+	await net.sign_out(_guest_play())
 	_signing_out = false
 	if not is_inside_tree(): return
 	_account_changed()
@@ -498,7 +506,8 @@ func resume() -> void:
 		_restore_surface_mode()
 		_bridge.set_map_visible(true); _camera._changed()
 	if _selector != null: _selector.activate()
-	if _claims != null: _claims.start()
+	# Re-reads the player's parcel; a guest sign-in that failed earlier (offline, rate limited) is retried here.
+	if _claims != null: _start_claims()
 	_record_presentation("map", _presentation_epoch)
 
 func _restore_surface_mode() -> void:

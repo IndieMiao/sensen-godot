@@ -38,6 +38,12 @@ export type FarmUpdateOutcome =
   | { kind: 'version_conflict'; parcel: OwnedParcel }
   | { kind: 'no_parcel' };
 
+/** 收回的地块（C-100）：原行加上认领者最后一次活动的时间和收回时间，原样存进 parcel_reclaims。 */
+export interface ReclaimedParcel extends OwnedParcel { last_active_at: number; reclaimed_at: number }
+
+/** 认领者的活动情况：是否游客（没有账号），最后一次登录或用 token 的时间。 */
+export interface PlayerActivity { guest: boolean; last_active_at: number }
+
 export type EnterOutcome = { kind: 'entered'; granted: boolean; parcel: OwnedParcel } | { kind: 'no_parcel' };
 
 /** bbox 与客户端 GeoJSON 一致：[west, south, east, north]。 */
@@ -55,6 +61,12 @@ export interface ParcelStore {
   enter(playerId: string, grant: (farm: ParcelFarmState) => ParcelFarmState | null, now: number): Promise<EnterOutcome>;
   /** 放弃免费地块（仅测试配置开放），地块内状态一并删除。 */
   abandon(playerId: string): Promise<OwnedParcel | null>;
+  /**
+   * 闲置回收（C-100）：认领者是游客，且最后一次活动（登录或用 token，取较晚的）早于 cutoff 的地块，
+   * 最多 limit 块。地块从 parcel_claims 删掉、整行存进 parcel_reclaims，之后谁都可以重新认领。
+   * 有账号的玩家的地块不收。正被写入（行锁被占）的地块这一轮跳过。
+   */
+  reclaimIdle(cutoff: number, now: number, limit: number): Promise<ReclaimedParcel[]>;
 }
 
 const keyOf = (c: Pick<ParcelClaim, 'community_id' | 'layer' | 'parcel_id'>) => `${c.community_id}\n${c.layer}\n${c.parcel_id}`;
@@ -65,7 +77,10 @@ export const sameParcel = (a: Pick<ParcelClaim, 'community_id' | 'layer' | 'parc
 /** 内存实现：HTTP 测试与本地开发用。nickname 由外部提供（账号表在 MemoryStore 里）。 */
 export class MemoryParcelStore implements ParcelStore {
   private rows = new Map<string, OwnedParcel>();
-  constructor(private nickname: (playerId: string) => Promise<string | null> = async () => null) {}
+  /** 测试读回用：收回存档。 */
+  readonly reclaimed: ReclaimedParcel[] = [];
+  constructor(private nickname: (playerId: string) => Promise<string | null> = async () => null,
+    private activity: (playerId: string) => Promise<PlayerActivity | null> = async () => null) {}
 
   private byPlayer(playerId: string): OwnedParcel | undefined {
     return [...this.rows.values()].find(r => r.player_id === playerId);
@@ -120,5 +135,20 @@ export class MemoryParcelStore implements ParcelStore {
     if (!row) return null;
     this.rows.delete(keyOf(row));
     return structuredClone(row);
+  }
+
+  async reclaimIdle(cutoff: number, now: number, limit: number) {
+    const out: ReclaimedParcel[] = [];
+    const rows = [...this.rows.values()].sort((a, b) => a.updated_at - b.updated_at || (a.parcel_id < b.parcel_id ? -1 : 1));
+    for (const row of rows) {
+      if (out.length >= limit) break;
+      const seen = await this.activity(row.player_id);
+      if (!seen?.guest || seen.last_active_at >= cutoff) continue;
+      this.rows.delete(keyOf(row));
+      const gone = { ...structuredClone(row), last_active_at: seen.last_active_at, reclaimed_at: now };
+      this.reclaimed.push(gone);
+      out.push(structuredClone(gone));
+    }
+    return out;
   }
 }

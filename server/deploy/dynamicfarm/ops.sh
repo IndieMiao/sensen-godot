@@ -71,7 +71,7 @@ check_env() {
   [[ "$(envget PG_IMAGE)" == *@sha256:* ]] || die "PG_IMAGE 要按 digest 引用"
   [[ "$(envget TRUSTED_PROXIES)" != *0.0.0.0* ]] || die "TRUSTED_PROXIES 不能是 0.0.0.0/0"
   # 这些开关由 compose.yml 写死；.env 里出现说明有人想改正式配置，先停下来问。
-  for k in ACCOUNT_SIGNUP GUEST_WRITES DYNAMIC_FARM_RESELECT QA_EMAIL_DOMAIN QA_EMAIL_CODE QA_PLAYER_IDS GOOGLE_CLIENT_IDS APPLE_BUNDLE_IDS; do
+  for k in ACCOUNT_SIGNUP GUEST_WRITES PARCEL_GUEST_WRITES DYNAMIC_FARM_RESELECT QA_EMAIL_DOMAIN QA_EMAIL_CODE QA_PLAYER_IDS GOOGLE_CLIENT_IDS APPLE_BUNDLE_IDS; do
     ! grep -qE "^$k=" "$ENV_FILE" || die ".env 里不要写 ${k}：正式配置写死在 compose.yml"
   done
 }

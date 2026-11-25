@@ -66,8 +66,11 @@ async function account(app: FastifyInstance, name: string): Promise<string> {
   expect(res.statusCode).toBe(201);
   return res.json().token;
 }
+/** 每个游客来自不同的网络：同一网络每小时只能新建 10 个匿名玩家（C-100），这里的并发场景要更多。 */
+let guestNetwork = 0;
 async function guest(app: FastifyInstance): Promise<string> {
-  const res = await app.inject({ method: 'POST', url: '/v1/auth/anonymous', payload: { install_key: newInstallKey() } });
+  const res = await app.inject({ method: 'POST', url: '/v1/auth/anonymous', remoteAddress: `198.51.${(++guestNetwork >> 8) & 255}.${guestNetwork & 255}`,
+    payload: { install_key: newInstallKey() } });
   return res.json().token;
 }
 const claim = (app: FastifyInstance, token: string, parcel: { parcel_id: string; center: number[] }, dataset = DATASET) =>

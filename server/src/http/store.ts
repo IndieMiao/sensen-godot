@@ -60,6 +60,8 @@ export type ApplyOutcome =
 export interface Store extends RealtimePersistence {
   /** 同 install_key 返回同一 player；每次调用签发新 token 并淘汰超出上限的旧 token。 */
   authAnonymous(installKeyHmac: string): Promise<{ player: PlayerRow; token: string }>;
+  /** 这个安装密钥是否已有玩家：没有时 authAnonymous 会新建一个（C-100 按网络限制新建的次数）。 */
+  installationKnown(installKeyHmac: string): Promise<boolean>;
   revokeToken(tokenHash: string): Promise<void>;
   revokeAllTokens(playerId: string): Promise<void>;
   rotateInstallKey(playerId: string, newHmac: string): Promise<void>;

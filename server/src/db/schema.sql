@@ -194,3 +194,24 @@ CREATE TABLE IF NOT EXISTS parcel_claims (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS parcel_claims_one_free ON parcel_claims(player_id) WHERE kind = 'free';
 CREATE INDEX IF NOT EXISTS parcel_claims_center ON parcel_claims(community_id, layer, center_lat, center_lng);
+
+-- 闲置地块回收（C-100）：游客 30 天（可调）没有登录或用 token 的地块从 parcel_claims 删掉，整行连同最后活动时间
+-- 和收回时间存在这里，之后谁都可以重新认领。只是存档：服务端不读它，需要时由运维按行恢复。只加表，旧版本忽略它。
+CREATE TABLE IF NOT EXISTS parcel_reclaims (
+  id               bigserial PRIMARY KEY,
+  community_id     text NOT NULL,
+  layer            int  NOT NULL,
+  parcel_id        text NOT NULL,
+  player_id        uuid NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+  kind             text NOT NULL,
+  dataset_version  text NOT NULL,
+  center_lat       double precision NOT NULL,
+  center_lng       double precision NOT NULL,
+  claimed_at       bigint NOT NULL,
+  farm_version     int  NOT NULL,
+  farm_state       jsonb NOT NULL,
+  updated_at       bigint NOT NULL,
+  last_active_at   bigint NOT NULL,
+  reclaimed_at     bigint NOT NULL
+);
+CREATE INDEX IF NOT EXISTS parcel_reclaims_player ON parcel_reclaims(player_id);

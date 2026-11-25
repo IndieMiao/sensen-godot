@@ -3,6 +3,7 @@ import type { FastifyInstance } from 'fastify';
 import path from 'node:path';
 import { buildApp, plotFor, loadBlueprint } from '../../src/http/app.js';
 import { MemoryStore } from '../../src/http/memory_store.js';
+import { installKeyHmac } from '../../src/http/auth.js';
 import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../../src/domain/content.js';
 
 const content = loadContent(DEFAULT_CONTENT_DIR);
@@ -17,6 +18,7 @@ async function start(trustedProxies?: string[]) {
     plot: plotFor(content), now });
   app = await buildApp({ guestWrites: true, store, content, contentVersion: version, blueprintDir,
     regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'), pepper: 'test-only', now, trustedProxies });
+  return store;
 }
 function attempt(remoteAddress: string, forwarded: string) {
   return app!.inject({ method: 'POST', url: '/v1/auth/anonymous', remoteAddress,
@@ -24,8 +26,10 @@ function attempt(remoteAddress: string, forwarded: string) {
 }
 
 describe('login rate limits behind a reverse proxy', () => {
-  it('allows 300 distinct installations on one NAT to authenticate and form a party, while bounding repeat logins', async () => {
-    await start();
+  it('allows 300 returning installations on one NAT to authenticate and form a party, while bounding repeat logins', async () => {
+    const store = await start();
+    // C-100: only a first sign-in creates a player and counts against the per-network quota; these 300 already exist.
+    for (let i = 1; i <= 300; i++) await store.authAnonymous(installKeyHmac(i.toString(16).padStart(32, '0'), 'test-only'));
     const tokens: string[] = [];
     for (let i = 1; i <= 300; i++) {
       const result = await app!.inject({ method: 'POST', url: '/v1/auth/anonymous',

@@ -20,6 +20,7 @@ import { effectiveNow as qaNow } from '../domain/qa.js';
 import type { Ctx } from '../domain/reducer.js';
 import { DOMAIN_VERSION } from '../domain/version.js';
 import { installKeyHmac, isValidInstallKey, safeEqualHex, tokenHash } from './auth.js';
+import { networkKey } from './network.js';
 import { currentOwnerFarmView, nearbyEntry, snapshotSlot, visitorSnapshot, type FarmRow } from './dto.js';
 import { avatarRef } from './avatar_ref.js';
 import { initialFarmState } from '../domain/farm_factory.js';
@@ -79,6 +80,8 @@ export interface AppDeps {
   google?: AccountRouteDeps['google'];
   /** Invite-only accounts (C-96): no self sign-up by email, Apple or Google; existing accounts still sign in. */
   signupClosed?: boolean;
+  /** New anonymous players per network per hour (C-100); defaults to ANONYMOUS_SIGNUPS_PER_NETWORK_HOUR. */
+  anonymousSignupsPerNetworkHour?: number;
   /** Dynamic farm parcel claims and parcel farms (C-31); absent leaves the /v1/parcels routes out. */
   parcels?: Omit<ParcelRouteDeps, 'now'>;
 }
@@ -87,6 +90,12 @@ interface Regions {
   regions: { id: string; timezone: string; placement_bounds?: PlacementBounds;
     candidates: { layout_patch_id: string; revision: number }[] }[];
 }
+
+/**
+ * 匿名建号（新安装第一次 /v1/auth/anonymous）每个网络每小时的上限（C-95#2、C-100）。已有玩家再次登录不占这个额度，
+ * 只受每个安装每小时 10 次的登录限制。网络的口径见 network.ts：IPv4 按地址，IPv6 按 /64。
+ */
+export const ANONYMOUS_SIGNUPS_PER_NETWORK_HOUR = 10;
 
 /** Nearby 列表上限：横向列表放不下更多，且越长越像在暴露整个城市的用户名单。 */
 export const NEARBY_LIMIT = 20;
@@ -155,8 +164,14 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return isValidInstallKey(key) ? 'installation:' + installKeyHmac(key, deps.pepper) : 'invalid:' + req.ip;
   } });
 
+  // Counted before the player exists, so concurrent first sign-ins from one network each use a unit:
+  // at most the limit of new players can be created per window, never more.
+  const anonymousSignupLimit = app.createRateLimit({ max: deps.anonymousSignupsPerNetworkHour ?? ANONYMOUS_SIGNUPS_PER_NETWORK_HOUR,
+    timeWindow: '1 hour', keyGenerator: req => 'network:' + networkKey(req.ip) });
+
   app.post('/v1/auth/anonymous', {
-    // A shared NAT must not prevent 300 different players from signing in together.
+    // A shared NAT must not prevent 300 returning players from signing in together; new players per network are
+    // bounded separately below (C-100).
     config: { rateLimit: { max: 600, timeWindow: '1 hour' } },
   }, async (req, reply) => {
     const quota = await installationLoginLimit(req);
@@ -164,7 +179,13 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     const body = req.body as { install_key?: unknown };
     if (!isValidInstallKey(body?.install_key))
       return reply.code(400).send({ code: 'SCHEMA', message: 'install_key 需为 32 位十六进制' });
-    const { player, token } = await deps.store.authAnonymous(installKeyHmac(body.install_key, deps.pepper));
+    const hmac = installKeyHmac(body.install_key, deps.pepper);
+    if (!await deps.store.installationKnown(hmac)) {
+      const signups = await anonymousSignupLimit(req);
+      if (!signups.isAllowed && signups.isExceeded)
+        return reply.code(429).header('retry-after', signups.ttlInSeconds).send({ code: 'RATE_LIMITED' });
+    }
+    const { player, token } = await deps.store.authAnonymous(hmac);
     return reply.send({ player_id: player.id, token, server_time: deps.now() });
   });
 
