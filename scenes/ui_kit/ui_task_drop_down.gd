@@ -1,12 +1,14 @@
 class_name UiTaskDropDown
 extends VBoxContainer
 ## UI v3 task drop-down (C-T1–C-T3, M-13; C-107, design C-85 ⑧-A): under the HUD, at most three glass task rows
-## (UiTaskRow GLASS, 4 apart), then `More…` when there are more, which opens the phone's task page. No scrim: rows take
-## no touches, only `More…` does, so the scene plays on under it. It folds itself away after 4 s untouched.
+## (UiTaskRow GLASS, 4 apart), then `More…` (a link row) when there are more, which opens the phone's task page.
+## No scrim: rows take no touches, only `More…` does, so the scene plays on under it. It folds itself away after 4 s
+## untouched.
 ##   open(rows, more)   rows: [{title, state: UiTaskRow.State}]; each row drops in y −8 → 0 and fades in over 160,
 ##                      40 apart (cubic out)
 ##   fold()             every row fades out together over 120 (cubic in), then `folded`
-##   complete(index)    the row's finishing beat (UiTaskRow.complete); one second on it slides out and the rest close up
+##   complete(index)    the row's finishing beat (UiTaskRow.complete); one second on it fades out and the caller's next
+##                      rows drop in
 ## Reduced motion (UiMotion.reduced): rows fade in and out over 120 without moving.
 
 signal more_pressed
@@ -45,6 +47,7 @@ func open(list: Array, has_more: bool) -> void:
 	if has_more:
 		more = UiTaskRow.new(MORE, UiTaskRow.State.TODO, UiTaskRow.Look.GLASS)
 		more.name = "More"
+		more.link = true
 		more.pressed.connect(func():
 			fold()
 			more_pressed.emit())

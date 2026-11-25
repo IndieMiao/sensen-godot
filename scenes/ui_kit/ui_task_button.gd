@@ -22,6 +22,10 @@ func _init(icon_: Texture2D = null) -> void:
 	icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
 	add_theme_constant_override(&"icon_max_width", int(_ICON))
+	# The art as drawn: the theme's button icon tint would darken it.
+	for slot in [&"icon_normal_color", &"icon_hover_color", &"icon_pressed_color", &"icon_hover_pressed_color",
+			&"icon_focus_color", &"icon_disabled_color"]:
+		add_theme_color_override(slot, UiTokens.COLOR_TEXT_ON_DARK)
 	UiMotion.press_feedback(self)
 
 func set_badge(v: bool) -> void:

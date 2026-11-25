@@ -294,6 +294,19 @@ func _on_scrim_input(e: InputEvent) -> void:
 	scrim.accept_event()
 	if not closing: close_requested.emit()
 
+## Greys a tab's icon (C-M4: unselected tabs show a grey icon): luminance, then the caller's `phone/textMuted` tint.
+const _GREY := "shader_type canvas_item;\nvoid fragment() {\n\tvec4 c = texture(TEXTURE, UV);\n" \
+	+ "\tCOLOR = vec4(vec3(dot(c.rgb, vec3(0.299, 0.587, 0.114))), c.a) * COLOR;\n}\n"
+static var _grey: ShaderMaterial
+
+static func grey_material() -> ShaderMaterial:
+	if _grey == null:
+		var shader := Shader.new()
+		shader.code = _GREY
+		_grey = ShaderMaterial.new()
+		_grey.shader = shader
+	return _grey
+
 ## One tab: the 22 icon (in colour when selected, greyed otherwise) over its `type/micro` name, a red count on it.
 class _Tab extends Button:
 	var count := 0
@@ -344,7 +357,8 @@ class _Tab extends Button:
 	func set_on(v: bool, pop: bool) -> void:
 		on = v
 		_name.add_theme_color_override(&"font_color", UiTokens.COLOR_PHONE_TEXT if v else UiTokens.COLOR_PHONE_TEXT_MUTED)
-		_icon.modulate = Color.WHITE if v else UiTokens.COLOR_PHONE_TEXT_MUTED
+		_icon.material = null if v else UiPhone.grey_material()
+		_icon.modulate = UiTokens.COLOR_TEXT_ON_DARK if v else UiTokens.COLOR_PHONE_TEXT_MUTED
 		if not (v and pop and is_inside_tree()) or UiMotion.reduced: return
 		var tw := UiMotion.tween(_icon, UiTokens.MOTION_EASING_POP)
 		var half := UiMotion.secs(UiTokens.MOTION_DURATION_BASE_MS) * 0.5

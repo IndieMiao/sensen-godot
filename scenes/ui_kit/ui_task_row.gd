@@ -7,7 +7,8 @@ extends Button
 ##   GLASS  pill 24 high on `glass/fillStrong`, white; done: a ✓, a line through and `text/onDarkMuted`
 ## complete() plays the design's finishing beat (C-85 ⑧ motion 2): the circle pops 0.6 → 1 with its ✓ (200, back
 ## out), the line draws left to right (200), then the text greys (120). Emits `pressed` like any Button; rows that are
-## not `tappable` let touches through to what is under them.
+## not `tappable` let touches through to what is under them. A `link` row (the drop-down's `More…`) has no circle and
+## its text in `action/selected`.
 
 enum Look { PHONE, GLASS }
 enum State { TODO, CURRENT, DONE }
@@ -26,6 +27,7 @@ var title := "": set = set_title
 ## A short count at the pill's right (`0/1`), "" for none.
 var count := "": set = set_count
 var tappable := true: set = set_tappable
+var link := false: set = set_link
 
 var _row: HBoxContainer
 var _check: _Check
@@ -112,6 +114,10 @@ func set_tappable(v: bool) -> void:
 	tappable = v
 	mouse_filter = Control.MOUSE_FILTER_STOP if v else Control.MOUSE_FILTER_IGNORE
 
+func set_link(v: bool) -> void:
+	link = v
+	if _check != null: _restyle()
+
 func set_state(v: State) -> void:
 	state = v
 	if _check == null: return
@@ -147,6 +153,7 @@ func complete() -> void:
 		UiMotion.secs(UiTokens.MOTION_DURATION_FAST_MS)).set_trans(Tween.TRANS_LINEAR)
 
 func _on_colour() -> Color:
+	if link: return UiTokens.COLOR_ACTION_SELECTED
 	return UiTokens.COLOR_PHONE_TEXT if look == Look.PHONE else UiTokens.COLOR_TEXT_ON_DARK
 
 func _muted_colour() -> Color:
@@ -179,6 +186,7 @@ class _Check extends Control:
 			queue_redraw()
 
 	func _draw() -> void:
+		if row.link: return
 		var c := size * 0.5
 		var r := UiTaskRow._CHECK * 0.5 * pop
 		var fill := UiTokens.COLOR_PHONE_ROW if row.look == UiTaskRow.Look.PHONE else UiTokens.COLOR_GLASS_FILL_STRONG
