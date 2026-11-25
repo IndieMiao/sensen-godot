@@ -5,12 +5,22 @@ extends RefCounted
 ## shared with the server and separate from the main farm. C-58 added the parcel's own
 ## coins and the `sell` / `claim_blueprint` commands (mirrored here for the local store, C-59);
 ## the `gather` command (outer gathering, C-60) is ParcelGather's.
+## C-150 (0.4.5): `buildings` holds every building with its type, spot, quarter turns (0–3) and the footprint it was
+## built with; types (model, blueprint, footprint, how many per parcel) are the rules' `buildings`. An older save has
+## only `house` (the one cottage): it reads as cottage 1 where it stood and facing as it did, and `house` stays the
+## cottage's mirror for 0.4.4 and older clients. `place_house` is those clients' cottage, as on the server.
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
 const STATE_VERSION := 1
 const MAX_COORD := 1024
 const MAX_CELLS := 8192
 const MAX_BATCH := 50
-const COMMANDS := ["place_house", "clear_obstacle", "till", "sow", "harvest", "sell", "claim_blueprint", "gather"]
+const COMMANDS := ["place_house", "place_building", "clear_obstacle", "till", "sow", "harvest", "sell", "claim_blueprint", "gather"]
+## The first house's building type: an old save's `house` and `place_house` are cottages (server rules.ts HOME_BUILDING).
+const HOME_BUILDING := "cottage"
+## Most buildings on one parcel, all types together; most cells along a building's side (server rules.ts).
+const MAX_BUILDINGS := 64
+const MAX_BUILDING_SIDE := 16
+const HOUSE_FIELDS := ["model", "x", "y", "width", "depth", "rotation", "built_at"]
 ## Server limits (C-58 farm.ts): the coin cap and the most one sell command may sell.
 const MAX_COINS := 1000000000
 const MAX_SELL_COUNT := 999
@@ -29,9 +39,13 @@ static func parse_rules(raw: Variant) -> Dictionary:
 		return {}
 	if not raw.get("welcome_gift") is Dictionary or not raw.get("till_tool") is String or not raw.get("crops") is Dictionary:
 		return {}
-	if not raw.get("house") is Dictionary or not raw.house.get("model") is String or not raw.house.get("blueprint") is String \
-			or not whole_in(raw.house.get("width"), 1, 16) or not whole_in(raw.house.get("depth"), 1, 16):
-		return {}
+	if not raw.get("buildings") is Dictionary or not raw.buildings.get(HOME_BUILDING) is Dictionary: return {}
+	for id in raw.buildings:
+		var b = raw.buildings[id]
+		if not id is String or not b is Dictionary or not b.get("model") is String or not b.get("blueprint") is String \
+				or not whole_in(b.get("width"), 1, MAX_BUILDING_SIDE) or not whole_in(b.get("depth"), 1, MAX_BUILDING_SIDE) \
+				or not whole_in(b.get("max"), 1, MAX_BUILDINGS):
+			return {}
 	for id in raw.welcome_gift:
 		if not id is String or not whole_in(raw.welcome_gift[id], 1, 999): return {}
 	if raw.crops.is_empty(): return {}
@@ -44,8 +58,8 @@ static func parse_rules(raw: Variant) -> Dictionary:
 	for id in parsed.crops:
 		parsed.crops[id].grow_seconds = int(parsed.crops[id].grow_seconds)
 		parsed.crops[id]["yield"] = int(parsed.crops[id]["yield"])
-	parsed.house.width = int(parsed.house.width)
-	parsed.house.depth = int(parsed.house.depth)
+	for id in parsed.buildings:
+		for field in ["width", "depth", "max"]: parsed.buildings[id][field] = int(parsed.buildings[id][field])
 	parsed["economy"] = _parse_economy(raw.get("economy"))
 	return parsed
 
@@ -65,7 +79,7 @@ static func _parse_economy(raw: Variant) -> Dictionary:
 	return out
 
 static func empty_state() -> Dictionary:
-	return {"v": STATE_VERSION, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {}, "welcomed_at": null,
+	return {"v": STATE_VERSION, "buildings": [], "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {}, "welcomed_at": null,
 		"coins": 0, "sales": 0, "gathered": {}, "blueprints_claimed": {}}
 
 ## A state as returned by the server, with JSON floats turned back into integers.
@@ -89,14 +103,25 @@ static func normalize(raw: Variant) -> Dictionary:
 		if not id is String or not whole_in(raw.bag[id], 0, 1 << 30): return {}
 		if int(raw.bag[id]) > 0: state.bag[id] = int(raw.bag[id])
 	var house = raw.get("house")
-	if house is Dictionary:
-		for field in ["x", "y", "width", "depth", "rotation"]:
-			if not whole_in(house.get(field), 0, MAX_COORD): return {}
-		state.house = {"model": str(house.get("model", "")), "x": int(house.x), "y": int(house.y),
-			"width": int(house.width), "depth": int(house.depth), "rotation": int(house.rotation),
-			"built_at": int(house.get("built_at", 0)) if _number(house.get("built_at")) else 0}
-	elif house != null:
+	if house != null and _house(house).is_empty(): return {}
+	var buildings = raw.get("buildings")
+	if buildings is Array:
+		if buildings.size() > MAX_BUILDINGS: return {}
+		for b in buildings:
+			var read := _house(b)
+			if read.is_empty() or not b.get("type") is String or not whole_in(b.get("id"), 1, 1 << 30): return {}
+			read.id = int(b.id)
+			read.type = b.type
+			state.buildings.append(read)
+	elif buildings != null:
 		return {}
+	elif house != null:
+		# Before C-150: the one house is cottage 1, where it stood and facing as it did.
+		var home := _house(house)
+		home.id = 1
+		home.type = HOME_BUILDING
+		state.buildings.append(home)
+	state.house = home_of(state.buildings)
 	var welcomed = raw.get("welcomed_at")
 	if welcomed != null and not _number(welcomed): return {}
 	state.welcomed_at = int(welcomed) if welcomed != null else null
@@ -112,6 +137,35 @@ static func normalize(raw: Variant) -> Dictionary:
 			if not id is String or not _number(raw[field][id]): return {}
 			state[field][id] = int(raw[field][id])
 	return state
+
+## A house-shaped entry (C-31 `house`, or a building without id and type) with whole numbers, or {}.
+static func _house(raw: Variant) -> Dictionary:
+	if not raw is Dictionary: return {}
+	for field in ["x", "y", "width", "depth", "rotation"]:
+		if not whole_in(raw.get(field), 0, MAX_COORD): return {}
+	if int(raw.rotation) > 3: return {}
+	return {"model": str(raw.get("model", "")), "x": int(raw.x), "y": int(raw.y),
+		"width": int(raw.width), "depth": int(raw.depth), "rotation": int(raw.rotation),
+		"built_at": int(raw.get("built_at", 0)) if _number(raw.get("built_at")) else 0}
+
+## The first cottage of `buildings` without id and type: the old save's `house`, or null.
+static func home_of(buildings: Array) -> Variant:
+	for b: Dictionary in buildings:
+		if b.type != HOME_BUILDING: continue
+		var house := {}
+		for field: String in HOUSE_FIELDS: house[field] = b[field]
+		return house
+	return null
+
+## The buildings of a state, an older one (only `house`) read as normalize does.
+static func buildings_of(state: Dictionary) -> Array:
+	if state.get("buildings") is Array: return state.buildings
+	var house = state.get("house")
+	if not house is Dictionary: return []
+	var home: Dictionary = house.duplicate()
+	home.id = 1
+	home.type = HOME_BUILDING
+	return [home]
 
 static func key(cell: Vector2i) -> String:
 	return "%d,%d" % [cell.x, cell.y]
@@ -133,15 +187,27 @@ static func welcome(rule_set: Dictionary, state: Dictionary, now: int) -> Varian
 	next.welcomed_at = now
 	return next
 
-## Cells under the house; 90°/270° swap width and depth.
-static func house_cells(state: Dictionary) -> Dictionary:
+## A footprint's size: `base` is width × depth unturned; a quarter or three-quarter turn swaps them.
+static func turned(base: Vector2i, rotation: int) -> Vector2i:
+	return Vector2i(base.y, base.x) if rotation % 2 else base
+
+## The cells of a footprint whose lowest-x, lowest-y cell is `at`.
+static func footprint(at: Vector2i, base: Vector2i, rotation: int) -> Array[Vector2i]:
+	var s := turned(base, rotation)
+	var out: Array[Vector2i] = []
+	for dy in s.y:
+		for dx in s.x: out.append(at + Vector2i(dx, dy))
+	return out
+
+## A saved building's cells.
+static func building_footprint(b: Dictionary) -> Array[Vector2i]:
+	return footprint(Vector2i(int(b.x), int(b.y)), Vector2i(int(b.width), int(b.depth)), int(b.rotation))
+
+## Cells under every building, as {Vector2i: true}.
+static func building_cells(state: Dictionary) -> Dictionary:
 	var cells := {}
-	var house = state.get("house")
-	if not house is Dictionary: return cells
-	var size := Vector2i(house.depth, house.width) if int(house.rotation) % 2 else Vector2i(house.width, house.depth)
-	for y in size.y:
-		for x in size.x:
-			cells[Vector2i(int(house.x) + x, int(house.y) + y)] = true
+	for b: Dictionary in buildings_of(state):
+		for at in building_footprint(b): cells[at] = true
 	return cells
 
 ## All commands succeed or none do, like the server: {ok, state} or {ok:false, index, code, detail}.
@@ -153,6 +219,7 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 	var blank := empty_state()
 	for field in ["coins", "sales", "gathered", "blueprints_claimed"]:
 		if not next.has(field): next[field] = blank[field]
+	next.buildings = buildings_of(next).duplicate(true)
 	for index in commands.size():
 		var command = commands[index]
 		if not command is Dictionary or command.get("type") not in COMMANDS:
@@ -166,9 +233,10 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 		elif command.type == "gather":
 			if not command.get("object") is String or str(command.object).length() > Gather.MAX_OBJECT_LENGTH:
 				return {"ok": false, "index": index, "code": "SCHEMA"}
-		elif command.type == "place_house":
+		elif command.type == "place_house" or command.type == "place_building":
 			if not whole_in(command.get("x"), 0, MAX_COORD - 1) or not whole_in(command.get("y"), 0, MAX_COORD - 1) \
-					or (command.has("rotation") and not whole_in(command.rotation, 0, 3)):
+					or (command.has("rotation") and not whole_in(command.rotation, 0, 3)) \
+					or (command.type == "place_building" and (not command.get("building") is String or str(command.building).length() > 64)):
 				return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif parse_key(command.get("cell")) == null:
 			return {"ok": false, "index": index, "code": "SCHEMA"}
@@ -176,28 +244,10 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 		var failure := ""
 		var detail := {}
 		match command.type:
-			"place_house":
-				var house := {"model": rule_set.house.model, "x": int(command.x), "y": int(command.y),
-					"width": int(rule_set.house.width), "depth": int(rule_set.house.depth),
-					"rotation": int(command.get("rotation", 0)), "built_at": now}
-				var footprint := house_cells({"house": house})
-				var covered: Array = []
-				for key: String in next.tilled + next.crops.keys():
-					if footprint.has(parse_key(key)) and key not in covered: covered.append(key)
-				covered.sort()
-				var far := false
-				for at: Vector2i in footprint: far = far or at.x >= MAX_COORD or at.y >= MAX_COORD
-				if next.house != null: failure = "HOUSE_PLACED"
-				elif int(next.bag.get(rule_set.house.blueprint, 0)) <= 0:
-					failure = "NO_BLUEPRINT"
-					detail = {"item": rule_set.house.blueprint}
-				elif far: failure = "OUT_OF_BOUNDS"
-				elif not covered.is_empty():
-					failure = "CELL_OCCUPIED"
-					detail = {"cells": covered}
-				else:
-					_take(next.bag, rule_set.house.blueprint)
-					next.house = house
+			"place_house", "place_building":
+				var outcome := _place(rule_set, next, command, now)
+				failure = outcome.code
+				detail = outcome.detail
 			"clear_obstacle":
 				if cell in next.cleared: failure = "ALREADY_CLEARED"
 				elif next.cleared.size() >= MAX_CELLS: failure = "TOO_MANY_CELLS"
@@ -206,7 +256,7 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				if int(next.bag.get(rule_set.till_tool, 0)) <= 0:
 					failure = "NO_TOOL"
 					detail = {"item": rule_set.till_tool}
-				elif house_cells(next).has(parse_key(cell)):
+				elif building_cells(next).has(parse_key(cell)):
 					failure = "CELL_OCCUPIED"
 					detail = {"cells": [cell]}
 				elif cell in next.tilled: failure = "ALREADY_TILLED"
@@ -270,7 +320,7 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				# The server knows the core cells under the house, tilled, sown or cleared: not outer.
 				var o = Gather.parse_id(command.object)
 				var at = parse_key(o.cell) if o != null else null
-				var in_core: bool = o != null and (house_cells(next).has(at) or o.cell in next.tilled \
+				var in_core: bool = o != null and (building_cells(next).has(at) or o.cell in next.tilled \
 					or next.crops.has(o.cell) or o.cell in next.cleared)
 				var outcome := Gather.take(Gather.rules(), next, command.object, parcel_id, in_core, now)
 				failure = outcome.code
@@ -280,6 +330,46 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 			if not detail.is_empty(): result.detail = detail
 			return result
 	return {"ok": true, "state": next}
+
+## `place_building` (and `place_house`, the cottage) on `next`, changed only on success: {code, detail}, code "" when
+## built. Like the server: a known type under its limit, its blueprint, on the grid, off every other building
+## (BUILDING_OVERLAP) and off tilled cells and crops (CELL_OCCUPIED), the turned footprint counting.
+static func _place(rule_set: Dictionary, next: Dictionary, command: Dictionary, now: int) -> Dictionary:
+	var old := str(command.type) == "place_house"
+	var type: String = HOME_BUILDING if old else str(command.building)
+	var rule = rule_set.buildings.get(type)
+	if not rule is Dictionary: return {"code": "UNKNOWN_BUILDING", "detail": {"building": type}}
+	var same := 0
+	var id := 0
+	for b: Dictionary in next.buildings:
+		if b.type == type: same += 1
+		id = maxi(id, int(b.id))
+	if same >= int(rule.max):
+		return {"code": "HOUSE_PLACED", "detail": {}} if old else {"code": "BUILDING_LIMIT", "detail": {"building": type, "max": int(rule.max)}}
+	if next.buildings.size() >= MAX_BUILDINGS: return {"code": "BUILDING_LIMIT", "detail": {"max": MAX_BUILDINGS}}
+	if int(next.bag.get(rule.blueprint, 0)) <= 0: return {"code": "NO_BLUEPRINT", "detail": {"item": rule.blueprint}}
+	var building := {"id": id + 1, "type": type, "model": rule.model, "x": int(command.x), "y": int(command.y),
+		"width": int(rule.width), "depth": int(rule.depth), "rotation": int(command.get("rotation", 0)), "built_at": now}
+	var cells := building_footprint(building)
+	for at: Vector2i in cells:
+		if at.x >= MAX_COORD or at.y >= MAX_COORD: return {"code": "OUT_OF_BOUNDS", "detail": {}}
+	var under := building_cells(next)
+	var overlap: Array = []
+	for at: Vector2i in cells:
+		if under.has(at): overlap.append(key(at))
+	if not overlap.is_empty():
+		overlap.sort()
+		return {"code": "BUILDING_OVERLAP", "detail": {"cells": overlap}}
+	var covered: Array = []
+	for k: String in next.tilled + next.crops.keys():
+		if cells.has(parse_key(k)) and k not in covered: covered.append(k)
+	if not covered.is_empty():
+		covered.sort()
+		return {"code": "CELL_OCCUPIED", "detail": {"cells": covered}}
+	_take(next.bag, rule.blueprint)
+	next.buildings.append(building)
+	next.house = home_of(next.buildings)
+	return {"code": "", "detail": {}}
 
 static func _take(bag: Dictionary, id: String, count := 1) -> void:
 	bag[id] = int(bag[id]) - count

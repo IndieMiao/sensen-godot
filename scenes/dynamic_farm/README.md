@@ -24,7 +24,7 @@ The first review package contains ordinary 328/424 scenes in Mobile and Compatib
 
 `setup({..., own_parcel:true, farm_store?})` opens the owner's parcel for farming instead of a preview (the host passes both keys through; `preview_only` is then not required). `ParcelFarming` (`parcel_farming.gd`) adds the main key, the bag row, toasts, tilled soil and carrots (`parcel_crop_art.gd`, C-138, below) and a target-cell marker. The target is the cell in front of the player; a short tap on the ground picks a cell until the player moves. One press clears a core obstacle, tills, sows or harvests (owner decision Q-39, C-34#14): no Energy or coins; carrots ripen 60 s after sowing by the store's clock; the first entry grants 1 Starter Hoe and 3 Carrot Seeds once. The scene asks the store to enter only after `preview_ready` (building the scene blocks the main thread for seconds, which timed out a request started earlier, V-123); a lost request is retried once before the key shows Retry. A cleared obstacle leaves the walker and is redrawn out of the core layer (`Scenery.build(..., bind=false)`, `Walk.remove_prop`).
 
-Rules and numbers: `assets/farm/data/dynamic_farm.json` (shared with the C-31 server; separate from the main farm) is read by `modules/dynamic_farm/parcel_farm.gd`, a copy of the server's farm state v1 and its commands. The server holds no parcel geometry, so `parcel_space.gd` keeps the spatial rules on the client: tilling only on core cells, refused outside the core (`Not farmland`), under the house (`House here`) and on the protected path (`On the path`). Schema 4 marks every core cell as reserved, so the protected path inside the core is derived: the shortest walk from the entry to the spawn widened by `PATH_HALF_WIDTH` (1) cell, plus the spawn's `SPAWN_CLEARANCE` (1) ring.
+Rules and numbers: `assets/farm/data/dynamic_farm.json` (shared with the C-31 server; separate from the main farm) is read by `modules/dynamic_farm/parcel_farm.gd`, a copy of the server's farm state v1 and its commands. The server holds no parcel geometry, so `parcel_space.gd` keeps the spatial rules on the client: tilling only on core cells, refused outside the core (`Not farmland`), under a building (`House here`) and on the protected path (`On the path`). Schema 4 marks every core cell as reserved, so the protected path inside the core is derived: the shortest walk from the entry to the spawn widened by `PATH_HALF_WIDTH` (1) cell, plus the spawn's `SPAWN_CLEARANCE` (1) ring.
 
 `farm_store` answers `enter()` and `send(base_version, commands)` with the farm, its version and `server_time`. By default the scene uses `parcel_farm_remote_store.gd`: C-31 `POST /parcels/mine/enter` (naming the dataset of the farm being opened, so a claim on an older dataset moves onto it: C-136) and `/parcels/mine/commands` through `Net.client` (it needs a signed-in client; a reply about another parcel is refused). `parcel_farm_local_store.gd` keeps the save in `user://dynamic_farm_local/` with the device clock; it is used only by tests or with the development setting `sensen/dynamic_farm/local_farm_save`, and is not save or server-time evidence.
 
@@ -53,27 +53,39 @@ Object ids follow C-58's contract (`docs/plans/C-58.md`): `<block id>:<outer_gro
 ## First house (C-33, Q-40)
 
 Built on the own-parcel farm above (Q-44: one entry, save and protected path for both). The welcome gift's
-`blueprint_cottage` comes with the first entry only. While the bag holds it and no house stands, `Build Cottage` opens
-placement (the farming key is held meanwhile): a press or drag moves the see-through `house_cottage` (its middle cell
-under the finger); its 3×3 cells fill green or red, grid lines fade over three core cells round it, and the protected
-path's cells in reach show sand. The bottom is the shared `UiPlaceBar` (`Cancel · Build`); the main key shows why a
-spot is refused. The preview starts on the valid spot nearest the player. Build sends `place_house` through
-`ParcelFarming.send`; the cottage stands at once (no construction time). A refused Build (`CELL_OCCUPIED`) keeps the
-preview, judged again on the farm the reply brought. A successful Build (C-114) pops the cottage in and puffs dust with
-the main farm's look-swap effect (`P0Fence.pop_in` / `P0Fence.dust`, read-only): one puff at the middle and one at each
-corner and edge middle of the footprint (`House.rim`), each `HOUSE_DUST_SCALE` (4) times the main farm's size. A house
-that comes with the save (reopening, a refused Build) just stands there.
+`blueprint_cottage` comes with the first entry only. C-150 (0.4.5) makes this any building type: the save keeps a
+`buildings` list (type, lowest cell, quarter turns 0–3, the footprint it was built with, an id) and the rules'
+`buildings` give each type its model name, blueprint, unturned footprint and limit per parcel; the client's
+`modules/dynamic_farm/farm_building.gd` `KINDS` gives each type its model asset, wall profile and name. Only the
+cottage (3×3, one per parcel) exists so far. While the bag holds a type's blueprint and the type is under its limit,
+`Build <name>` (`Build Cottage`) opens placement (the farming key is held meanwhile): a press or drag moves the
+see-through model (its middle cell under the finger); its cells fill green or red, grid lines fade over three core
+cells round it, and the protected path's cells in reach show sand. The bottom is the shared `UiPlaceBar`
+(`Cancel · Rotate · Build`, the three-key bar P0's Decorate uses); Rotate turns the preview a quarter in place
+(0, 90, 180, 270°, the owner's SEN-C-134#22 question 3), a turn swapping the footprint's width and depth; the reason a
+spot is refused shows above the bar. The preview starts unturned on the valid spot nearest the player. Build sends
+`place_building` (type, cell, turn) through `ParcelFarming.send`; it stands at once (no construction time). A refused
+Build (`CELL_OCCUPIED`, `BUILDING_OVERLAP`) keeps the preview, judged again on the farm the reply brought. A
+successful Build (C-114) pops the building in and puffs dust with the main farm's look-swap effect (`P0Fence.pop_in` /
+`P0Fence.dust`, read-only): one puff at the middle and one at each corner and edge middle of the footprint
+(`FarmBuilding.rim`), each `HOUSE_DUST_SCALE` (4) times the main farm's size. Buildings that come with the save
+(reopening, a refused Build) just stand there.
 
-Rules (`modules/dynamic_farm/farm_house.gd`, the save's `house.x/y` is the footprint's lowest cell): every cell
-core (`Outside your yard`); none under an uncleared core obstacle (`ParcelFarming.obstacle_cells()`, every role, weeds
-too), a tilled cell or a crop (`Space taken`); none on `ParcelFarming.protected_path()` (the same path tilling keeps
-clear), and every other walk cell still reaching spawn (`Keep the path clear`). The walls block through a
-model-fitted box (walls and plinth below the eaves; C-19's walker), so the player walks along them and stops at
-contact; the eaves, bench, woodpile and doorstep are not walls. A player standing where the walls go steps out to the
-nearest clear point. Without `own_parcel` (the art preview) nothing of this shows.
+Rules (`modules/dynamic_farm/farm_building.gd`, a building's `x/y` is the footprint's lowest cell): every cell core
+(`Outside your yard`); none under an uncleared core obstacle (`ParcelFarming.obstacle_cells()`, every role, weeds
+too), another building, a tilled cell or a crop (`Space taken`); none on `ParcelFarming.protected_path()` (the same
+path tilling keeps clear), and every other walk cell still reaching spawn with the standing buildings counted
+(`Keep the path clear`). The server (`server/src/parcels/farm.ts`) checks the same buildings, tilled cells and crops
+(it has no parcel geometry), with the turned footprint. The walls block through a model-fitted profile per type (the
+cottage: walls and plinth below the eaves; C-19's walker), turned with the model, so the player walks along them and
+stops at contact; the eaves, bench, woodpile and doorstep are not walls. A player standing where the walls go steps
+out to the nearest clear point. Tilling is refused under every building (`House here`). A save from before C-150 has
+only `house`: it reads as cottage 1 where it stood and facing as it did, and the server keeps `house` as the cottage's
+mirror for 0.4.4 and older clients (their `place_house` is still the cottage). Without `own_parcel` (the art preview)
+nothing of this shows.
 
-`tools/dev/dynamic_farm/house_probe.gd` drives the real scene on the local save: entry, a valid and each refused spot,
-Build (three pop frames), the wall, reopen (`--headless`: states only).
+`tools/dev/dynamic_farm/building_probe.gd` drives the real scene on the local save: entry, a valid spot turned
+through the four turns, each refused spot, Build turned (three pop frames), the wall, reopen (`--headless`: states only).
 
 ## First-visit guide (C-35, 0.4.2; C-61, 0.4.3)
 
