@@ -15,8 +15,19 @@ var labels := {
 	"Claim this parcel?": "认领确认", "You can only have one home.": "只能有一个家",
 	"My home": "我的家园", "Sign out": "退出登录", "Not claimed": "未认领", "Sign out on this phone?": "退出确认",
 	"Parcel": "地块", "Your home": "我的家", "Market": "市场", "Carpenter": "木匠",
-	"Can't reach the server. You're still signed in.": "账号保留提示"
+	"Can't reach the server. You're still signed in.": "账号保留提示",
+	# C-144: the router's loading layer and the v3 sign-in panel.
+	"Loading...": "正在加载…", "Go back": "返回", "Could not open this place": "无法打开这里",
+	"Email": "邮箱", "Password": "密码", "Show": "显示", "Forgot password?": "忘记密码？", "or": "或",
+	"Sign in with Google": "通过 Google 登录", "Create an account": "注册新账号", "Close": "关闭",
+	"Create account": "注册", "Password (8+ characters)": "密码（至少 8 位）", "Confirm password": "确认密码",
+	"Already have an account? Sign in": "已有账号？登录", "Signing in…": "正在登录…",
+	"Email or password is incorrect.": "邮箱或密码错误。", "Enter a valid email address.": "请输入有效的邮箱地址。"
 }
+## Loaded at run time, like the map does: the panel uses the Net autoload.
+const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
+const Overlay := preload("res://modules/ui/loading_overlay.gd")
+const CJK := "[\\x{3000}-\\x{9fff}\\x{ff00}-\\x{ffef}]"
 
 func _initialize() -> void:
 	_run.call_deferred()
@@ -31,6 +42,83 @@ func text_nodes(node: Node) -> Array[Node]:
 	if node is Label or node is Button: found.append(node)
 	for child in node.get_children(): found.append_array(text_nodes(child))
 	return found
+
+## Every Label / Button / LineEdit / OptionButton text as drawn (after automatic translation), with its node path.
+func shown(node: Node) -> Array:
+	var out := []
+	for n in [node] + node.find_children("*", "", true, false):
+		if not (n is Control) or not (n as Control).is_visible_in_tree(): continue
+		var texts := []
+		if n is Label or n is Button: texts.append(n.text)
+		if n is LineEdit: texts.append_array([n.text, n.placeholder_text])
+		if n is Control and not n.tooltip_text.is_empty(): texts.append(n.tooltip_text)
+		if n is OptionButton:
+			for i in n.item_count: texts.append(n.get_item_text(i))
+		for t in texts:
+			if not str(t).is_empty(): out.append([str(n.get_path()), String(n.atr(t))])
+	return out
+
+func has_cjk(text: String) -> bool:
+	var re := RegEx.create_from_string(CJK)
+	return re.search(text) != null
+
+## C-144: the router's loading layer over the map's 3D scenes (V-361). The map asks open_instance for it in English; the
+## main farm's layer (no english_ui) keeps translating.
+func _loading_layer() -> void:
+	var english = Overlay.new(); english.english = true; root.add_child(english)
+	var main_farm = Overlay.new(); root.add_child(main_farm)
+	await process_frame
+	verify(english.message.text == "Loading..." and String(english.message.atr(english.message.text)) == "Loading...",
+		"dynamic farm loading layer stays English: Loading...")
+	verify(String(main_farm.message.atr(main_farm.message.text)) == "正在加载…", "main farm loading layer still translates")
+	english.failed(); main_farm.failed()
+	for pair in [[english.message, "Could not open this place"], [english.close_button, "Go back"]]:
+		verify(pair[0].text == pair[1] and String(pair[0].atr(pair[0].text)) == pair[1], "dynamic farm loading failure stays English: " + pair[1])
+	verify(String(main_farm.close_button.atr(main_farm.close_button.text)) == "返回", "main farm loading failure still translates")
+	verify(shown(english).all(func(p): return not has_cjk(p[1])), "no Chinese anywhere on the English loading layer")
+	english.queue_free(); main_farm.queue_free()
+	# The real router: open_instance's english_ui reaches the layer it draws, and only that call's layer.
+	var router := root.get_node_or_null("/root/AppRouter")
+	verify(router != null, "AppRouter autoload present")
+	if router == null: return
+	for case in [[{Overlay.ENGLISH_UI: true}, true], [{}, false]]:
+		var done := [false]
+		var load_it := func(): await router._load_with_feedback("res://scenes/dynamic_farm/dynamic_farm_host.tscn", case[0]); done[0] = true
+		load_it.call()
+		var layer = router._loading
+		verify(layer != null and layer.english == case[1], "router loading layer english=%s for %s" % [case[1], case[0]])
+		var drawn := String(layer.message.atr(layer.message.text)) if layer != null else ""
+		verify(drawn == ("Loading..." if case[1] else "正在加载…"), "router loading layer with %s draws %s" % [case[0], drawn])
+		for i in 600:
+			if done[0]: break
+			await process_frame
+		router._clear_transition()
+	await process_frame
+
+## C-144: the map's v3 sign-in panel (V-378): every mode the board covers is English whatever the locale, as approved in
+## C-85 ④; the main farm's classic panel still translates.
+func _sign_in_panel(map_page: Node) -> void:
+	GoogleSignIn.force_available = true # the Android row (Google Play services), as on the phone
+	for mode in ["sign_in", "sign_up", "forgot", "verify", "profile"]:
+		var panel = load(ACCOUNT_PANEL).open(map_page, mode, "", true, true)
+		await process_frame
+		var chinese := shown(panel).filter(func(p): return has_cjk(p[1]))
+		verify(chinese.is_empty(), "v3 %s panel stays English%s" % [mode, "" if chinese.is_empty() else ": " + str(chinese.slice(0, 3))])
+		if mode == "sign_in":
+			var texts := shown(panel).map(func(p): return p[1])
+			for copy in ["Sign in", "Email", "Password", "Show", "Forgot password?", "or", "Sign in with Google", "Create an account"]:
+				verify(copy in texts, "v3 sign-in shows the approved copy: " + copy)
+			panel._say("Email or password is incorrect.", false)
+			await process_frame
+			verify(shown(panel).all(func(p): return not has_cjk(p[1])), "v3 sign-in error stays English")
+		panel.free()
+	GoogleSignIn.force_available = false
+	var classic = load(ACCOUNT_PANEL).open(map_page, "sign_in")
+	await process_frame
+	verify(shown(classic).any(func(p): return p[1] == "邮箱"), "the main farm's panel still translates")
+	classic.free()
+	var opened: Array = map_page.find_children("*", "AccountPanel", true, false)
+	verify(opened.is_empty(), "no sign-in panel left open")
 
 func _run() -> void:
 	var previous := TranslationServer.get_locale()
@@ -70,6 +158,8 @@ func _run() -> void:
 	root.add_child(farm) # Builds real UI, then rejects missing payload before creating any geometry.
 	for node in text_nodes(farm):
 		verify(String(node.atr(node.text)) == node.text, "3D preview UI stays English: " + node.text)
+	await _loading_layer()
+	await _sign_in_panel(map_page)
 	TranslationServer.set_locale("en")
 	await process_frame
 	TranslationServer.set_locale("zh_CN")
