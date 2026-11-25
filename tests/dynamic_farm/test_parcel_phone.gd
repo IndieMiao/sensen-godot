@@ -294,7 +294,8 @@ func _scene() -> void:
 	_check(drop.rows[0].title == "Build Cottage" and drop.rows[0].state == UiTaskRow.State.CURRENT, "the current task leads on a first visit")
 	_check(not button.badge and not farming.phone_button.badge, "seeing the task clears both dots")
 	_check(not farming._tip.visible, "the tip card steps aside for the drop-down")
-	_check(drop.get_global_rect().position.y >= scene._header.get_global_rect().end.y, "the rows sit under the top bar")
+	_check(absf(drop.get_global_rect().position.y - (scene.top_bar_bottom() + farming.DROP_DOWN_GAP)) < 1.0,
+		"the rows sit 10 under the top bar's second row")
 	var saved = JSON.parse_string(FileAccess.get_file_as_string(farming.phone_seen_path))
 	_check(saved is Dictionary and saved.get(raw.block_id) is Dictionary and saved[raw.block_id].get("seen") == "build",
 		"the seen task is kept on the device")
@@ -348,6 +349,13 @@ func _scene() -> void:
 	await process_frame
 	_check(farming.phone == null and farming._tip.visible and farming._tip.tip == preload("res://modules/dynamic_farm/parcel_guide.gd").text("till"),
 		"tapping the current task closes the phone and shows its tip")
+	# The profile (C-108) over an open phone: the phone goes; Back closes the profile.
+	farming.open_phone()
+	await process_frame
+	_check(scene.open_profile() != null and farming.phone == null and not drop.showing, "the profile closes the phone")
+	_check(scene.close_modal() and farming.phone == null, "Back closes the profile, not a phone")
+	await create_timer(0.6).timeout
+	_check(not scene.profile_open(), "the profile is gone")
 	# House placement holds the screen: the buttons and phone go.
 	farming.held = true
 	_check(not button.visible and not farming.phone_button.visible and not drop.showing, "placement hides the task and phone buttons")
