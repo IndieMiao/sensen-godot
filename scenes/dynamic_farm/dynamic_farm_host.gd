@@ -24,6 +24,7 @@ func setup(args:Dictionary) -> void:
 func _ready() -> void:
 	get_viewport().transparent_bg=false
 	_build_hud()
+	_retry.hide() # Loading while the surface settles: Retry only after an error.
 	if await _surface_settled():_open_view()
 
 ## C-168: as this scene is pushed the map asks Android for an opaque Godot surface (dynamic_farm_map._suspend_map), and

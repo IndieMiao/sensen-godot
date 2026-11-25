@@ -66,6 +66,7 @@ func _surface_checks(router:Node) -> void:
 	Engine.register_singleton("GodotMap",plugin)
 	var host=Host.instantiate();host.view_factory=_factory;host.setup(args());router.top=host;root.add_child(host)
 	verify(host._state=="loading" and not is_instance_valid(host._view),"C-168: no parcel is built while Android still has the old surface")
+	verify(host._panel.visible and not host._retry.visible,"C-168: waiting for the surface shows loading, without Retry")
 	for frame in 8:
 		if host._state!="loading":break
 		await process_frame
