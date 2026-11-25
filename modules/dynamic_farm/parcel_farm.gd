@@ -4,16 +4,18 @@ extends RefCounted
 ## Numbers come from assets/farm/data/dynamic_farm.json (owner decision Q-39, C-34#14),
 ## shared with the server and separate from the main farm. C-58 added the parcel's own
 ## coins and the `sell` / `claim_blueprint` commands (mirrored here for the local store, C-59);
-## the `gather` command (outer gathering, C-60) is ParcelGather's.
+## the `gather` command (outer gathering, C-60) is ParcelGather's. C-149 added `buy` (Jasmine's seeds,
+## `economy.buy_prices`).
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
 const STATE_VERSION := 1
 const MAX_COORD := 1024
 const MAX_CELLS := 8192
 const MAX_BATCH := 50
-const COMMANDS := ["place_house", "clear_obstacle", "till", "sow", "harvest", "sell", "claim_blueprint", "gather"]
-## Server limits (C-58 farm.ts): the coin cap and the most one sell command may sell.
+const COMMANDS := ["place_house", "clear_obstacle", "till", "sow", "harvest", "sell", "buy", "claim_blueprint", "gather"]
+## Server limits (C-58 farm.ts): the coin cap and the most one sell (C-149: buy) command may sell (buy).
 const MAX_COINS := 1000000000
 const MAX_SELL_COUNT := 999
+const MAX_BUY_COUNT := 999
 const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
 
 static var _rules := {}
@@ -49,13 +51,15 @@ static func parse_rules(raw: Variant) -> Dictionary:
 	parsed["economy"] = _parse_economy(raw.get("economy"))
 	return parsed
 
-## C-58 `economy`: sell prices and one-off blueprints; {sell_prices:{}, blueprints:{}} when absent.
+## C-58 `economy`: sell prices and one-off blueprints; C-149 buy prices (Jasmine's shelf).
+## {sell_prices:{}, buy_prices:{}, blueprints:{}} when absent.
 static func _parse_economy(raw: Variant) -> Dictionary:
-	var out := {"sell_prices": {}, "blueprints": {}}
+	var out := {"sell_prices": {}, "buy_prices": {}, "blueprints": {}}
 	if not raw is Dictionary: return out
-	if raw.get("sell_prices") is Dictionary:
-		for id in raw.sell_prices:
-			if id is String and whole_in(raw.sell_prices[id], 1, 100000): out.sell_prices[id] = int(raw.sell_prices[id])
+	for field in ["sell_prices", "buy_prices"]:
+		if raw.get(field) is Dictionary:
+			for id in raw[field]:
+				if id is String and whole_in(raw[field][id], 1, 100000): out[field][id] = int(raw[field][id])
 	if raw.get("blueprints") is Dictionary:
 		for id in raw.blueprints:
 			var rule = raw.blueprints[id]
@@ -157,8 +161,9 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 		var command = commands[index]
 		if not command is Dictionary or command.get("type") not in COMMANDS:
 			return {"ok": false, "index": index, "code": "SCHEMA"}
-		if command.type == "sell":
-			if not command.get("item") is String or str(command.item).length() > 64 or not whole_in(command.get("count"), 1, MAX_SELL_COUNT):
+		if command.type == "sell" or command.type == "buy":
+			var most := MAX_SELL_COUNT if command.type == "sell" else MAX_BUY_COUNT
+			if not command.get("item") is String or str(command.item).length() > 64 or not whole_in(command.get("count"), 1, most):
 				return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type == "claim_blueprint":
 			if not command.get("blueprint") is String or str(command.blueprint).length() > 64:
@@ -255,6 +260,20 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 					_take(next.bag, item, count)
 					next.coins = int(next.coins) + int(prices[item]) * count
 					next.sales = int(next.sales) + 1
+			"buy":
+				# The price is the rules' only (the server ignores any price in a request).
+				var item: String = command.item
+				var prices: Dictionary = rule_set.get("economy", {}).get("buy_prices", {})
+				var cost := int(prices.get(item, 0)) * int(command.count)
+				if not prices.has(item):
+					failure = "NOT_FOR_SALE"
+					detail = {"item": item}
+				elif int(next.coins) < cost:
+					failure = "NOT_ENOUGH_COINS"
+					detail = {"coins": next.coins, "need": cost}
+				else:
+					next.coins = int(next.coins) - cost
+					next.bag[item] = int(next.bag.get(item, 0)) + int(command.count)
 			"claim_blueprint":
 				var blueprint: String = command.blueprint
 				var rule = rule_set.get("economy", {}).get("blueprints", {}).get(blueprint)
