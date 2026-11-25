@@ -12,8 +12,9 @@ var labels := {
 	"328 FRIDA KAHLO WAY": "测试地名翻译",
 	"Make this my first home": "设为我的第一个家", "Enter my farm": "进入我的地",
 	"Give up and choose again": "放弃并重选", "Claim": "认领", "Cancel": "取消", "Sign in": "登录",
-	"Claim this parcel? You can only have one home.": "认领确认",
-	"My home": "我的家园", "Sign out": "退出登录", "Not signed in": "未登录", "Sign out on this phone?": "退出确认",
+	"Claim this parcel?": "认领确认", "You can only have one home.": "只能有一个家",
+	"My home": "我的家园", "Sign out": "退出登录", "Not claimed": "未认领", "Sign out on this phone?": "退出确认",
+	"Parcel": "地块", "Your home": "我的家", "Market": "市场", "Carpenter": "木匠",
 	"Can't reach the server. You're still signed in.": "账号保留提示"
 }
 
@@ -43,17 +44,23 @@ func _run() -> void:
 	verify(String(outside.atr(outside.text)) == "重试", "Chinese automatic translation is active outside preview scenes")
 	var map_page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
 	root.add_child(map_page)
-	for text in ["Retry", "San Francisco", "Back", "Preview in 3D", "Make this my first home", "Enter my farm", "Give up and choose again", "Claim", "Cancel", "Sign in", "My home", "Sign out"]:
+	for text in ["Retry", "San Francisco", "Preview in 3D", "Make this my first home", "Enter my farm", "Give up and choose again", "Claim", "Cancel", "Sign in", "Sign out"]:
 		var nodes := text_nodes(map_page).filter(func(n: Node): return n is Button and n.text == text)
 		verify(nodes.size() >= 1 and nodes.all(func(n: Node): return String(n.atr(n.text)) == text), "map button stays English: " + text)
-	for prefix in ["Claim this parcel", "Not signed in", "Sign out on this phone?", "Can't reach the server."]:
+	for prefix in ["Claim this parcel", "You can only have one home.", "Sign out on this phone?", "Can't reach the server."]:
 		var lines := text_nodes(map_page).filter(func(n: Node): return n is Label and n.text.begins_with(prefix))
 		verify(lines.size() == 1 and String(lines[0].atr(lines[0].text)) == lines[0].text, "map line stays English: " + prefix)
-	map_page._choices.add_item("328 FRIDA KAHLO WAY")
-	map_page._choices.select(0)
-	var popup: PopupMenu = map_page._choices.get_popup()
-	verify(String(map_page._choices.atr(map_page._choices.text)) == "328 FRIDA KAHLO WAY", "selected parcel address stays unchanged")
-	verify(String(popup.atr(popup.get_item_text(0))) == "328 FRIDA KAHLO WAY", "parcel popup address stays unchanged")
+	# The glass keys draw their glyphs; Back and My home are named in their tooltips (C-106).
+	for text in ["Back", "My home"]:
+		var keys := text_nodes(map_page).filter(func(n: Node): return n is Button and n.tooltip_text == text)
+		verify(keys.size() == 1 and String(keys[0].atr(keys[0].tooltip_text)) == text, "map key stays English: " + text)
+	map_page._card_tag.text = "Parcel"; map_page._details.text = "Not claimed"
+	for node in [map_page._card_tag.label(), map_page._details]:
+		verify(String(node.atr(node.text)) == node.text, "parcel card line stays English: " + node.text)
+	map_page._show_candidates([{"block_id": "p-1", "name": "328 FRIDA KAHLO WAY"}])
+	var rows: Array = map_page._choices.get_children()
+	verify(rows.size() == 1 and rows[0].text == "328 FRIDA KAHLO WAY" and String(rows[0].atr(rows[0].text)) == "328 FRIDA KAHLO WAY",
+		"overlapping parcel address stays unchanged")
 	var host = load("res://scenes/dynamic_farm/dynamic_farm_host.tscn").instantiate()
 	root.add_child(host) # Invalid context intentionally displays the real retry/error UI.
 	for node in text_nodes(host):

@@ -3,6 +3,7 @@ extends SceneTree
 ## logic only; it is not evidence of a real claim, a save or device rendering.
 const Claims := preload("res://modules/dynamic_farm/map/claim_controller.gd")
 const ClaimApi := preload("res://modules/dynamic_farm/map/claim_api.gd")
+const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const FakeServer := preload("res://modules/dynamic_farm/map/fake_parcel_server.gd")
 const Fixture := preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
@@ -185,10 +186,25 @@ func _map_card() -> void:
 	# C-35: with nothing selected the card says where to go next, only in a package that enters one's own farm.
 	selector.selection = {}
 	page._render()
-	check(page._details.text == page.PICK_PREVIEW, "preview package, nothing selected: 'Choose a parcel to explore in 3D.'")
+	check(page._message.text == page.PICK_PREVIEW and page._hint.visible and not page._card.visible,
+		"preview package, nothing selected: the hint says 'Choose a parcel to explore in 3D.' and no card shows")
 	ProjectSettings.set_setting(OWN_FARM, true)
 	page._render()
-	check(page._details.text == page.PICK_FIRST, "no home yet, nothing selected: 'Tap a building to choose your first home.'")
+	check(page._message.text == page.PICK_FIRST, "no home yet, nothing selected: 'Tap a building to choose your first home.'")
+	# C-88#5: the selector's idle prompt and the next step said the same thing at the top and the bottom; one line now.
+	selector.message = Selection.PROMPT
+	page._render()
+	var said := func(text: String) -> int: return page.find_children("*", "Label", true, false).filter(func(l): return l.text == text and l.is_visible_in_tree()).size()
+	check(page._message.text == page.PICK_FIRST and said.call(page.PICK_FIRST) == 1 and said.call(Selection.PROMPT) == 0,
+		"with no home the map says 'Tap a building to choose your first home.' once and not the idle prompt as well")
+	selector.message = Selection.QUERY_FAILED
+	page._render()
+	check(page._error_card.visible and page._error_line.text == Selection.QUERY_FAILED and not page._hint.visible and page._retry.visible,
+		"a failed read shows its line with Retry on the load-failure card, not in the hint")
+	selector.message = "Zoom in to choose a farm."
+	page._render()
+	check(not page._error_card.visible and page._message.text == "Zoom in to choose a farm.", "what the map is doing reads in the hint")
+	selector.message = ""
 	var farming_page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
 	root.add_child(farming_page)
 	check(page.find_children("*", "Label", true, false).any(func(l): return l.text.begins_with("Explore and walk.")) \
@@ -198,14 +214,21 @@ func _map_card() -> void:
 	selector.selection = Fixture.metadata(ids[0]); selector.selection.block_id = ids[0]
 	page._render(); await process_frame
 	check(page._claim.visible and not page._claim.disabled and not page._enter.visible and page._open.visible, "free parcel shows 'Make this my first home'")
+	check(page._card.visible and not page._hint.visible and page._card_tag.text == "Parcel" and page._details.text == "Not claimed"
+		and page._card_name.text == str(selector.selection.name), "the parcel card names the parcel, says it is not claimed, and the hint steps aside")
 	page._claim.pressed.emit()
 	check(page._confirm.visible and not page._claim.visible, "claim asks for confirmation first")
 	page._claim_selection(); await process_frame
 	check(page._enter.visible and not page._claim.visible and not page._open.visible, "after claiming the card offers 'Enter my farm'")
+	check(page._card_tag.text == "Your home" and page._details.text == "Your home" and not page._confirm.visible and not page._claim_toast.visible,
+		"the claimed parcel's card reads 'Your home'")
+	page._claims.message = "Could not claim. Try again."; page._render()
+	check(page._claim_toast.visible and page._claim_note.text == "Could not claim. Try again.", "a claim failure shows on a toast")
+	page._claims.message = ""; page._render()
 	var picked: Dictionary = selector.selection
 	selector.selection = {}
 	page._render()
-	check(page._details.text == page.PICK_HOME, "with a home, nothing selected: 'Tap your green parcel, then Enter my farm.'")
+	check(page._message.text == page.PICK_HOME, "with a home, nothing selected: 'Tap your green parcel, then Enter my farm.'")
 	await _map_guide(page, selector, picked)
 	ProjectSettings.set_setting(OWN_FARM, false)
 	selector.selection = picked
@@ -230,13 +253,13 @@ func _map_card() -> void:
 	account.token = ""; account.user_id = ""
 	selector.selection = Fixture.metadata(ids[1]); selector.selection.block_id = ids[1]
 	page._render(); await process_frame
-	check(not page._claim.visible and page._details.text.ends_with("You already have a home."), "a second free parcel cannot be claimed")
+	check(not page._claim.visible and page._details.text == "You already have a home.", "a second free parcel cannot be claimed")
 	selector.selection = Fixture.metadata(taken); selector.selection.block_id = taken
 	page._render(); await process_frame
-	check(not page._claim.visible and page._open.visible and page._details.text.ends_with("Claimed by " + FakeServer.NEIGHBOUR), "someone else's parcel is view-only with the claimer's name")
+	check(not page._claim.visible and page._open.visible and page._details.text == "Claimed by " + FakeServer.NEIGHBOUR, "someone else's parcel is view-only with the claimer's name")
 	page._claims.owners[taken].nickname = "" # An owner without a display name, or a PARCEL_TAKEN race before the re-read.
 	page._render()
-	check(page._details.text.ends_with("\nClaimed") and native.names.any(func(row): return row.block_id == taken and row.nickname == "Claimed"), "an owner without a name reads 'Claimed' on the card and on the map")
+	check(page._details.text == "Claimed" and native.names.any(func(row): return row.block_id == taken and row.nickname == "Claimed"), "an owner without a name reads 'Claimed' on the card and on the map")
 	page._claims.owners[taken].nickname = FakeServer.NEIGHBOUR
 	page._claims.reselect = true
 	selector.selection = Fixture.metadata(ids[0]); selector.selection.block_id = ids[0]
@@ -248,7 +271,7 @@ func _map_card() -> void:
 	page._claims = guest; guest.changed.connect(page._render)
 	selector.selection = Fixture.metadata(ids[1]); selector.selection.block_id = ids[1]
 	page._render(); await process_frame
-	check(guest.status(ids[1]) == "unknown" and page._details.text.ends_with("Sign in to claim a home.") and not page._claim.visible, "signed-out player sees 'Sign in to claim a home.' even though ownership can't be read")
+	check(guest.status(ids[1]) == "unknown" and page._details.text == "Sign in to claim a home." and not page._claim.visible, "signed-out player sees 'Sign in to claim a home.' even though ownership can't be read")
 	check(page._account_button.visible and page._account_button.text == "Sign in", "signed-out player gets a 'Sign in' button")
 	page._account_button.pressed.emit(); await process_frame
 	var panels: Array = page.find_children("*", "AccountPanel", true, false)
@@ -273,7 +296,7 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 		"crops": {}, "bag": {"crop_carrot": 1}, "welcomed_at": 0}
 	page.home_farm = Farm.normalize(carrot); page._farm_parcel = "p-elsewhere"
 	page._render()
-	check(page._details.text == page.PICK_HOME, "a save of another parcel says nothing about this home")
+	check(page._message.text == page.PICK_HOME, "a save of another parcel says nothing about this home")
 	page._farm_parcel = home
 	var lines := [[{}, "Tap Market to sell your carrot."],
 		[{"sales": 1, "bag": {}}, "Enter my farm and gather from trees, flowers and rocks."],
@@ -285,11 +308,11 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 		save.merge(row[0], true)
 		page.home_farm = Farm.normalize(save)
 		page._render()
-		check(page._details.text == row[1], "nothing selected, %s: '%s' (got '%s')" % [row[0], row[1], page._details.text])
+		check(page._message.text == row[1], "nothing selected, %s: '%s' (got '%s')" % [row[0], row[1], page._message.text])
 	page.home_farm = Farm.normalize(carrot)
 	selector.selection = home_pick
 	page._render()
-	check(page._details.text.ends_with("\nYour home\nTap Market to sell your carrot."), "the home selected: its card adds the next step")
+	check(page._details.text == "Your home" and page._guide.visible and page._guide.text == "Tap Market to sell your carrot.", "the home selected: its card adds the next step")
 	selector.selection = {}
 	ProjectSettings.set_setting(LOCAL_SAVE, true) # the town reads the device save, not a server
 	page._render(); await process_frame
@@ -434,7 +457,8 @@ func _account_kept_on_server_errors() -> void:
 	check(not await net.restore_saved_account() and not net.account.signed_in() and net.client.token.is_empty() and not FileAccess.file_exists(path) and str(net.get("restore_error")).is_empty(), "401: saved account and its file are cleared")
 	net.use_transport(gone, "https://restore.test/v1", "user://test_account.json")
 
-## C-110: the top panel always shows who is signed in with Sign in / Sign out, selected parcel or not.
+## C-110: the account chip always shows who is signed in with Sign in / Sign out, selected parcel or not (C-106: the
+## chip at the top right, C-85 ⑤ D).
 func _account_row() -> void:
 	var net = root.get_node_or_null("Net")
 	if net == null:
@@ -455,30 +479,34 @@ func _account_row() -> void:
 	page._claims = controller(server, "nobody", Native.new()); page._claims.changed.connect(page._render)
 	await page._claims.start()
 	page._render()
-	check(page._account_line.visible and page._account_line.text == page.NOT_SIGNED_IN and page._account_button.visible and page._account_button.text == "Sign in", "signed out, nothing selected: 'Not signed in' with 'Sign in'")
+	check(page._account_button.visible and page._account_button.text == "Sign in" and not page._avatar.visible and not page._account_button.disabled,
+		"signed out, nothing selected: the chip reads 'Sign in'")
 	page._restoring = true; page._render()
-	check(page._account_line.text == page.CHECKING and not page._account_button.visible, "while the saved account is checked: 'Checking your account…' and no button")
+	check(page._account_button.text == page.BUSY_DOTS and page._account_button.disabled, "while the saved account is checked: • • • on the chip and no tap")
 	page._restoring = false
 	net.account.adopt({"token": "row-token", "user_id": "u1", "player_id": "p1", "display_name": "Ash"}, path)
 	net.client.token = "row-token"
 	page._render()
-	check(page._account_line.text == "Signed in as Ash" and page._account_button.text == "Sign out" and not page._account_note.visible, "signed in: 'Signed in as Ash' with 'Sign out'")
+	check(page._account_button.text == "Ash" and page._avatar.visible and not page._account_toast.visible, "signed in: the chip shows the avatar and 'Ash'")
 	selector.selection = Fixture.metadata(_free_ids(server, 1)[0]); selector.selection.block_id = _free_ids(server, 1)[0]
 	page._render()
-	check(page._account_line.visible and page._account_button.visible and page._account_button.text == "Sign out", "the account entry stays while a parcel is selected")
+	check(page._account_button.visible and page._account_button.text == "Ash", "the account entry stays while a parcel is selected")
 	net.restore_error = "HTTP_503"; page._render()
-	check(page._account_note.visible and page._account_note.text == page.ACCOUNT_KEPT and page._account_button.text == "Sign out", "an account kept through a server error says so and can still sign out")
+	check(page._account_toast.visible and page._account_note.text == page.ACCOUNT_KEPT and page._account_button.text == "Ash" and not page._account_button.disabled,
+		"an account kept through a server error says so and can still sign out")
 	net.restore_error = ""
 	page._account_button.pressed.emit(); await process_frame
-	check(page._sign_out_confirm.visible and not page._account_button.visible and net.account.signed_in(), "'Sign out' asks first; nothing is cleared yet")
-	page._sign_out_confirm.get_child(1).get_child(1).pressed.emit(); await process_frame
+	check(page._sign_out_confirm.visible and net.account.signed_in(), "a tap on the chip asks 'Sign out on this phone?' first; nothing is cleared yet")
+	var answer := func(text: String) -> Button: return page._sign_out_confirm.find_children("*", "Button", true, false).filter(func(b): return b.text == text)[0]
+	check(answer.call("Sign out").theme_type_variation == UiTokens.BUTTON_CMD_DESTRUCTIVE, "'Sign out' is the danger key")
+	answer.call("Cancel").pressed.emit(); await process_frame
 	check(not page._sign_out_confirm.visible and page._account_button.visible and net.account.signed_in(), "'Cancel' keeps the account")
 	page._account_button.pressed.emit(); await process_frame
 	calls.clear()
 	await page._sign_out()
 	check(not net.account.signed_in() and not FileAccess.file_exists(path) and net.client.token.is_empty(), "'Sign out' clears this phone's account and its file")
 	check(calls.size() >= 1 and calls[0] == ["DELETE", "/auth/token", true] and not calls.any(func(c): return c[1] == "/auth/anonymous"), "sign-out revokes this phone's token and does not sign in as a guest")
-	check(page._account_line.text == page.NOT_SIGNED_IN and page._account_button.text == "Sign in", "after signing out the panel offers 'Sign in' again")
+	check(page._account_button.text == "Sign in" and not page._avatar.visible and not page._sign_out_confirm.visible, "after signing out the chip offers 'Sign in' again")
 	# C-100: an install-and-play package (guest_play) goes on as this installation's guest after signing out.
 	net.account.adopt({"token": "row-token", "user_id": "u1", "player_id": "p1", "display_name": "Ash"}, path)
 	net.client.token = "row-token"
@@ -519,7 +547,7 @@ func _home_framing() -> void:
 	page._restoring = false
 	await page._claims.start()
 	check(page._framed and near.call(page._camera, home_center, page.HOME_ZOOM), "with a home, the map opens on the home")
-	check(page._home.visible and not page._home.disabled and page._places.visible, "'My home' is shown for a player with a home")
+	check(page._home.visible and not page._home.disabled, "'My home' is shown for a player with a home")
 	page._camera.frame_center(-122.43, 37.76, 16.0); page._camera.user_moved.emit()
 	page._render()
 	check(near.call(page._camera, [-122.43, 37.76], 16.0), "later renders do not pull a moved camera back")

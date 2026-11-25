@@ -521,3 +521,92 @@ func test_every_button_can_be_scrolled_to_and_pressed_on_a_16_9_screen() -> void
 	AppleSignIn.force_available = false
 	GoogleSignIn.force_available = false
 	window.size = window_size
+
+# --- UI v3 look (C-106, C-85 ④): opened from the dynamic farm map; the main farm keeps the classic look. ---
+
+func _v3_panel(mode := "sign_in", reason := "") -> AccountPanel:
+	var p := AccountPanel.new()
+	p.v3 = true
+	p.mode = mode
+	p.reason = reason
+	add_child(p)
+	return p
+
+func _edge(c: Control) -> Color:
+	return (c.get_theme_stylebox("normal") as StyleBoxFlat).border_color
+
+func test_v3_sign_in_has_the_board_layout_and_the_same_actions() -> void:
+	var p := _v3_panel()
+	assert_object(p.find_child("Band", true, false)).is_not_null()
+	assert_object(p.find_child("Hero", true, false)).is_not_null()
+	assert_str(p._title.text).is_equal("Sign in")
+	assert_array(_visible_fields(p)).contains_exactly(["Email", "Password"])
+	# "Forgot password?" sits right-aligned above the primary key; the ids and the flows are the same.
+	assert_array(_actions(p)).contains_exactly(["ForgotRow", "Status", "sign_in", "to_sign_up"])
+	assert_object(p.action_button("to_forgot")).is_not_null()
+	assert_bool(p._subtitle.visible).is_false()
+	assert_bool((p.find_child("ShowPasswords", true, false) as Control).visible).is_false()
+	assert_bool((p.find_child("EmailCaption", true, false) as Control).visible).is_false()
+	var show := p.find_child("Password", true, false).get_node("Show") as Button
+	assert_bool(p._password.secret).is_true()
+	show.pressed.emit()
+	assert_bool(p._password.secret).is_false()
+	assert_str(p.action_button("sign_in").theme_type_variation).is_equal(String(UiTokens.BUTTON_CMD_PRIMARY))
+	p.queue_free()
+
+func test_v3_a_reason_still_shows_under_the_title() -> void:
+	var p := _v3_panel("sign_in", "Sign in to create your farm.")
+	assert_bool(p._subtitle.visible).is_true()
+	assert_str(p._subtitle.text).is_equal("Sign in to create your farm.")
+	p.set_mode("verify")
+	assert_bool(p._subtitle.visible).is_true()
+	await get_tree().process_frame # replaced keys are freed at the end of the frame
+	p.queue_free()
+
+func test_v3_field_errors_outline_the_field_and_other_errors_use_the_toast() -> void:
+	var p := _v3_panel()
+	await p._on_action("sign_in")
+	assert_str(_status(p)).is_equal("Enter a valid email address.")
+	assert_that(_edge(p._email)).is_equal(UiTokens.COLOR_ACTION_DANGER)
+	p._email.text = "a"
+	p._email.text_changed.emit("a")
+	assert_that(_edge(p._email)).is_not_equal(UiTokens.COLOR_ACTION_DANGER)
+	p._say(AccountSession.describe("TRANSPORT"))
+	var toast := p.find_child("Toast", true, false) as Control
+	assert_bool(toast.visible).is_true()
+	assert_str(_status(p)).is_empty()
+	p.set_mode("sign_up")
+	assert_bool(toast.visible).is_false()
+	await get_tree().process_frame
+	p.queue_free()
+
+func test_v3_busy_primary_reads_dots_and_comes_back() -> void:
+	var p := _v3_panel()
+	p._set_busy(true)
+	assert_str(p.action_button("sign_in").text).is_equal(AccountPanel.BUSY_DOTS)
+	assert_bool(p.action_button("to_sign_up").disabled).is_true()
+	p._set_busy(false)
+	assert_str(p.action_button("sign_in").text).is_equal("Sign in")
+	p.queue_free()
+
+func test_v3_code_is_six_boxes_and_enter_submits_the_primary() -> void:
+	_sign_in_locally("Ada")
+	var p := _v3_panel("verify")
+	assert_array(_visible_fields(p)).contains_exactly(["Code"])
+	assert_object(p._code.get_node_or_null("CodeBoxes")).is_not_null()
+	assert_str(p._primary_id).is_equal("verify")
+	await p._on_action("verify")
+	assert_str(_status(p)).is_equal("Enter the 6-digit code.")
+	p.queue_free()
+	Net.account.clear(AccountSession.PATH)
+
+func test_v3_gate_hides_close_and_classic_has_no_toast() -> void:
+	var p := _v3_panel()
+	p.set_gate(true)
+	assert_bool((p.find_child("Close", true, false) as Control).visible).is_false()
+	p.queue_free()
+	var classic := _panel()
+	assert_object(classic.find_child("Toast", true, false)).is_null()
+	assert_object(classic.find_child("ShowPasswords", true, false)).is_not_null()
+	assert_bool((classic.find_child("ShowPasswords", true, false) as Control).visible).is_true()
+	classic.queue_free()
