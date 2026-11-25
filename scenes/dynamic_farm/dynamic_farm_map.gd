@@ -11,6 +11,8 @@ extends Control
 ## The guide (C-35, C-61) says on the bottom card where the next step is, from the home's parcel save (ParcelGuide).
 ## C-112: farm-dev's camera feel (geo_native_camera.gd) and its round locate key, over the bottom card at the right;
 ## My home, San Francisco and the locate key fly there. Only buildings are coloured (ParcelMapController.kt).
+## C-128 (0.4.4): `Profile` on the top panel opens the main farm's profile over the map, and from it Settings and the
+## dressing room (parcel_profile.gd).
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
@@ -23,6 +25,7 @@ const CONFIG := "res://modules/dynamic_farm/map/config.json"
 const HOST := "res://scenes/dynamic_farm/dynamic_farm_host.tscn"
 const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
 const TOWN := "res://scenes/dynamic_farm/parcel_town.gd"
+const PROFILE := "res://scenes/dynamic_farm/parcel_profile.gd"
 const LocalFarmStore := preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const RemoteFarmStore := preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
 const ParcelFarm := preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -76,6 +79,9 @@ var _bottom: Control
 var _market: Button
 var _carpenter: Button
 var _town: Control
+var _profile_button: Button
+## The profile and the pages opened from it, over the map (parcel_profile.gd), else null.
+var _profile: Control
 ## The town that is loading after a tap on Market / Carpenter (C-61: the tap shows Loading… at once), else "".
 var _town_loading := ""
 ## The home's parcel save as last read or seen (the guide's line) and the parcel it belongs to; read again after
@@ -192,6 +198,7 @@ func _build_ui() -> void:
 	var row := HBoxContainer.new(); top.add_child(row)
 	_retry = _button("Retry", _retry_map); _retry.disabled = true; row.add_child(_retry)
 	row.add_child(_button("San Francisco", _reset_area.bind(true)))
+	_profile_button = _button("Profile", _open_profile); row.add_child(_profile_button)
 	row.add_child(_button("Back", _leave))
 	_places = HBoxContainer.new(); _places.visible = _own_farm_entry(); top.add_child(_places)
 	_home = _button(MY_HOME, _go_home); _home.hide(); _places.add_child(_home)
@@ -283,7 +290,7 @@ func _render() -> void:
 	var state: String = _claims.status(id)
 	var idle: bool = not _selector.busy and _selector.map_ready and not _opening and not _claims.busy
 	_open.disabled = not idle or id.is_empty()
-	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy and _town == null
+	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy and _town == null and _profile == null
 	if id.is_empty(): _details.text = _no_selection()
 	else:
 		var p: Dictionary = _selector.selection
@@ -352,6 +359,8 @@ func _locate_player() -> void:
 ## Development builds on the in-memory claim stand-in have no account and hide it.
 func _render_account() -> void:
 	if _account_line == null: return
+	_profile_button.disabled = _opening or _town != null or not _town_loading.is_empty() or _profile != null \
+		or (_selector != null and _selector.busy)
 	var net := get_node_or_null("/root/Net")
 	var shown := net != null and not _fake_claims()
 	_account_line.visible = shown
@@ -540,6 +549,21 @@ func _town_closed(town: Control, parcel: String) -> void:
 	if _suspended or _leaving: return
 	_hud.show(); _render()
 
+## The profile over the map (C-128), as the town is: the map's panels hide and its camera holds still until it closes.
+func _open_profile() -> void:
+	if _profile != null or _town != null or _opening or not _town_loading.is_empty() or _leaving or _suspended: return
+	var view := Vector3.ZERO
+	if _camera != null: view = Vector3(float(_camera.center[1]), float(_camera.center[0]), float(_camera.zoom))
+	_profile = load(PROFILE).open(self, view)
+	_profile.closed.connect(_profile_closed)
+	_hud.hide()
+	if _camera != null: _camera.input_enabled = false
+
+func _profile_closed() -> void:
+	_profile = null
+	if _suspended or _leaving: return
+	_hud.show(); _render()
+
 ## The same save the parcel scene uses: the server, or the device stand-in with the development setting.
 func _farm_store(block_id: String, dataset: String) -> RefCounted:
 	if bool(ProjectSettings.get_setting(LOCAL_SAVE_SETTING, false)): return LocalFarmStore.new(block_id)
@@ -603,7 +627,8 @@ func _suspend_map(committing_preview: bool) -> void:
 
 func resume() -> void:
 	if _leaving: return
-	_suspended = false; process_mode = Node.PROCESS_MODE_INHERIT; _hud.show()
+	_suspended = false; process_mode = Node.PROCESS_MODE_INHERIT
+	_hud.visible = _profile == null # Back from the dressing room: the profile is still over the map.
 	_farm_fresh = false # Back from the parcel: its save has moved on.
 	_presentation_epoch += 1
 	if _bridge != null:
@@ -653,6 +678,9 @@ func _quit_preview() -> void:
 	get_tree().quit()
 
 func is_back_navigation_locked() -> bool:
+	if is_instance_valid(_profile):
+		_profile.back()
+		return true
 	if is_instance_valid(_town):
 		if not _town.stack.back(): _town.close()
 		return true
