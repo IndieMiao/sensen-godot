@@ -12,6 +12,8 @@ extends Control
 ## The guide (C-35, C-61) says on the bottom card where the next step is, from the home's parcel save (ParcelGuide).
 ## C-112: farm-dev's camera feel (geo_native_camera.gd) and its round locate key, over the bottom card at the right;
 ## My home, San Francisco and the locate key fly there. Only buildings are coloured (ParcelMapController.kt).
+## C-130: with the server's starter zone on, the map lands there for a player without a home (San Francisco and the
+## locate key go there too), marks it with its own native layer and offers claiming only inside it.
 ## C-128 (0.4.4): a round profile key at the left, level with the locate key, opens the main farm's profile over the
 ## map, and from it Settings and the dressing room (parcel_profile.gd).
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
@@ -301,6 +303,7 @@ func _render() -> void:
 	_message.text = _selector.message
 	_retry.disabled = _selector.busy or _opening
 	var id := str(_selector.selection.get("block_id", ""))
+	if _selector.generation > 0: _claims.show_zone(_selector.generation) # Before the parcel layers load (C-130 V-362).
 	if _selector.map_ready and _selector.generation > 0:
 		_claims.attach(_selector.generation, id)
 		if _area_generation != _selector.generation:
@@ -321,8 +324,9 @@ func _render() -> void:
 			_details.text += ("\nClaimed by %s" % owner) if not owner.is_empty() else "\n" + Claims.NO_NAME
 		elif state == "none" and _claims.has_home(): _details.text += "\nYou already have a home."
 		elif state != "other" and _claims.signed_out: _details.text += "\nSign in to claim a home."
+		elif state == "none" and not _claims.in_zone(id): _details.text += "\n" + Claims.OUTSIDE_ZONE
 	if not _claims.message.is_empty(): _details.text += "\n" + _claims.message
-	var claimable: bool = state == "none" and _claims.mine_known and not _claims.has_home()
+	var claimable: bool = state == "none" and _claims.mine_known and not _claims.has_home() and _claims.in_zone(id)
 	if not claimable or not idle: _confirm.hide()
 	_claim.visible = claimable and not _confirm.visible; _claim.disabled = not idle
 	_enter.visible = state == "mine"; _enter.disabled = not idle
@@ -336,13 +340,14 @@ func _render() -> void:
 	if _own_farm_entry() and _claims.has_home(): _read_farm()
 	if _selector._options.is_empty(): _choices.hide()
 
-## First framing after the map loads: the player's home if they have one, else the dataset's area. It waits while the
-## saved account and the home are still being read, and never moves a camera the player has already moved. A home
-## that only becomes known later (sign-in, a retried read) is framed once, the same way.
+## First framing after the map loads: the player's home if they have one, else the starter zone (C-130), else the
+## dataset's area. It waits while the saved account, the home and the zone are still being read, and never moves a
+## camera the player has already moved. A home that only becomes known later (sign-in, a retried read) is framed once,
+## the same way.
 func _frame_on_entry() -> void:
 	if _selector.manifest.is_empty() or _claims == null: return
 	if not _framed:
-		if _restoring or _claims._reading_mine or _selector.busy: return
+		if _restoring or _claims._reading_mine or _claims._reading_zone or _selector.busy: return
 		_framed = true
 		if _player_moved: return
 		if not _frame_home(): _reset_area()
@@ -363,7 +368,8 @@ func _go_home() -> void:
 	if _selector == null or _selector.manifest.is_empty() or _opening: return
 	_frame_home(true)
 
-## The locate key: back to the player, who lives at their home; without a home, back to the dataset's area.
+## The locate key: back to the player, who lives at their home; without a home, back to the starter zone (C-130) or the
+## dataset's area.
 func _locate_player() -> void:
 	if _selector == null or _selector.manifest.is_empty() or _opening: return
 	if not _frame_home(true): _reset_area(true)
@@ -452,12 +458,16 @@ func _show_candidates(rows: Array) -> void:
 		_candidate_ids.append(row.block_id); _choices.add_item(row.name)
 	_choices.select(-1); _choices.show()
 
+## The default area: the server's starter zone when it has one on (C-130), else the dataset's centre.
 func _reset_area(fly := false) -> void:
 	if _selector == null or _selector.busy or _selector.manifest.is_empty() or _opening: return
 	var native: Dictionary = _selector.manifest.native_map
+	var center: Array = native.center
 	var level := clampf(float(native.get("initial_zoom", 17.5)), 13, 21)
-	if fly: _camera.fly_to(float(native.center[0]), float(native.center[1]), level)
-	else: _camera.frame_center(float(native.center[0]), float(native.center[1]), level)
+	if _claims != null and not _claims.zone.is_empty():
+		center = _claims.zone.center; level = _claims.zone.zoom
+	if fly: _camera.fly_to(float(center[0]), float(center[1]), level)
+	else: _camera.frame_center(float(center[0]), float(center[1]), level)
 
 func _retry_map() -> void:
 	if _selector != null and not _selector.busy and not _opening: _selector.retry()

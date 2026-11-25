@@ -210,6 +210,11 @@ func set_parcel_building_highlight(generation: int, key: String, parcel_id := ""
 	elif _parcel_active and generation == _parcel_generation:
 		_plugin.setParcelBuildingHighlight(generation, key, parcel_id)
 
+func set_starter_zone(generation: int, zone_json: String) -> void:
+	# Older native plugins have no zone layer: no marker, nothing else changes.
+	if supports_parcels() and _supports("setStarterZone") and _parcel_active and generation == _parcel_generation:
+		_plugin.setStarterZone(generation, zone_json)
+
 func clear_parcel_layers(generation: int) -> void:
 	if not _parcel_active or generation != _parcel_generation: return
 	# Invalidate before touching Java: queued deferred results must not revive the departed scene.

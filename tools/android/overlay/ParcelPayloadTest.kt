@@ -97,4 +97,34 @@ class ParcelPayloadTest {
         assertNull(ParcelPayload.publicProperties(JsonParser.parseString("""{"parcel_id":"3139010"}""").asJsonObject))
         assertNull(ParcelPayload.publicProperties(JsonParser.parseString("""{"block_id":"3139010"}""").asJsonObject))
     }
+    // C-130: the starter zone marker.
+    private val zone = """{"boundary":[[-122.409,37.800],[-122.406,37.801],[-122.405,37.798],[-122.408,37.797],[-122.409,37.800]],"line_color":"#3E7D43","line_width":3.0,"mask_color":"#FBF8F1","mask_opacity":0.45}"""
+    @Test fun starterZoneIsAClosedRingWithAStyleOrNothing() {
+        assertNull(ParcelPayload.starterZone(""))
+        val marker = ParcelPayload.starterZone(zone)!!
+        assertEquals(5, marker.ring.size); assertEquals("#3E7D43", marker.lineColor); assertEquals(0.45, marker.maskOpacity)
+        assertFails { ParcelPayload.starterZone(zone.replace("[-122.409,37.800]]", "[-122.409,37.801]]")) } // Open ring.
+        assertFails { ParcelPayload.starterZone(zone.replace("#3E7D43", "red")) }
+        assertFails { ParcelPayload.starterZone(zone.replace("0.45", "1.5")) }
+        assertFails { ParcelPayload.starterZone(zone.replace("\"line_width\":3.0,", "")) }
+        assertFails { ParcelPayload.starterZone(zone.replace("37.797", "95.0")) }
+        assertFails { ParcelPayload.starterZone("[]") }
+    }
+    @Test fun starterZoneMaskHasTheZoneAsAnOppositelyWoundHoleAndAnEdgeLine() {
+        for (raw in listOf(zone, zone.replace("[[-122.409,37.800],[-122.406,37.801],[-122.405,37.798],[-122.408,37.797],[-122.409,37.800]]",
+                "[[-122.409,37.800],[-122.408,37.797],[-122.405,37.798],[-122.406,37.801],[-122.409,37.800]]"))) {
+            val features = JsonParser.parseString(ParcelPayload.starterZoneGeoJson(ParcelPayload.starterZone(raw)!!)).asJsonObject.getAsJsonArray("features")
+            val mask = features[0].asJsonObject; val edge = features[1].asJsonObject
+            assertEquals("mask", mask.getAsJsonObject("properties").get("kind").asString)
+            val rings = mask.getAsJsonObject("geometry").getAsJsonArray("coordinates").map { r -> r.asJsonArray.map { p -> p.asJsonArray[0].asDouble to p.asJsonArray[1].asDouble } }
+            assertEquals(2, rings.size)
+            assertTrue(ParcelPayload.signedArea(rings[0]) > 0 && ParcelPayload.signedArea(rings[1]) < 0, "world outer ring and zone hole wind oppositely")
+            assertEquals("edge", edge.getAsJsonObject("properties").get("kind").asString)
+            assertEquals("LineString", edge.getAsJsonObject("geometry").get("type").asString)
+        }
+    }
+    @Test fun mapboxBuildingsFadeOnlyFromTheParcelZoom() {
+        assertEquals("""["interpolate",["linear"],["zoom"],15,0,16.0,0.3]""", ParcelPayload.mapboxBuildingOpacity(16.0))
+        assertEquals("""["interpolate",["linear"],["zoom"],15,0,15.5,0.3]""", ParcelPayload.mapboxBuildingOpacity(12.0))
+    }
 }

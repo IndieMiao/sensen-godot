@@ -5,7 +5,8 @@ extends SceneTree
 ## faces it and plays the labour clip; the result shows as the clip ends; a cell with nowhere to
 ## stand says so and sends nothing; the stick cancels a walk; the parcel stays covered until the
 ## save is applied. C-33: opening the house placement gives up a press still walking. C-114: Build pops the
-## cottage in with dust round it; reopening shows it still, without dust. Run in the private preview project (README), optionally
+## cottage in with dust round it; reopening shows it still, without dust. C-138: the carrot's stage and the dry soil block
+## are drawn; the development switch draws the soil wet. Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -227,7 +228,7 @@ func _first_visit() -> void:
 	_check(await _key(farming, cell) == ["Till", "Free", UiSceneAction.State.DEFAULT], "a free core cell offers Till")
 	seen = await _press(farming, cell)
 	_check(_beside([cell]) and seen.clips.has("labour_till") and not seen.early, "till: beside the cell, facing it, the till clip")
-	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._soil.counts().get("soil", 0) == 1, "one press tills, soil drawn")
+	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crop_art.counts().soil == {"dry": 1, "wet": 0}, "one press tills, one dry soil block drawn")
 	_check(_tip(farming) == "Press Sow to plant Carrot Seeds in your soil.", "the next step's card comes back after tilling: " + _tip(farming))
 	_check(await _key(farming, cell) == ["Sow", "Carrot", UiSceneAction.State.DEFAULT], "tilled soil offers Sow")
 	seen = await _press(farming, cell)
@@ -235,6 +236,13 @@ func _first_visit() -> void:
 	var crop: Dictionary = farming.farm.crops.get(ParcelFarm.key(cell), {})
 	_check(crop.get("ripe_at", 0) - crop.get("planted_at", 0) == 60000 and farming.farm.bag.seed_carrot == 2, "sown: 60 s to ripen, one seed used")
 	_check(_bar_counts(farming).get("seed_carrot") == 2, "the quick bar's seed count follows at once")
+	_check(farming._crop_art.counts().stages == [0, 1, 0, 0, 0, 0, 0], "C-138: the sown carrot shows its sowing stage at once")
+	_check(not farming.wet_soil_preview and farming._crop_art.counts().soil == {"dry": 1, "wet": 0}, "C-138: no watering yet, the soil is dry")
+	farming.wet_soil_preview = true
+	farming._draw_crops()
+	_check(farming._crop_art.counts().soil == {"dry": 0, "wet": 1}, "C-138: the development switch previews wet soil")
+	farming.wet_soil_preview = false
+	farming._draw_crops()
 	_check(_tip(farming) == "", "no card while the carrot grows")
 	key = await _key(farming, cell)
 	_check(key[0] == "Growing" and key[1] in ["Ready in 1:00", "Ready in 0:59", "Ready in 0:58"] and key[2] == UiSceneAction.State.UNAVAILABLE, "growing counts down")
@@ -270,13 +278,14 @@ func _first_visit() -> void:
 	_check(await _key(farming, cell) == ["Harvest", "Free", UiSceneAction.State.DEFAULT], "ripe after 60 s")
 	await create_timer(farming.get_script().REDRAW_S * 2).timeout
 	_check(_tip(farming) == "Your carrot is ripe. Press Harvest!", "a ripe carrot brings the harvest card: " + _tip(farming))
+	_check(farming._crop_art.counts().stages == [0, 0, 0, 0, 0, 0, 1], "C-138: the ripe carrot is drawn mature")
 	seen = await _press(farming, cell)
 	_check(_beside([cell]) and seen.clips.has("labour_harvest") and not seen.early, "harvest: beside the cell, the harvest clip")
 	_check(farming.farm.bag.get("crop_carrot") == 1 and farming.last_gains == {"crop_carrot": 1}, "harvest goes to the bag")
 	_check("+1 Carrot" in _floats(farming) and _flights(farming) >= 1, "the harvest floats up and flies into the bag")
 	_check(_bar_counts(farming).get("crop_carrot") == 1, "the quick bar shows the carrot")
 	_check(_tip(farming) == "Head back to the map and tap Washington Square to sell your carrot.", "after the first harvest the card sends the carrot to the Market (C-61, C-115: at Washington Square): " + _tip(farming))
-	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crops.counts().get("C", 0) == 0, "the soil stays tilled, the carrot is gone")
+	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crop_art.counts().stages == [1, 0, 0, 0, 0, 0, 0], "the soil stays tilled, the carrot is gone")
 	await _press(farming, cell)
 	await _press(farming, cell)
 	_check(farming.farm.crops.has(ParcelFarm.key(cell)), "sow again for the reopen check")
@@ -313,7 +322,7 @@ func _reopen() -> void:
 	names = farming._bar.cells().slice(0, 3).map(func(c): return str(c.get("_name").text).replace("\n", " "))
 	_check(names == ["Starter Hoe", "Carrot Seeds", "Carrot"], "resumed, quick bar names stay English: %s" % [names])
 	_check(farming.farm.cleared.size() == 1 and _obstacle_instances(farming) == farming._core_plan.layout.size() - 1, "the cleared obstacle stays gone")
-	_check(farming._soil.counts().get("soil", 0) == 1, "tilled soil is still drawn")
+	_check(farming._crop_art.counts().soil == {"dry": 1, "wet": 0}, "tilled soil is still drawn")
 	var key: Array
 	for crop_key: String in farming.farm.crops:
 		key = await _key(farming, ParcelFarm.parse_key(crop_key))
