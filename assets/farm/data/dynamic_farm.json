@@ -12,11 +12,14 @@
     "blueprint_cottage": 1
   },
   "till_tool": "hoe_starter",
-  "house": {
-    "model": "cottage",
-    "blueprint": "blueprint_cottage",
-    "width": 3,
-    "depth": 3
+  "buildings": {
+    "cottage": {
+      "model": "cottage",
+      "blueprint": "blueprint_cottage",
+      "width": 3,
+      "depth": 3,
+      "max": 1
+    }
   },
   "crops": {
     "crop_carrot": {

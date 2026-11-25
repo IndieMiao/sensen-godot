@@ -113,7 +113,7 @@ async function r4Farm(app: FastifyInstance, token: string, parcel = A) {
   return farm;
 }
 /** 换到 r6 之后应有的样子：格子上的清空，每棵作物退一颗种子、房子退住宅蓝图，其余不动。 */
-const rebased = (before: { farm: Record<string, unknown> }) => ({ ...before.farm, house: null, cleared: [], tilled: [], crops: {}, gathered: {},
+const rebased = (before: { farm: Record<string, unknown> }) => ({ ...before.farm, buildings: [], house: null, cleared: [], tilled: [], crops: {}, gathered: {},
   bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1, seed_carrot: 2, blueprint_cottage: 1 } });
 const GIFT = { hoe_starter: 1, seed_carrot: 3, blueprint_cottage: 1 };
 const command = (app: FastifyInstance, token: string, base_version: number, commands: object[]) =>
@@ -382,10 +382,18 @@ for (const [name, enabled, makeStores] of makers) {
       const harvested = await command(app, ada, 3, [{ type: 'harvest', cell: '2,2' }]);
       expect(harvested.statusCode).toBe(200);
       expect(await mine(app, ada)).toMatchObject({ farm_version: 4, farm: {
+        buildings: [{ id: 1, type: 'cottage', model: 'cottage', x: 10, y: 4, width: 3, depth: 3, rotation: 1, built_at: T0 }],
         house: { model: 'cottage', x: 10, y: 4, width: 3, depth: 3, rotation: 1, built_at: T0 },
         cleared: ['2,2'], tilled: ['1,1', '2,2'], crops: {}, bag: { hoe_starter: 1, seed_carrot: 2, crop_carrot: 1 },
       } });
       expect((await command(app, ada, 4, [{ type: 'teleport' }])).statusCode).toBe(400);
+      // C-150 place_building: the shape is checked (400), an unknown type or a second cottage is refused (422) and changes nothing.
+      expect((await command(app, ada, 4, [{ type: 'place_building', building: 'cottage', x: 1, y: 1, rotation: 4 }])).statusCode).toBe(400);
+      expect((await command(app, ada, 4, [{ type: 'place_building', x: 1, y: 1 }])).statusCode).toBe(400);
+      expect((await command(app, ada, 4, [{ type: 'place_building', building: 'barn', x: 20, y: 20 }])).json())
+        .toMatchObject({ code: 'UNKNOWN_BUILDING', index: 0, detail: { building: 'barn' }, parcel: { farm_version: 4 } });
+      expect((await command(app, ada, 4, [{ type: 'place_building', building: 'cottage', x: 20, y: 20 }])).json())
+        .toMatchObject({ code: 'BUILDING_LIMIT', detail: { building: 'cottage', max: 1 }, parcel: { farm_version: 4 } });
       expect((await command(app, await account(app, 'Bob'), 0, [{ type: 'till', cell: '1,1' }])).json().code).toBe('NO_PARCEL');
     });
 
@@ -730,14 +738,16 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
       const legacy = { v: 1, house: { model: 'cottage', x: 6, y: 6, width: 3, depth: 3, rotation: 0, built_at: T0 }, cleared: ['1,2'], tilled: ['1,2'],
         crops: {}, bag: { hoe_starter: 1, seed_carrot: 2, crop_carrot: 1 }, welcomed_at: T0 };
       await pool!.query('UPDATE parcel_claims SET farm_state = $1, farm_version = 4 WHERE parcel_id = $2', [JSON.stringify(legacy), A.parcel_id]);
-      expect((await mine(app, ada)).farm).toEqual({ ...legacy, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} });
+      // C-150: the old house reads as building 1, a cottage, where it stood and facing as it did; house stays for old clients.
+      const buildings = [{ id: 1, type: 'cottage', ...legacy.house }];
+      expect((await mine(app, ada)).farm).toEqual({ ...legacy, buildings, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} });
       // Re-entering an old save still gives no gift and does not rewrite it.
       expect((await enter(app, ada)).json()).toMatchObject({ granted: false, parcel: { farm_version: 4 } });
       expect((await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state).toEqual(legacy);
       const sold = await command(app, ada, 4, [{ type: 'sell', item: 'crop_carrot', count: 1 }]);
       expect(sold.statusCode).toBe(200);
       const stored = (await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state;
-      expect(stored).toEqual({ ...legacy, bag: { hoe_starter: 1, seed_carrot: 2 }, coins: 12, sales: 1, gathered: {}, blueprints_claimed: {} });
+      expect(stored).toEqual({ ...legacy, buildings, bag: { hoe_starter: 1, seed_carrot: 2 }, coins: 12, sales: 1, gathered: {}, blueprints_claimed: {} });
     } finally { await app.close(); }
   });
 

@@ -174,12 +174,12 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
     const want = (req.body as { dataset_version?: unknown } | undefined | null)?.dataset_version;
     if (want !== undefined && (typeof want !== 'string' || want.length > 128)) return reply.code(400).send({ code: 'SCHEMA', server_time: now() });
     const at = now();
-    let rebased = null as { from: string; house: boolean; cleared: number; tilled: number; crops: number } | null;
+    let rebased = null as { from: string; buildings: number; cleared: number; tilled: number; crops: number } | null;
     const out = await deps.store.enter(p.id, parcel => {
       rebased = null;
       let farm = parcel.farm, dataset = parcel.dataset_version;
       if (want !== undefined && communityOf(deps.rules, want) === parcel.community_id && isNewerDataset(deps.rules, dataset, want)) {
-        rebased = { from: dataset, house: Boolean(farm.house), cleared: farm.cleared.length, tilled: farm.tilled.length, crops: Object.keys(farm.crops).length };
+        rebased = { from: dataset, buildings: withEconomy(farm).buildings.length, cleared: farm.cleared.length, tilled: farm.tilled.length, crops: Object.keys(farm.crops).length };
         farm = rebaseFarm(deps.rules, farm);
         dataset = want;
       }
