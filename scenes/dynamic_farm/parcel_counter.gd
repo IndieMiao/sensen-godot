@@ -6,14 +6,13 @@ extends UiDrawer
 ## counter_sell) · the five-column grid with only what Jasmine buys (LOCK-15: an outpost shows what it buys).
 ## Prices are the rules' (assets/farm/data/dynamic_farm.json, C-58); the server ignores any price in a request.
 ## C-149: a shelf over the divider, as the P0 counter's Buy page (FARM-6 / NPC-2): one UiShopRow per `buy_prices` item
-## (F-07 counter_buy: `Ready in 1m` · `Bag ×3`, `9 coins`, stepper + Buy, or the grey `Need 4 more coins`).
+## (`Bag ×3`, `9 coins`, stepper + Buy, or the grey `Need 4 more coins`; copy as PM finalised it on C-149#10).
 ## Buttons only report (`sell_requested`, `buy_requested`); the town sends the command.
 
 signal sell_requested(item_id: String, count: int)
 signal buy_requested(item_id: String, count: int)
 
 const ParcelItems = preload("res://modules/dynamic_farm/parcel_items.gd")
-const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 ## 560 for the bag half as before (C-59), plus one shelf row (58) and its gap.
 const HEIGHT := 626.0
 const _MAX_STEP := 99
@@ -131,21 +130,18 @@ func affordable(id: String) -> int:
 	var each := int(buy_prices.get(id, 0))
 	return clampi(int(farm.get("coins", 0)) / each, 1, _MAX_STEP) if each > 0 else 1
 
-## A shelf row, as P0's counter_buy (F-07): line 2 the seed's grow time (or `2 × 9 coins` with the stepper above 1),
-## line 3 what the bag holds, the price for the chosen count, then stepper + Buy, or the grey `Need N more coins`.
+## A shelf row, as P0's counter_buy (F-07) in the copy PM finalised on C-149#10 (C-45 / Q-61): the name, `Bag ×N` under
+## it, the price for the chosen count (`9 coins`, `18 coins`), then stepper + Buy, or the grey `Need N more coins`.
+## No grow-time line and no `2 × 9 coins` working.
 func buy_spec(id: String, qty := 1) -> Dictionary:
 	var each := int(buy_prices.get(id, 0))
 	qty = maxi(1, qty)
-	var crop := {}
-	for rule: Dictionary in ParcelFarm.rules().get("crops", {}).values():
-		if str(rule.get("seed", "")) == id: crop = {grow_s = int(rule.grow_seconds)}
-	var use := ("Ready in " + P0ItemInfo.grow_time(crop)) if not crop.is_empty() else ""
 	var short := each * qty - int(farm.get("coins", 0))
 	var button := {id = &"buy", label = "Buy", kind = &"secondary", payload = {}} if short <= 0 \
 		else {id = &"buy", label = "Need %d more coins" % short, kind = &"unavailable", payload = {}}
 	return {id = id, title = ParcelItems.name_of(id), icon = ParcelItems.icon_of(id), info = false,
-		facts = [use, "Bag ×%d" % int(farm.get("bag", {}).get(id, 0))],
-		price = {each = each, total = each * qty, text = "%d coins" % (each * qty), line = ("%d × %d coins" % [qty, each]) if qty > 1 else ""},
+		facts = ["Bag ×%d" % int(farm.get("bag", {}).get(id, 0))],
+		price = {each = each, total = each * qty, text = "%d coins" % (each * qty), line = ""},
 		buttons = [button]}
 
 func _show_row(id: String) -> void:
