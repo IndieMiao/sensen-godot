@@ -29,7 +29,7 @@ export interface EconomyRules {
 }
 export interface ParcelRules {
   version: 1;
-  /** 地块数据集归哪个社区：社区编号由服务端按数据集推出，客户端不能自报。 */
+  /** 地块数据集归哪个社区：社区编号由服务端按数据集推出，客户端不能自报。datasets 按发布先后排列，新的在后（C-136）。 */
   communities: { id: string; datasets: string[] }[];
   /** 首次进入自己的地块发一次（锄头、种子、首栋住宅蓝图）；重开、重试不重发。 */
   welcome_gift: Record<string, number>;
@@ -108,4 +108,13 @@ export function loadParcelRules(contentDir: string): ParcelRules {
 /** 数据集所属社区；未登记的数据集返回 null。 */
 export function communityOf(rules: ParcelRules, dataset: string): string | null {
   return rules.communities.find(c => c.datasets.includes(dataset))?.id ?? null;
+}
+
+/**
+ * 认领能否从数据集 from 换到 to（C-136，Q-168 rebase）：两个都已登记、同属一个社区，且 to 比 from 新。
+ * 新旧按社区 datasets 里的先后：后登记的是新版本（发新数据集时追加在末尾）。只能往新换，不能换回旧的。
+ */
+export function isNewerDataset(rules: ParcelRules, from: string, to: string): boolean {
+  const c = rules.communities.find(x => x.datasets.includes(from));
+  return Boolean(c) && c!.datasets.indexOf(to) > c!.datasets.indexOf(from);
 }

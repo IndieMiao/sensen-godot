@@ -8,7 +8,7 @@ import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:
 import path from 'node:path';
 import { slimPolygons } from './buildings.js';
 import { GENERATOR_VERSION, SCHEMA, type GeneratorParams } from './config.js';
-import { generateFarm, LowIouError } from './farm.js';
+import { generateFarm, LowIouError, OSM_ATTRIBUTION } from './farm.js';
 import { bounds, insideRings, polygonArea, rotate, round, toUtm, type Point, type Polygon } from './geo.js';
 import { DIRS, LayoutError, type Dir } from './layout.js';
 import { encodeTiles, MVT_ENCODER, resolveMapParams, type MapLayerParams, type TileFeature, type TileValue } from './mvt.js';
@@ -210,6 +210,10 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
     bySource.get(src)!.push(bi);
   });
 
+  const buildingDefs = snap.manifest.sources.filter(s => s.role === 'buildings');
+  const fallbackSources = new Set(buildingDefs.filter(s => s.fallback).map(s => s.label));
+  const osmSources = new Set(buildingDefs.filter(s => s.kind === 'osm-pbf').map(s => s.label));
+
   const files = new Map<string, string | Uint8Array>();
   const reports: ParcelReport[] = [];
   const excluded: BuildResult['excluded'] = [];
@@ -224,13 +228,19 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
     const bySource = perParcel.get(pi);
     if (!bySource) { excluded.push({ block_id: blockId, reason: 'no_building' }); continue; }
     // One source per parcel, never a mix of copies whose coordinates disagree: the copy with the
-    // most footprint area (the more complete one), earlier sources winning ties.
+    // most footprint area (the more complete one), earlier sources winning ties. A fallback source
+    // (OpenStreetMap, C-113) only counts when no other source has a footprint here.
     let chosen = '';
-    let chosenArea = 0;
-    for (const src of snap.building_sources) {
-      const a = (bySource.get(src) ?? []).reduce((sum, i) => sum + buildingUtm[i].reduce((t, poly) => t + polygonArea(poly), 0), 0);
-      if (a > chosenArea + 1e-6) { chosen = src; chosenArea = a; }
+    for (const fallback of [false, true]) {
+      let chosenArea = 0;
+      for (const src of snap.building_sources) {
+        if (fallbackSources.has(src) !== fallback) continue;
+        const a = (bySource.get(src) ?? []).reduce((sum, i) => sum + buildingUtm[i].reduce((t, poly) => t + polygonArea(poly), 0), 0);
+        if (a > chosenArea + 1e-6) { chosen = src; chosenArea = a; }
+      }
+      if (chosen) break;
     }
+    if (!chosen) { excluded.push({ block_id: blockId, reason: 'no_building' }); continue; }
     const ids = bySource.get(chosen)!;
     const records = ids.map(i => snap.buildings[i]);
     const hash = geometryHash(parcel.record, records);
@@ -244,6 +254,7 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
         address: parcel.record.address,
         buildings: ids.flatMap(i => buildingUtm[i]),
         building_source: chosen,
+        attribution: osmSources.has(chosen) ? OSM_ATTRIBUTION : undefined,
         parcel_area_m2: parcel.utm.reduce((s, poly) => s + polygonArea(poly), 0),
         front: frontFinder(parcel, ids.flatMap(i => buildingUtm[i]), index, pi),
         source_geometry_hash: hash,
@@ -367,6 +378,7 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
     },
     native_map: native,
     scope: { mode: snap.manifest.bbox ? 'bbox' : 'full_city', bounds: bboxAll },
+    ...(osmSources.size > 0 ? { licence: osmLicence(reports, osmSources) } : {}),
     files: fileHashes,
   };
   const manifestText = `${JSON.stringify(manifest, null, 2)}\n`;
@@ -384,6 +396,24 @@ export function buildDataset(snap: Snapshot, opts: BuildOptions, log: (s: string
   };
   files.set('client-manifest.json', `${JSON.stringify(client, null, 2)}\n`);
   return { files, reports, excluded };
+}
+
+/**
+ * ODbL 1.0 (C-113): a dataset with OpenStreetMap buildings is a derivative database. It names the
+ * OSM credit and stays under the ODbL; the DataSF parcels and footprints remain PDDL. Datasets
+ * without an OSM source carry no `licence` block, so their manifests are unchanged.
+ */
+function osmLicence(reports: ParcelReport[], osm: Set<string>) {
+  const farms: Record<string, number> = {};
+  for (const r of reports) farms[r.building_source] = (farms[r.building_source] ?? 0) + 1;
+  return {
+    dataset: 'Open Data Commons Open Database License (ODbL) 1.0',
+    attribution: '© OpenStreetMap contributors; DataSF (PDDL 1.0)',
+    notice: 'Contains information from OpenStreetMap (https://www.openstreetmap.org/copyright), made available here under the '
+      + 'Open Database License (ODbL) 1.0. Parcels and DataSF footprints: Public Domain Dedication and License (PDDL) 1.0.',
+    farms_by_building_source: farms,
+    osm_farms: reports.filter(r => osm.has(r.building_source)).length,
+  };
 }
 
 function geometryJson(polys: Polygon[]) {

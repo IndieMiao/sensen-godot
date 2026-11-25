@@ -3,29 +3,36 @@
  * kept byte-for-byte with their SHA-256; `build` only ever reads a snapshot, never the network.
  */
 import { createHash } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { osmBuildings } from './osm.js';
 
 export type Role = 'parcels' | 'buildings';
 
 export interface SourceDef {
   label: string;
   role: Role;
-  kind: 'socrata' | 'arcgis';
+  kind: 'socrata' | 'arcgis' | 'osm-pbf';
   title: string;
-  /** Canonical DataSF dataset this copy comes from. */
-  datasf_dataset: string;
+  /** Canonical DataSF dataset this copy comes from; null for OpenStreetMap. */
+  datasf_dataset: string | null;
   license: string;
-  /** socrata: dataset resource endpoint; arcgis: FeatureServer layer URL. */
+  /** socrata: dataset resource endpoint; arcgis: FeatureServer layer URL; osm-pbf: the extract file. */
   url: string;
   geometry_field?: string;
   arcgis_item?: string;
   fields: string[];
   note?: string;
+  /** A fallback building source is only used for a parcel no other building source covers (C-113). */
+  fallback?: boolean;
 }
 
 const ARCGIS = 'https://services.arcgis.com/Zs2aNLFN00jrS4gG/arcgis/rest/services';
 const PDDL = 'Open Data Commons Public Domain Dedication and License (PDDL) 1.0';
+export const ODBL = 'Open Data Commons Open Database License (ODbL) 1.0; attribution: © OpenStreetMap contributors';
+/** The whole city incl. Treasure Island and Yerba Buena (lon/lat): the OSM extract is cut to it when `fetch` gets no --bbox. */
+export const SF_BBOX = [-122.516, 37.703, -122.355, 37.833];
+const BBBIKE = 'https://download.bbbike.org/osm/bbbike/SanFrancisco';
 
 export const SOURCES: Record<string, SourceDef> = {
   'datasf-parcels': {
@@ -57,10 +64,22 @@ export const SOURCES: Record<string, SourceDef> = {
     url: `${ARCGIS}/Buildings_filtered/FeatureServer/0`, arcgis_item: '12571fc538e5487598af2b76f2a1febe', fields: ['area_id', 'mblr'],
     note: 'City org copy (2025-02) of the same DataSF records, 127,010 rows; coordinates sit about 1.3 m west-northwest of the sfgis copy. Local fallback only.',
   },
+  'osm-buildings': {
+    label: 'osm-buildings', role: 'buildings', kind: 'osm-pbf', title: 'OpenStreetMap buildings (BBBike San Francisco extract)',
+    datasf_dataset: null, license: ODBL, url: `${BBBIKE}/SanFrancisco.osm.pbf`, fields: ['area_id', 'osm_type', 'osm_id', 'building'],
+    fallback: true,
+    note: 'C-113: fills parcels the DataSF copies have no footprint for (fallback source, see README). BBBike rebuilds this extract of the OSM planet weekly; '
+      + 'the snapshot keeps the file (raw/) and its hash. Closed building ways and multipolygon relations; area_id = way id or -relation id. '
+      + 'A dataset using it is a derivative database under the ODbL: credit "© OpenStreetMap contributors" and keep it under the ODbL.',
+  },
 };
 
 export interface SnapshotFile { file: string; sha256: string; count: number }
-export interface SnapshotSource extends SourceDef { metadata: Record<string, unknown>; files: SnapshotFile[]; bbox: number[] | null }
+export interface SnapshotSource extends SourceDef {
+  metadata: Record<string, unknown>; files: SnapshotFile[]; bbox: number[] | null;
+  /** Set on a source added later with `fetch --append`; the others share the manifest's fetched_at. */
+  fetched_at?: string;
+}
 export interface SnapshotManifest { snapshot_schema: 1; fetched_at: string; bbox: number[] | null; sources: SnapshotSource[] }
 
 export const sha256 = (data: string | Uint8Array) => createHash('sha256').update(data).digest('hex');
@@ -89,20 +108,93 @@ class HttpError extends Error {
 }
 
 async function getText(url: string): Promise<string> {
+  return new TextDecoder().decode(await getBytes(url));
+}
+
+async function getBytes(url: string, range?: [number, number]): Promise<Uint8Array> {
   for (let attempt = 1; ; attempt++) {
     try {
-      const res = await fetch(url, { headers: { Accept: 'application/json', 'User-Agent': 'sensen-dynamic-farm-gen/1' } });
-      const body = await res.text();
+      const headers: Record<string, string> = { Accept: range ? '*/*' : 'application/json', 'User-Agent': 'sensen-dynamic-farm-gen/1' };
+      if (range) headers.Range = `bytes=${range[0]}-${range[1]}`;
+      const res = await fetch(url, { headers });
+      const body = new Uint8Array(await res.arrayBuffer());
       if (!res.ok) {
         const f = httpFailure(res.status, url, res.headers.has('x-socrata-requestid'));
         throw new HttpError(f.message, f.retry);
       }
+      if (range && res.status !== 206) throw new HttpError(`HTTP ${res.status} for a byte range of ${url}: ranges not served`, false);
+      if (range && body.length !== range[1] - range[0] + 1) throw new HttpError(`short byte range of ${url}`, true);
       return body;
     } catch (error) {
       if (attempt >= 4 || (error instanceof HttpError && !error.retry)) throw error;
       await new Promise(r => setTimeout(r, 1000 * 2 ** attempt));
     }
   }
+}
+
+/**
+ * A large file in 1 MiB ranges, 16 at a time: from our network one connection to the extract host
+ * runs at about 15 KB/s (34 MB in ~40 min), parallel ranges in a few minutes.
+ */
+async function getLargeFile(url: string): Promise<Uint8Array> {
+  const head = await fetch(url, { method: 'HEAD', headers: { 'User-Agent': 'sensen-dynamic-farm-gen/1' } });
+  const size = Number(head.headers.get('content-length'));
+  if (!head.ok || !Number.isSafeInteger(size) || size <= 0) throw new Error(`HTTP ${head.status} for ${url} (no size)`);
+  const chunk = 1 << 20;
+  const out = new Uint8Array(size);
+  let next = 0;
+  const worker = async () => {
+    for (let at = next; at < size; at = next) {
+      next += chunk;
+      out.set(await getBytes(url, [at, Math.min(size, at + chunk) - 1]), at);
+    }
+  };
+  await Promise.all(Array.from({ length: 16 }, worker));
+  return out;
+}
+
+/** `md5 file` lines of a BBBike CHECKSUM.txt. */
+export function checksumFor(text: string, file: string): string | null {
+  for (const line of text.split('\n')) {
+    const m = /^([0-9a-f]{32})\s+(\S+)$/.exec(line.trim());
+    if (m && m[2] === file) return m[1];
+  }
+  return null;
+}
+
+/**
+ * OSM buildings: downloads the extract and checks it against the extract's CHECKSUM.txt (or takes
+ * an already downloaded `extract` file, so a rebuild elsewhere uses the same OSM data), keeps it in
+ * raw/ and writes the buildings meeting the bbox (or SF_BBOX) as GeoJSON pages of 20,000.
+ */
+async function fetchOsmExtract(def: SourceDef, dir: string, bbox: number[] | null, log: (s: string) => void, extract?: string): Promise<SnapshotSource> {
+  const name = path.posix.basename(new URL(def.url).pathname);
+  const bytes = extract ? new Uint8Array(readFileSync(extract)) : await getLargeFile(def.url);
+  const md5 = createHash('md5').update(bytes).digest('hex');
+  if (!extract) {
+    const listed = checksumFor(await getText(new URL('CHECKSUM.txt', def.url).href), name);
+    if (listed !== md5) throw new Error(`${def.label}: ${name} md5 ${md5} does not match CHECKSUM.txt (${listed ?? 'not listed'})`);
+  }
+  mkdirSync(path.join(dir, 'raw'), { recursive: true });
+  mkdirSync(path.join(dir, def.role), { recursive: true });
+  writeFileSync(path.join(dir, 'raw', name), bytes);
+  const { header, features } = osmBuildings(bytes, bbox ?? SF_BBOX);
+  const files: SnapshotFile[] = [];
+  const page = 20000;
+  for (let n = 0; n * page < features.length; n++) {
+    const body = JSON.stringify({ type: 'FeatureCollection', features: features.slice(n * page, (n + 1) * page) });
+    const file = `${def.role}/${def.label}-${String(n).padStart(4, '0')}.geojson`;
+    writeFileSync(path.join(dir, file), body);
+    files.push({ file, sha256: sha256(body), count: Math.min(page, features.length - n * page) });
+    log(`${def.label}: ${file} ${files.at(-1)!.count} buildings`);
+  }
+  const metadata = {
+    extract_file: `raw/${name}`, extract_bytes: bytes.length, extract_sha256: sha256(bytes), extract_md5: md5,
+    extract_from: extract ? 'local file (--extract)' : def.url,
+    osm_replication_timestamp: header.replication_timestamp, osm_writing_program: header.writing_program,
+    clip_bbox: bbox ?? SF_BBOX, buildings: features.length,
+  };
+  return { ...def, metadata, files, bbox };
 }
 
 async function metadata(def: SourceDef): Promise<Record<string, unknown>> {
@@ -121,7 +213,9 @@ async function metadata(def: SourceDef): Promise<Record<string, unknown>> {
 }
 
 /** bbox = [minLon, minLat, maxLon, maxLat] or null for the whole city. */
-export async function fetchSource(def: SourceDef, dir: string, bbox: number[] | null, log = console.log): Promise<SnapshotSource> {
+export async function fetchSource(def: SourceDef, dir: string, bbox: number[] | null, log = console.log, extract?: string): Promise<SnapshotSource> {
+  if (def.kind === 'osm-pbf') return fetchOsmExtract(def, dir, bbox, log, extract);
+  if (extract) throw new Error(`${def.label}: --extract only applies to an OSM extract source`);
   mkdirSync(path.join(dir, def.role), { recursive: true });
   const files: SnapshotFile[] = [];
   const page = def.kind === 'arcgis' ? 2000 : 50000;
@@ -160,15 +254,30 @@ export async function fetchSource(def: SourceDef, dir: string, bbox: number[] | 
   return { ...def, metadata: await metadata(def), files, bbox };
 }
 
-export async function fetchSnapshot(dir: string, labels: string[], bbox: number[] | null, log = console.log): Promise<SnapshotManifest> {
+export interface FetchOptions {
+  /** A local copy of the OSM extract instead of downloading it. */
+  extract?: string;
+  /** Add the sources to the snapshot already in `dir` (same bbox), e.g. OSM buildings to the snapshot an earlier dataset was built from. */
+  append?: boolean;
+}
+
+export async function fetchSnapshot(dir: string, labels: string[], bbox: number[] | null, log = console.log, opts: FetchOptions = {}): Promise<SnapshotManifest> {
+  const manifestFile = path.join(dir, 'source-manifest.json');
+  const base: SnapshotManifest | null = opts.append ? JSON.parse(readFileSync(manifestFile, 'utf8')) : null;
+  if (!base && existsSync(manifestFile)) throw new Error(`${dir} already holds a snapshot; use --append to add sources to it`);
+  if (base && JSON.stringify(base.bbox) !== JSON.stringify(bbox)) throw new Error(`--bbox must equal the snapshot's (${JSON.stringify(base.bbox)})`);
   mkdirSync(dir, { recursive: true });
   const sources: SnapshotSource[] = [];
   for (const label of labels) {
     const def = SOURCES[label];
     if (!def) throw new Error(`unknown source ${label}; known: ${Object.keys(SOURCES).join(', ')}`);
-    sources.push(await fetchSource(def, dir, bbox, log));
+    if (base?.sources.some(s => s.label === label)) throw new Error(`the snapshot already has ${label}`);
+    const src = await fetchSource(def, dir, bbox, log, opts.extract);
+    sources.push(base ? { ...src, fetched_at: new Date().toISOString() } : src);
   }
-  const manifest: SnapshotManifest = { snapshot_schema: 1, fetched_at: new Date().toISOString(), bbox, sources };
-  writeFileSync(path.join(dir, 'source-manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+  const manifest: SnapshotManifest = base
+    ? { ...base, sources: [...base.sources, ...sources] }
+    : { snapshot_schema: 1, fetched_at: new Date().toISOString(), bbox, sources };
+  writeFileSync(manifestFile, `${JSON.stringify(manifest, null, 2)}\n`);
   return manifest;
 }

@@ -1,7 +1,10 @@
 {
-  "base_url": "https://oss2.sensenjoy.cn/sensen/dynamicfarm/data/r6-6c3733e3b025/",
-  "dataset_version": "sf-dynamic-farm-20261124-r6",
-  "manifest_sha256": "727ff59ae8a94c6af4620dd5ecdf605233f2c5f86ddcc11a98d93f908b9d0cb5",
+  "base_url": "https://oss2.sensenjoy.cn/sensen/dynamicfarm/data/r8-ce232c99c9c8/",
+  "dataset_version": "sf-dynamic-farm-20261125-r8",
+  "manifest_sha256": "063700f3ef7db2bb0c4642f58a6b63df8b68e6930cb578924e683c1ccc8b32ae",
+  "releases": {
+    "sf-dynamic-farm-20261124-r6": "https://oss2.sensenjoy.cn/sensen/dynamicfarm/data/r6-6c3733e3b025/"
+  },
   "building_source": "datasf",
   "min_core_cells": 400
 }

@@ -6,10 +6,14 @@ extends SceneTree
 ## stand says so and sends nothing; the stick cancels a walk; the parcel stays covered until the
 ## save is applied. C-33: opening the house placement gives up a press still walking. C-114: Build pops the
 ## cottage in with dust round it; reopening shows it still, without dust. C-138: the carrot's stage and the dry soil block
-## are drawn; the development switch draws the soil wet. Run in the private preview project (README), optionally
+## are drawn; the development switch draws the soil wet. C-136: a claim made on an older dataset opens on the
+## server save once the enter request names the opened farm's dataset (Q-168), the lost first try included. C-113: with
+## the map on r8, an r6 home opens its r6 farm and its enter names r6 (Q-172: not moved); an r4 home opens in r8 and its
+## enter names r8 (moved, Q-168). Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
+const RemoteStore = preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
@@ -48,6 +52,26 @@ class FlakyStore extends RefCounted:
 		return inner.enter()
 	func send(base_version: int, commands: Array) -> Dictionary: return inner.send(base_version, commands)
 
+## C-136 stand-in for the server's /parcels/mine endpoints holding the player's claim on an older dataset: an enter
+## naming a dataset moves the claim to it (Q-168 rebase; the cell progress is gone, the bag kept); anything else answers
+## the claim as it is. The first `drop` requests are lost like a dropped connection.
+class OldClaimServer extends RefCounted:
+	var block_id: String
+	var dataset: String
+	var farm: Dictionary
+	var drop := 0
+	var enters: Array = [] # Bodies of the enter requests that reached the server, lost ones included.
+	func handle(method: String, url: String, _headers: PackedStringArray, body: String) -> ApiClient.Response:
+		var data = JSON.parse_string(body) if not body.is_empty() else {}
+		if method == "POST" and url.ends_with("/parcels/mine/enter"):
+			enters.append(data)
+			if data is Dictionary and data.get("dataset_version") is String: dataset = data.dataset_version
+		if drop > 0:
+			drop -= 1
+			return ApiClient.Response.new(false, 0, {}, "transport error")
+		return ApiClient.Response.new(true, 200, {"granted": false, "server_time": int(Time.get_unix_time_from_system() * 1000.0),
+			"parcel": {"parcel_id": block_id, "dataset_version": dataset, "farm_version": 5, "farm": farm}})
+
 func _initialize() -> void:
 	_run.call_deferred()
 
@@ -65,6 +89,8 @@ func _run() -> void:
 	await _reopen()
 	await _placement_takes_over()
 	await _house_pops_once()
+	await _older_dataset_claim()
+	await _release_named_on_enter()
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
 	print("PARCEL_FARMING_SCENE checks=%d failures=%d" % [checks, failures])
@@ -75,9 +101,13 @@ func _store() -> RefCounted:
 	store.now_ms = func() -> int: return int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
 	return store
 
-func _open(store: RefCounted = null) -> Node:
+## `farm` defaults to the fixture; `net_store` leaves the save to the scene's own server store, as the map opens it.
+func _open(store: RefCounted = null, farm: Dictionary = {}, net_store := false) -> Node:
+	var opened := raw if farm.is_empty() else farm
+	var args := {"farm": opened, "dataset": opened.dataset_version, "block_id": opened.block_id, "own_parcel": true}
+	if not net_store: args.farm_store = store if store != null else _store()
 	scene = (load(SCENE_PATH) as PackedScene).instantiate()
-	scene.setup({"farm": raw, "dataset": raw.dataset_version, "block_id": raw.block_id, "own_parcel": true, "farm_store": store if store != null else _store()})
+	scene.setup(args)
 	if store is FlakyStore: store.scene = scene
 	var state := {"ready": false}
 	scene.preview_ready.connect(func(_summary): state.ready = true)
@@ -518,6 +548,76 @@ func _house_pops_once() -> void:
 	await process_frame
 	for name in DirAccess.get_files_at(house_dir): DirAccess.remove_absolute(house_dir.path_join(name))
 	DirAccess.remove_absolute(house_dir)
+
+func _older_dataset_claim() -> void:
+	var server := OldClaimServer.new()
+	server.block_id = raw.block_id
+	server.dataset = "sf-dynamic-farm-older"
+	var bag := {"hoe_starter": 1, "seed_carrot": 2, "blueprint_cottage": 1, "blueprint_coop": 1}
+	server.farm = ParcelFarm.empty_state()
+	server.farm.bag = bag; server.farm.welcomed_at = 0; server.farm.coins = 12; server.farm.sales = 1
+	var client := ApiClient.new("https://fake.invalid/v1", server.handle)
+	client.token = "player"
+	# Before C-136 nothing named the dataset: the reply is about the claim's older dataset and is refused.
+	var old: Dictionary = await RemoteStore.new(client, raw.block_id, raw.dataset_version).read()
+	_check(not old.ok and old.code == "OTHER_PARCEL", "a reply on the claim's older dataset is still refused")
+	server.drop = 1
+	var farming := await _open(RemoteStore.new(client, raw.block_id, raw.dataset_version))
+	var deadline := Time.get_ticks_msec() + 30000
+	while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
+	_check(server.enters.size() == 2 and server.enters.all(func(b): return b is Dictionary and b.get("dataset_version") == raw.dataset_version),
+		"each enter, the lost one and its retry, names the opened farm's dataset")
+	_check(farming.loaded() and not farming.unavailable and not farming._cover.visible, "the moved claim opens: no Could not open your farm")
+	_check(farming.farm.get("bag") == bag and farming.farm.get("coins") == 12 and farming.farm.get("house", 0) == null and farming.farm.get("tilled") == [],
+		"the moved save shows the kept bag and coins on fresh cells")
+	scene.queue_free()
+	await process_frame
+	# Retry from the cover goes the same way: both tries lost, then the key's Retry opens it.
+	server.drop = 2
+	server.enters.clear()
+	server.dataset = "sf-dynamic-farm-older"
+	farming = await _open(RemoteStore.new(client, raw.block_id, raw.dataset_version))
+	deadline = Time.get_ticks_msec() + 30000
+	while farming.busy and Time.get_ticks_msec() < deadline: await process_frame
+	_check(farming.unavailable and farming._cover.visible and farming._cover_label.text == "Could not open your farm.", "two lost tries leave the cover up")
+	farming._on_key()
+	deadline = Time.get_ticks_msec() + 30000
+	while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
+	_check(server.enters.size() == 3 and server.enters[2].get("dataset_version") == raw.dataset_version and farming.loaded() and not farming.unavailable,
+		"Retry names the dataset and opens the moved claim")
+	scene.queue_free()
+	await process_frame
+
+## C-113: the scene's own server store (the one the map's "Enter my farm" gets) names the release of the farm file it
+## opened, not the map's: an r6 home's r6 farm names r6, so the server leaves it on r6 (Q-172); an r4 home opens in r8
+## and names r8, so the server moves it (Q-168).
+func _release_named_on_enter() -> void:
+	var net = root.get_node_or_null("Net")
+	if net == null:
+		_check(false, "Net autoload is present"); return
+	var was_client = net.client
+	var was_local = ProjectSettings.get_setting("sensen/dynamic_farm/local_farm_save", false)
+	ProjectSettings.set_setting("sensen/dynamic_farm/local_farm_save", false)
+	for case in [["sf-dynamic-farm-20261124-r6", "sf-dynamic-farm-20261124-r6", "an r6 home opened in its r6 farm names r6 and stays on r6"],
+			["sf-dynamic-farm-20261118-r4", "sf-dynamic-farm-20261125-r8", "an r4 home opened in r8 names r8 and moves to r8"]]:
+		var server := OldClaimServer.new()
+		server.block_id = raw.block_id
+		server.dataset = case[0]
+		server.farm = ParcelFarm.empty_state()
+		server.farm.bag = {"hoe_starter": 1}; server.farm.welcomed_at = 0
+		net.client = ApiClient.new("https://fake.invalid/v1", server.handle)
+		net.client.token = "player"
+		var farm := raw.duplicate(true)
+		farm.dataset_version = case[1]
+		var farming := await _open(null, farm, true)
+		var deadline := Time.get_ticks_msec() + 30000
+		while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
+		_check(server.enters.size() == 1 and server.enters[0].get("dataset_version") == case[1] and server.dataset == case[1]
+			and farming.loaded() and not farming.unavailable, case[2])
+		scene.queue_free()
+		await process_frame
+	net.client = was_client
+	ProjectSettings.set_setting("sensen/dynamic_farm/local_farm_save", was_local)
 
 func _dust() -> Array:
 	return scene.get_children().filter(func(n): return n is CPUParticles3D)

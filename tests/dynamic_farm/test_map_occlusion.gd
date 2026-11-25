@@ -81,6 +81,11 @@ func _run() -> void:
 		await page._open_host(farm)
 		var own: bool = router.received.get("own_parcel", false) == true
 		verify(own == case[3] and router.received.get("preview_only", false) != case[3] and page._entering.is_empty(), case[4])
+	# C-113 Q-172: a home claimed on r6 opens its r6 farm while the map is on r8; the farm scene saves against r6.
+	ProjectSettings.set_setting(OWN_FARM, true); claims.state = "mine"; page._entering = "p-A"
+	var r6_farm := {"dataset_version":"sf-dynamic-farm-20261124-r6", "block_id":"p-A"}
+	await page._open_host(r6_farm)
+	verify(router.received.get("own_parcel", false) == true and router.received.dataset == "sf-dynamic-farm-20261124-r6" and router.received.farm == r6_farm, "an r6 home enters as its own r6 farm")
 	ProjectSettings.set_setting(OWN_FARM, null); page._claims = null; claims.free()
 	plugin.calls.clear()
 	router.hold_loading = true

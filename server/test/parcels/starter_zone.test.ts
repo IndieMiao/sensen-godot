@@ -97,7 +97,7 @@ describe('shipped San Francisco starter zone', () => {
     expect(shipped.zones).toHaveLength(1);
     expect(sf).toMatchObject({ id: 'sf-starter', community_id: 'sf', zoom: 14 });
     expect(communityOf(loadParcelRules(DEFAULT_CONTENT_DIR), sf.dataset_version)).toBe('sf');
-    expect(raw.zones[0].dataset_version).toBe('sf-dynamic-farm-20261124-r6');
+    expect(raw.zones[0].dataset_version).toBe('sf-dynamic-farm-20261125-r8');
   });
 
   it('California, Hyde, Bay and The Embarcadero bound it (C-130#45); Grant Ave between Green and Vallejo is the landing point', () => {
@@ -122,17 +122,17 @@ describe('shipped San Francisco starter zone', () => {
       [-122.39700, 37.79250], [-122.42050, 37.79800]] as LngLat[]) expect(inside(p)).toBe(false);
   });
 
-  it('lists the 2968 parcels of the r6 dataset whose centre is inside, all within the boundary', () => {
-    expect(sf.parcels.size).toBe(2968);
+  it('lists the 4190 parcels of the r8 dataset (C-113; 2968 on r6) whose centre is inside, all within the boundary', () => {
+    expect(sf.parcels.size).toBe(4190);
     for (const c of sf.parcels.values()) expect(inside(c)).toBe(true);
     expect(Object.keys(raw.zones[0].parcels)).toEqual([...Object.keys(raw.zones[0].parcels)].sort());
   });
 
-  it('C-143: 392 of them are too small to claim, by the client\'s own min_core_cells; 2576 stay claimable', () => {
+  it('C-143: 536 of them are too small to claim, by the client\'s own min_core_cells; 3654 stay claimable', () => {
     const client = JSON.parse(readFileSync(CLIENT_MAP_CONFIG, 'utf8')) as { min_core_cells: number };
     expect(sf.min_core_cells).toBe(client.min_core_cells);
-    expect(sf.too_small.size).toBe(392);
-    expect(sf.parcels.size - sf.too_small.size).toBe(2576);
+    expect(sf.too_small.size).toBe(536);
+    expect(sf.parcels.size - sf.too_small.size).toBe(3654);
     expect(raw.zones[0].too_small).toEqual([...raw.zones[0].too_small].sort());
   });
 });
