@@ -6,6 +6,9 @@
 [ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/FM-12.glb" id="FM-12"]
 [ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/SC-10.glb" id="SC-10"]
 [ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/SC-06.glb" id="SC-06"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/Hedge-End.glb" id="Hedge-End"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/Verge.glb" id="Verge"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/Sand-Signs.glb" id="Sand-Signs"]
 [ext_resource type="ArrayMesh" path="res://assets/dynamic_farm/chicken_yard/GX-04.res" id="GX-04"]
 [ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/GX-09.glb" id="GX-09"]
 [ext_resource type="ArrayMesh" path="res://assets/dynamic_farm/chicken_yard/CS-05P.res" id="CS-05P"]
@@ -63,13 +66,34 @@ position = Vector3(2.5, 0, 3.5)
 position = Vector3(6.5, 0, 2.5)
 
 [node name="RearHedge00" parent="Furnishings" instance=ExtResource("SC-06")]
-position = Vector3(0.568, 0, 0.317)
+position = Vector3(0.99, 0.4, -0.285)
+
+[node name="RearHedge01" parent="Furnishings" instance=ExtResource("SC-06")]
+position = Vector3(1.99, 0.4, -0.285)
+
+[node name="RearHedge02" parent="Furnishings" instance=ExtResource("SC-06")]
+position = Vector3(2.99, 0.4, -0.285)
+
+[node name="RearHedge03" parent="Furnishings" instance=ExtResource("SC-06")]
+position = Vector3(3.99, 0.4, -0.285)
+
+[node name="RearHedge04" parent="Furnishings" instance=ExtResource("SC-06")]
+position = Vector3(4.99, 0.4, -0.285)
 
 [node name="RearHedge05" parent="Furnishings" instance=ExtResource("SC-06")]
-position = Vector3(5.436, 0, 0.317)
+position = Vector3(5.99, 0.4, -0.285)
 
-[node name="RearHedge06" parent="Furnishings" instance=ExtResource("SC-06")]
-position = Vector3(6.436, 0, 0.317)
+[node name="LaurelEnd0" parent="Furnishings" instance=ExtResource("Hedge-End")]
+position = Vector3(0.36, 0.285, -0.282)
+
+[node name="LaurelEnd1" parent="Furnishings" instance=ExtResource("Hedge-End")]
+position = Vector3(6.65, 0.285, -0.282)
+
+[node name="WildflowerVerge" parent="Furnishings" instance=ExtResource("Verge")]
+position = Vector3(0, 0, 0)
+
+[node name="SandSurfaceMarks" parent="Furnishings" instance=ExtResource("Sand-Signs")]
+position = Vector3(0, 0, 0)
 
 [node name="Approach" type="Node3D" parent="."]
 metadata/note = "Optional surface link beyond the opening, not a reserved or blocked cell."
