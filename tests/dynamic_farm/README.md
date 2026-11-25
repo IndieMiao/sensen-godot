@@ -56,6 +56,11 @@ from. New claims send the same `dataset_version`, which
 entered in that release's farm, because its save's cells belong to that grid (Q-172);
 "My home" selects such a home from that farm, so it can be entered even where r8 has
 no farm for the parcel. A home on an unlisted release opens in r8.
+Entering names the release of the farm opened (C-136): an r6 home names r6 and stays
+on r6; an r4 home opens in r8, names r8 and the server moves it there (Q-168).
+The starter zone list (`assets/farm/data/dynamic_farm_starter_zone.json`) is rebuilt
+from r8's `index.geojson` by `server/tools/starter_zone_build.ts`: 4190 parcels, 536 too small.
+The map credits the OpenStreetMap buildings r8 adds (ODbL) beside the DataSF parcels.
 The service is ready; the complete 3D candidate still requires its own reviewed
 scene integration and actual package verification. The packager must take exact source config, not
 silently replace URL/hash. Include five native runtime Kotlin files (no *Test),
