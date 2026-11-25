@@ -19,6 +19,7 @@ import { MemoryParcelStore, type ParcelStore } from '../../src/parcels/store.js'
 import { PgParcelStore } from '../../src/parcels/pg_store.js';
 import { parcelReselectFromEnv } from '../../src/parcels/routes.js';
 import { emptyFarm } from '../../src/parcels/farm.js';
+import type { StarterZones } from '../../src/parcels/starter_zone.js';
 
 const DSN = process.env.TEST_DATABASE_URL;
 if (process.env.CI === '1' && !DSN) throw new Error('CI 下必须设置 TEST_DATABASE_URL');
@@ -53,11 +54,22 @@ const makers: [string, boolean, (now: () => number) => Stores][] = [
 
 const bearer = (token: string) => ({ authorization: `Bearer ${token}` });
 let clock = T0;
-const appFor = (stores: Stores, opts: { reselect?: boolean; guestWrites?: boolean } = {}) => buildApp({
+const appFor = (stores: Stores, opts: { reselect?: boolean; guestWrites?: boolean; starterZones?: StarterZones } = {}) => buildApp({
   store: stores.store, content, contentVersion: CV, blueprintDir: path.join(ROOT, 'assets', 'blueprints'),
   regionsFile: REGIONS, pepper: 'test-pepper', now: () => clock, realtimeEnabled: false, guestWrites: opts.guestWrites,
-  parcels: { store: stores.parcels, rules, reselect: opts.reselect ?? false },
+  parcels: { store: stores.parcels, rules, reselect: opts.reselect ?? false, starterZones: opts.starterZones },
 });
+/** C-130 起步区：A、B 在区内（清单里的中心点与客户端报的不同，认领应存清单里的），FAR 在区外。
+ * C-143：SMALL 在区内但太小（too_small），不能认领。 */
+const SMALL = { parcel_id: 'p-3512003', center: [-122.4170, 37.7755] };
+const ZONE_CENTER_A: [number, number] = [-122.41941, 37.77491];
+const zones = (enabled = true): StarterZones => ({ enabled, zones: [{
+  id: 'test-zone', community_id: 'sf', name: 'Test', dataset_version: DATASET,
+  boundary: [[-122.43, 37.77], [-122.41, 37.77], [-122.41, 37.78], [-122.43, 37.78], [-122.43, 37.77]],
+  center: [-122.42, 37.775], zoom: 17, min_core_cells: 400,
+  parcels: new Map([[A.parcel_id, ZONE_CENTER_A], [B.parcel_id, [B.center[0], B.center[1]]], [SMALL.parcel_id, [SMALL.center[0], SMALL.center[1]]]]),
+  too_small: new Set([SMALL.parcel_id]),
+}] });
 
 /** 带昵称的邮箱账号。 */
 async function account(app: FastifyInstance, name: string): Promise<string> {
@@ -375,6 +387,133 @@ for (const [name, enabled, makeStores] of makers) {
         expect(again.statusCode).toBe(201);
         expect(again.json().parcel.farm).toEqual(emptyFarm());
       } finally { await test.close(); }
+    });
+
+    it('C-130 starter zone: a player without a parcel may only claim inside it; outside is refused and nothing is stored', async () => {
+      const zoned = await appFor(stores, { starterZones: zones() });
+      try {
+        const ada = await account(zoned, 'Ada');
+        const outside = await claim(zoned, ada, FAR);
+        expect(outside.statusCode).toBe(403);
+        expect(outside.json()).toMatchObject({ code: 'OUTSIDE_STARTER_ZONE', starter_zone: 'test-zone' });
+        expect(await mine(zoned, ada)).toBeNull();
+        expect((await owners(zoned, ada, `ids=${FAR.parcel_id}`)).json().parcels[0].owner).toBe('none');
+        // A fake centre inside the zone does not help an outside parcel: the zone is judged by parcel id only.
+        expect((await claim(zoned, ada, { parcel_id: FAR.parcel_id, center: A.center })).json().code).toBe('OUTSIDE_STARTER_ZONE');
+        // The older dataset of the same community is held to the same zone.
+        expect((await claim(zoned, ada, FAR, 'sf-dynamic-farm-20261124-r6')).json().code).toBe('OUTSIDE_STARTER_ZONE');
+        // Inside: claimed, with the zone's centre for the parcel rather than the one the client sent.
+        const inside = await claim(zoned, ada, { parcel_id: A.parcel_id, center: [-122.5, 37.7] });
+        expect(inside.statusCode).toBe(201);
+        expect(inside.json().parcel).toMatchObject({ parcel_id: A.parcel_id, center: ZONE_CENTER_A });
+        expect((await claim(zoned, ada, A)).statusCode).toBe(200);
+        // The other rules are unchanged: one parcel per player, first come first served.
+        expect((await claim(zoned, ada, B)).json().code).toBe('ALREADY_CLAIMED');
+        expect((await claim(zoned, await account(zoned, 'Bob'), A)).json().code).toBe('PARCEL_TAKEN');
+        // Guests are still refused before the zone when the server does not allow guest writes.
+        expect((await claim(zoned, await guest(zoned), FAR)).json().code).toBe('LOGIN_REQUIRED');
+      } finally { await zoned.close(); }
+    });
+
+    it('C-130 starter zone: a parcel claimed outside before the zone keeps working and is never taken back', async () => {
+      const ada = await account(app, 'Ada');
+      expect((await claim(app, ada, FAR)).statusCode).toBe(201);
+      const before = await mine(app, ada);
+      await enter(app, ada);
+      const zoned = await appFor(stores, { starterZones: zones() });
+      try {
+        expect(await mine(zoned, ada)).toMatchObject({ parcel_id: FAR.parcel_id, center: before.center });
+        // A retry of the old claim is not refused by the zone; another parcel answers the existing home as before.
+        const retry = await claim(zoned, ada, FAR);
+        expect(retry.statusCode).toBe(200);
+        expect(retry.json().parcel.parcel_id).toBe(FAR.parcel_id);
+        for (const other of [B, { parcel_id: 'p-0001002', center: FAR.center }]) {
+          const res = await claim(zoned, ada, other);
+          expect(res.statusCode).toBe(409);
+          expect(res.json()).toMatchObject({ code: 'ALREADY_CLAIMED', parcel: { parcel_id: FAR.parcel_id } });
+        }
+        expect((await enter(zoned, ada)).json()).toMatchObject({ granted: false, parcel: { parcel_id: FAR.parcel_id } });
+        expect((await command(zoned, ada, 1, [{ type: 'till', cell: '1,1' }])).statusCode).toBe(200);
+        const bob = await account(zoned, 'Bob');
+        expect((await owners(zoned, bob, `ids=${FAR.parcel_id}`)).json().parcels[0]).toMatchObject({ owner: 'other', nickname: 'Ada' });
+        expect((await claim(zoned, bob, FAR)).json().code).toBe('OUTSIDE_STARTER_ZONE');
+      } finally { await zoned.close(); }
+    });
+
+    it('C-143 starter zone: a parcel too small to claim is refused by the server too, and nothing is stored', async () => {
+      const zoned = await appFor(stores, { starterZones: zones() });
+      try {
+        const ada = await account(zoned, 'Ada');
+        const small = await claim(zoned, ada, SMALL);
+        expect(small.statusCode).toBe(403);
+        expect(small.json()).toMatchObject({ code: 'PARCEL_TOO_SMALL', starter_zone: 'test-zone' });
+        expect(await mine(zoned, ada)).toBeNull();
+        expect((await owners(zoned, ada, `ids=${SMALL.parcel_id}`)).json().parcels[0].owner).toBe('none');
+        // The older dataset of the same community is held to the same list.
+        expect((await claim(zoned, ada, SMALL, 'sf-dynamic-farm-20261124-r6')).json().code).toBe('PARCEL_TOO_SMALL');
+        // Claimable parcels are claimed as before; afterwards a too-small one answers the home like any other parcel.
+        expect((await claim(zoned, ada, A)).statusCode).toBe(201);
+        expect((await claim(zoned, ada, SMALL)).json()).toMatchObject({ code: 'ALREADY_CLAIMED', parcel: { parcel_id: A.parcel_id } });
+        // The map still sees it as a parcel inside the zone (the client judges the size itself).
+        const view = await zoned.inject({ method: 'GET', url: `/v1/parcels/starter-zone?dataset_version=${DATASET}` });
+        expect(view.json().zone.parcel_ids).toContain(SMALL.parcel_id);
+      } finally { await zoned.close(); }
+    });
+
+    it('C-143 starter zone: a too-small parcel claimed before keeps working and is never taken back', async () => {
+      const ada = await account(app, 'Ada');
+      expect((await claim(app, ada, SMALL)).statusCode).toBe(201);
+      await enter(app, ada);
+      const zoned = await appFor(stores, { starterZones: zones() });
+      try {
+        expect(await mine(zoned, ada)).toMatchObject({ parcel_id: SMALL.parcel_id });
+        const retry = await claim(zoned, ada, SMALL);
+        expect(retry.statusCode).toBe(200);
+        expect(retry.json().parcel.parcel_id).toBe(SMALL.parcel_id);
+        expect((await claim(zoned, ada, A)).json()).toMatchObject({ code: 'ALREADY_CLAIMED', parcel: { parcel_id: SMALL.parcel_id } });
+        expect((await enter(zoned, ada)).json()).toMatchObject({ granted: false, parcel: { parcel_id: SMALL.parcel_id } });
+        expect((await command(zoned, ada, 1, [{ type: 'till', cell: '1,1' }])).statusCode).toBe(200);
+        const bob = await account(zoned, 'Bob');
+        expect((await owners(zoned, bob, `ids=${SMALL.parcel_id}`)).json().parcels[0]).toMatchObject({ owner: 'other', nickname: 'Ada' });
+        expect((await claim(zoned, bob, SMALL)).json().code).toBe('PARCEL_TOO_SMALL');
+      } finally { await zoned.close(); }
+    });
+
+    it('C-130 starter zone switched off: claims anywhere, as before', async () => {
+      const off = await appFor(stores, { starterZones: zones(false) });
+      try {
+        expect((await claim(off, await account(off, 'Ada'), FAR)).statusCode).toBe(201);
+        const zone = await off.inject({ method: 'GET', url: `/v1/parcels/starter-zone?dataset_version=${DATASET}` });
+        expect(zone.json()).toMatchObject({ enabled: false, zone: null });
+      } finally { await off.close(); }
+    });
+
+    it('C-130 one player racing an outside and an inside claim at once gets only the inside one', async () => {
+      const zoned = await appFor(stores, { starterZones: zones() });
+      try {
+        const ada = await account(zoned, 'Ada');
+        const results = await Promise.all([claim(zoned, ada, FAR), claim(zoned, ada, A), claim(zoned, ada, FAR)]);
+        // The outside claims are refused, or answer the inside home if it landed first; none is stored.
+        expect(results[1].statusCode).toBe(201);
+        for (const r of [results[0], results[2]]) expect(['OUTSIDE_STARTER_ZONE', 'ALREADY_CLAIMED']).toContain(r.json().code);
+        expect((await mine(zoned, ada)).parcel_id).toBe(A.parcel_id);
+        expect((await owners(zoned, ada, `ids=${FAR.parcel_id}`)).json().parcels[0].owner).toBe('none');
+      } finally { await zoned.close(); }
+    });
+
+    it('C-130 the starter zone is public: boundary, landing point and parcel ids; unknown datasets are refused', async () => {
+      const zoned = await appFor(stores, { starterZones: zones() });
+      try {
+        const res = await zoned.inject({ method: 'GET', url: `/v1/parcels/starter-zone?dataset_version=${DATASET}` });
+        expect(res.statusCode).toBe(200);
+        expect(res.json()).toEqual({ enabled: true, server_time: T0, zone: { id: 'test-zone', community_id: 'sf', name: 'Test',
+          dataset_version: DATASET, boundary: zones().zones[0].boundary, center: [-122.42, 37.775], zoom: 17,
+          parcel_ids: [A.parcel_id, B.parcel_id, SMALL.parcel_id] } });
+        expect((await zoned.inject({ method: 'GET', url: '/v1/parcels/starter-zone?dataset_version=other' })).statusCode).toBe(422);
+        expect((await zoned.inject({ method: 'GET', url: '/v1/parcels/starter-zone' })).statusCode).toBe(400);
+        const none = await app.inject({ method: 'GET', url: `/v1/parcels/starter-zone?dataset_version=${DATASET}` });
+        expect(none.json()).toMatchObject({ enabled: false, zone: null });
+      } finally { await zoned.close(); }
     });
   });
 }

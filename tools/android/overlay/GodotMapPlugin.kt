@@ -305,6 +305,12 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
         runOnUiThread { parcelController?.setBuildingHighlight(generation, key, parcelId) }
     }
 
+    /** C-130: the dynamic farm starter zone marker (boundary and style JSON, "" clears it), its own layers. */
+    @UsedByGodot
+    fun setStarterZone(generation: Long, zoneJson: String) {
+        runOnUiThread { parcelController?.setStarterZone(generation, zoneJson) }
+    }
+
     @UsedByGodot
     fun clearParcelLayers(generation: Long) {
         runOnUiThread { parcelController?.clear(generation) }

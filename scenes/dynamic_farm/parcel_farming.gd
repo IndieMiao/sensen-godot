@@ -3,10 +3,12 @@ extends Node3D
 ## till, sow a carrot and harvest it into the bag. One press of the main key does one step,
 ## free of Energy and coins. The store (server or local stand-in) is authoritative; this node
 ## only checks the spatial rules the server cannot (ParcelSpace) and draws the result.
-## Main-farm pieces are reused read-only: CropField for soil and carrots, P0 names and icons, and the
-## main farm's UI kit (C-74): the quick bar, the action key and item flights into the bag; the bag is the UI v3 modal
-## panel and gains the v3 float (C-105). Nothing of P0Ui / P0Runtime or Energy; the parcel's own coins (C-59) show in the
-## scene's top bar as the main HUD's coins capsule.
+## Soil and carrots are drawn by ParcelCropArt (C-138: 1×1 dry or wet soil blocks, seven
+## carrot stages). Main-farm pieces are reused read-only: P0 names and icons, and the main
+## farm's UI kit (C-74): the quick bar, the action key and item flights into the bag; the bag
+## is the UI v3 modal panel and gains the v3 float (C-105). Nothing of P0Ui / P0Runtime or
+## Energy; the parcel's own coins (C-59) show in the scene's top bar as the main HUD's coins
+## capsule.
 ## Outer gathering (C-60, ParcelGather): near a tree, flower or rock of the extension the key
 ## picks it by hand; a picked one stays faded (trees, rocks) or hidden (flowers, which never
 ## block) until it grows back. Gathering never touches the walk, the layout or collision.
@@ -21,7 +23,9 @@ const ParcelItems = preload("res://modules/dynamic_farm/parcel_items.gd")
 const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
 const Guide = preload("res://modules/dynamic_farm/parcel_guide.gd")
 const GATHERED_SHADER = preload("res://modules/dynamic_farm/gathered_prop.gdshader")
-const CROP_CODES := {"crop_carrot": "C"}
+const CropArt = preload("res://modules/dynamic_farm/parcel_crop_art.gd")
+## Development only: draw every tilled cell as wet soil. Until watering exists (C-137) the game shows dry soil.
+const WET_SOIL_SETTING := "sensen/dynamic_farm/preview_wet_soil"
 const BAG_ORDER := ["hoe_starter", "seed_carrot", "crop_carrot"]
 ## Parcel items the main farm's content table does not name (C-74#33, copy per C-45). The icon is a placeholder from
 ## the existing set (the HUD's home), no new art.
@@ -89,8 +93,9 @@ var _anchors := {}
 var _removed := {}
 var _path := {}
 var _clock_offset_ms := 0
-var _soil: CropField
-var _crops: CropField
+var _crop_art: CropArt
+## Draw tilled soil wet (WET_SOIL_SETTING; probes may set it too).
+var wet_soil_preview := false
 var _marker: MeshInstance3D
 var _marker_material: StandardMaterial3D
 var _keys: UiActionKey
@@ -160,18 +165,10 @@ func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: Ref
 		var version := str(recipe.get("outer_groves", {}).get("version", "")) if recipe is Dictionary else ""
 		gatherables = Gather.objects(_outer_layout, walk, data.block_id, _gather, version)
 	_names = _item_names()
-	var bp := FarmBlueprint.new()
-	bp.cell_m = data.cell_m
-	# Two fields: tilled soil stays under a growing carrot (one field draws one layer per cell).
-	_soil = CropField.new(bp)
-	_soil.ground_layers = true
-	_soil.name = "ParcelSoil"
-	_crops = CropField.new(bp)
-	_crops.name = "ParcelCrops"
-	for field: CropField in [_soil, _crops]:
-		# CropField draws on (x+0.5)*cell_m; the walker centres the grid on the origin.
-		field.position = Vector3(-walk.center_grid.x * data.cell_m, 0, walk.center_grid.y * data.cell_m)
-		add_child(field)
+	_crop_art = CropArt.new(walk.point, data.cell_m)
+	_crop_art.name = "ParcelCrops"
+	add_child(_crop_art)
+	wet_soil_preview = bool(ProjectSettings.get_setting(WET_SOIL_SETTING, false))
 	_build_marker()
 	_build_ui(canvas)
 
@@ -489,14 +486,8 @@ func _draw_gathered() -> void:
 func _draw_crops() -> void:
 	if farm.is_empty(): return
 	var soil := {}
-	for key: String in farm.tilled: soil[key] = {"state": "tilled"}
-	_soil.sync(soil, 0)
-	var crops := {}
-	for key: String in farm.crops:
-		var crop: Dictionary = farm.crops[key]
-		crops[key] = {"state": "growing", "crop": CROP_CODES.get(crop.crop, ""),
-			"watered_at": crop.planted_at, "ready_at": crop.ripe_at}
-	_crops.sync(crops, server_now())
+	for key: String in farm.tilled: soil[key] = CropArt.WET if wet_soil_preview else CropArt.DRY
+	_crop_art.sync(soil, farm.crops, server_now())
 
 ## The bag's items in bar order: the farming items first, then anything else with a name.
 func bag_ids() -> Array:
