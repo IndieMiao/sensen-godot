@@ -81,7 +81,8 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
   });
 
   /** 认领：每人一块免费地，只能认领无主地块，认领后永久归属。重复认领自己那块返回 200。
-   * 起步区开着时（C-130），没有地块的玩家只能认领区内地块，区外 403 OUTSIDE_STARTER_ZONE。
+   * 起步区开着时（C-130），没有地块的玩家只能认领区内地块，区外 403 OUTSIDE_STARTER_ZONE，
+   * 区内太小的 403 PARCEL_TOO_SMALL（C-143）。
    * 认领只建空农场；赠品在首次进入（/mine/enter）时发。 */
   app.post('/v1/parcels/claim', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (req, reply) => {
     const p = await parcelWriter(req, reply);
@@ -96,14 +97,15 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
     const claim = { community_id: community, layer: DEFAULT_LAYER, parcel_id: b.parcel_id, dataset_version: b.dataset_version, center };
     // C-130 起步区：区外地块不进存储层，所以绝不会为它新建认领。已有地块的玩家照旧拿到自己的地块
     // （重试认领自己那块 200，换一块 409 ALREADY_CLAIMED），不因起步区被误拒；区内认领存数据集里的中心点。
+    // C-143：区内太小的地块（客户端不给认领键）同样不进存储层，已认领的照旧。
     const zone = activeZone(deps.starterZones, community);
     if (zone) {
       const inZone = zone.parcels.get(b.parcel_id);
-      if (!inZone) {
+      if (!inZone || zone.too_small.has(b.parcel_id)) {
         const own = await deps.store.mine(p.id);
         if (own && sameParcel(own, claim)) return reply.send({ parcel: parcelView(own), server_time: at });
         if (own) return reply.code(409).send({ code: 'ALREADY_CLAIMED', parcel: parcelView(own), server_time: at });
-        return reply.code(403).send({ code: 'OUTSIDE_STARTER_ZONE', starter_zone: zone.id, server_time: at });
+        return reply.code(403).send({ code: inZone ? 'PARCEL_TOO_SMALL' : 'OUTSIDE_STARTER_ZONE', starter_zone: zone.id, server_time: at });
       }
       claim.center = { lng: inZone[0], lat: inZone[1] };
     }
