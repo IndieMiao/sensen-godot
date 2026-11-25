@@ -20,6 +20,9 @@ const MARK_OVERHANG := 8.0
 const _COUNT_AT := Vector2(26.0, -4.0)   # ×N, top-right (P1)
 ## Label=Short (q(137)): 11 Bold, a 2 px cream outline (Godot's outline_size is the stroke's whole width), at most 96.
 const SHORT_MAX_W := 96.0
+## This pin's short-name width limit (SHORT_MAX_W unless a single pin's whole name needs more: the dynamic farm map's
+## Washington Square, C-145).
+var short_max_w := SHORT_MAX_W: set = set_short_max_w
 const _SHORT_HALO := 4
 const _PERSON := "res://assets/ui/kit_icons/count_person.svg"
 const _PERSON_SIDE := 9.0
@@ -241,7 +244,14 @@ func set_plate(v: bool) -> void:
 ## A short name keeps to one line of at most 96 px, cut with an ellipsis past it (q(137)); a plate's name is whole.
 func _fit_short() -> void:
 	if _plate_on < 0: return
-	_label.custom_minimum_size.x = 0.0 if plate else label_size_for(text, false).x
+	_label.custom_minimum_size.x = 0.0 if plate else label_size_for(text, false, short_max_w).x
+
+func set_short_max_w(v: float) -> void:
+	if is_equal_approx(v, short_max_w): return
+	short_max_w = v
+	if _label == null: return
+	_fit_short()
+	_layout()
 
 func set_mark(v: String) -> void:
 	if v == mark: return
@@ -331,12 +341,13 @@ func set_online(v: int) -> void:
 	_count.visible = true
 
 ## The name's size for `text` before any pin exists (the city map packs pins by it). A plate's: Compact/10 Bold, 6 / 2
-## padding, never cut. A short name's (q(137)): 11 Bold, 2 over and under, at most 96 wide. Matches label_size() of a
+## padding, never cut. A short name's (q(137)): 11 Bold, 2 over and under, at most max_w (96) wide. Matches label_size() of a
 ## built pin. Measured once per name: the city map asks for every pin it packs, every frame. Measured as the label
 ## shows it, translated under 中文 (#649 第二批 ⑨; the locale is set at start, so the cache holds).
-static func label_size_for(text: String, plated := true) -> Vector2:
+static func label_size_for(text: String, plated := true, max_w := SHORT_MAX_W) -> Vector2:
 	if text == "": return Vector2.ZERO
-	var key := text + ("|p" if plated else "|s")
+	# The usual 96 px short name keeps its "|s" key; only a pin's own wider limit (C-145) adds its width.
+	var key := text + ("|p" if plated else "|s" if max_w == SHORT_MAX_W else "|s%d" % roundi(max_w))
 	if _label_sizes.has(key): return _label_sizes[key]
 	text = String(TranslationServer.translate(text))
 	var style := UiTokens.STYLE_C10_B if plated else UiTokens.STYLE_C11_B
@@ -344,7 +355,7 @@ static func label_size_for(text: String, plated := true) -> Vector2:
 	var f := th.get_font(&"font", style)
 	var fs := th.get_font_size(&"font_size", style)
 	var w := ceilf(f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x)
-	var size := Vector2(w + _LABEL_PAD_X * 2.0 if plated else minf(w, SHORT_MAX_W), ceilf(f.get_height(fs)) + _LABEL_PAD_Y * 2.0)
+	var size := Vector2(w + _LABEL_PAD_X * 2.0 if plated else minf(w, max_w), ceilf(f.get_height(fs)) + _LABEL_PAD_Y * 2.0)
 	if _label_sizes.size() >= 512: _label_sizes.clear()   # names come from a fixed catalogue; a bound all the same
 	_label_sizes[key] = size
 	return size
