@@ -22,11 +22,6 @@ func verify(value: bool, label: String) -> void:
 	if not value: failures += 1
 	print("PASS " if value else "FAIL ", label)
 
-func button(node: Node, text: String) -> Button:
-	for b in node.find_children("*", "Button", true, false):
-		if (b as Button).text == text and (b as Button).is_visible_in_tree(): return b
-	return null
-
 func row(page: Node, row_name: String) -> Node:
 	return page.find_child(row_name, true, false)
 
@@ -54,9 +49,11 @@ func _run() -> void:
 	root.add_child(map)
 	current_scene = map
 	await process_frame
-	var entry := button(map, "Profile")
-	verify(entry != null and not entry.disabled, "the map's top panel has a Profile entry")
-	verify(entry.get_parent() == button(map, "Back").get_parent(), "Profile sits in the row with San Francisco and Back")
+	var entry: Button = map.find_child("MapProfile", true, false)
+	var locate: Button = map.find_child("MapLocate", true, false)
+	verify(entry != null and entry.is_visible_in_tree() and not entry.disabled, "the map has a profile key")
+	verify(entry.theme_type_variation == locate.theme_type_variation and entry.size == locate.size, "the same round key as locate")
+	verify(is_equal_approx(entry.position.y, locate.position.y) and entry.position.x < locate.position.x, "at the left, level with locate")
 	entry.pressed.emit()
 	await process_frame
 	var host: Control = map._profile
