@@ -1,7 +1,7 @@
 extends SceneTree
-## C-115 review pictures on a desktop (not device evidence): the Union Square room (parcel_outpost.tscn) on the local
+## C-115 review pictures on a desktop (not device evidence): the Washington Square room (parcel_outpost.tscn) on the local
 ## stand-in save — the opening view, Jasmine's greeting and counter, Scott's greeting, the door's Map strip — and the map's
-## Union Square pin and place card over a plain stand-in for the native map (the desktop has no Mapbox).
+## Washington Square pin and place card over a plain stand-in for the native map (the desktop has no Mapbox).
 ##   godot --path <project> --resolution 360x800 --script res://tools/dev/dynamic_farm/outpost_shots.gd -- <new empty dir>
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")

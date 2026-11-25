@@ -75,7 +75,7 @@ func ground_offset(offset:Vector2) -> Vector2:
 	return Vector2(t*offset.x,eye*sin(phi)+t*(dy*cos(phi)-eye*sin(phi)))
 func screen_geo(point:Vector2) -> PackedFloat64Array:
 	return Geo.unproject(size*.5+ground_offset(point-size*.5),center,size,scale_pixels())
-## The screen point over a ground point, screen_geo's inverse (C-115: the Union Square pin rides on it); Vector2.INF
+## The screen point over a ground point, screen_geo's inverse (C-115: the Washington Square pin rides on it); Vector2.INF
 ## where a tilted view does not show the ground (past the clipped horizon).
 func geo_screen(lon:float,lat:float) -> Vector2:
 	var g:=Geo.project(lon,lat,center,size,scale_pixels())-size*.5

@@ -173,7 +173,7 @@ func _failures() -> void:
 	town.close()
 	await process_frame
 
-## C-115: the map no longer opens Jasmine and Scott over itself; its Union Square pin (town_entry.gd) opens the 3D room
+## C-115: the map no longer opens Jasmine and Scott over itself; its Washington Square pin (town_entry.gd) opens the 3D room
 ## where they stand (test_parcel_outpost.gd, test_claim_controller.gd). Without a home nothing opens.
 func _entries() -> void:
 	for own in [false, true]:
@@ -183,7 +183,7 @@ func _entries() -> void:
 		await process_frame
 		_check(not map.find_children("*", "Button", true, false).any(func(b): return b.text in ["Market", "Carpenter"]),
 			"no Market or Carpenter button on the map with own_farm=%s" % own)
-		_check(map._entry != null and not map._entry.visible, "the Union Square pin waits for the map (own_farm=%s)" % own)
+		_check(map._entry != null and not map._entry.visible, "the Washington Square pin waits for the map (own_farm=%s)" % own)
 		map._open_town()
 		_check(not map._opening and map.find_children("*", "ParcelTown", true, false).is_empty(), "nothing opens without a home")
 		map.queue_free()

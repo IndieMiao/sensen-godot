@@ -4,7 +4,7 @@ extends Control
 ## release package (C-98) also open the player's own parcel for farming from "Enter my farm"
 ## (`sensen/dynamic_farm/own_farm`, C-34 Q-72); everywhere else that button opens the same read-only 3D preview.
 ## C-115 (C-103#17, replacing C-59's Market and Carpenter buttons): one fixed place pin in San Francisco, farm-dev's
-## Union Square Travel Post (town_entry.gd), opens its place card; Go opens the 3D room (parcel_outpost.tscn) where
+## Washington Square Travel Post (town_entry.gd), opens its place card; Go opens the 3D room (parcel_outpost.tscn) where
 ## Jasmine (Market) and Scott (Carpenter) trade through the home's parcel save. Like "Enter my farm" it is only in
 ## packages with `own_farm` (C-59#29): internal test packages and the release package (C-98).
 ## C-110: the map frames the player's home on entry and has a "My home" button; the account state and its
@@ -23,7 +23,7 @@ const AndroidBridge := preload("res://scenes/map_poc/map_bridge_android.gd")
 const CONFIG := "res://modules/dynamic_farm/map/config.json"
 const HOST := "res://scenes/dynamic_farm/dynamic_farm_host.tscn"
 const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
-## The 3D space the Union Square pin opens (C-115).
+## The 3D space the Washington Square pin opens (C-115).
 const ROOM := "res://scenes/dynamic_farm/parcel_outpost.tscn"
 const TownEntry := preload("res://scenes/dynamic_farm/town_entry.gd")
 const LocalFarmStore := preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -40,7 +40,7 @@ const PICK_HOME := "Tap your green parcel, then Enter my farm."
 ## Camera zoom when the map moves to the player's home (C-110); the parcel and its address labels show from 18.
 const HOME_ZOOM := 18.0
 const MY_HOME := "My home"
-## The Union Square pin stays above this fraction of the screen's height while its card is open (C-115).
+## The Washington Square pin stays above this fraction of the screen's height while its card is open (C-115).
 const PIN_CLEAR_OF_CARD := 0.55
 ## The locate key: farm-dev's MapLocateButton (scenes/p0/p0_map.gd _style_locate, LOCK-24) as it is, in its place
 ## over the bottom card. It flies back to the player's home, or to the dataset's area without one.
@@ -75,7 +75,7 @@ var _places: Control
 var _home: Button
 var _locate: Button
 var _bottom: Control
-var _entry: Control # The Union Square pin and its place card (TownEntry).
+var _entry: Control # The Washington Square pin and its place card (TownEntry).
 ## The home's parcel save as last read or seen (the guide's line) and the parcel it belongs to; read again after
 ## a visit to the parcel.
 var home_farm := {}
@@ -461,7 +461,7 @@ func _open_sign_in() -> void:
 	if signed_in: _account_changed()
 	else: _render()
 
-## The Union Square pin (C-115): in packages that enter one's own farm, once the map shows; the card's Distance and Go
+## The Washington Square pin (C-115): in packages that enter one's own farm, once the map shows; the card's Distance and Go
 ## need the home. Its card stands over the map's panels while it is open.
 func _render_entry() -> void:
 	if _entry == null: return
@@ -471,7 +471,7 @@ func _render_entry() -> void:
 	_entry.home_center = center if Geo.valid_point(center) else []
 	if not _entry.visible: _entry.close_card()
 
-## A tap on the map: the Union Square pin first (farm-dev's city map takes a pin's tap before the ground), else the
+## A tap on the map: the Washington Square pin first (farm-dev's city map takes a pin's tap before the ground), else the
 ## building under it.
 func _on_map_tap(point: Vector2) -> void:
 	if _entry != null and _entry.visible and not _opening and _entry.hit(point * _camera.size):
@@ -489,7 +489,7 @@ func _on_entry_card(open: bool) -> void:
 	if at == Vector2.INF or at.y > _camera.size.y * PIN_CLEAR_OF_CARD:
 		_camera.fly_to(TownEntry.LON, TownEntry.LAT, _camera.zoom)
 
-## Go on the Union Square card: the 3D room above the map (AppRouter, as "Enter my farm"), trading through the home's
+## Go on the Washington Square card: the 3D room above the map (AppRouter, as "Enter my farm"), trading through the home's
 ## parcel save. Back or the room's door returns here; the map then reads the save again for the guide's line.
 func _open_town() -> void:
 	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _opening: return
@@ -530,7 +530,7 @@ func _open_host(farm: Dictionary) -> void:
 	await _open_scene(HOST, {"farm": farm, "dataset": farm.dataset_version, "block_id": farm.block_id,
 		"own_parcel" if own else "preview_only": true, "return_context": {"center": Array(_camera.center), "zoom": _camera.zoom}})
 
-## Opens a 3D scene above the map through AppRouter: the parcel (dynamic_farm_host) or the Union Square room. The map's
+## Opens a 3D scene above the map through AppRouter: the parcel (dynamic_farm_host) or the Washington Square room. The map's
 ## occlusion colour is set first; the map goes opaque only once the router really pushes the scene (suspend).
 func _open_scene(path: String, args: Dictionary) -> void:
 	if _bridge == null or not _bridge.supports_surface_opacity() or not _bridge.set_map_occlusion_color(OCCLUSION_COLOR):

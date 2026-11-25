@@ -77,7 +77,7 @@ func _ground_matches_camera() -> void:
 	check(is_finite(top.y) and top.y < 0 and top.length() < 40.0 * SIZE.y, "70°: the top edge still lands on the ground ahead")
 	view.queue_free(); c.queue_free()
 
-## C-115: geo_screen is screen_geo's inverse, flat and tilted (the Union Square pin rides on it); past a tilted view's
+## C-115: geo_screen is screen_geo's inverse, flat and tilted (the Washington Square pin rides on it); past a tilted view's
 ## clipped horizon it gives no point.
 func _geo_screen() -> void:
 	var c := camera(17.5)

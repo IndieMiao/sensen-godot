@@ -1,5 +1,5 @@
 extends SceneTree
-## C-115: the dynamic farm's 3D space (parcel_outpost.tscn), farm-dev's Union Square Travel Post room run without the
+## C-115: the dynamic farm's 3D space (parcel_outpost.tscn), farm-dev's Travel Post room run without the
 ## P0 runtime, with Jasmine (Market) and Scott (Carpenter). Headless, on the local stand-in for the parcel save: the
 ## cast and prompts, a tap walks to the keeper and opens her greeting, a sale and the coop blueprint go through the
 ## save, the door returns to the map (AppRouter pops the room), and no P0 runtime, session or online room starts.
@@ -47,8 +47,8 @@ func _run() -> void:
 	root.add_child(room)
 	for i in 6: await process_frame
 	_check(not room.use_runtime and room.rt == null, "the room runs without the P0 runtime")
-	_check(room.place_name == "Union Square Travel Post" and room.layout_path.ends_with("post_office/layout.json"),
-		"farm-dev's Union Square Travel Post kit")
+	_check(room.place_name == "Washington Square Travel Post" and room.layout_path.ends_with("post_office/layout.json"),
+		"farm-dev's Travel Post kit, named after the map's Washington Square pin (C-115#30)")
 	_check(room.npcs.has("npc_keeper") and room.npcs.npc_keeper.name == "Jasmine" and room.npcs.has("npc_sam")
 		and room.npcs.npc_sam.name == "Scott" and room.npcs.size() == 2, "Jasmine at the counter, Scott where Sam stands, nobody else")
 	var taps := Array(room._tappable())

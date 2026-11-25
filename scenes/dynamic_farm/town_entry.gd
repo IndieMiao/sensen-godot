@@ -1,6 +1,7 @@
 extends Control
 ## The dynamic farm map's one place pin (C-115; the owner on C-103#17: "在旧金山放一个固定3D空间入口,形式与交互都参考
-## farm-dev"): farm-dev's Union Square Travel Post at its own spot, drawn as farm-dev draws an outpost on its city map
+## farm-dev"; moved to Washington Square Park on C-115#30: "同意吧空间入口放到新的区域附近", beside C-130's North Beach
+## starter area): farm-dev's Travel Post pin, drawn as farm-dev draws an outpost on its city map
 ## (UiMapDestination with the post's i-travel glyph and the short name, LOCK-24's MapDestination) and carded as farm-dev
 ## cards it (P0PlaceSheet's place card, rebuilt from the same kit pieces without P0Ui: the header, the Distance fact,
 ## Go, × above the corner, a tap outside closes). Selected, the pin grows as CityMapView's does. Go asks the map to
@@ -9,13 +10,13 @@ extends Control
 signal go_requested
 signal card_changed(open: bool)
 
-## farm-dev's sh_post_1 (assets/p0/p0_outposts.json): Union Square, San Francisco.
-const LAT := 37.788
-const LON := -122.4075
+## Washington Square Park, North Beach, San Francisco (the park's centre; Union / Filbert / Powell / Stockton St).
+const LAT := 37.8008
+const LON := -122.4103
 const ICON := "res://assets/p0/icons/travel.svg"
-## Player-visible copy (C-45: PM finalises; author defaults on C-115#9).
-const SHORT := "Union Square"
-const TITLE := "Union Square Travel Post"
+## Player-visible copy (C-45, finalised on C-115#22 and C-115#34).
+const SHORT := "Washington Square"
+const TITLE := "Washington Square Travel Post"
 const SUBTITLE := "Market · Carpenter"
 const NO_HOME := "Claim a home first."
 const GO := "Go"
@@ -38,7 +39,7 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pin = UiMapDestination.new(load(ICON) if ResourceLoader.exists(ICON) else null, SHORT)
-	pin.name = "UnionSquare"
+	pin.name = "WashingtonSquare"
 	add_child(pin)
 	pin.visible = false
 

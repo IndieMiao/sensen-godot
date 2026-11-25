@@ -1,8 +1,8 @@
 extends "res://scenes/p0/p0_outpost.gd"
 ## The dynamic farm's one 3D space (C-115; the owner on C-103#17: "在旧金山放一个固定3D空间入口,形式与交互都参考
-## farm-dev"): farm-dev's Union Square Travel Post room (its post_office kit, post anchors, door, camera and walking;
+## farm-dev"): farm-dev's Travel Post room (its post_office kit, post anchors, door, camera and walking;
 ## P0Outpost read only) with Jasmine (Market) behind the counter and Scott (Carpenter) where Sam stands. It opens from
-## the map's Union Square pin (town_entry.gd) and runs without the P0 runtime (use_runtime = false): no P0Runtime,
+## the map's Washington Square pin (town_entry.gd) and runs without the P0 runtime (use_runtime = false): no P0Runtime,
 ## P0Ui, session, online room or voice. It drives the room itself: the scene touchpad (GestureArbiter, as P0Ui's), the
 ## world prompts (names only, one open at a time, LOCK-07 v2) and p0_frame.
 ## Tapping Jasmine or her counter walks to the counter and opens her greeting, Sell her counter (LOCK-16); tapping Scott
@@ -12,7 +12,9 @@ extends "res://scenes/p0/p0_outpost.gd"
 ## LOCK-18) and the room holds two roles (LOCK-19 is for the main farm's outposts).
 
 const Town := preload("res://scenes/dynamic_farm/parcel_town.gd")
-## farm-dev's Union Square Travel Post (assets/p0/p0_outposts.json): its kit, anchors, name and sign.
+const Entry := preload("res://scenes/dynamic_farm/town_entry.gd")
+## farm-dev's Union Square Travel Post (assets/p0/p0_outposts.json): its kit and anchors. The room's name (its top
+## bar) is the map pin's: Washington Square Travel Post since C-115#30.
 const OUTPOST_ID := "sh_post_1"
 ## Who stands at which npc_ anchor, by parcel_town role.
 const CAST := {"npc_keeper": Town.MARKET, "npc_sam": Town.CARPENTER}
@@ -44,6 +46,8 @@ func setup(args: Dictionary) -> void:
 	use_runtime = false
 	super.setup({"outpost_id": OUTPOST_ID})
 	outpost = outpost.duplicate(true)
+	outpost["name"] = Entry.TITLE
+	place_name = Entry.TITLE
 	outpost["residents"] = []   # nobody else of the main farm's cast (Sigrid, Pip, Sam) stands here
 	store = args.get("store") as RefCounted
 	parcel_id = str(args.get("parcel_id", ""))

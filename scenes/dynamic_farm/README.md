@@ -38,7 +38,7 @@ Tests: `tests/dynamic_farm/test_parcel_farming.gd` (rules, commands, spatial rul
 
 ## Market and carpenter (C-59)
 
-Jasmine and Scott (`parcel_town.gd`) first opened over the map from two fixed entries, `Market` and `Carpenter`; since C-115 they stand in the Union Square room (below). Both read and write that home's parcel save through the same store as the parcel scene: `read()` (`GET /parcels/mine`, no welcome gift) and `send()`. Jasmine introduces coins once per parcel on this device (`user://dynamic_farm_local/town.json`), then her `Sell` counter (`parcel_counter.gd`, built from the main counter's kit pieces; the main `P0CounterDrawer` is untouched) sells with the C-58 `sell` command at the rules' prices. Scott gives one Coop Blueprint with `claim_blueprint` once the parcel has sold something. Their looks are existing avatar parts, drawn by `P0KeeperPortraits.register_look`. The parcel's coins show in its top bar (C-74). Details and the copy draft: `docs/plans/C-59.md`; tests: `tests/dynamic_farm/test_parcel_town.gd`; review pictures: `tools/dev/dynamic_farm/town_shots.gd`.
+Jasmine and Scott (`parcel_town.gd`) first opened over the map from two fixed entries, `Market` and `Carpenter`; since C-115 they stand in the Washington Square room (below). Both read and write that home's parcel save through the same store as the parcel scene: `read()` (`GET /parcels/mine`, no welcome gift) and `send()`. Jasmine introduces coins once per parcel on this device (`user://dynamic_farm_local/town.json`), then her `Sell` counter (`parcel_counter.gd`, built from the main counter's kit pieces; the main `P0CounterDrawer` is untouched) sells with the C-58 `sell` command at the rules' prices. Scott gives one Coop Blueprint with `claim_blueprint` once the parcel has sold something. Their looks are existing avatar parts, drawn by `P0KeeperPortraits.register_look`. The parcel's coins show in its top bar (C-74). Details and the copy draft: `docs/plans/C-59.md`; tests: `tests/dynamic_farm/test_parcel_town.gd`; review pictures: `tools/dev/dynamic_farm/town_shots.gd`.
 
 ## Outer gathering (C-60)
 
@@ -88,23 +88,24 @@ shows the preview's `Explore and walk. Farming actions come later.` Copy and scr
 `sell` (at the Market); sold once and nothing gathered -> `gather`; something gathered in the bag that the Market buys
 -> `sell_gathered`; gathered and sold -> `blueprint` (the Carpenter's coop blueprint); nothing once it is claimed. The
 parcel's card says where to go; the map reads the home's save (`GET /parcels/mine`, no gift) on each return, and its
-bottom card names the step done off the parcel (`Tap Union Square to sell your carrot.` … since C-115), with nothing
+bottom card names the step done off the parcel (`Tap Washington Square to sell your carrot.` … since C-115), with nothing
 selected or added under `Your home`. Copy and screenshots: `docs/plans/C-61.md`.
 
-## Union Square room (C-115)
+## Washington Square room (C-115)
 
 The owner on C-103#17: no place icons on the map, one fixed 3D space entry in San Francisco, its look and interaction
-after farm-dev. The C-59 `Market` and `Carpenter` buttons are gone. `town_entry.gd` draws farm-dev's Union Square Travel
-Post pin at its own spot (37.788, -122.4075; `UiMapDestination` with the post's i-travel glyph and the short name
-`Union Square`), placed each frame through `geo_native_camera.gd`'s `geo_screen` (screen_geo's inverse, tilted too).
+after farm-dev. The C-59 `Market` and `Carpenter` buttons are gone. `town_entry.gd` draws farm-dev's Travel Post pin at
+Washington Square Park in North Beach (37.8008, -122.4103, the park's centre; moved there from farm-dev's own Union
+Square spot on C-115#30, beside C-130's starter area; `UiMapDestination` with the post's i-travel glyph and the short
+name `Washington Square`), placed each frame through `geo_native_camera.gd`'s `geo_screen` (screen_geo's inverse, tilted too).
 The map takes a tap on the pin before its building pick and opens the place card farm-dev opens for an outpost
-(P0PlaceSheet's layout from the same kit pieces, without P0Ui): `Union Square Travel Post`, `Market · Carpenter`, the
+(P0PlaceSheet's layout from the same kit pieces, without P0Ui): `Washington Square Travel Post`, `Market · Carpenter`, the
 Distance from home and `Go`, × above its corner, a tap outside or Back closes it; the pin grows while selected. Without a
 home the card says `Claim a home first.` and has no Go. Only in packages with `own_farm`.
 
 Go opens `parcel_outpost.tscn` through AppRouter, as Enter my farm opens the parcel (the map goes opaque only once the
 router pushes it). The room extends farm-dev's `P0Outpost` read only, with `use_runtime = false`: the post_office kit, the
-post anchors, the sign, the door, the room camera and walking are farm-dev's; no P0Runtime, P0Ui, session, online room or
+post anchors, the door, the room camera and walking are farm-dev's (its top bar names it after the pin); no P0Runtime, P0Ui, session, online room or
 voice starts, and no file of the main farm changes. Jasmine stands behind the counter (`npc_keeper`) and Scott where Sam
 stands (`npc_sam`), in their C-59 looks; nobody else. The room drives itself: P0Ui's scene touchpad rebuilt on
 `GestureArbiter` (stick, tap, double tap recenter, pinch), `p0_frame` each frame and the world prompts (UiNpcNameTag over

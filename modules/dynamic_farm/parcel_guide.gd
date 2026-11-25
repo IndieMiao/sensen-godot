@@ -5,7 +5,7 @@ extends RefCounted
 ## Carpenter; nothing once that blueprint is claimed. The parcel shows the step as the main farm's TipCard (UiTipCard);
 ## the community map says where to go for the steps done off the parcel (`map_text`).
 ## The 0.4.3 copy is for PM to finalise (C-45 / Q-61; docs/plans/C-61.md); English only, as the parcel's UI. C-115: the
-## map's Market and Carpenter buttons became the Union Square pin (Jasmine and Scott in its room), so the lines name it.
+## map's Market and Carpenter buttons became the Washington Square pin (Jasmine and Scott in its room; C-115#30), so the lines name it.
 
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
@@ -19,17 +19,17 @@ const TIPS := {
 	"till": "Pick a spot in your yard and press Till.",
 	"sow": "Press Sow to plant Carrot Seeds in your soil.",
 	"harvest": "Your carrot is ripe. Press Harvest!",
-	"sell": "Head back to the map and tap Union Square to sell your carrot.",
+	"sell": "Head back to the map and tap Washington Square to sell your carrot.",
 	"gather": "Walk up to a tree, flower or rock and press Gather.",
-	"sell_gathered": "Head back to the map and tap Union Square to sell what you gathered.",
-	"blueprint": "Head back to the map and tap Union Square for a coop blueprint.",
+	"sell_gathered": "Head back to the map and tap Washington Square to sell what you gathered.",
+	"blueprint": "Head back to the map and tap Washington Square for a coop blueprint.",
 }
 ## The map's line for the steps done off the parcel (and gathering, done back on it).
 const MAP_TIPS := {
-	"sell": "Tap Union Square to sell your carrot.",
+	"sell": "Tap Washington Square to sell your carrot.",
 	"gather": "Enter my farm and gather from trees, flowers and rocks.",
-	"sell_gathered": "Tap Union Square to sell what you gathered.",
-	"blueprint": "Tap Union Square to get your coop blueprint.",
+	"sell_gathered": "Tap Washington Square to sell what you gathered.",
+	"blueprint": "Tap Washington Square to get your coop blueprint.",
 }
 
 ## The step to teach for `farm` (ParcelFarm.normalize) at server time `now_ms`: a TIPS key, or "".
