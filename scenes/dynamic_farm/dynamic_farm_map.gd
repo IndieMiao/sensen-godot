@@ -27,6 +27,7 @@ const Geo := preload("res://modules/dynamic_farm/map/geo_math.gd")
 const AndroidBridge := preload("res://scenes/map_poc/map_bridge_android.gd")
 const CONFIG := "res://modules/dynamic_farm/map/config.json"
 const HOST := "res://scenes/dynamic_farm/dynamic_farm_host.tscn"
+const LoadingLayer := preload("res://modules/ui/loading_overlay.gd")
 const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
 ## The 3D space the Washington Square pin opens (C-115).
 const ROOM := "res://scenes/dynamic_farm/parcel_outpost.tscn"
@@ -759,7 +760,7 @@ func _claim_selection() -> void:
 func _open_sign_in() -> void:
 	if _claims == null or find_children("*", "AccountPanel", true, false).size() > 0: return
 	# Loaded at run time: the panel uses the Net autoload, which scripts preloading this scene may not have yet.
-	var panel: CanvasLayer = load(ACCOUNT_PANEL).open(self, "sign_in", "", true) # the v3 look (C-85 ④)
+	var panel: CanvasLayer = load(ACCOUNT_PANEL).open(self, "sign_in", "", true, true) # the v3 look (C-85 ④), in English (C-144)
 	_camera.input_enabled = false
 	var signed_in: bool = await panel.closed
 	if not is_inside_tree(): return
@@ -882,7 +883,9 @@ func _open_scene(path: String, args: Dictionary) -> void:
 	if router == null or not router.has_method("open_instance"):
 		_set_hint("This preview is missing its scene router."); return
 	_opening = true; _render()
-	await router.open_instance(path, args)
+	var english_args := args.duplicate()
+	english_args[LoadingLayer.ENGLISH_UI] = true # its loading layer in English as well (C-144)
+	await router.open_instance(path, english_args)
 	_opening = false
 	if not _suspended:
 		# Loading cancelled/failed before a host became top, or Back already returned here.

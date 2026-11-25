@@ -69,6 +69,7 @@ func _run() -> void:
 	await page._open_host(farm)
 	verify(plugin.calls == [["color", "#E7F0DF"]] and router.opened == 1, "opaque scene color is supplied before Router may suspend the map")
 	verify(router.received.preview_only and router.received.farm == farm, "preview payload keeps identity and presentation-only semantics")
+	verify(router.received.get("english_ui") == true, "the map asks for its scene's loading layer in English (C-144)")
 	verify(not plugin.opaque, "cancelled loading before Router suspension never makes the still-visible map opaque")
 	# C-34 Q-72: only an internal package opens the player's own parcel for farming, and only from "Enter my farm".
 	var claims := Claims.new(); page._claims = claims

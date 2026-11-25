@@ -2,9 +2,16 @@ extends CanvasLayer
 var progress: ProgressBar
 var message: Label
 var close_button: Button
+## open_instance's args key: true gives AppRouter's default layer in English (C-144: the dynamic farm opens its parcel
+## and Washington Square room with it; other callers' layers keep translating).
+const ENGLISH_UI := "english_ui"
+## English only (C-144): the dynamic farm's scenes show no 中文 (English-only UI copy), while the main farm keeps its
+## translated layer. Set before the layer enters the tree (AppRouter, from open_instance's english_ui).
+var english := false
 
 func _ready() -> void:
 	layer = 120
+	if english: auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	GameUi.register_modal(self)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	var background := ColorRect.new()
@@ -33,7 +40,7 @@ func _ready() -> void:
 	var symbol := GameUi.picture(GameUi.icon("sprout"), 36)
 	symbol.modulate = GameUi.GREEN
 	column.add_child(symbol)
-	message = GameUi.label(L10n.text("Loading..."), 16)
+	message = GameUi.label(_text("Loading..."), 16)
 	message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(message)
 	progress = ProgressBar.new()
@@ -41,12 +48,15 @@ func _ready() -> void:
 	progress.show_percentage = false
 	progress.indeterminate = true
 	column.add_child(progress)
-	close_button = GameUi.button("arrow-left", L10n.text("Go back"), "", true)
+	close_button = GameUi.button("arrow-left", _text("Go back"), "", true)
 	close_button.hide()
 	column.add_child(close_button)
 
+func _text(source: String) -> String:
+	return source if english else L10n.text(source)
+
 func failed() -> void:
-	message.text = L10n.text("Could not open this place")
+	message.text = _text("Could not open this place")
 	progress.hide()
 	close_button.show()
 
