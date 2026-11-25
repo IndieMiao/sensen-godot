@@ -105,7 +105,10 @@ for (const [name, enabled, makeStores] of makers) {
       expect((await enter(app, g.token)).json()).toMatchObject({ granted: true, parcel: { farm_version: 1 } });
       expect((await command(app, g.token, 1, [{ type: 'place_house', x: 9, y: 9 }, { type: 'clear_obstacle', cell: '2,2' },
         { type: 'till', cell: '1,1' }, { type: 'till', cell: '2,1' },
-        { type: 'sow', cell: '1,1', crop: 'crop_carrot' }, { type: 'sow', cell: '2,1', crop: 'crop_carrot' }])).statusCode).toBe(200);
+        { type: 'sow', cell: '1,1', crop: 'crop_carrot' }, { type: 'sow', cell: '2,1', crop: 'crop_carrot' },
+        // C-151: the well from the entry's grant, a pail drawn, both cells watered.
+        { type: 'place_building', building: 'well', x: 20, y: 20, rotation: 0 }, { type: 'draw_water', building: 2 },
+        { type: 'water', cell: '1,1' }, { type: 'water', cell: '2,1' }])).statusCode).toBe(200);
       clock = T0 + 60_000;
       expect((await command(app, g.token, 2, [{ type: 'harvest', cell: '1,1' }, { type: 'harvest', cell: '2,1' }])).statusCode).toBe(200);
       // Market (sell) and carpenter (claim_blueprint) go through the same parcel save.
@@ -113,7 +116,7 @@ for (const [name, enabled, makeStores] of makers) {
       expect((await command(app, g.token, 4, [{ type: 'claim_blueprint', blueprint: 'coop' }])).statusCode).toBe(200);
       expect(await mine(app, g.token)).toMatchObject({ parcel_id: A.parcel_id, farm_version: 5, farm: {
         house: { model: 'cottage' }, cleared: ['2,2'], tilled: ['1,1', '2,1'], coins: 24, sales: 1,
-        bag: { hoe_starter: 1, seed_carrot: 1, blueprint_coop: 1 } } });
+        bag: { hoe_starter: 1, seed_carrot: 1, blueprint_coop: 1, pail: 1 } } });
       // The same installation signing in again is the same player with the same parcel.
       const again = await install(app, g.key);
       expect(again.player).toBe(g.player);

@@ -22,9 +22,13 @@ const Livestock = preload("res://modules/dynamic_farm/farm_livestock.gd")
 ## The cottage (house_cottage.glb, 3×3): walls and plinth below the eaves, measured from its cross-sections at
 ## 0.15–1.1 m (x ±0.875, z −0.84…0.885; the low step, the side woodpile and the bench stay walkable, under the body
 ## only). The eaves are overhead; the whole model stays within the 3×3 footprint (2.4 m).
+## The well (C-151, well.glb, 1×1 as P0's well): its bounds are x −0.41…0.48, z ±0.345, 0.98 m high; the stone ring
+## stops the player, a hair inside them. The winch's ends reach 4 cm past the 0.8 m cell on each side, overhead only.
 const KINDS := {
 	"cottage": {"asset": "house_cottage", "name": "Cottage",
 		"profile": {"solid": true, "shape": "box", "center_xz_m": [0.0, 0.0225], "size_xz_m": [1.75, 1.725], "height_m": 1.1}},
+	"well": {"asset": "well", "name": "Well",
+		"profile": {"solid": true, "shape": "box", "center_xz_m": [0.035, 0.0], "size_xz_m": [0.8, 0.66], "height_m": 0.9}},
 }
 const HOME := ParcelFarm.HOME_BUILDING
 const OUTSIDE := "Outside your yard"

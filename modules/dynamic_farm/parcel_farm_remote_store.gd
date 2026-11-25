@@ -2,10 +2,12 @@ extends RefCounted
 ## The owner's parcel farm on the server: C-31 `POST /parcels/mine/enter` and
 ## `POST /parcels/mine/commands` (docs/plans/C-31.md) over an ApiClient whose base ends in /v1.
 ## Same results as the local stand-in, so the scene reads either:
-##   {ok, granted?, farm, farm_version, server_time} or
+##   {ok, granted?, gift?, farm, farm_version, server_time} or
 ##   {ok:false, code, index, detail?, farm?, farm_version?, server_time?}.
 ## The server answers for the player's own parcel; a reply about another parcel is refused,
 ## so the scene never shows one parcel's farm on another.
+const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
+
 var client: ApiClient
 var block_id: String
 var dataset: String
@@ -47,5 +49,11 @@ func _result(r: ApiClient.Response, entering: bool) -> Dictionary:
 		out.farm_version = int(parcel.get("farm_version", -1))
 	elif out.ok:
 		return {"ok": false, "code": "SCHEMA", "index": 0}
-	if entering: out.granted = r.json.get("granted") == true
+	if entering:
+		out.granted = r.json.get("granted") == true
+		# C-151: everything this entry gave (the first-entry gift and the one-off grants); older servers send none.
+		if r.json.get("gift") is Dictionary:
+			out.gift = {}
+			for id in r.json.gift:
+				if id is String and ParcelFarm.whole_in(r.json.gift[id], 1, 999): out.gift[id] = int(r.json.gift[id])
 	return out

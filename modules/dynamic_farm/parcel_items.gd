@@ -2,8 +2,10 @@ extends RefCounted
 ## Names and icons of the parcel farm's items (C-59). The main farm's names are reused read-only (P0 content); only
 ## the parcel's own blueprints, which the main farm does not have, are named here. Icons are the UI v3 item art (C-86,
 ## Q-155; C-105) where it has the item; the blueprints keep the existing recipe-card icon, anything else P0's icon.
-const NAMES := {"blueprint_cottage": "Cottage Blueprint", "blueprint_coop": "Coop Blueprint", "egg": "Egg"}
-const ICONS := {"blueprint_cottage": "recipe_card", "blueprint_coop": "recipe_card"}
+## C-151: the well's blueprint is named as the cottage's; the pail (水桶, SEN-C-151) shows P0's Water icon.
+const NAMES := {"blueprint_cottage": "Cottage Blueprint", "blueprint_coop": "Coop Blueprint", "blueprint_well": "Well Blueprint",
+	"pail": "Pail", "egg": "Egg"}
+const ICONS := {"blueprint_cottage": "recipe_card", "blueprint_coop": "recipe_card", "blueprint_well": "recipe_card", "pail": "water"}
 ## Parcel item → UiArt item art. The hoe is the v3 row tool; the wild herb (picked from the flowers) is the chamomile.
 const ART := {"crop_carrot": "carrot", "seed_carrot": "seed_carrot", "wood": "wood", "stone": "stone",
 	"wild_herb": "chamomile", "hoe_starter": "row_tool"}

@@ -25,6 +25,12 @@
  * 喂的那一刻就写好它在哪个落点、哪只动物下的、什么时候下（ready_at），到点前不能捡、客户端不画。人走近时客户端发 pick_up，
  * 服务端只核实这条掉落物在、已经下了，捡一次就从 drops 删掉，同一个编号不会再出现（编号取 drop_seq 递增，不复用）。
  * 不喂不产；每只动物同时只等一个；这栋建筑地上的（含没下的）到 max_ground 就不能再喂。drops、drop_seq 也是 v1 上追加的可选字段。
+ *
+ * 浇水（C-151，所有者 SEN-C-137#6、#15）：播下的作物是干土、不计时（watered_at 为 null，ripe_at 为 NEVER）；
+ * 在井（watering.well 类建筑）旁打水（draw_water，花体力），水桶装满 pail_uses 次，每浇一格（water）用一次，浇过才从那一刻起长。
+ * 服务端不知道人站在哪，“人在井边”由客户端限定；这里核实井已盖好、有水桶、桶里的次数、格子播下了还没浇。
+ * 桶里的次数存在 pail_water，补发记录存在 grants，都是在 v1 上追加的字段：旧存档没有时按 0 次、没补发过算。
+ * C-151 以前种下的作物没有 watered_at，按已浇过算，照原来的 ripe_at 成熟。
  */
 import { dayKey, energyCost, maxEnergy, nextRollover, nextTickIn, settleEnergy, spendEnergy, type EnergyState } from './energy.js';
 import { gatherSourceOf, HOME_BUILDING, MAX_BUILDINGS, type ParcelRules } from './rules.js';
@@ -61,7 +67,18 @@ export interface BuildingState extends HouseState {
  * 下在第几个落点（建筑规则 livestock.spots）；ready_at 之后才在地上、才能捡。
  */
 export interface DropState { id: number; item: string; amount: number; building: number; animal: number; spot: number; ready_at: number }
-export interface CropState { crop: string; planted_at: number; ripe_at: number }
+/**
+ * 地里的一棵作物。watered_at（C-151）：浇水的服务端时间，从这一刻起长；null 是播下还没浇（干土），这时 ripe_at 为 NEVER；
+ * 没有这个字段的是 C-151 以前种下的，按已浇过算。
+ */
+export interface CropState { crop: string; planted_at: number; ripe_at: number; watered_at?: number | null }
+/**
+ * 还没浇水的作物的 ripe_at（C-151）：JS 时间能表示的最晚时刻，永远不熟。存一个数而不是 null，
+ * 0.4.4 及更早的客户端照常读出存档，只是把它当成一直在长；收获照样被服务端拒绝。
+ */
+export const NEVER = 8_640_000_000_000_000;
+/** 播下了还没浇水（C-151）。 */
+export const isDry = (crop: CropState): boolean => crop.watered_at === null;
 export interface ParcelFarmState {
   v: typeof FARM_STATE_VERSION;
   /** C-150：地上的建筑，按放下先后排列。 */
@@ -90,6 +107,10 @@ export interface ParcelFarmState {
   drops: DropState[];
   /** C-154：上一个掉落物的编号；新掉落物取它 + 1。 */
   drop_seq: number;
+  /** C-151：水桶里还能浇几格（0 到 watering.pail_uses）。 */
+  pail_water: number;
+  /** C-151：已发过的一次性补发编号 → 发放时间（rules.grants）。 */
+  grants: Record<string, number>;
 }
 
 export type FarmCommand =
@@ -108,7 +129,11 @@ export type FarmCommand =
   /** C-154：在养殖建筑 building（建筑 id）里喂一次。 */
   | { type: 'feed'; building: number }
   /** C-154：捡起地上的掉落物 drop（掉落物 id）。 */
-  | { type: 'pick_up'; drop: number };
+  | { type: 'pick_up'; drop: number }
+  /** C-151：在编号为 building 的井旁把水桶打满。 */
+  | { type: 'draw_water'; building: number }
+  /** C-151：浇一格播下还没浇的作物。 */
+  | { type: 'water'; cell: string };
 
 /** 命令执行时服务端核实过的上下文：本人地块编号（来自 token 查到的那一行，不来自请求体）。 */
 export interface FarmContext { parcel_id: string }
@@ -120,12 +145,12 @@ export type FarmOutcome =
 /** 认领时的空农场：背包为空，赠品等首次进入时再发（认领和进入不是同一个动作）。 */
 export function emptyFarm(): ParcelFarmState {
   return { v: FARM_STATE_VERSION, buildings: [], house: null, cleared: [], tilled: [], crops: {}, bag: {}, welcomed_at: null,
-    coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, drops: [], drop_seq: 0 };
+    coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, drops: [], drop_seq: 0, pail_water: 0, grants: {} };
 }
 
 /**
  * 旧存档兼容：C-31 时期写下的地块农场没有经济字段，按开局值补上（金币 0、没卖过、没采过、没领过）；
- * C-150 之前的存档没有 buildings，按 house 补上（见 withBuildings）。
+ * C-150 之前的存档没有 buildings，按 house 补上（见 withBuildings）；C-151 之前的没有水桶次数和补发记录，按 0 次、没发过补上。
  * 只补缺的，不动已有字段；返回新对象，不改入参。
  */
 export function withEconomy(state: ParcelFarmState): ParcelFarmState {
@@ -140,6 +165,8 @@ export function withEconomy(state: ParcelFarmState): ParcelFarmState {
   // C-154 之前的存档没有掉落物：空列表、编号从 0 起；不成形的条目丢掉，编号至少是现有最大编号。
   s.drops = Array.isArray(s.drops) ? s.drops.filter(isDrop) : [];
   s.drop_seq = Math.max(count(s.drop_seq), ...s.drops.map(d => d.id));
+  s.pail_water = count(s.pail_water);
+  s.grants = map(s.grants);
   return s;
 }
 
@@ -174,6 +201,24 @@ export function welcome(rules: ParcelRules, state: ParcelFarmState, now: number)
   for (const [id, n] of Object.entries(rules.welcome_gift)) s.bag[id] = (s.bag[id] ?? 0) + n;
   s.welcomed_at = now;
   return s;
+}
+
+/**
+ * 一次性补发（C-151）：rules.grants 里存档还没记下的，各发一次并记下发放时间；新玩家在首次进入时和赠品一起拿到，
+ * 老玩家下次进入时拿到。都发过返回 null。gift 是这次发的物品合计。返回新对象，不改入参。
+ */
+export function grant(rules: ParcelRules, state: ParcelFarmState, now: number): { state: ParcelFarmState; gift: Record<string, number> } | null {
+  const s = withEconomy(state);
+  const gift: Record<string, number> = {};
+  for (const [id, items] of Object.entries(rules.grants)) {
+    if (Object.hasOwn(s.grants, id)) continue;
+    for (const [item, n] of Object.entries(items)) {
+      s.bag[item] = (s.bag[item] ?? 0) + n;
+      gift[item] = (gift[item] ?? 0) + n;
+    }
+    s.grants[id] = now;
+  }
+  return Object.keys(gift).length ? { state: s, gift } : null;
 }
 
 /**
@@ -228,6 +273,10 @@ export function parseFarmCommands(raw: unknown): FarmCommand[] | null {
   for (const c of raw as Record<string, unknown>[]) {
     if (!c || typeof c !== 'object') return null;
     switch (c.type) {
+      case 'draw_water':
+        if (!Number.isInteger(c.building) || (c.building as number) < 1 || (c.building as number) > 2 ** 30) return null;
+        out.push({ type: 'draw_water', building: c.building as number });
+        break;
       case 'place_house':
         if (!coord(c.x) || !coord(c.y) || (c.rotation !== undefined && ![0, 1, 2, 3].includes(c.rotation as number))) return null;
         out.push({ type: 'place_house', x: c.x, y: c.y, rotation: (c.rotation as number | undefined) ?? 0 });
@@ -237,7 +286,7 @@ export function parseFarmCommands(raw: unknown): FarmCommand[] | null {
           || (c.rotation !== undefined && ![0, 1, 2, 3].includes(c.rotation as number))) return null;
         out.push({ type: 'place_building', building: c.building, x: c.x, y: c.y, rotation: (c.rotation as number | undefined) ?? 0 });
         break;
-      case 'clear_obstacle': case 'till': case 'harvest':
+      case 'clear_obstacle': case 'till': case 'harvest': case 'water':
         if (!parseCell(c.cell)) return null;
         out.push({ type: c.type, cell: c.cell as string });
         break;
@@ -396,12 +445,37 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         if (!(s.bag[rule.seed] > 0)) return fail('NO_SEED', { item: rule.seed });
         if ((refused = pay())) return refused;
         take(s.bag, rule.seed, 1);
-        s.crops[c.cell] = { crop: c.crop, planted_at: now, ripe_at: now + rule.grow_seconds * 1000 };
+        // C-151：播下是干土，不计时，浇过水才开始长。
+        s.crops[c.cell] = { crop: c.crop, planted_at: now, ripe_at: NEVER, watered_at: null };
+        break;
+      }
+      case 'draw_water': {
+        // 服务端不知道人站在哪：“在井边”由客户端限定，这里核实这口井盖好了。
+        const well = s.buildings.find(b => b.id === c.building);
+        if (!well || well.type !== rules.watering.well) return fail('NO_WELL', { building: c.building });
+        if (!(s.bag[rules.watering.pail] > 0)) return fail('NO_PAIL', { item: rules.watering.pail });
+        if (s.pail_water >= rules.watering.pail_uses) return fail('PAIL_FULL', { water: s.pail_water });
+        if ((refused = pay())) return refused;
+        s.pail_water = rules.watering.pail_uses;
+        break;
+      }
+      case 'water': {
+        if (!(s.bag[rules.watering.pail] > 0)) return fail('NO_PAIL', { item: rules.watering.pail });
+        const crop = s.crops[c.cell];
+        if (!crop) return fail('NO_CROP');
+        if (!isDry(crop)) return fail('ALREADY_WATERED');
+        if (s.pail_water <= 0) return fail('PAIL_EMPTY');
+        const grow = rules.crops[crop.crop]?.grow_seconds;
+        if (grow === undefined) return fail('UNKNOWN_CROP');
+        s.pail_water -= 1;
+        crop.watered_at = now;
+        crop.ripe_at = now + grow * 1000;
         break;
       }
       case 'harvest': {
         const crop = s.crops[c.cell];
         if (!crop) return fail('NO_CROP');
+        if (isDry(crop)) return fail('NOT_WATERED');
         if (now < crop.ripe_at) return fail('NOT_RIPE', { ripe_at: crop.ripe_at });
         delete s.crops[c.cell];
         const amount = rules.crops[crop.crop]?.yield ?? 1;
