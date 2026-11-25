@@ -5,8 +5,9 @@
 [ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/SC-09.glb" id="SC-09"]
 [ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/FM-12.glb" id="FM-12"]
 [ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/SC-10.glb" id="SC-10"]
-[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/SC-06.glb" id="SC-06"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/Rear-Hedgerow.glb" id="Rear-Hedgerow"]
 [ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/Hedge-End.glb" id="Hedge-End"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/Eave-Straw.glb" id="Eave-Straw"]
 [ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/Verge.glb" id="Verge"]
 [ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/Sand-Signs.glb" id="Sand-Signs"]
 [ext_resource type="ArrayMesh" path="res://assets/dynamic_farm/chicken_yard/GX-04.res" id="GX-04"]
@@ -65,29 +66,21 @@ position = Vector3(2.5, 0, 3.5)
 [node name="BowlRight" parent="Furnishings" instance=ExtResource("SC-10")]
 position = Vector3(6.5, 0, 2.5)
 
-[node name="RearHedge00" parent="Furnishings" instance=ExtResource("SC-06")]
-position = Vector3(0.99, 0.4, -0.285)
+[node name="ContinuousRearHedge" parent="Furnishings" instance=ExtResource("Rear-Hedgerow")]
+position = Vector3(3.19, 0.385, -0.32)
 
-[node name="RearHedge01" parent="Furnishings" instance=ExtResource("SC-06")]
-position = Vector3(1.99, 0.4, -0.285)
+[node name="RoundShrubsLeft" parent="Furnishings" instance=ExtResource("Hedge-End")]
+position = Vector3(0.34, 0.28, -0.34)
+rotation = Vector3(0, 0.401425728, 0)
+scale = Vector3(0.92, 0.94, 0.9)
 
-[node name="RearHedge02" parent="Furnishings" instance=ExtResource("SC-06")]
-position = Vector3(2.99, 0.4, -0.285)
+[node name="RoundShrubsRight" parent="Furnishings" instance=ExtResource("Hedge-End")]
+position = Vector3(6.12, 0.3, -0.34)
+rotation = Vector3(0, -2.460914245, 0)
+scale = Vector3(1.16, 1.03, 1.11)
 
-[node name="RearHedge03" parent="Furnishings" instance=ExtResource("SC-06")]
-position = Vector3(3.99, 0.4, -0.285)
-
-[node name="RearHedge04" parent="Furnishings" instance=ExtResource("SC-06")]
-position = Vector3(4.99, 0.4, -0.285)
-
-[node name="RearHedge05" parent="Furnishings" instance=ExtResource("SC-06")]
-position = Vector3(5.99, 0.4, -0.285)
-
-[node name="LaurelEnd0" parent="Furnishings" instance=ExtResource("Hedge-End")]
-position = Vector3(0.36, 0.285, -0.282)
-
-[node name="LaurelEnd1" parent="Furnishings" instance=ExtResource("Hedge-End")]
-position = Vector3(6.65, 0.285, -0.282)
+[node name="StrawUnderCoop" parent="Furnishings" instance=ExtResource("Eave-Straw")]
+position = Vector3(3.05, 0, 1.1)
 
 [node name="WildflowerVerge" parent="Furnishings" instance=ExtResource("Verge")]
 position = Vector3(0, 0, 0)
