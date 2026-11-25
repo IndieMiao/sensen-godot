@@ -8,6 +8,7 @@ const _ICON := 24.0
 const _DOT := 8.0
 
 var badge := false: set = set_badge
+var _icon: TextureRect
 
 func _init(icon_: Texture2D = null) -> void:
 	focus_mode = Control.FOCUS_NONE
@@ -17,16 +18,15 @@ func _init(icon_: Texture2D = null) -> void:
 	size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	for st in [&"normal", &"hover", &"pressed", &"hover_pressed", &"focus", &"disabled"]:
 		add_theme_stylebox_override(st, StyleBoxEmpty.new())
-	icon = icon_ if icon_ != null else UiArt.sys("tasks")
-	expand_icon = true
-	icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
-	add_theme_constant_override(&"icon_max_width", int(_ICON))
-	# The art as drawn: the theme's button icon tint would darken it.
-	for slot in [&"icon_normal_color", &"icon_hover_color", &"icon_pressed_color", &"icon_hover_pressed_color",
-			&"icon_focus_color", &"icon_disabled_color"]:
-		add_theme_color_override(slot, UiTokens.COLOR_TEXT_ON_DARK)
+	# The art as drawn, in its own TextureRect: the Button's icon slot is tinted by the theme.
+	_icon = UiKit.icon(icon_ if icon_ != null else UiArt.sys("tasks"), _ICON)
+	_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_icon.size = Vector2.ONE * _ICON
+	_icon.set_anchors_and_offsets_preset(Control.PRESET_CENTER, Control.PRESET_MODE_KEEP_SIZE)
+	add_child(_icon)
 	UiMotion.press_feedback(self)
+
+func icon_rect() -> TextureRect: return _icon
 
 func set_badge(v: bool) -> void:
 	badge = v
