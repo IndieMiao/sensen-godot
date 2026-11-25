@@ -448,6 +448,10 @@ func _profile_from_avatar(farming: Node) -> void:
 	farm.crops["2,2"] = {"crop": "crop_carrot", "ripe_at": now - 1}
 	_check(scene.home_status(farm, now) == {"text": "Carrots ready to harvest", "ready": true}, "ready: the main farm's line, deep green")
 	_check(scene.home_status({}, now).text == "", "nothing sown: no status line")
+	var dry := {"crops": {"1,1": {"crop": "crop_carrot", "planted_at": now, "ripe_at": ParcelFarm.NEVER, "watered_at": null}}}
+	_check(scene.home_status(dry, now).text == "", "a dry crop is not growing (C-151): no status line")
+	dry.crops["2,2"] = {"crop": "crop_carrot", "ripe_at": now + 60 * 60000, "watered_at": now}
+	_check(scene.home_status(dry, now).text == "Carrots ready in 1h", "the watered one is: %s" % scene.home_status(dry, now))
 
 func _full_bag(farming: Node) -> void:
 	var save: Dictionary = farming.farm.duplicate(true)

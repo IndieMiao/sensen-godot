@@ -867,6 +867,8 @@ static func home_status(farm: Dictionary, now_ms: int) -> Dictionary:
 	var growing := ""
 	for cell in farm.get("crops", {}):
 		var c: Dictionary = farm.crops[cell]
+		# A dry crop (C-151) is not growing: its ripe_at is NEVER, and the main farm leaves an unwatered plot out too.
+		if ParcelFarm.is_dry(c): continue
 		var left := float(int(c.get("ripe_at", 0)) - now_ms)
 		if left <= 0.0:
 			if ready == "": ready = str(c.get("crop", ""))
