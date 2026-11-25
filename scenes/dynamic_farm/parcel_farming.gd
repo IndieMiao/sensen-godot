@@ -4,8 +4,8 @@ extends Node3D
 ## free of Energy and coins. The store (server or local stand-in) is authoritative; this node
 ## only checks the spatial rules the server cannot (ParcelSpace) and draws the result.
 ## Soil and carrots are drawn by ParcelCropArt (C-138: 1×1 dry or wet soil blocks, seven carrot stages). Main-farm
-## pieces are reused read-only: P0 names and icons, and the main farm's UI kit (C-74): the quick bar with a compact bag drawer, the action key, floats and
-## item flights into the bag. Nothing of P0Ui / P0Runtime or Energy; the parcel's own coins (C-59) show in the
+## pieces are reused read-only: P0 names and icons, and the main farm's UI kit (C-74): the quick bar with a compact
+## bag drawer, the action key, floats and item flights into the bag. Nothing of P0Ui / P0Runtime or Energy; the parcel's own coins (C-59) show in the
 ## scene's top bar as the main HUD's coins capsule.
 ## Outer gathering (C-60, ParcelGather): near a tree, flower or rock of the extension the key
 ## picks it by hand; a picked one stays faded (trees, rocks) or hidden (flowers, which never
