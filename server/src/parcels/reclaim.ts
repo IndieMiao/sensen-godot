@@ -3,6 +3,7 @@
  * 他的地块收回，之后谁都可以重新认领。N 默认 30，用 PARCEL_IDLE_RECLAIM_DAYS 调，0 为不收回。
  * 有账号（邀请账号等）的玩家的地块不收：他们换设备、重装都能登录回来，地块不会成为没人用的空占。
  * 判定口径：最后活动时间 = 最后一次登录（players.last_seen_at）和最后一次用 token（tokens.last_used_at）中较晚的；
+ * token 被撤销或过期时，它的最后使用时间先记到 players.last_seen_at 上（C-120），所以撤销全部 token 不会让地块提前收回。
  * 严格早于 now − N 天才收，正好满 N 天不收。
  */
 import type { ParcelStore } from './store.js';

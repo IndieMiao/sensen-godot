@@ -18,6 +18,9 @@ var api # claim_api.gd
 var bridge: MapBridge
 ## Internal test packages set `sensen/dynamic_farm/reselect`; release has no reselect entry (and the server refuses).
 var reselect := false
+## Playing as this installation's guest (install-and-play, no account). The server refuses a guest's give-up, so
+## there is no give-up entry for a guest (Q-156); it appears once the player signs in.
+var guest := false
 var owners := {} # parcel_id -> {owner, nickname}
 var mine := {} # Parcel from the server, or empty.
 var mine_known := false
@@ -140,8 +143,12 @@ func claim(selection: Dictionary) -> void:
 			_: message = "Could not claim. Try again."
 	_sync(); changed.emit()
 
+## Whether the give-up entry is offered: an internal package, an account, a home.
+func can_give_up() -> bool:
+	return reselect and not guest and has_home()
+
 func abandon() -> void:
-	if busy or not reselect or not has_home(): return
+	if busy or not can_give_up(): return
 	busy = true; message = ""; changed.emit()
 	var epoch := _epoch
 	var r: Dictionary = await api.abandon()
