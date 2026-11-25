@@ -100,6 +100,7 @@ func _market() -> void:
 	_check(counter != null and town.stack.has_drawer(), "Sell opens Jasmine's counter")
 	_check(counter.sellable() == ["crop_carrot", "wood"], "the counter lists only what she buys (not seeds)")
 	_check(counter.coins.value == "0", "the counter shows the parcel's coins")
+	_check(counter.coins.icon == UiArt.COIN, "the counter's coins row shows the v3 coin (C-105)")
 	counter.select("crop_carrot")
 	var spec: Dictionary = counter.spec("crop_carrot")
 	_check(spec.facts == ["12 each"] and spec.buttons[1].label == "Sell All · 36 coins", "the card reads like the main counter's")

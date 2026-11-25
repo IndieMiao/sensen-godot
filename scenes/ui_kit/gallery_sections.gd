@@ -87,6 +87,14 @@ static func all() -> Array[Dictionary]:
 		# SGODOT-231 workbench
 		{id = "blueprint_card", title = "UiBlueprintCard", figma = "BlueprintCard 1434:93844 · B2-06 · LOCK-10 / 29", build = _blueprint_cards},
 		{id = "elevator_panel", title = "UiElevatorPanel", figma = "ElevatorPanel 1230:107860 · ElevatorRow 1230:107859 · MINE-P0-6 · LOCK-21", build = _elevator_panels},
+		# UI v3 (C-105, docs/design/ui-v3-2026-11-24)
+		{id = "v3_type", title = "v3 type scale", figma = "ui-v3 §2.2 · fig 9 · white variants §2.1", build = _v3_type},
+		{id = "v3_buttons", title = "v3 buttons and CTA bar", figma = "ui-v3 C-B1–C-B4 · C-N6 · fig 11", build = _v3_buttons},
+		{id = "v3_glass", title = "v3 glass: back, capsules, round buttons", figma = "ui-v3 C-H4 · C-R1 · fig 2 / 3 (quick slots on glass: item_cell_quick, quick_bar)", build = _v3_glass},
+		{id = "v3_bag_slots", title = "UiBagSlot states", figma = "ui-v3 C-P5 / C-P6 · fig 11", build = _v3_bag_slots},
+		{id = "v3_modal_panel", title = "UiModalPanel · bag", figma = "ui-v3 C-P1–C-P4 · fig 4", build = _v3_modal_panel},
+		{id = "v3_npc_card", title = "UiNpcCard", figma = "ui-v3 C-N1–C-N7 · fig 5", build = _v3_npc_card},
+		{id = "v3_gain_float", title = "UiGainFloat", figma = "ui-v3 C-W5 · M-10 · fig 6", build = _v3_gain_float},
 	]
 	return out
 
@@ -220,7 +228,7 @@ static func _panels() -> Control:
 	badge.theme_type_variation = UiTokens.PANEL_BADGE
 	badge.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	badge.custom_minimum_size.y = UiTokens.SIZE_STATE_BADGE_H
-	var bl := UiKit.label("Ready", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_PRIMARY)
+	var bl := UiKit.label("Ready", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_PRIMARY_INK)
 	bl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	badge.add_child(bl)
 	v.add_child(badge)
@@ -333,7 +341,16 @@ static func _cells_quick() -> Control:
 		var c: UiItemCell = _cell(D, fields)
 		c.show_new_ring()   # State=new 1663:101150: the 600 ms ring, held at its peak for the shot
 		row.add_child(_captioned(c, sample[0]))
-	return row
+	# v3: the quick slots sit on the bar's dark glass (C-Q1)
+	return _on_glass(row)
+
+## A sample over the bar's dark glass (UI v3 C-Q1), as the quick bar draws it.
+static func _on_glass(c: Control) -> PanelContainer:
+	var p := PanelContainer.new()
+	p.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_GLASS_FILL, UiTokens.RADIUS_LG)
+		.with_margins(UiTokens.SPACE_S4, UiTokens.SPACE_S4, UiTokens.SPACE_S4, UiTokens.SPACE_S4))
+	p.add_child(c)
+	return p
 
 static func _cells_kitchen() -> Control:
 	var row := _row(UiTokens.SPACE_ROW)
@@ -1494,3 +1511,139 @@ static func _tip_cards() -> Control:
 		card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		v.add_child(card)
 	return v
+
+# ------------------------------------------------------------------ UI v3 (C-105)
+
+static func _v3_type() -> Control:
+	var col := _column(UiTokens.SPACE_S2)
+	for k in ["TYPE_DISPLAY", "TYPE_TITLE", "TYPE_HEADLINE", "TYPE_BODY", "TYPE_BODY_BOLD", "TYPE_BUTTON", "TYPE_LABEL",
+			"TYPE_HUD_NUMBER", "TYPE_CAPTION", "TYPE_MICRO"]:
+		var style: StringName = (UiTokens as Script).get_script_constant_map()["STYLE_" + k]
+		var l := UiKit.label("%s · 200/200" % style, style)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		col.add_child(l)
+	var dark := _column(UiTokens.SPACE_S2)
+	for style in [UiTokens.STYLE_TYPE_LABEL_ON_DARK, UiTokens.STYLE_TYPE_HUD_NUMBER_ON_DARK, UiTokens.STYLE_TYPE_CAPTION_ON_DARK,
+			UiTokens.STYLE_TYPE_MICRO_ON_DARK, UiTokens.STYLE_TYPE_FLOAT]:
+		var l := UiKit.label("%s · Bag 1533 x22" % style, style)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		dark.add_child(l)
+	col.add_child(_on_glass(dark))
+	var lime := PanelContainer.new()
+	lime.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_ACTION_PRIMARY, UiTokens.RADIUS_LG)
+		.with_margins(UiTokens.SPACE_S4, UiTokens.SPACE_S4, UiTokens.SPACE_S4, UiTokens.SPACE_S4))
+	lime.add_child(UiKit.label("TypeButtonOnAction · Give radish", UiTokens.STYLE_TYPE_BUTTON_ON_ACTION))
+	col.add_child(lime)
+	return col
+
+static func _v3_buttons() -> Control:
+	var col := _column(UiTokens.SPACE_S4)
+	var keys := _row(UiTokens.SPACE_S4)
+	for k in [[UiCommandButton.Kind.PRIMARY, "Deliver"], [UiCommandButton.Kind.SECONDARY, "Deliver"],
+			[UiCommandButton.Kind.DESTRUCTIVE, "Discard"]]:
+		keys.add_child(UiCommandButton.new(k[1], k[0]))
+	var blocked := UiCommandButton.new("Deliver")
+	blocked.reason = "Need 2 Carrots"
+	keys.add_child(blocked)
+	col.add_child(keys)
+	var cta := UiCommandButton.new("Sell")
+	cta.bar = true
+	col.add_child(_captioned(cta, "CTA bar (C-N6)"))
+	cta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return col
+
+static func _v3_glass() -> Control:
+	# The scene stands in as the field colour; glass sits over it (S-2).
+	var scene := PanelContainer.new()
+	scene.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_FAMILY_FIELD, UiTokens.RADIUS_LG)
+		.with_margins(UiTokens.SPACE_S5, UiTokens.SPACE_S5, UiTokens.SPACE_S5, UiTokens.SPACE_S5))
+	var col := _column(UiTokens.SPACE_S5)
+	scene.add_child(col)
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override(&"separation", int(UiTokens.SPACE_S3))
+	top.add_child(UiGlassButton.new(null, UiGlassButton.Glyph.BACK))
+	var chip := UiGlassCapsule.new()
+	chip.text = "Sunset Parcel 12"
+	chip.detail = "Core 64 · Walk-only 120"
+	chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top.add_child(chip)
+	var coins := UiGlassCapsule.coins(UiHud.ICON_COIN)
+	coins.text = "1533"
+	coins.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top.add_child(coins)
+	col.add_child(top)
+	var side := HBoxContainer.new()
+	side.add_theme_constant_override(&"separation", int(UiTokens.SIZE_HUD_SIDE_GAP))
+	side.add_child(UiGlassButton.new(_tex("bag")))
+	var badged := UiGlassButton.new(_tex("bell"))
+	badged.badge = true
+	side.add_child(badged)
+	col.add_child(side)
+	return scene
+
+static func _v3_bag_slots() -> Control:
+	var row := _row(UiTokens.SPACE_S5)
+	var fish := {id = "crop_carrot", icon = _tex("crop_carrot"), qty = 20}
+	var samples := [["empty", {}, UiBagSlot.State.EMPTY, false], ["filled", fish, UiBagSlot.State.FILLED, false],
+		["selected", fish, UiBagSlot.State.SELECTED, false], ["new", fish, UiBagSlot.State.FILLED, true],
+		["locked", {}, UiBagSlot.State.LOCKED, false], ["add", {}, UiBagSlot.State.ADD, false]]
+	for sample in samples:
+		var slot := UiBagSlot.new(sample[1])
+		slot.state = sample[2]
+		slot.is_new = sample[3]
+		row.add_child(_captioned(slot, sample[0]))
+	return row
+
+static func _v3_modal_panel() -> Control:
+	var host := Control.new()
+	host.custom_minimum_size = Vector2(328, 470)
+	var panel := UiModalPanel.new("Bag", _tex("bag"))
+	host.add_child(panel)
+	var grid := GridContainer.new()
+	grid.columns = 3
+	grid.add_theme_constant_override(&"h_separation", int(UiTokens.SIZE_PANEL_SLOT_GAP))
+	grid.add_theme_constant_override(&"v_separation", int(UiTokens.SIZE_PANEL_ROW_GAP))
+	for i in 9:
+		var item := {}
+		if i == 0: item = {id = "seed_carrot", icon = _tex("seed_carrot"), qty = 3}
+		elif i == 1: item = {id = "crop_carrot", icon = _tex("crop_carrot"), qty = 20}
+		var slot := UiBagSlot.new(item)
+		if i == 1: slot.state = UiBagSlot.State.SELECTED
+		grid.add_child(slot)
+	panel.body.add_child(grid)
+	var picked := UiKit.label("Carrot ×20", UiTokens.STYLE_TYPE_CAPTION, UiTokens.COLOR_TEXT_SECONDARY)
+	picked.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	panel.body.add_child(picked)
+	return host
+
+static func _v3_npc_card() -> Control:
+	var host := Control.new()
+	host.custom_minimum_size = Vector2(328, 250)
+	var scrim := ColorRect.new()
+	scrim.color = UiTokens.COLOR_SCRIM_MODAL
+	scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	host.add_child(scrim)
+	var face := AtlasTexture.new()
+	face.atlas = load("res://assets/p0/art/pip-portrait.jpg")
+	face.region = Rect2(Vector2.ZERO, face.atlas.get_size() * Vector2(1.0, 0.5))
+	var card := UiNpcCard.new(face, "Market · Jasmine", "Hi, I'm Jasmine! Bring me crops and wild finds, and I'll pay you in coins.")
+	card.relation = "Stranger"
+	card.relation_ratio = 0.4
+	card.place_centred()
+	card.anchor_top = 0.55
+	card.anchor_bottom = 0.55
+	host.add_child(card)
+	card.content.add_child(UiCommandButton.new("Sell"))
+	return host
+
+static func _v3_gain_float() -> Control:
+	var scene := PanelContainer.new()
+	scene.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_FAMILY_FIELD, UiTokens.RADIUS_LG)
+		.with_margins(UiTokens.SPACE_S5, UiTokens.SPACE_S5, UiTokens.SPACE_S5, UiTokens.SPACE_S5))
+	var col := _column(UiTokens.SPACE_S2)
+	scene.add_child(col)
+	col.add_child(UiGainFloat.new("+3 Carrot Seeds", UiGainFloat.Tone.ITEM, _tex("seed_carrot")))
+	col.add_child(UiGainFloat.new("+1 Timber", UiGainFloat.Tone.ITEM, _tex("wood")))
+	col.add_child(UiGainFloat.new("+36", UiGainFloat.Tone.COINS, UiHud.ICON_COIN))
+	return scene

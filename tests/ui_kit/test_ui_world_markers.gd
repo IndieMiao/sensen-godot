@@ -106,7 +106,7 @@ func test_entry_card_reads_title_main_then_second() -> void:
 	assert_float(c._main.size.x).is_equal_approx(UiEntryCard.WIDTH - 24.0, 0.5)   # across the card, 12 in from each side
 	assert_float(c._main.size.y).is_equal(44.0)
 	var pill := c._main.get_theme_stylebox(&"normal") as UiStyleBox
-	assert_vector(pill.corner_radius).is_equal(Vector4.ONE * 22.0)
+	assert_vector(pill.corner_radius).is_equal(Vector4.ONE * float(UiTokens.RADIUS_PILL))
 	assert_float(c.second_rect().size.y).is_equal(float(UiTokens.SIZE_TOUCH))
 	assert_str(str(c._second.theme_type_variation)).is_equal(str(UiTokens.STYLE_BUTTON_B15))
 	assert_bool(c.note_shown()).is_true()

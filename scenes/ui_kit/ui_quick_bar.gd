@@ -58,6 +58,8 @@ var bag_open := false: set = set_bag_open
 var capacity_warning := false: set = set_capacity_warning
 ## Spaces without a quick bar (kitchen, counters, the map): only the Bag end stays (plan §10.3.5, MAP-1).
 var bag_only := false: set = set_bag_only
+## The end's Bag icon (the dynamic farm gives C-86's glass-button bag, UiArt.SYS_BAG; P0 keeps its glyph).
+var bag_icon: Texture2D = BAG_GLYPH: set = set_bag_icon
 ## Vibrate on lift; off in tests and the gallery.
 var haptics := true
 ## Docked as the bag drawer's top row (SGODOT-225): the drop zones open under the bar instead of over it (q(61)).
@@ -83,9 +85,25 @@ const FLY_BACK_MS := 200        # cancel: back to its place, ease-out (a lifted 
 const _FLY_HOME_MS := 150       # pin toggle: back to its place
 const _FLY_IN_MS := 150         # remove: into the zone's centre
 
+## UI v3 (C-Q1, C-105): the bar's dark glass, `radius/lg`, drawn this far outside the slots (it takes no room, so
+## every placement keeps its layout); hidden while collapsed or bag-only.
+const GLASS_PAD := 6.0
+var _glass: Panel
+
 func _init() -> void:
 	custom_minimum_size = Vector2(UiTokens.SIZE_QUICK_BAR_W, UiTokens.SIZE_QUICK_BAR_H)
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	_glass = Panel.new()
+	_glass.name = "Glass"
+	_glass.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_glass.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var lift := UiTokens.SIZE_QUICK_SLOT_H - UiTokens.SIZE_QUICK_SLOT_SURFACE_H
+	_glass.offset_left = -GLASS_PAD
+	_glass.offset_top = lift - GLASS_PAD
+	_glass.offset_right = GLASS_PAD
+	_glass.offset_bottom = GLASS_PAD
+	_glass.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_GLASS_FILL, UiTokens.RADIUS_LG))
+	add_child(_glass)
 	_row = HBoxContainer.new()
 	_row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_row.add_theme_constant_override(&"separation", int(UiTokens.SPACE_QUICK_BAR_GAP))
@@ -109,6 +127,7 @@ func set_collapsed(v: bool) -> void: collapsed = v; _refresh()
 func set_bag_open(v: bool) -> void: bag_open = v; _refresh()
 func set_capacity_warning(v: bool) -> void: capacity_warning = v; _refresh()
 func set_bag_only(v: bool) -> void: bag_only = v; _refresh()
+func set_bag_icon(v: Texture2D) -> void: bag_icon = v; _refresh()
 
 func cells() -> Array[UiItemCell]: return _cells
 func end_button() -> Button: return _end
@@ -127,16 +146,17 @@ func _build_end() -> Button:
 	b.focus_mode = Control.FOCUS_NONE
 	b.custom_minimum_size = Vector2(UiTokens.SIZE_QUICK_END_W, UiTokens.SIZE_QUICK_SLOT_H)
 	var lift := UiTokens.SIZE_QUICK_SLOT_H - UiTokens.SIZE_QUICK_SLOT_SURFACE_H
-	var surface := UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CELL, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
+	# v3: a glass slot like the others (C-Q2); pressed raises the glass (C-R1)
+	var surface := UiStyleBox.make(UiTokens.COLOR_GLASS_SLOT, UiTokens.RADIUS_MD)
 	surface.inset = Vector4(0, lift, 0, 0)
-	var pressed := UiStyleBox.make(UiTokens.COLOR_PRIMARY_TINT, UiTokens.RADIUS_CELL, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
+	var pressed := UiStyleBox.make(UiTokens.COLOR_GLASS_FILL_STRONG, UiTokens.RADIUS_MD)
 	pressed.inset = surface.inset
 	for s in [&"normal", &"hover", &"focus", &"disabled"]: b.add_theme_stylebox_override(s, surface)
 	for s in [&"pressed", &"hover_pressed"]: b.add_theme_stylebox_override(s, pressed)
 	_end_icon = UiKit.icon(null, UiTokens.SIZE_QUICK_SLOT_ICON)
 	_end_icon.position = Vector2((UiTokens.SIZE_QUICK_END_W - UiTokens.SIZE_QUICK_SLOT_ICON) * 0.5, lift + _END_ICON_TOP)
 	b.add_child(_end_icon)
-	_end_label = UiKit.label("", UiTokens.STYLE_C11_B)
+	_end_label = UiKit.label("", UiTokens.STYLE_C11_B, UiTokens.COLOR_TEXT_ON_DARK)
 	_end_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_end_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_end_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -199,8 +219,9 @@ func _refresh() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE if collapsed or bag_only else Control.MOUSE_FILTER_STOP
 	# Collapsed or bag-only: the end stays at the right (BAR-1-2); the handle sits centred when collapsed.
 	_row.alignment = BoxContainer.ALIGNMENT_END if collapsed or bag_only else BoxContainer.ALIGNMENT_BEGIN
-	_end_icon.texture = CLOSE_GLYPH if bag_open else BAG_GLYPH
-	_end_icon.self_modulate = UiTokens.COLOR_TEXT if bag_open else Color.WHITE
+	_end_icon.texture = CLOSE_GLYPH if bag_open else bag_icon
+	_end_icon.self_modulate = UiTokens.COLOR_TEXT_ON_DARK if bag_open else Color.WHITE
+	_glass.visible = not collapsed and not bag_only
 	_end_label.text = "Close" if bag_open else "Bag"
 	_end_dot.visible = capacity_warning and not bag_open
 

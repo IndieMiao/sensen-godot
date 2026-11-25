@@ -32,7 +32,7 @@ func test_lays_out_title_and_one_row_per_stop() -> void:
 func test_state_colours_follow_the_row_states() -> void:
 	var p := _panel()
 	var value := func(i: int) -> Color: return (p.row(i).find_children("*", "Label", true, false)[1] as Label).get_theme_color(&"font_color")
-	assert_that(value.call(0)).is_equal(UiTokens.COLOR_PRIMARY)     # Free
+	assert_that(value.call(0)).is_equal(UiTokens.COLOR_PRIMARY_INK) # Free
 	assert_that(value.call(1)).is_equal(UiTokens.COLOR_SECONDARY)   # Here
 	assert_that(value.call(2)).is_equal(UiTokens.COLOR_SECONDARY)   # Locked
 	assert_that(value.call(3)).is_equal(UiTokens.COLOR_WARNING)     # Short

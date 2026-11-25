@@ -173,6 +173,10 @@ func _first_visit() -> void:
 	_check(_tip(farming) == "", "a tap closes the card")
 	_check(farming._bar.visible and _bar_counts(farming) == {"hoe_starter": 1, "seed_carrot": 3, "blueprint_cottage": 1}, "quick bar shows hoe, seeds and the blueprint")
 	_check(farming._bar.slots[2].icon == load("res://modules/dynamic_farm/parcel_items.gd").icon_of("blueprint_cottage"), "the blueprint has the parcel adapter's placeholder icon (C-59)")
+	_check(farming._bar.slots[0].icon == UiArt.item("row_tool") and farming._bar.slots[1].icon == UiArt.item("seed_carrot"),
+		"the hoe and the seeds show C-86's v3 item art (C-105)")
+	_check(farming._bar.bag_icon == UiArt.SYS_BAG and (scene._coins_capsule as UiGlassCapsule).icon == UiArt.COIN,
+		"the Bag end and the coins capsule show the v3 bag and coin (C-105)")
 	_check(scene._coins_capsule.visible and scene._coins.text == "0", "the top bar shows the parcel's coins, 0 on a new parcel (C-59)")
 	scene._on_farm_changed(farming.farm.merged({"coins": 12}, true))
 	_check(scene._coins.text == "12", "the coins follow the save")
@@ -345,7 +349,7 @@ func _full_bag(farming: Node) -> void:
 	_check(screen.encloses(scene._header.get_global_rect()) and scene._coins.text == "1234", "the top bar with 1234 coins stays on screen: %s" % scene._header.get_global_rect())
 	farming.open_bag()
 	await process_frame
-	_check(farming._grid.items.size() == 8, "the Bag lists all 8: %d" % farming._grid.items.size())
+	_check(farming._bag_slots.size() == 8 and farming._slots.get_child_count() == 9, "the Bag lists all 8: %d" % farming._bag_slots.size())
 	farming.close_bag()
 
 ## The guide's card text on screen (C-35), "" when it is hidden.
@@ -354,7 +358,7 @@ func _tip(farming: Node) -> String:
 
 ## Texts of the gain floats on screen.
 func _floats(farming: Node) -> Array:
-	return farming._ui.get_children().filter(func(n): return n is UiFloatText).map(func(n): return n.text)
+	return farming._ui.get_children().filter(func(n): return n is UiGainFloat).map(func(n): return n.text)
 
 func _flights(farming: Node) -> int:
 	return farming._ui.get_children().filter(func(n): return n is UiItemFly).size()
@@ -379,28 +383,38 @@ func _held(farming: Node) -> void:
 	await process_frame
 	farming.held = true
 	await process_frame
-	_check(not farming.bag_open() and not farming._keys.visible and not farming._bar.visible, "held: no key, no quick bar, drawer closed")
+	_check(not farming.bag_open() and not farming._keys.visible and not farming._bar.visible, "held: no key, no quick bar, bag closed")
 	farming.held = false
 	await process_frame
 	_check(farming._keys.visible and farming._bar.visible, "released: key and quick bar back")
 
-## The Bag end opens the compact drawer with the bar docked in it; a cell shows its name; Close and Back close it.
+## The Bag end opens the UI v3 bag panel (C-105): the quick bar slides away (M-16) and comes back where it was; a
+## slot shows its name; ✕, Back and a tap on the dimmed area close it.
 func _bag_drawer(farming: Node) -> void:
-	var home: Node = farming._bar.get_parent()
 	farming._bar.bag_requested.emit()
 	await process_frame
-	_check(farming.bag_open() and farming._bar.get_parent().get_parent() == farming._drawer.body and farming._bar.bag_open, "Bag opens the drawer, the quick bar docked on top")
-	var ids: Array = farming._grid.shown_items().map(func(it): return it.id)
-	_check(ids == ["hoe_starter", "seed_carrot", "blueprint_cottage"] and farming._grid.shown_items()[1].qty == 3, "the drawer lists the bag")
-	farming._grid.select("seed_carrot")
-	_check(farming._picked_name.text == "Carrot Seeds ×3", "a tapped cell shows its name")
-	farming._bar.close_requested.emit()
+	_check(farming.bag_open() and farming._bag.title == "Bag" and farming._bag.hero == UiArt.HERO_BAG, "Bag opens the bag panel, C-86's bag as its hero")
+	var ids: Array = farming._bag_slots.keys()
+	_check(ids == ["hoe_starter", "seed_carrot", "blueprint_cottage"] and farming._bag_slots.seed_carrot.item.qty == 3,
+		"the panel lists the bag: %s" % [ids])
+	_check(farming._slots.get_child_count() == 9 and farming._slots.columns == 3, "three rows of three round slots")
+	farming._bag_slots.seed_carrot.tapped.emit("seed_carrot")
+	_check(farming._picked_name.text == "Carrot Seeds ×3" and farming.bag_selected == "seed_carrot"
+		and farming._bag_slots.seed_carrot.state == UiBagSlot.State.SELECTED, "a tapped slot is selected and named")
+	await create_timer(0.35).timeout
+	_check(not farming._bar.visible, "the quick bar is hidden while the bag is open (M-16)")
+	var panel: UiModalPanel = farming._bag
+	panel.close_button().pressed.emit()
 	await process_frame
-	_check(not farming.bag_open() and farming._bar.get_parent() == home and not farming._bar.bag_open, "Close puts the bar back")
+	_check(not farming.bag_open() and panel.closing, "✕ closes it")
+	await create_timer(0.4).timeout
+	_check(not is_instance_valid(panel), "…and the panel frees itself after its exit")
 	var bar_rect: Rect2 = farming._bar.get_global_rect()
 	var ui_rect: Rect2 = farming._ui.get_global_rect()
-	_check(is_equal_approx(bar_rect.end.y, ui_rect.end.y - UiTokens.SIZE_QUICK_BAR_BOTTOM) and is_equal_approx(bar_rect.position.x, UiTokens.SIZE_QUICK_BAR_X),
-		"…at the bottom, where it was: %s in %s" % [bar_rect, ui_rect])
+	_check(farming._bar.visible and is_equal_approx(farming._bar.modulate.a, 1.0)
+		and is_equal_approx(bar_rect.end.y, ui_rect.end.y - UiTokens.SIZE_QUICK_BAR_BOTTOM)
+		and is_equal_approx(bar_rect.position.x, UiTokens.SIZE_QUICK_BAR_X),
+		"the quick bar comes back at the bottom, where it was: %s in %s" % [bar_rect, ui_rect])
 	# No long-press drag on this bar (no swap, Pin or Remove, C-74#39); a swipe up still opens the bag.
 	var cell: UiItemCell = farming._bar.cells()[0]
 	cell.gesture.emit({"kind": &"lift", "pos": cell.get_global_rect().get_center()})
@@ -413,21 +427,22 @@ func _bag_drawer(farming: Node) -> void:
 	await process_frame
 	farming._bar.slot_tapped.emit("seed_carrot")
 	await process_frame
-	_check(farming.bag_open() and farming._grid.selected_id == "seed_carrot", "a slot opens the drawer on its item")
-	_check(scene.is_back_navigation_locked() and not farming.bag_open() and not scene._back_sent, "Back closes the drawer first, the farm stays")
+	_check(farming.bag_open() and farming.bag_selected == "seed_carrot", "a slot opens the bag on its item")
+	_check(scene.is_back_navigation_locked() and not farming.bag_open() and not scene._back_sent, "Back closes the bag first, the farm stays")
 	await process_frame
-	# C-111: a tap on the dimmed area closes the drawer. 0.4.2 used the scrim after close_bag() had cleared it: a
+	# C-111: a tap on the dimmed area closes the bag. 0.4.2 used the scrim after close_bag() had cleared it: a
 	# SCRIPT ERROR here, a native crash (SIGSEGV in Control::accept_event) in the release package.
 	farming._bar.bag_requested.emit()
 	await process_frame
-	var scrim: Control = farming._scrim
+	panel = farming._bag
+	var scrim: Control = panel.scrim
 	var release := InputEventMouseButton.new()
 	release.button_index = MOUSE_BUTTON_LEFT
 	release.pressed = false
 	release.position = scrim.get_global_rect().position + Vector2(40, 40)
 	scrim.gui_input.emit(release)
-	_check(not farming.bag_open() and farming._scrim == null and farming._bar.get_parent() == home, "a tap on the dimmed area closes the drawer")
-	await process_frame
+	_check(not farming.bag_open() and farming._bag == null, "a tap on the dimmed area closes the bag")
+	await create_timer(0.4).timeout
 	_check(not is_instance_valid(scrim), "…and frees its scrim")
 
 ## C-33 on a fresh save (the welcome blueprint, no house): Build Cottage while a press is still

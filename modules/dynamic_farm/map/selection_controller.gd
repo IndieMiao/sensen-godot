@@ -44,6 +44,7 @@ var _query_failed := false
 var _map_retried := false
 var _reload_left := -1.0
 var _resume_tap := false
+var _map_loading := false # C-94: this map is still loading (not failed); a tap now waits for it like a cold start.
 var _failed_generation := -1 # Map being replaced by the automatic reload; its later signals are the same failure.
 var _buildings_left := -1.0 # Countdown for the DataSF building layer of the current map; -1 when not waiting.
 var _buildings_wait := false # The current DataSF map has not reported its building layer loaded; taps wait for it.
@@ -59,7 +60,7 @@ var _connected := false
 func activate(auto := false) -> void:
 	if not auto: _map_retried = false; _resume_tap = false; _failed_generation = -1
 	_reload_left = -1.0; _buildings_left = -1.0; _buildings_wait = false
-	suspended = false
+	suspended = false; _map_loading = true
 	_epoch += 1
 	var epoch := _epoch
 	var started := Time.get_ticks_msec()
@@ -99,7 +100,7 @@ func activate(auto := false) -> void:
 func pause() -> void:
 	suspended = true; _epoch += 1; _pending = -1; _retry_left = -1.0; _query_failed = false; map_ready = false; busy = false
 	_reload_left = -1.0; _resume_tap = false; _failed_generation = -1; _buildings_left = -1.0; _buildings_wait = false
-	selection = {}; _options = []; _key = ""
+	_map_loading = false; selection = {}; _options = []; _key = ""
 	if api != null: api.cancel_all()
 	if bridge != null:
 		if generation > 0: bridge.clear_parcel_layers(generation)
@@ -117,6 +118,7 @@ func _native_ready(gen: int, style: int, payload: String) -> void:
 		_buildings_left = -1.0; _buildings_wait = false
 	var was_ready := map_ready
 	map_ready = data.get("source_ready") == true and str(data.get("error", "")).is_empty()
+	_map_loading = not map_ready
 	if map_ready and _resume_tap and not _buildings_wait:
 		# The reloaded map (or its building layer) answers the waiting tap; a reload was that tap's one retry.
 		_resume_tap = false; message = FINDING; changed.emit(); _send_query(); return
@@ -144,12 +146,16 @@ func _native_error(gen: int, style: int, code: String) -> void:
 
 func camera_changed(zoom := -1.0) -> void:
 	if zoom >= 0.0: _view_zoom = zoom
+	var waiting := _resume_tap
 	_pending = -1; _retry_left = -1.0; _query_failed = false; _resume_tap = false; _options = []
 	if map_ready and not busy:
 		message = PROMPT; changed.emit()
+	elif waiting and not busy: # C-94: a tap waiting for the loading map is cancelled; the map is still loading.
+		message = "Loading map details…"; changed.emit()
 
+## C-94: while the map is still loading ("Loading map details…") the tap waits and is sent once it is ready.
 func tap(point: Vector2, zoom: float) -> void:
-	if suspended or not map_ready or busy: return
+	if suspended or busy or not (map_ready or _map_loading): return
 	_view_zoom = zoom
 	if zoom < float(manifest.native_map.get("minzoom", 16)):
 		message = "Zoom in to choose a farm."; changed.emit(); return
@@ -166,7 +172,11 @@ func retry() -> void:
 
 func _start_query() -> void:
 	message = FINDING; changed.emit()
-	_retried = false; _retry_left = -1.0; _query_failed = false; _map_retried = false
+	_retried = false; _retry_left = -1.0; _query_failed = false
+	# C-94: sent by _native_ready once the loading map (and its DataSF building layer) is ready. The map's own
+	# automatic reload, if already used, is not given back to this tap.
+	if not map_ready: _resume_tap = true; return
+	_map_retried = false
 	if _buildings_wait: _resume_tap = true; return # Sent once the DataSF building layer loads (C-43 V-199).
 	_send_query()
 
@@ -301,7 +311,7 @@ func _process(delta: float) -> void:
 		_pending = -1; _fail("The map did not respond. Tap again or Retry.")
 
 func _fail(text: String) -> void:
-	busy = false; _resume_tap = false; _reload_left = -1.0; message = text; changed.emit()
+	busy = false; _resume_tap = false; _map_loading = false; _reload_left = -1.0; message = text; changed.emit()
 
 static func _parse(text: String) -> Dictionary:
 	var parser := JSON.new()
