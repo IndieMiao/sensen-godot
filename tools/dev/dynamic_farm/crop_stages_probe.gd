@@ -1,10 +1,10 @@
 extends SceneTree
-## Carrot stage and soil review (C-138) on C-34's local save, not the server: seven tilled cells in a row near the
-## arrival, six of them sown so that each of the seven stages shows at once (tilled, sowing, emergence, leaf growth,
-## root shoulders, root thickening, maturity), captured with dry soil and with the development wet-soil switch.
+## Carrot stage and soil review (C-138) on C-34's local save, not the server: seven tilled cells near the arrival, six
+## of them sown so that each of the seven stages shows at once (tilled, sowing, emergence, leaf growth, root shoulders,
+## root thickening, maturity), captured with dry soil and with the development wet-soil switch.
 ##   godot --path "$QA" --script res://tools/dev/dynamic_farm/crop_stages_probe.gd -- <farm.json> <out> [<now_ms> <lead_s>]
-## With <now_ms> (a device's clock) the save in <out>/save is written for that clock plus <lead_s> seconds, so the stages
-## are in the middle of each other when a package opens it later (emulator QA, gather_qa_apk.sh); nothing is captured.
+## With <now_ms> (a device's clock) the save in <out>/save is written for that clock plus <lead_s> seconds, so
+## each carrot is mid-stage when a package opens it later (emulator QA, gather_qa_apk.sh); nothing is captured.
 ## Scripted; not touch or device evidence. <out>/save is cleared first. With --headless: states only.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -38,7 +38,7 @@ func _run() -> void:
 	var farming = scene._farming
 	var row := _row(farming, CropArt.STAGES.size())
 	if row.is_empty():
-		push_error("No free row of seven core cells")
+		push_error("No seven free core cells")
 		quit(1)
 		return
 	var version: int = farming.farm_version
@@ -95,25 +95,22 @@ func _shot(name: String) -> void:
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(out.path_join(name + ".png"))
 
-## `count` free core cells in a row (x increasing), off the path, obstacles and house, nearest the arrival first. The
-## player standing at the arrival hides about three cells behind it on screen, so the row keeps out of that.
+## `count` free core cells off the path, obstacles and house, nearest a point just beyond the arrival, the row nearest
+## the camera first, left to right, so the taller late stages stand behind the early ones. The player standing at the
+## arrival hides about three cells behind it.
 func _row(farming, count: int) -> Array:
 	var data: Dictionary = scene._data
 	var house := ParcelFarm.house_cells(farming.farm)
 	var obstacles: Dictionary = farming.obstacle_cells()
-	var free := func(at: Vector2i) -> bool:
-		return data.by_cell.has(at) and data.by_cell[at].zone == "core" and not farming._path.has(at) \
-			and not obstacles.has(at) and not house.has(at)
-	var best: Array = []
-	var best_d := INF
+	var spawn: Vector2i = data.spawn
+	var aim := Vector2(spawn + Vector2i(0, 4))
+	var cells: Array = []
 	for cell: Dictionary in data.cells:
-		var row: Array = []
-		for i in count: row.append(Vector2i(cell.x + i, cell.y))
-		var hidden: bool = cell.y >= data.spawn.y and cell.y <= data.spawn.y + 3 \
-			and data.spawn.x >= cell.x - 1 and data.spawn.x <= cell.x + count
-		if hidden or not row.all(free): continue
-		var d: float = (row[count / 2] - data.spawn).length()
-		if d < best_d:
-			best_d = d
-			best = row
-	return best
+		var at := Vector2i(cell.x, cell.y)
+		var hidden := absi(at.x - spawn.x) <= 1 and at.y >= spawn.y and at.y <= spawn.y + 3
+		if cell.zone == "core" and not hidden and not farming._path.has(at) and not obstacles.has(at) and not house.has(at):
+			cells.append(at)
+	cells.sort_custom(func(p: Vector2i, q: Vector2i) -> bool: return aim.distance_squared_to(Vector2(p)) < aim.distance_squared_to(Vector2(q)))
+	var picked := cells.slice(0, count)
+	picked.sort_custom(func(p: Vector2i, q: Vector2i) -> bool: return p.y < q.y or (p.y == q.y and p.x < q.x))
+	return picked if picked.size() == count else []
