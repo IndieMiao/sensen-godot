@@ -28,9 +28,13 @@ const LOAD_TRIES := 2
 var sync_loads := RenderingServer.get_current_rendering_method() == "gl_compatibility"
 ## 实例栈（PRD §3.2 第二层空间）：地图常驻为底，农场/地点/换装房压在上面。
 var _stack: Array[Node] = []
+## Threaded loads whose requester went away before taking them (one entry per request): taken here once done, so
+## leaving a scene never waits for its preload on the main thread (C-125); only a quitting Godot waits for them.
+var _orphan_loads: Array[String] = []
 
 
 func _ready() -> void:
+	set_process(false)
 	# 项目设置是主配置；运行时再设一次，避免导出模板或测试环境覆盖它。
 	get_tree().quit_on_go_back = false
 	var qa_scene := qa_scene_path(OS.get_cmdline_user_args())
@@ -305,6 +309,22 @@ func handle_back() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST and is_inside_tree():
 		handle_back()
+	elif what == NOTIFICATION_PREDELETE:
+		# Godot quitting: a load left on its thread kept it from exiting (C-61, Q-139), so the rest are waited for here.
+		for path in _orphan_loads: ResourceLoader.load_threaded_get(path)
+		_orphan_loads.clear()
+
+## Takes `path`'s threaded load (requested once by a node now going away) when it is done, without waiting for it.
+func adopt_threaded_load(path: String) -> void:
+	_orphan_loads.append(path)
+	set_process(true)
+
+func _process(_delta: float) -> void:
+	for i in range(_orphan_loads.size() - 1, -1, -1):
+		if ResourceLoader.load_threaded_get_status(_orphan_loads[i]) == ResourceLoader.THREAD_LOAD_IN_PROGRESS: continue
+		ResourceLoader.load_threaded_get(_orphan_loads[i])
+		_orphan_loads.remove_at(i)
+	if _orphan_loads.is_empty(): set_process(false)
 
 
 func _go_to(scene_path: String) -> void:

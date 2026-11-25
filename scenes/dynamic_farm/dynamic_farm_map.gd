@@ -85,6 +85,7 @@ var _farm_parcel := ""
 var _farm_fresh := false
 var _farm_reading := false
 var _town_prepared := false
+var _town_router: Node   # AppRouter when the preload was requested: it takes a preload the map leaves behind
 var _town_script: GDScript
 var _area_timer: Timer
 var _area_generation := -1
@@ -525,13 +526,16 @@ func _prepare_town() -> void:
 	if router != null and router.sync_loads: return
 	if not _town_prepared and _town_script == null:
 		_town_prepared = ResourceLoader.load_threaded_request(TOWN) == OK
+		if _town_prepared: _town_router = router
 
-## A map freed with that load still running waits for it and takes it: a load left on its thread kept a quitting
-## Godot from exiting (C-61, the merge check's test_claim_controller ran into its time limit after passing).
+## A map freed with that load still running hands it to AppRouter, which takes it once done (and waits for it only
+## when Godot quits): a load left on its thread kept a quitting Godot from exiting (C-61, Q-139), and waiting here
+## held Back on the main thread until the town had loaded (C-125). Without AppRouter the map still waits for it.
 func _finish_town_load() -> void:
 	if not _town_prepared: return
 	_town_prepared = false
-	ResourceLoader.load_threaded_get(TOWN)
+	if is_instance_valid(_town_router): _town_router.adopt_threaded_load(TOWN)
+	else: ResourceLoader.load_threaded_get(TOWN)
 
 func _town_closed(town: Control, parcel: String) -> void:
 	_town = null
