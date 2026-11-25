@@ -69,6 +69,13 @@ static func fail(cluster: String) -> void:
 	_failing.erase(cluster)
 	for f in told: if _alive(f): (f as Callable).call()
 
+## The reads still out given up, nobody told (P0Runtime._exit_tree: the app ending, its session's requests gone with it);
+## the cities read stay. The askers' lambdas (the map's) go now: left to the engine's script teardown they could be
+## freed after their own script, an abort at exit (C-47, as C-41's P0HomePick).
+static func drop_waiting() -> void:
+	_pending.clear()
+	_failing.clear()
+
 ## A city's answer (the route's `city`: ponds / outposts ids, residents, fish, detail {ponds, outposts}, gather, preview).
 ## Every caller waiting on it is told, in the order they asked. The hand-written home city is read too, for its
 ## gathering spots alone (v4q(4), contract C §9): the server sends it no `detail`, its ponds and outposts are the client's.
