@@ -1,7 +1,8 @@
 extends SceneTree
 ## C-107 the in-game phone on one's own parcel (design C-85 ⑦ / ⑧):
 ## - ParcelTasks: the guide's eight steps as rows, done / current / todo from the save alone, at every stage of the
-##   first visit (a growing carrot waits on Harvest, the coop blueprint ends the list), and gathering again after
+##   first visit (a growing carrot waits on Harvest, as does one sown dry while the guide asks for the well and water,
+##   C-151; the coop blueprint ends the list), and gathering again after
 ##   selling what was gathered not taking the rows back once the device saw them further on;
 ## - the kit: UiTaskRow's finishing beat, UiTaskDropDown's rows / More… / fold, UiPhone's tabs, badge and head;
 ## - the phone's pages over data: tasks with groups and only the current row tappable, the inbox's rows and Claim all,
@@ -90,6 +91,29 @@ func _task_progress() -> void:
 	_check(Tasks.rows({}, NOW)[0].state == "current" and Tasks.rows({}, NOW)[0].group == "GET STARTED"
 		and Tasks.rows({}, NOW)[4].group == "TOWN", "groups: GET STARTED then TOWN")
 	_check(Tasks.title("sell") == "Sell to Jasmine" and Tasks.title("blueprint") == "Take Scott's blueprint", "design copy")
+	# C-151's well and water asks have no row: the carrot sown dry waits on Harvest, as one growing does.
+	var rules := ParcelFarm.rules()
+	var state: Dictionary = ParcelFarm.grant(rules, ParcelFarm.welcome(rules, ParcelFarm.empty_state(), NOW), NOW).state
+	var steps := [[{"type": "place_house", "x": 4, "y": 4, "rotation": 0}, 1],
+		[{"type": "clear_obstacle", "cell": "9,10"}, 1],
+		[{"type": "till", "cell": "10,10"}, 2],
+		[{"type": "sow", "cell": "10,10", "crop": "crop_carrot"}, 3],
+		[{"type": "place_building", "building": "well", "x": 30, "y": 30, "rotation": 0}, 3],
+		[{"type": "draw_water", "building": 2}, 3],
+		[{"type": "water", "cell": "10,10"}, 3]]
+	for pair: Array in steps:
+		var result := ParcelFarm.apply(rules, state, [pair[0]], NOW)
+		_check(result.ok, "watering walk: %s applies" % pair[0].type)
+		if not result.ok: return
+		state = result.state
+		_check(Tasks.done_count(state, NOW) == pair[1] and Tasks.current(state, NOW) == Tasks.TASKS[pair[1]].key,
+			"watering walk: after %s, %d done (got %d)" % [pair[0].type, pair[1], Tasks.done_count(state, NOW)])
+	# A farm past the first carrot with a dry one: the rows stay where the save says, the device's count kept.
+	var veteran := _farm({"buildings": [HOUSE], "sales": 2, "bag": {"wood": 1, "blueprint_well": 1}, "gathered": {"x": NOW, "y": NOW},
+		"tilled": ["7,7"], "crops": {"7,7": {"crop": "crop_carrot", "planted_at": NOW, "ripe_at": ParcelFarm.NEVER, "watered_at": null}}})
+	_check(preload("res://modules/dynamic_farm/parcel_guide.gd").step(veteran, NOW) == "well"
+		and Tasks.done_count(veteran, NOW, 7) == 7 and Tasks.done_count(veteran, NOW) == 6,
+		"a dry carrot on a veteran farm asks for the well; the rows do not move")
 
 func _host(c: Control) -> Control:
 	var holder := Control.new()

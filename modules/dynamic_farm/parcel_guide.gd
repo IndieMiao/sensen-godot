@@ -52,6 +52,14 @@ static func step(farm: Dictionary, now_ms: int) -> String:
 	if dry and not ripe:
 		if not ParcelFarm.wells(ParcelFarm.rules(), farm).is_empty(): return "water"
 		if int(bag.get(WELL_BLUEPRINT, 0)) > 0: return "well"
+	return step_past_water(farm, now_ms)
+
+## The step `step` teaches once no dry carrot asks for the well or for water (C-151): the phone's task list (C-107)
+## has no row for those two, so it reads the rows from this one.
+static func step_past_water(farm: Dictionary, now_ms: int) -> String:
+	if farm.is_empty(): return ""
+	var bag: Dictionary = farm.get("bag", {})
+	var crops: Dictionary = farm.get("crops", {})
 	if farm.get("blueprints_claimed", {}).has(COOP): return ""
 	if int(farm.get("sales", 0)) > 0:
 		if _holds_gathered(bag): return "sell_gathered"

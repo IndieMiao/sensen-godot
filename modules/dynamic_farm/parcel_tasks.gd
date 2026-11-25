@@ -35,7 +35,8 @@ static func done_count(farm: Dictionary, now_ms: int, reached := 0) -> int:
 	if farm.is_empty(): return 0
 	if farm.get("blueprints_claimed", {}).has(Guide.COOP): return TASKS.size()
 	var order := keys()
-	var step := Guide.step(farm, now_ms)
+	# The well and water asks (C-151) have no row: a carrot waiting on water still waits on Harvest.
+	var step := Guide.step_past_water(farm, now_ms)
 	if step == "sell_gathered" and reached > order.find(step): return order.find("blueprint")
 	if not step.is_empty(): return order.find(step)
 	if int(farm.get("sales", 0)) > 0: return order.find("blueprint")
