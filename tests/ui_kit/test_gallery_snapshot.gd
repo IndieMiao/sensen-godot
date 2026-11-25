@@ -6,6 +6,10 @@ extends GdUnitTestSuite
 ## Pixel shots are separate: tools/ui/shoot_gallery.sh (needs a desktop renderer).
 
 const SNAP_DIR := "res://tests/ui_kit/snapshots"
+## Glyphs Nunito has no face for (★ ✓) are drawn by a font of the OS, measured differently on macOS and on the
+## Ubuntu check runner (quality_badge, reward_moment, gear_row failed there only, C-22). The snapshots are laid out
+## with the project's own fonts alone: a missing glyph is the engine's box, the same everywhere.
+const OWN_FONTS := ["res://assets/ui/fonts/Nunito.ttf", "res://assets/ui/fonts/NotoSansSC-Regular.otf"]
 
 ## Sections are snapshotted online: a P0 world an earlier suite opened keeps P0Runtime's singleton alive, and with no
 ## server it goes offline, which leaves the static UiCommandButton.offline set and every sending button reading
@@ -13,6 +17,12 @@ const SNAP_DIR := "res://tests/ui_kit/snapshots"
 func test_every_section_matches_its_layout_snapshot() -> void:
 	var was_offline := UiCommandButton.offline
 	UiCommandButton.offline = false
+	var fonts: Array[FontFile] = []
+	for path in OWN_FONTS:
+		var f := load(path) as FontFile
+		if f.allow_system_fallback:
+			f.allow_system_fallback = false
+			fonts.append(f)
 	var host := Control.new()
 	host.size = Vector2(360, 800)
 	add_child(auto_free(host))
@@ -32,6 +42,7 @@ func test_every_section_matches_its_layout_snapshot() -> void:
 			continue
 		if FileAccess.get_file_as_string(path).strip_edges() != dump.strip_edges(): mismatched.append(id)
 	UiCommandButton.offline = was_offline
+	for f in fonts: f.allow_system_fallback = true
 	assert_array(mismatched).override_failure_message("layout changed: %s (rerun with UPDATE_UI_SNAPSHOTS=1 if intended)" % [mismatched]).is_empty()
 
 func _dump(node: Control, origin: Control) -> Dictionary:
