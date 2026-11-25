@@ -346,7 +346,8 @@ func set_online(v: int) -> void:
 ## shows it, translated under 中文 (#649 第二批 ⑨; the locale is set at start, so the cache holds).
 static func label_size_for(text: String, plated := true, max_w := SHORT_MAX_W) -> Vector2:
 	if text == "": return Vector2.ZERO
-	var key := text + ("|p" if plated else "|s%d" % roundi(max_w))
+	# The usual 96 px short name keeps its "|s" key; only a pin's own wider limit (C-145) adds its width.
+	var key := text + ("|p" if plated else "|s" if max_w == SHORT_MAX_W else "|s%d" % roundi(max_w))
 	if _label_sizes.has(key): return _label_sizes[key]
 	text = String(TranslationServer.translate(text))
 	var style := UiTokens.STYLE_C10_B if plated else UiTokens.STYLE_C11_B
