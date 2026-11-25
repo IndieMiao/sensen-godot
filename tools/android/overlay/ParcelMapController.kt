@@ -17,6 +17,7 @@ import com.mapbox.maps.MapView
 import com.mapbox.maps.RenderedQueryGeometry
 import com.mapbox.maps.RenderedQueryOptions
 import com.mapbox.maps.ScreenCoordinate
+import com.mapbox.maps.SourceDataLoadedType
 import com.mapbox.maps.Style
 
 /** Optional dynamic-farm native overlay. Mapbox owns URL loading, geometry projection, rendering and hit testing. */
@@ -34,6 +35,7 @@ internal class ParcelMapController(
     private val loaded = mutableSetOf<String>()
     private var query: Cancelable? = null
     private val waiting = ParcelIdleWait<WaitingQuery>()
+    private val settle = ParcelQuerySettle()
     private val buildingSelection = ParcelBuildingSelection()
     private val buildingSource = ParcelBuildingsSource(BUILDINGS_SOURCE)
     private var buildingSourceAddedAt = 0L
@@ -72,14 +74,20 @@ internal class ParcelMapController(
                 query?.cancel(); query = null; waiting.drop(); hiddenPlaces.clear() // A new style has its own icons.
                 state.reloading(); mapIdle = false; mapboxLoadFailed = false; buildingSelection.clear(); sources.clear(); loaded.clear()
                 buildingSource.dropped() // The new style has none of our sources.
+                settle.reset(emptySet())
                 install()
             }
         }
-        subscriptions += map.subscribeCameraChanged { cameraRevision++; mapIdle = false }
+        subscriptions += map.subscribeCameraChanged { cameraRevision++; mapIdle = false; settle.cameraChanged() }
         subscriptions += map.subscribeMapIdle {
             if (!closed) { mapIdle = true; if (state.active) emitReady(); resumeWaiting() }
         }
+        // C-83: our own sources can be ready for this camera while map-wide idle still waits on unrelated requests.
+        subscriptions += map.subscribeRenderFrameFinished {
+            if (!closed && settle.frameRendered()) { if (state.active) emitReady(); resumeWaiting() }
+        }
         subscriptions += map.subscribeSourceDataLoaded { event ->
+            if (!closed && event.type == SourceDataLoadedType.TILE) settle.tileLoaded(event.sourceId, event.loaded)
             if (!closed && event.sourceId == "composite" && event.loaded == true) mapboxLoadFailed = false
             if (!closed && event.loaded == true) when {
                 buildingSource.markLoaded(event.sourceId) -> buildingsLog("LOADED ms=${SystemClock.uptimeMillis() - buildingSourceAddedAt}")
@@ -119,7 +127,7 @@ internal class ParcelMapController(
         if (state.begin(generation) == null) return
         if (oldGeneration != generation) claims = emptyMap()
         query?.cancel(); query = null; waiting.drop()
-        removeLayers(); config = next; mapIdle = false; mapboxLoadFailed = false
+        removeLayers(); config = next; mapIdle = false; mapboxLoadFailed = false; settle.reset(emptySet())
         install()
     }
     private fun install() {
@@ -164,6 +172,10 @@ internal class ParcelMapController(
                 ok = layer("""{"id":"$BUILDING_FILL","type":"fill",$drawn,"paint":{"fill-color":${ParcelPayload.buildingColor(states)},"fill-opacity":${ParcelPayload.buildingOpacity(states)}}}""")
             }
         }
+        // C-83: the sources a tap queries, by the current building copy's id (C-124), so a replaced copy's late tile
+        // events cannot settle a tap. A reused copy still waits for its own tile events: Mapbox lays its tiles out
+        // again for the re-added fill layer, and a query before that would miss the building.
+        settle.reset(ParcelQuerySettle.sourcesFor(parcel, cfg.buildingSource == "datasf", sources["buildings"]))
         ok = ok && layer("""{"id":"$HIGHLIGHT_FILL","type":"fill",$highlightSource,"paint":{"fill-color":"${ParcelPayload.CLAIMABLE_COLOR}","fill-opacity":0.65}}""") &&
             layer("""{"id":"$ADDRESSES","type":"symbol","source":"$parcel"$sourceLayer,"minzoom":${cfg.addressMinZoom},"layout":{"text-field":["coalesce",["get","address"],""],"text-size":11,"text-max-width":8,"text-allow-overlap":false},"paint":{"text-color":"#37463B","text-halo-color":"#FFFFFF","text-halo-width":1.2}}""") &&
             layer("""{"id":"$CLAIM_NAMES","type":"symbol","source":"$parcel"$sourceLayer,"minzoom":${cfg.minZoom},"filter":${ParcelPayload.claimFilter(claims)},"layout":{"text-field":${ParcelPayload.claimLabel(claims)},"text-size":13,"text-max-width":8,"text-allow-overlap":false},"paint":{"text-color":"#7A2620","text-halo-color":"#FFFFFF","text-halo-width":1.5}}""")
@@ -202,7 +214,7 @@ internal class ParcelMapController(
         addProperty("source_ready", state.ready)
         addProperty("parcel_source_ready", sources["parcels"] in loaded)
         addProperty("buildings_source_ready", sources["buildings"] in loaded)
-        addProperty("building_query_ready", mapIdle && !mapboxLoadFailed && buildingLayers()?.isNotEmpty() == true)
+        addProperty("building_query_ready", settled() && !mapboxLoadFailed && buildingLayers()?.isNotEmpty() == true)
     }.toString())
 
     fun setStates(generation: Long, raw: String) {
@@ -283,7 +295,8 @@ internal class ParcelMapController(
             if (waiting.expire(tap) && !closed && state.current(ticket)) failQuery(requestId, generation, "loading")
         }, IDLE_WAIT_MS)
     }
-    private fun queryReady(cfg: ParcelSourceConfig): Boolean = mapIdle && (cfg.buildingSource != "datasf" || sources["buildings"] in loaded)
+    private fun settled(): Boolean = mapIdle || settle.settled
+    private fun queryReady(cfg: ParcelSourceConfig): Boolean = settled() && (cfg.buildingSource != "datasf" || sources["buildings"] in loaded)
     private fun resumeWaiting() {
         val cfg = config ?: return
         val tap = waiting.resume(queryReady(cfg)) ?: return
@@ -351,7 +364,7 @@ internal class ParcelMapController(
             for ((kind, id) in sources) if (kind != "buildings" && style.styleSourceExists(id)) style.removeStyleSource(id)
         }
         restorePlaceIcons(style)
-        sources.clear(); loaded.clear(); buildingSelection.clear()
+        sources.clear(); loaded.clear(); buildingSelection.clear(); settle.reset(emptySet())
     }
     fun close() {
         if (closed) return
