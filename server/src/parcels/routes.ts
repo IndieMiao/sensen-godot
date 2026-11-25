@@ -6,6 +6,7 @@
  */
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { PlayerRow } from '../http/store.js';
+import { energyOf } from './energy.js';
 import { applyFarmCommands, emptyFarm, parseFarmCommands, rebaseFarm, welcome, withEconomy } from './farm.js';
 import { communityOf, isNewerDataset, type ParcelRules } from './rules.js';
 import { activeZone, zoneView, type StarterZones } from './starter_zone.js';
@@ -59,13 +60,19 @@ function parseBbox(raw: unknown): [number, number, number, number] | null {
   return [w, s, e, n];
 }
 
-const parcelView = (p: OwnedParcel) => ({
-  community_id: p.community_id, layer: p.layer, parcel_id: p.parcel_id, dataset_version: p.dataset_version,
-  center: [p.center.lng, p.center.lat], claimed_at: p.claimed_at, farm_version: p.farm_version, farm: withEconomy(p.farm),
-});
+/** 农场按当前字段补齐后给客户端：缺的经济字段补开局值，缺的体力补满（C-148，energyOf；只补显示，不写回）。 */
+const farmView = (rules: ParcelRules, farm: OwnedParcel['farm'], at: number) => {
+  const f = withEconomy(farm);
+  f.energy = energyOf(rules, f, at);
+  return f;
+};
 
 export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps, { auth, writer }: Auth): void {
   const now = deps.now;
+  const parcelView = (p: OwnedParcel) => ({
+    community_id: p.community_id, layer: p.layer, parcel_id: p.parcel_id, dataset_version: p.dataset_version,
+    center: [p.center.lng, p.center.lat], claimed_at: p.claimed_at, farm_version: p.farm_version, farm: farmView(deps.rules, p.farm, now()),
+  });
   /** 认领、进入、地块内命令用它：装上即建号打开时游客也能写自己的地块；关着时与其它写接口一样要账号。 */
   const parcelWriter: Auth['writer'] = !deps.guestWrites ? writer : async (req, reply) => {
     const p = await auth(req);

@@ -22,7 +22,27 @@
     "crop_carrot": {
       "seed": "seed_carrot",
       "grow_seconds": 60,
-      "yield": 1
+      "yield": 1,
+      "energy": 3
+    }
+  },
+  "energy": {
+    "max_base": 200,
+    "per_level": 10,
+    "regen_ms": 240000,
+    "rest_amount": 60,
+    "blessing": {
+      "days": 7,
+      "regen_mult": 1.5
+    },
+    "day": {
+      "utc_offset_hours": -8,
+      "rollover_hour": 4
+    },
+    "costs": {
+      "clear_obstacle": 2,
+      "till": 2,
+      "gather": 2
     }
   },
   "economy": {
