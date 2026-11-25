@@ -42,7 +42,7 @@ func _surface_settled() -> bool:
 	surface_wait_frames=0
 	if not Engine.has_singleton(MAP_PLUGIN):return true
 	var plugin:=Engine.get_singleton(MAP_PLUGIN)
-	if not is_instance_valid(plugin) or not plugin.has_method("getMapVisibilityState"):return true
+	if not is_instance_valid(plugin) or not _plugin_has(plugin,"getMapVisibilityState"):return true
 	var started:=Time.get_ticks_msec()
 	# getMapVisibilityState returns the UI thread's last snapshot and asks for a new one: a stale one is not opaque yet.
 	while Time.get_ticks_msec()-started<SURFACE_WAIT_MS and not surface_is_opaque(str(plugin.getMapVisibilityState())):
@@ -50,6 +50,11 @@ func _surface_settled() -> bool:
 	for frame in SURFACE_SETTLE_FRAMES:
 		if not await _drawn_frame():return false
 	return true
+
+## Android singletons are JavaObject wrappers: Object.has_method sees only the wrapper (MapBridgeAndroid._supports).
+static func _plugin_has(plugin:Object,method:String) -> bool:
+	if plugin.has_method("has_java_method"):return plugin.has_java_method(method)
+	return plugin.has_method(method)
 
 ## One frame drawn (AppRouter._render_frame); false when Back left meanwhile.
 func _drawn_frame() -> bool:

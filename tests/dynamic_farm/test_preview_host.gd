@@ -31,6 +31,10 @@ class SurfacePlugin extends Object:
 		calls+=1
 		if calls<=stale:return JSON.stringify({"godot_surface_mode":2,"godot_requested_format":-3,"godot_observed_format":-3})
 		return JSON.stringify({"godot_surface_mode":5,"godot_requested_format":2,"godot_observed_format":2})
+## An Android singleton: a JavaObject wrapper whose has_method does not see the Java methods (MapBridgeAndroid._supports).
+class JavaWrapper extends Object:
+	func has_java_method(method:String) -> bool:return method=="getMapVisibilityStateJava"
+	func getMapVisibilityState() -> String:return "{}"
 var checked:=0
 var failed:=0
 var _fixture_fail:=false
@@ -54,6 +58,10 @@ func _surface_checks(router:Node) -> void:
 		"C-168: opaque asked for but no surface made in it yet is not ready")
 	verify(Host_.surface_is_opaque(JSON.stringify({"godot_surface_mode":5,"godot_requested_format":2,"godot_observed_format":2})),
 		"C-168: the opaque surface made is ready")
+	var java:=JavaWrapper.new()
+	verify(not Host_._plugin_has(java,"getMapVisibilityState") and Host_._plugin_has(java,"getMapVisibilityStateJava"),
+		"C-168: an Android singleton's methods are asked through has_java_method, not the wrapper's has_method")
+	java.free()
 	var plugin:=SurfacePlugin.new();plugin.stale=2
 	Engine.register_singleton("GodotMap",plugin)
 	var host=Host.instantiate();host.view_factory=_factory;host.setup(args());router.top=host;root.add_child(host)
