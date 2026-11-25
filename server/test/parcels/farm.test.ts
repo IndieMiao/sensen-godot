@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONTENT_DIR } from '../../src/domain/content.js';
-import { applyFarmCommands, emptyFarm, MAX_BATCH, MAX_COINS, MAX_SELL_COUNT, parseCell, parseFarmCommands, rebaseFarm, welcome, withEconomy,
+import { applyFarmCommands, emptyFarm, MAX_BATCH, MAX_BUY_COUNT, MAX_COINS, MAX_SELL_COUNT, parseCell, parseFarmCommands, rebaseFarm, welcome, withEconomy,
   type FarmCommand, type ParcelFarmState } from '../../src/parcels/farm.js';
 import { communityOf, isNewerDataset, loadParcelRules, parseParcelRules } from '../../src/parcels/rules.js';
 
@@ -305,6 +305,80 @@ describe('parcel economy (C-58)', () => {
     expect(tryAt(sold, [{ type: 'claim_blueprint', blueprint: '__proto__' }])).toMatchObject({ ok: false, code: 'UNKNOWN_BLUEPRINT' });
     // Selling and claiming in one batch works (the sale counts at once).
     expect(runAt(s, [{ type: 'sell', item: 'crop_carrot', count: 1 }, { type: 'claim_blueprint', blueprint: 'coop' }]).bag.blueprint_coop).toBe(1);
+  });
+});
+
+/** C-149（0.4.5）：Jasmine 卖种子。胡萝卜种子 9 金币照 P0（所有者 C-137#15 第 3 题“照搬p0”）；单价只看服务端配置。 */
+describe('parcel buy (C-149)', () => {
+  /** 卖过 2 个萝卜、有 24 金币的农场（经种收卖得来，不直接改金币）。 */
+  const with24 = (): ParcelFarmState => {
+    let s = run(welcomed(), [{ type: 'till', cell: '1,1' }, { type: 'till', cell: '2,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' },
+      { type: 'sow', cell: '2,1', crop: 'crop_carrot' }]);
+    s = run(s, [{ type: 'harvest', cell: '1,1' }, { type: 'harvest', cell: '2,1' }, { type: 'sell', item: 'crop_carrot', count: 2 }], T0 + 60_000);
+    expect(s).toMatchObject({ coins: 24, bag: { seed_carrot: 1 } });
+    return s;
+  };
+
+  it('ships carrot seeds at 9 coins, the P0 seed price, and nothing else for sale', () => {
+    expect(rules.economy.buy_prices).toEqual({ seed_carrot: 9 });
+    const p0 = JSON.parse(readFileSync(path.resolve(DEFAULT_CONTENT_DIR, '..', '..', 'p0', 'p0_content.json'), 'utf8'));
+    const carrot = p0.crops.find((c: { id: string }) => c.id === 'crop_carrot');
+    expect(carrot.seed).toBe('seed_carrot');
+    expect(rules.economy.buy_prices[carrot.seed]).toBe(carrot.seed_price);
+    // Selling prices are unchanged by C-149; the egg is C-154 (Q-237).
+    expect(rules.economy.sell_prices).toEqual({ crop_carrot: 12, egg: 20, wood: 2, wild_herb: 1, stone: 2 });
+  });
+
+  it('refuses out-of-bounds buy prices at load time; an economy without buy_prices sells nothing', () => {
+    const eco = rules.economy;
+    const bad = (economy: unknown) => () => parseParcelRules(structuredClone({ ...rules, economy }));
+    expect(bad({ ...eco, buy_prices: { seed_carrot: 0 } })).toThrow();
+    expect(bad({ ...eco, buy_prices: { seed_carrot: 1.5 } })).toThrow();
+    expect(bad({ ...eco, buy_prices: { seed_carrot: 100_001 } })).toThrow();
+    expect(bad({ ...eco, buy_prices: { 'Seed Carrot': 9 } })).toThrow();
+    expect(bad({ ...eco, buy_prices: [9] })).toThrow();
+    const { buy_prices: _, ...without } = eco;
+    const none = parseParcelRules(structuredClone({ ...rules, economy: without }));
+    expect(none.economy.buy_prices).toEqual({});
+    const out = applyFarmCommands(none, with24(), [{ type: 'buy', item: 'seed_carrot', count: 1 }], T0 + 60_000);
+    expect(out).toMatchObject({ ok: false, code: 'NOT_FOR_SALE' });
+  });
+
+  it('a purchase takes 9 coins a seed and adds the seeds to the bag; sales and other fields stay', () => {
+    const s = with24();
+    const after = run(s, [{ type: 'buy', item: 'seed_carrot', count: 2 }], T0 + 60_000);
+    expect(after).toEqual({ ...s, coins: 6, bag: { ...s.bag, seed_carrot: 3 } });
+    // The seeds bought can be sown.
+    expect(run(after, [{ type: 'sow', cell: '1,1', crop: 'crop_carrot' }], T0 + 60_000).bag.seed_carrot).toBe(2);
+  });
+
+  it('too few coins: refused, the whole batch unchanged; spending exactly all coins is allowed', () => {
+    const s = with24();
+    const frozen = structuredClone(s);
+    const out = applyFarmCommands(rules, s, [{ type: 'buy', item: 'seed_carrot', count: 1 }, { type: 'buy', item: 'seed_carrot', count: 2 }], T0 + 60_000);
+    expect(out).toEqual({ ok: false, index: 1, code: 'NOT_ENOUGH_COINS', detail: { coins: 15, need: 18 } });
+    expect(s).toEqual(frozen);
+    expect(applyFarmCommands(rules, emptyFarm(), [{ type: 'buy', item: 'seed_carrot', count: 1 }], T0))
+      .toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH_COINS', detail: { coins: 0, need: 9 } });
+    const legacy = { v: 1, house: null, cleared: [], tilled: [], crops: {}, bag: {}, welcomed_at: T0 } as unknown as ParcelFarmState;
+    expect(applyFarmCommands(rules, legacy, [{ type: 'buy', item: 'seed_carrot', count: 1 }], T0)).toMatchObject({ ok: false, code: 'NOT_ENOUGH_COINS' });
+    const all = run({ ...s, coins: 27 }, [{ type: 'buy', item: 'seed_carrot', count: 3 }], T0 + 60_000);
+    expect(all).toMatchObject({ coins: 0, bag: { seed_carrot: 4 } });
+  });
+
+  it('only what Jasmine sells can be bought', () => {
+    for (const item of ['crop_carrot', 'hoe_starter', 'blueprint_coop', 'toString', '__proto__'])
+      expect(applyFarmCommands(rules, with24(), [{ type: 'buy', item, count: 1 }], T0 + 60_000))
+        .toEqual({ ok: false, index: 0, code: 'NOT_FOR_SALE', detail: { item } });
+  });
+
+  it('a price in the request is dropped at parse time; the count is bounded', () => {
+    expect(parseFarmCommands([{ type: 'buy', item: 'seed_carrot', count: 2, price: 0 }])).toEqual([{ type: 'buy', item: 'seed_carrot', count: 2 }]);
+    expect(parseFarmCommands([{ type: 'buy', item: 'seed_carrot', count: MAX_BUY_COUNT }])).not.toBeNull();
+    for (const count of [0, -1, 1.5, MAX_BUY_COUNT + 1, '2', undefined])
+      expect(parseFarmCommands([{ type: 'buy', item: 'seed_carrot', count }])).toBeNull();
+    expect(parseFarmCommands([{ type: 'buy', item: 'x'.repeat(65), count: 1 }])).toBeNull();
+    expect(parseFarmCommands([{ type: 'buy', count: 1 }])).toBeNull();
   });
 });
 
