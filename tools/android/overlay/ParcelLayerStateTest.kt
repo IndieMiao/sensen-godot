@@ -85,6 +85,28 @@ class ParcelLayerStateTest {
         assertTrue(wait.expire("second")); assertNull(wait.resume(true))
         wait.park("third"); wait.drop(); assertNull(wait.resume(true)); assertFalse(wait.expire("third"))
     }
+    @Test fun querySettlesAfterItsSourcesLoadAndOneFrameRenders() {
+        val settle = ParcelQuerySettle(); settle.reset(setOf("parcels", "buildings"))
+        assertFalse(settle.frameRendered())
+        settle.tileLoaded("parcels", true); assertFalse(settle.frameRendered())
+        settle.tileLoaded("composite", false); settle.tileLoaded("buildings", null); assertFalse(settle.frameRendered())
+        settle.tileLoaded("buildings", true); assertFalse(settle.settled)
+        assertTrue(settle.frameRendered()); assertTrue(settle.settled)
+        assertFalse(settle.frameRendered()); assertTrue(settle.settled) // Reported once; later frames keep it.
+        settle.tileLoaded("parcels", true); assertFalse(settle.frameRendered()); assertTrue(settle.settled)
+    }
+    @Test fun querySettleRestartsOnCameraChangeIncompleteTilesAndNewSources() {
+        val settle = ParcelQuerySettle(); settle.reset(setOf("parcels", "buildings"))
+        settle.tileLoaded("parcels", true); settle.tileLoaded("buildings", true); settle.cameraChanged()
+        assertFalse(settle.frameRendered()); assertFalse(settle.settled) // Loaded before the pan: the new view is unknown.
+        settle.tileLoaded("parcels", true); settle.tileLoaded("buildings", true); assertTrue(settle.frameRendered())
+        settle.tileLoaded("buildings", false); assertFalse(settle.settled); assertFalse(settle.frameRendered())
+        settle.tileLoaded("buildings", true); assertTrue(settle.frameRendered())
+        settle.reset(setOf("parcels-2")); assertFalse(settle.settled)
+        settle.tileLoaded("parcels", true); assertFalse(settle.frameRendered())
+        settle.tileLoaded("parcels-2", true); assertTrue(settle.frameRendered())
+        settle.reset(emptySet()); settle.tileLoaded("parcels-2", true); assertFalse(settle.frameRendered()); assertFalse(settle.settled)
+    }
     // C-118: returning to the map, the foreground or a reload must not fetch and parse the 60 MB building file again.
     private val buildingsUrl = "https://example.test/r6/buildings.geojson"
     private fun buildings() = ParcelBuildingsSource("gensen-buildings-datasf")
@@ -137,5 +159,31 @@ class ParcelLayerStateTest {
         // The same for a copy replaced at the same URL after a failure.
         source.markFailed(next); val third = source.added("https://example.test/r7/buildings.geojson")
         assertFalse(source.markLoaded(next)); assertFalse(source.markFailed(next)); assertTrue(source.markLoaded(third))
+    }
+    // C-83 on C-118/C-124: a tap settles on the current building copy's own tile events, never a replaced copy's.
+    @Test fun querySettleFollowsTheCurrentBuildingCopy() {
+        val source = buildings(); val settle = ParcelQuerySettle()
+        val stuck = source.added(buildingsUrl) // Download cut off by the outage, neither loaded nor failed.
+        settle.reset(ParcelQuerySettle.sourcesFor("parcels-1", true, stuck))
+        assertEquals(ParcelBuildingsSource.Plan.REPLACE, source.plan(buildingsUrl, exists = true, refetch = true)) // Retry.
+        val fresh = source.added(buildingsUrl)
+        settle.reset(ParcelQuerySettle.sourcesFor("parcels-2", true, fresh))
+        settle.tileLoaded("parcels-2", true); settle.tileLoaded(stuck, true) // The old copy finishing late.
+        assertFalse(settle.frameRendered()); assertFalse(settle.settled)
+        settle.tileLoaded(fresh, true); assertTrue(settle.frameRendered())
+    }
+    @Test fun aReusedLoadedCopyStillNeedsItsOwnTileEvents() {
+        val source = buildings(); val settle = ParcelQuerySettle()
+        val id = source.added(buildingsUrl); source.markLoaded(id)
+        assertEquals(ParcelBuildingsSource.Plan.REUSE, source.plan(buildingsUrl, exists = true)); assertTrue(source.loaded)
+        // The fill layer is added again: its tiles are laid out again before a query can hit a building.
+        settle.reset(ParcelQuerySettle.sourcesFor("parcels-2", true, source.id))
+        settle.tileLoaded("parcels-2", true); assertFalse(settle.frameRendered()); assertFalse(settle.settled)
+        settle.tileLoaded(id, true); assertTrue(settle.frameRendered())
+    }
+    @Test fun querySettleSourcesByBuildingKind() {
+        assertEquals(setOf("parcels", "composite"), ParcelQuerySettle.sourcesFor("parcels", false, null))
+        assertEquals(setOf("parcels", "gensen-buildings-datasf-3"), ParcelQuerySettle.sourcesFor("parcels", true, "gensen-buildings-datasf-3"))
+        assertEquals(emptySet<String>(), ParcelQuerySettle.sourcesFor("parcels", true, null)) // Mapbox refused the copy.
     }
 }
