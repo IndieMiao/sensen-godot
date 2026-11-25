@@ -299,7 +299,7 @@
                                   ]
                                 },
                                 {
-                                  "type": "BaseButton",
+                                  "type": "UiEnergyChip",
                                   "rect": [
                                     48,
                                     67,
@@ -793,7 +793,7 @@
                                   ]
                                 },
                                 {
-                                  "type": "BaseButton",
+                                  "type": "UiEnergyChip",
                                   "rect": [
                                     48,
                                     157,
@@ -1342,7 +1342,7 @@
                                   ]
                                 },
                                 {
-                                  "type": "BaseButton",
+                                  "type": "UiEnergyChip",
                                   "rect": [
                                     48,
                                     247,
@@ -1858,7 +1858,7 @@
                                   ]
                                 },
                                 {
-                                  "type": "BaseButton",
+                                  "type": "UiEnergyChip",
                                   "rect": [
                                     48,
                                     337,
@@ -2352,7 +2352,7 @@
                                   ]
                                 },
                                 {
-                                  "type": "BaseButton",
+                                  "type": "UiEnergyChip",
                                   "rect": [
                                     48,
                                     427,
