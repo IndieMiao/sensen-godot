@@ -14,13 +14,15 @@ var _backoffs: Array[Timer] = []
 static func valid_base(url: String) -> bool:
 	return url.begins_with("https://") and url.length() > 8 and not "@" in url and not "?" in url and not "#" in url
 
-func request(path: String, expected_sha256 := "") -> Dictionary:
+## `base`: another release's directory (an earlier dataset still serving its farms, C-113); "" is `base_url`.
+func request(path: String, expected_sha256 := "", base := "") -> Dictionary:
 	var epoch := _epoch
-	var origin := base_url.trim_suffix("/") # Retries cannot drift to a later configuration.
+	var origin := (base_url if base.is_empty() else base).trim_suffix("/") # Retries cannot drift to a later configuration.
 	if not valid_base(origin) or not path.begins_with("/") or ".." in path or "?" in path or "#" in path:
 		return {"ok":false,"code":"configuration"}
 	if transport.is_valid():
-		var value: Dictionary = await transport.call(path)
+		# Fixtures see the path for `base_url` and the full URL for another release.
+		var value: Dictionary = await transport.call(path if base.is_empty() else origin + path)
 		return value if epoch == _epoch else {"ok":false,"code":"superseded"}
 	_request_sequence += 1
 	var request_id := _request_sequence

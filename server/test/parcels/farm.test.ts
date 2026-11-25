@@ -28,6 +28,7 @@ describe('dynamic_farm.json', () => {
     expect(rules.till_tool).toBe('hoe_starter');
     expect(communityOf(rules, 'sf-dynamic-farm-20261118-r4')).toBe('sf');
     expect(communityOf(rules, 'sf-dynamic-farm-20261124-r6')).toBe('sf'); // C-43: r6, r5 without its broken building rings (V-167)
+    expect(communityOf(rules, 'sf-dynamic-farm-20261125-r8')).toBe('sf'); // C-113: r8, r6's parcels plus OSM buildings where DataSF has none
     expect(communityOf(rules, 'sf-dynamic-farm-20261124-r5')).toBeNull(); // never shipped
     expect(communityOf(rules, 'nope')).toBeNull();
   });

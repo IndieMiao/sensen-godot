@@ -32,7 +32,12 @@ class Selector extends Node:
 	var manifest := {"native_map": {"minzoom": 16}}
 	var _options: Array = []
 	var opened := 0
-	func open_farm() -> void: opened += 1
+	var releases_opened: Array = []
+	var releases := {} # Earlier releases still serving their farms (selection_controller.release_base).
+	var homes: Array = []
+	func open_farm(release := "") -> void: opened += 1; releases_opened.append(release)
+	func home_release(claimed: String) -> String: return claimed if releases.has(claimed) else str(manifest.get("dataset_version", ""))
+	func select_home(id: String, release: String) -> void: homes.append([id, release])
 	func pause() -> void: pass
 	func activate() -> void: pass
 var checks := 0
@@ -59,6 +64,7 @@ func _run() -> void:
 	await _account_kept_on_server_errors()
 	await _account_row()
 	await _home_framing()
+	await _earlier_release_home()
 	await _guest_play_sign_in()
 	print("DYNAMIC CLAIM ", checks - failures, "/", checks)
 	quit(1 if failures else 0)
@@ -565,6 +571,39 @@ func _home_framing() -> void:
 	check(near.call(page._camera, home_center, page.HOME_ZOOM), "after signing in the map moves to the new account's home")
 	page.queue_free(); pair[1].queue_free()
 	await process_frame
+
+## C-113 Q-172: with the map on r8, a home claimed on r6 is entered in its r6 farm, from the card or from "My home"
+## (r8 has no farm for a few r6 parcels, so its building may not be on the map); a home claimed on r8 enters r8.
+func _earlier_release_home() -> void:
+	const R6 := "sf-dynamic-farm-20261124-r6"
+	const R8 := "sf-dynamic-farm-20261125-r8"
+	ProjectSettings.set_setting(OWN_FARM, true)
+	for case in [[R6, R6, "r6"], [R8, R8, "r8"], ["sf-dynamic-farm-20261118-r4", R8, "an unlisted r4"]]:
+		var server := FakeServer.new(); server.dataset = case[0]
+		var home_id: String = _free_ids(server, 1)[0]
+		await ClaimApi.new(server.client("fake-a"), case[0]).claim(home_id, [-122.4101, 37.7801])
+		var page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
+		root.add_child(page)
+		var selector := Selector.new(); root.add_child(selector)
+		selector.manifest = {"dataset_version": R8, "native_map": {"minzoom": 16, "center": [-122.45, 37.73], "initial_zoom": 16.5}}
+		selector.releases = {R6: "https://old.invalid/r6/"}
+		page._selector = selector; page._camera = CameraInput.new(); page.add_child(page._camera)
+		page._framed = true; page._area_generation = selector.generation
+		page._claims = controller(server, "fake-a", Native.new()); page._claims.changed.connect(page._render)
+		await page._claims.start()
+		page._home.pressed.emit()
+		check(selector.homes == ([[home_id, R6]] if case[1] == R6 else []), "home claimed on %s: 'My home' %s" % [case[2],
+			"also selects it from its r6 farm" if case[1] == R6 else "only flies there"])
+		selector.selection = Fixture.metadata(home_id); selector.selection.block_id = home_id
+		page._render()
+		check(page._enter.visible, "home claimed on %s: the card offers 'Enter my farm'" % case[2])
+		page._enter.pressed.emit()
+		check(selector.releases_opened == [case[1]] and page._entering == home_id, "home claimed on %s: 'Enter my farm' opens its %s farm" % [case[2], "r6" if case[1] == R6 else "r8"])
+		page._preview()
+		check(selector.releases_opened.back() == "", "a 3D preview always reads the map's release")
+		page.queue_free(); selector.queue_free()
+		await process_frame
+	ProjectSettings.set_setting(OWN_FARM, false)
 
 func _write(path: String, text: String) -> void:
 	var f := FileAccess.open(path, FileAccess.WRITE)

@@ -5,6 +5,7 @@ signal candidates_found(rows: Array)
 signal farm_ready(farm: Dictionary)
 signal load_diagnostic(details: Dictionary)
 const Contract := preload("res://modules/dynamic_farm/map/geo_contract.gd")
+const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const MapConfig := preload("res://modules/dynamic_farm/map/geo_map_config.gd")
 const Metadata := preload("res://modules/dynamic_farm/map/parcel_metadata.gd")
 const FarmData := preload("res://modules/dynamic_farm/farm_data.gd")
@@ -235,18 +236,53 @@ func min_core_cells() -> int:
 	if not (raw is int or raw is float) or not is_finite(float(raw)): raw = MIN_CORE_CELLS
 	return int(clampf(float(raw), 1, FarmData.MAX_CELLS)) # Clamp before int(): 1e30 must not wrap.
 
-func open_farm() -> void:
+## Directory of an earlier release that still serves its farms (config `releases`, C-113), or "" for the map's
+## own release and for any release not listed there.
+func release_base(version: String) -> String:
+	var releases = config.get("releases")
+	if version == str(manifest.get("dataset_version", "")) or not releases is Dictionary or not Contract.valid_dataset(version): return ""
+	var base := str(releases.get(version, ""))
+	return base if Api.valid_base(base.trim_suffix("/")) else ""
+
+## The release the player's own farm opens in: the one their home was claimed on while that release still serves its
+## farms (the save's cells belong to its grid, Q-172), else the map's release.
+func home_release(claimed: String) -> String:
+	return claimed if not release_base(claimed).is_empty() else str(manifest.get("dataset_version", ""))
+
+## "My home" for a home claimed on an earlier release (C-113): selects it from that release's farm, so the player can
+## enter it even where the map's release has no farm for that parcel.
+func select_home(id: String, release: String) -> void:
+	var base := release_base(release)
+	if suspended or not map_ready or busy or base.is_empty() or not Contract.valid_id(id): return
+	var epoch := _epoch
+	_pending = -1; _retry_left = -1.0; _query_failed = false; _resume_tap = false; _options = []
+	selection = {}; _key = ""; bridge.set_parcel_building_highlight(generation, "")
+	message = FINDING; changed.emit()
+	var farm: Dictionary = await api.request(Contract.farm_path(id), "", base)
+	if epoch != _epoch or suspended or busy or not selection.is_empty() or _querying(): return
+	var decoded := FarmData.decode(farm) if Contract.farm_matches(farm, id, release) else {}
+	if decoded.get("ok") != true:
+		message = "Your home could not load. Tap My home again."; changed.emit(); return
+	selection = {"block_id": id, "parcel_id": decoded.parcel_id, "name": decoded.name,
+		"core_cell_count": decoded.counts.core, "extension_cell_count": decoded.counts.extension,
+		"total_cell_count": decoded.counts.core + decoded.counts.extension, "release": release}
+	message = "Ready to preview this farm."; changed.emit()
+
+## `release`: the release to read the farm from (home_release); "" is the map's release.
+func open_farm(release := "") -> void:
 	if suspended or not map_ready or busy or selection.is_empty(): return
 	var id := str(selection.block_id)
+	var base := release_base(release)
+	var version := release if not base.is_empty() else str(manifest.dataset_version)
 	var epoch := _epoch
 	busy = true; message = "Loading dynamic farm…"; changed.emit()
 	var started := Time.get_ticks_msec()
 	_record_load("farm", "request", epoch, started)
-	var farm: Dictionary = await api.request(Contract.farm_path(id))
+	var farm: Dictionary = await api.request(Contract.farm_path(id), "", base)
 	if epoch != _epoch or suspended:
 		_record_load("farm", "superseded", epoch, started); return
 	busy = false
-	var decoded := FarmData.decode(farm) if Contract.farm_matches(farm, id, str(manifest.dataset_version)) else {}
+	var decoded := FarmData.decode(farm) if Contract.farm_matches(farm, id, version) else {}
 	if decoded.get("ok") != true:
 		_record_load("farm", "validation_rejected", epoch, started)
 		_fail("This farm could not load. Please try again."); return

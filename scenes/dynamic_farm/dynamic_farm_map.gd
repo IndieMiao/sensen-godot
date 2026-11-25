@@ -363,7 +363,15 @@ func _frame_home(fly := false) -> bool:
 
 func _go_home() -> void:
 	if _selector == null or _selector.manifest.is_empty() or _town != null: return
-	_frame_home(true)
+	if not _frame_home(true): return
+	# A home claimed on an earlier release opens in that release's farm (Q-172), which the map's release may not draw.
+	if not _own_farm_entry(): return
+	var release := _home_release()
+	if release != str(_selector.manifest.get("dataset_version", "")): _selector.select_home(str(_claims.mine.parcel_id), release)
+
+## The release the player's own farm opens in: the one the home was claimed on while it still serves its farms.
+func _home_release() -> String:
+	return _selector.home_release(str(_claims.mine.get("dataset_version", ""))) if _claims.has_home() else str(_selector.manifest.get("dataset_version", ""))
 
 ## The locate key: back to the player, who lives at their home; without a home, back to the dataset's area.
 func _locate_player() -> void:
@@ -475,7 +483,8 @@ func _preview() -> void:
 
 func _enter_farm() -> void:
 	if _selector != null and not _opening:
-		_entering = str(_selector.selection.get("block_id", "")); _selector.open_farm()
+		_entering = str(_selector.selection.get("block_id", ""))
+		_selector.open_farm(_home_release() if _claims != null and _claims.status(_entering) == "mine" else "")
 
 func _claim_selection() -> void:
 	_confirm.hide()
