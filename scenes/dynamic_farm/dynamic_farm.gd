@@ -91,6 +91,8 @@ var _route: Array[Vector3] = []
 var _route_stuck_s := 0.0
 ## A labour clip is playing; the player holds still until it ends.
 var _labour_left := 0.0
+## The Energy card's `Show home` (C-148) holds the camera on the cottage until the player moves.
+var _showing_house := false
 
 func setup(args: Dictionary) -> void:
 	_args = args.duplicate(true)
@@ -185,6 +187,9 @@ func _ready() -> void:
 		_hint.hide()
 		_farming.state_changed.connect(_on_farm_changed)
 		_farming.place_side_button(_build)
+		# C-148: the parcel's Energy in the top bar, P0's chip just before the coins.
+		_header.add_child(_farming.energy_chip)
+		_header.move_child(_farming.energy_chip, _coins_capsule.get_index())
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_summary = {"schema":4,"dataset":_data.dataset_version,"block_id":_data.block_id,
@@ -425,12 +430,22 @@ func _process(delta: float) -> void:
 	if _farming != null:
 		_farming.update(dt, _walk.cell_at(_actor.position + _facing * _walk.cell_m * 0.8), steering,
 			_actor.position, _facing)
-	if not _overview:
+	if steering: _showing_house = false
+	if not _overview and not _showing_house:
 		var size := get_viewport().get_visible_rect().size
 		var safe := Rect2(size*Vector2(0.23,0.26),size*Vector2(0.54,0.48))
 		_focus += CameraRules.follow_shift(_camera,_actor.position,safe)
 		if input.is_zero_approx() and _route.is_empty(): _focus = _focus.lerp(_actor.position,minf(dt*2.8,1.0))
 		_place_camera()
+
+## The Energy card's Rest tile (`Show home`, C-148): the camera turns to the cottage and stays there until the
+## player moves; it never walks the player there or rests for them (LOCK-09: tiles only guide).
+func show_house() -> void:
+	if _house == null: return
+	_focus = _house.position
+	_overview = false
+	_showing_house = true
+	_place_camera()
 
 ## Walks the player beside `cells` (8 neighbours, sides preferred) and turns them to face the
 ## cells, along a route around everything the walker collides with (C-73). Returns "ok" there,
@@ -589,7 +604,8 @@ func _build_ui() -> void:
 	_header.add_child(chip)
 	_title = chip.label()
 	_title.theme_type_variation = UiTokens.STYLE_TYPE_LABEL_ON_DARK
-	_title.custom_minimum_size.x = 120
+	# The place capsule takes the room left (on 360 that is ~110 beside the Energy chip and coins); its lines cut with …
+	_title.custom_minimum_size.x = 0
 	chip.text = "Dynamic farm"
 	chip.detail = "Loading preview…"
 	_status = chip.detail_label()
@@ -654,9 +670,9 @@ func is_back_navigation_locked() -> bool:
 	_request_back()
 	return true
 
-## Closes the farming UI's open drawer (the bag); false when none was open.
+## Closes the farming UI's open drawer (the bag) or Energy card / panel; false when none was open.
 func close_modal() -> bool:
-	return _farming != null and _farming.close_bag()
+	return _farming != null and (_farming.close_energy() or _farming.close_bag())
 
 func suspend() -> void:
 	_suspended = true

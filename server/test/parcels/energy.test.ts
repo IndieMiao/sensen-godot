@@ -218,3 +218,17 @@ describe('C-148 old saves read at full Energy', () => {
     expect(rebaseFarm(rules, s).energy).toEqual({ value: 42, at: T0, rested_on: '2026-11-23' });
   });
 });
+
+/**
+ * 客户端和服务端同一套规则：tests/dynamic_farm/fixtures/energy_cases.json 的每个用例在这里按服务端跑，
+ * 在 tests/dynamic_farm/test_parcel_farming.gd 里按客户端 parcel_farm.gd 跑，两边结果都要等于文件里记的结果。
+ */
+describe('C-148 the client runs the same Energy cases (shared fixture)', () => {
+  const shared = JSON.parse(readFileSync(path.join(DEFAULT_CONTENT_DIR, '..', '..', '..', 'tests', 'dynamic_farm', 'fixtures', 'energy_cases.json'), 'utf8'));
+  for (const c of shared.cases) {
+    it(c.name, () => {
+      const r = applyFarmCommands(rules, structuredClone(c.farm), c.commands, c.now, { parcel_id: shared.parcel_id });
+      expect(r.ok ? { ok: true, energy: r.state.energy } : { ok: false, index: r.index, code: r.code, detail: r.detail ?? {} }).toEqual(c.expect);
+    });
+  }
+});

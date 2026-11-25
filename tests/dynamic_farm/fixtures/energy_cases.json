@@ -1,0 +1,895 @@
+{
+ "_note": "C-148: the same Energy cases for server/test/parcels/energy.test.ts and tests/dynamic_farm/test_parcel_farming.gd; parcel p-3512001. Regenerate only from the server rules.",
+ "parcel_id": "p-3512001",
+ "cases": [
+  {
+   "name": "till costs 2 from full; the timer starts now",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 200,
+     "at": 1795377600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "till",
+     "cell": "2,2"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": true,
+    "energy": {
+     "value": 198,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "clear costs 2",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 150,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "clear_obstacle",
+     "cell": "5,5"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": true,
+    "energy": {
+     "value": 148,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "sow a carrot costs 3",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 150,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "sow",
+     "cell": "1,1",
+     "crop": "crop_carrot"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": true,
+    "energy": {
+     "value": 147,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "gather costs 2",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 150,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "gather",
+     "object": "p-3512001:outer-groves-v2:wild_pz_tree_20:41,7:0"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": true,
+    "energy": {
+     "value": 148,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "harvest is free",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 1795464000000
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 150,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "harvest",
+     "cell": "1,1"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": true,
+    "energy": {
+     "value": 150,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "short of a sow: NO_ENERGY with need, have and next_in",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 2,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "sow",
+     "cell": "1,1",
+     "crop": "crop_carrot"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NO_ENERGY",
+    "detail": {
+     "need": 3,
+     "have": 2,
+     "next_in": 180000
+    }
+   }
+  },
+  {
+   "name": "short of a gather after its own checks",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 1,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "gather",
+     "object": "p-3512001:outer-groves-v2:wild_pz_tree_20:41,7:0"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NO_ENERGY",
+    "detail": {
+     "need": 2,
+     "have": 1,
+     "next_in": 240000
+    }
+   }
+  },
+  {
+   "name": "a batch that runs out is refused at the command that runs out",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 5,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "till",
+     "cell": "2,2"
+    },
+    {
+     "type": "till",
+     "cell": "3,2"
+    },
+    {
+     "type": "till",
+     "cell": "4,2"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 2,
+    "code": "NO_ENERGY",
+    "detail": {
+     "need": 2,
+     "have": 1,
+     "next_in": 240000
+    }
+   }
+  },
+  {
+   "name": "its own reason first: ALREADY_TILLED at 0",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 0,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "till",
+     "cell": "1,1"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "ALREADY_TILLED",
+    "detail": {}
+   }
+  },
+  {
+   "name": "+1 every 4 minutes by server time",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 100,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "place_house",
+     "x": 20,
+     "y": 20
+    }
+   ],
+   "now": 1795464600000,
+   "expect": {
+    "ok": true,
+    "energy": {
+     "value": 102,
+     "at": 1795464480000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "never past the pool",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 100,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "place_house",
+     "x": 20,
+     "y": 20
+    }
+   ],
+   "now": 1795550400000,
+   "expect": {
+    "ok": true,
+    "energy": {
+     "value": 200,
+     "at": 1795550400000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "Newcomer: every 2:40 in the first 7 days",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1795377600000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 100,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "place_house",
+     "x": 20,
+     "y": 20
+    }
+   ],
+   "now": 1795464960000,
+   "expect": {
+    "ok": true,
+    "energy": {
+     "value": 106,
+     "at": 1795464960000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "Newcomer ends after 7 days",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794859200001,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 100,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "place_house",
+     "x": 20,
+     "y": 20
+    }
+   ],
+   "now": 1795464960000,
+   "expect": {
+    "ok": true,
+    "energy": {
+     "value": 104,
+     "at": 1795464960000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "rest +60 at the cottage",
+   "farm": {
+    "v": 1,
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795377600000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 50,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "rest"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": true,
+    "energy": {
+     "value": 110,
+     "at": 1795464000000,
+     "rested_on": "2026-11-23"
+    }
+   }
+  },
+  {
+   "name": "rest gives only what fits",
+   "farm": {
+    "v": 1,
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795377600000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 180,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "rest"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": true,
+    "energy": {
+     "value": 200,
+     "at": 1795464000000,
+     "rested_on": "2026-11-23"
+    }
+   }
+  },
+  {
+   "name": "rest needs the cottage",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 50,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "rest"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NO_HOUSE",
+    "detail": {}
+   }
+  },
+  {
+   "name": "rest once a player day",
+   "farm": {
+    "v": 1,
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795377600000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 50,
+     "at": 1795464000000,
+     "rested_on": "2026-11-23"
+    }
+   },
+   "commands": [
+    {
+     "type": "rest"
+    }
+   ],
+   "now": 1795521540000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "RESTED_TODAY",
+    "detail": {
+     "resets_at": 1795521600000
+    }
+   }
+  },
+  {
+   "name": "the day turns at 04:00 San Francisco time",
+   "farm": {
+    "v": 1,
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795377600000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 50,
+     "at": 1795521600000,
+     "rested_on": "2026-11-23"
+    }
+   },
+   "commands": [
+    {
+     "type": "rest"
+    }
+   ],
+   "now": 1795521600000,
+   "expect": {
+    "ok": true,
+    "energy": {
+     "value": 110,
+     "at": 1795521600000,
+     "rested_on": "2026-11-24"
+    }
+   }
+  },
+  {
+   "name": "nothing to gain when full",
+   "farm": {
+    "v": 1,
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795377600000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "energy": {
+     "value": 200,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "rest"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "ENERGY_FULL",
+    "detail": {}
+   }
+  },
+  {
+   "name": "a save from before Energy is full",
+   "farm": {
+    "v": 1,
+    "house": null,
+    "cleared": [],
+    "tilled": [
+     "1,1"
+    ],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_cottage": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {}
+   },
+   "commands": [
+    {
+     "type": "till",
+     "cell": "2,2"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": true,
+    "energy": {
+     "value": 198,
+     "at": 1795464000000,
+     "rested_on": null
+    }
+   }
+  }
+ ]
+}

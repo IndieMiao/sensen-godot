@@ -89,6 +89,8 @@ func _run() -> void:
 	await _reopen()
 	await _placement_takes_over()
 	await _house_pops_once()
+	await _energy_short_and_rest()
+	await _energy_comes_back()
 	await _older_dataset_claim()
 	await _release_named_on_enter()
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
@@ -234,7 +236,7 @@ func _first_visit() -> void:
 	var key: Array
 	var all_clear := block.size() == 4
 	for at: Vector2i in block:
-		all_clear = all_clear and farming.obstacle_cells().has(at) and await _key(farming, at) == ["Clear", "Free", UiSceneAction.State.DEFAULT]
+		all_clear = all_clear and farming.obstacle_cells().has(at) and await _key(farming, at) == ["Clear", "2 Energy", UiSceneAction.State.DEFAULT]
 	_check(all_clear, "every cell under the tree offers Clear, none Till")
 	_check(not _beside(block), "the tree starts out of reach")
 	# The stick cancels the walk: nothing is sent.
@@ -257,19 +259,21 @@ func _first_visit() -> void:
 	for at: Vector2i in block:
 		freed = freed and not farming.obstacle_cells().has(at) and (await _key(farming, at))[0] != "Clear"
 	_check(freed and walk.clear_position(walk.point(obstacle)), "and frees the whole block and the walk")
-	_check(farming.farm.bag.get("hoe_starter") == 1, "clearing costs nothing")
+	_check(farming.farm.bag.get("hoe_starter") == 1 and farming.energy_value() == 198, "clearing uses no item, 2 Energy (C-148)")
+	_check("−2 Energy" in _floats(farming), "the Energy it cost floats up: %s" % [_floats(farming)])
 	# Till, sow, wait, harvest.
 	var cell := _free_cell(data, farming)
-	_check(await _key(farming, cell) == ["Till", "Free", UiSceneAction.State.DEFAULT], "a free core cell offers Till")
+	_check(await _key(farming, cell) == ["Till", "2 Energy", UiSceneAction.State.DEFAULT], "a free core cell offers Till for 2 Energy")
 	seen = await _press(farming, cell)
 	_check(_beside([cell]) and seen.clips.has("labour_till") and not seen.early, "till: beside the cell, facing it, the till clip")
 	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crop_art.counts().soil == {"dry": 1, "wet": 0}, "one press tills, one dry soil block drawn")
 	_check(_tip(farming) == "Press Sow to plant Carrot Seeds in your soil.", "the next step's card comes back after tilling: " + _tip(farming))
-	_check(await _key(farming, cell) == ["Sow", "Carrot", UiSceneAction.State.DEFAULT], "tilled soil offers Sow")
+	_check(await _key(farming, cell) == ["Sow", "3 Energy", UiSceneAction.State.DEFAULT], "tilled soil offers Sow for 3 Energy")
 	seen = await _press(farming, cell)
 	_check(seen.moved < 0.01 and seen.clips.has("labour_sow"), "already beside it: no walk, the sow clip")
 	var crop: Dictionary = farming.farm.crops.get(ParcelFarm.key(cell), {})
 	_check(crop.get("ripe_at", 0) - crop.get("planted_at", 0) == 60000 and farming.farm.bag.seed_carrot == 2, "sown: 60 s to ripen, one seed used")
+	_check(farming.energy_value() == 193 and scene._header.get_node("Energy").value_label.text == "193/200", "clear 2 + till 2 + sow 3: the top bar's chip reads 193/200")
 	_check(_bar_counts(farming).get("seed_carrot") == 2, "the quick bar's seed count follows at once")
 	_check(farming._crop_art.counts().stages == [0, 1, 0, 0, 0, 0, 0], "C-138: the sown carrot shows its sowing stage at once")
 	_check(not farming.wet_soil_preview and farming._crop_art.counts().soil == {"dry": 1, "wet": 0}, "C-138: no watering yet, the soil is dry")
@@ -310,7 +314,7 @@ func _first_visit() -> void:
 	_check(walk.position == at_start, "and the player stays put")
 	shift[0] += 60000
 	farming._clock_offset_ms += 60000
-	_check(await _key(farming, cell) == ["Harvest", "Free", UiSceneAction.State.DEFAULT], "ripe after 60 s")
+	_check(await _key(farming, cell) == ["Harvest", "", UiSceneAction.State.DEFAULT], "ripe after 60 s; harvesting is free, no price (LOCK-02)")
 	await create_timer(farming.get_script().REDRAW_S * 2).timeout
 	_check(_tip(farming) == "Your carrot is ripe. Press Harvest!", "a ripe carrot brings the harvest card: " + _tip(farming))
 	_check(farming._crop_art.counts().stages == [0, 0, 0, 0, 0, 0, 1], "C-138: the ripe carrot is drawn mature")
@@ -386,6 +390,79 @@ func _full_bag(farming: Node) -> void:
 	await process_frame
 	_check(farming._bag_slots.size() == 8 and farming._slots.get_child_count() == 9, "the Bag lists all 8: %d" % farming._bag_slots.size())
 	farming.close_bag()
+
+## C-148: a save short of Energy: the chip, the amber key that opens P0's Energy card instead of sending, its tiles,
+## Rest at the cottage's door (+60 once a player day) and the chip's panel.
+func _energy_short_and_rest() -> void:
+	var data: Dictionary = scene_data()
+	var house_at := _free_block(data)
+	var now: int = int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
+	var seeded := ParcelFarm.empty_state()
+	seeded.house = {"model": "cottage", "x": house_at.x, "y": house_at.y, "width": 3, "depth": 3, "rotation": 0, "built_at": 0}
+	seeded.welcomed_at = now - 8 * 86400000
+	seeded.bag = {"hoe_starter": 1, "seed_carrot": 3}
+	seeded.energy = {"value": 1, "at": now, "rested_on": null}
+	var energy_dir := dir + "_energy"
+	DirAccess.make_dir_recursive_absolute(energy_dir)
+	var file := FileAccess.open(energy_dir.path_join(raw.block_id.validate_filename() + ".json"), FileAccess.WRITE)
+	file.store_string(JSON.stringify({"block_id": raw.block_id, "farm_version": 3, "farm": seeded}))
+	file.close()
+	var store := LocalStore.new(raw.block_id, energy_dir)
+	store.now_ms = func() -> int: return int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
+	var farming := await _open(store)
+	var chip: UiEnergyChip = scene._header.get_node_or_null("Energy")
+	_check(chip != null and chip.visible and chip.get_index() == scene._coins_capsule.get_index() - 1, "the top bar shows P0's Energy chip before the coins")
+	_check(chip.value_label.text == "1/200" and chip.regen_text().begins_with("+1 in "), "the chip: 1/200, +1 in m:ss: %s %s" % [chip.value_label.text, chip.regen_text()])
+	var screen: Rect2 = farming._ui.get_global_rect()
+	_check(screen.encloses(scene._header.get_global_rect()), "the top bar with the chip stays on screen: %s" % scene._header.get_global_rect())
+	var cell := _free_cell(data, farming)
+	_check(await _key(farming, cell) == ["Till", "Need 2 Energy", UiSceneAction.State.INSUFFICIENT], "short: the key turns amber, Need 2 Energy (LOCK-10)")
+	_check(chip.state() == UiHud.Energy.LOW, "short of the next action the chip is amber too (LOCK-06)")
+	var version: int = farming.farm_version
+	farming._key.pressed_down.emit()
+	await process_frame
+	_check(farming.energy_modal == "card" and farming.farm_version == version and not farming.busy, "the press opens the Energy card and sends nothing")
+	var card := farming._ui.find_child("EnergyCard", true, false) as UiEnergyCard
+	_check(card != null and (card.find_child("Fact", true, false) as Label).text == "Till needs 2 Energy · you have 1",
+		"the card says what it needs and what there is (LOCK-09)")
+	var tiles := card.find_children("*", "UiEnergyTile", true, false)
+	var on := tiles.filter(func(t): return t.available)
+	_check(tiles.size() == 4 and on.size() == 1, "four RECOVER tiles; only Rest can be used here: %d" % on.size())
+	_check(card.find_child("Free", true, false) is UiCommandButton, "one button: Free to do now")
+	card.tile_pressed.emit("home")
+	await process_frame
+	_check(farming.energy_modal == "" and scene._showing_house, "the Rest tile only turns the camera to the cottage")
+	# Rest at the cottage's door.
+	var door = load("res://modules/dynamic_farm/parcel_space.gd").door_cell(farming.farm)
+	_check(await _key(farming, door) == ["Rest", "+60 Energy", UiSceneAction.State.DEFAULT], "at the cottage's door: Rest +60 Energy")
+	var seen := await _press(farming, door)
+	_check(farming.energy_value() == 61 and farming.farm.energy.rested_on != null, "one press rests: 1 -> 61")
+	_check("+60 Energy" in _floats(farming), "the Energy it gave floats up")
+	_check(seen.moved > 0.0 or _beside([door]), "the player stands at the door")
+	_check(await _key(farming, door) == ["Rest", "Rested today", UiSceneAction.State.UNAVAILABLE], "once a player day")
+	_check(await _key(farming, cell) == ["Till", "2 Energy", UiSceneAction.State.DEFAULT], "with Energy again the key works")
+	chip.pressed.emit()
+	await process_frame
+	var panel := farming._ui.find_child("EnergyPanel", true, false) as UiEnergyCard
+	_check(farming.energy_modal == "panel" and panel != null, "a tap on the chip opens P0's Energy panel")
+	_check(scene.close_modal() and farming.energy_modal == "", "Back closes it")
+	scene.queue_free()
+	await process_frame
+
+## C-148: away for a while, the Energy that came back by server time is there on return (offline regen).
+func _energy_comes_back() -> void:
+	var energy_dir := dir + "_energy"
+	var store := LocalStore.new(raw.block_id, energy_dir)
+	store.now_ms = func() -> int: return int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
+	var before := int(store.read().farm.energy.value)
+	shift[0] += 8 * 60000 + 1000
+	var farming := await _open(store)
+	_check(farming.energy_value() == before + 2, "8 minutes away: +2 (%d -> %d)" % [before, farming.energy_value()])
+	_check(scene._header.get_node("Energy").value_label.text == "%d/200" % (before + 2), "the chip shows it")
+	scene.queue_free()
+	await process_frame
+	for name in DirAccess.get_files_at(energy_dir): DirAccess.remove_absolute(energy_dir.path_join(name))
+	DirAccess.remove_absolute(energy_dir)
 
 ## The guide's card text on screen (C-35), "" when it is hidden.
 func _tip(farming: Node) -> String:

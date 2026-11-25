@@ -1,14 +1,17 @@
 extends Node3D
 ## Farming inside the owner's own dynamic parcel (C-34, rules Q-39): clear a core obstacle,
-## till, sow a carrot and harvest it into the bag. One press of the main key does one step,
-## free of Energy and coins. The store (server or local stand-in) is authoritative; this node
+## till, sow a carrot and harvest it into the bag. One press of the main key does one step.
+## Energy (C-148, P0's numbers): clearing, tilling, sowing and gathering cost it, harvesting is free;
+## the key shows the price (`3 Energy`), short of it it turns amber (`Need 3 Energy`, LOCK-10) and a press
+## opens P0's Energy card (LOCK-09) instead of sending. The top bar shows P0's Energy chip (LOCK-06);
+## at the cottage's door the key rests (+60 once a player day). The store (server or local stand-in) is authoritative; this node
 ## only checks the spatial rules the server cannot (ParcelSpace) and draws the result.
 ## Soil and carrots are drawn by ParcelCropArt (C-138: 1×1 dry or wet soil blocks, seven
 ## carrot stages). Main-farm pieces are reused read-only: P0 names and icons, and the main
 ## farm's UI kit (C-74): the quick bar, the action key and item flights into the bag; the bag
-## is the UI v3 modal panel and gains the v3 float (C-105). Nothing of P0Ui / P0Runtime or
-## Energy; the parcel's own coins (C-59) show in the scene's top bar as the main HUD's coins
-## capsule.
+## is the UI v3 modal panel and gains the v3 float (C-105). Nothing of P0Ui / P0Runtime; the
+## parcel's own coins (C-59) show in the scene's top bar as the main HUD's coins capsule, its
+## Energy (C-148) beside them as the main HUD's Energy chip.
 ## Outer gathering (C-60, ParcelGather): near a tree, flower or rock of the extension the key
 ## picks it by hand; a picked one stays faded (trees, rocks) or hidden (flowers, which never
 ## block) until it grows back. Gathering never touches the walk, the layout or collision.
@@ -29,9 +32,10 @@ const WET_SOIL_SETTING := "sensen/dynamic_farm/preview_wet_soil"
 const BAG_ORDER := ["hoe_starter", "seed_carrot", "crop_carrot"]
 ## Parcel items the main farm's content table does not name (C-74#33, copy per C-45). The icon is a placeholder from
 ## the existing set (the HUD's home), no new art.
-const VERBS := {"clear": "Clear", "till": "Till", "sow": "Sow", "harvest": "Harvest"}
+const VERBS := {"clear": "Clear", "till": "Till", "sow": "Sow", "harvest": "Harvest", "rest": "Rest", "gather": "Gather"}
+## C-148: Rested today / Energy full are P0's Rest copy (P0Logic.energy_card, rest_state).
 const REFUSALS := {Space.OUTSIDE: "Not farmland", Space.PATH: "On the path", Space.HOUSE: "House here",
-	Space.NO_TOOL: "Need a hoe", Space.NO_SEED: "No seeds"}
+	Space.NO_TOOL: "Need a hoe", Space.NO_SEED: "No seeds", Space.RESTED: "Rested today", Space.FULL: "Energy full"}
 ## Crop stages follow server time; redraw them this often.
 const REDRAW_S := 0.25
 ## How close (m, ground plane) the player must be to an outer object's bounds to gather it.
@@ -54,6 +58,8 @@ const KEY_ABOVE_BAR := 40.0
 const TIP_TOP := UiTokens.SIZE_SCREEN_SAFE_INSET + UiTokens.SIZE_TOUCH_MIN + UiTokens.SPACE_PAGE
 const LOADING := "Loading your farm…"
 const OPEN_FAILED := "Could not open your farm."
+## The Energy card's scrim (P0Ui.open_energy_card: UiTokens.OPACITY_SCRIM_MODAL over P0's veil colour).
+const SCRIM := Color(0.184, 0.227, 0.2, UiTokens.OPACITY_SCRIM_MODAL)
 
 var store: RefCounted
 var rules := {}
@@ -73,7 +79,9 @@ var unavailable := false
 var held := false:
 	set(value):
 		held = value
-		if value: close_bag()
+		if value:
+			close_bag()
+			close_energy()
 		if _key != null: _refresh_key()
 		_refresh_tip()
 		if not value and _bar != null: _draw_bag()
@@ -137,6 +145,14 @@ var _body: Node
 ## Hides the parcel until the save is applied: before it, cleared obstacles would still show.
 var _cover: ColorRect
 var _cover_label: Label
+
+## C-148: P0's Energy chip (the scene puts it in its top bar) and the open Energy card or panel ("" none).
+var energy_chip: UiEnergyChip
+var energy_modal := ""
+var _energy_layer: Control
+## Energy the key's action costs (0 none) and whether the player is short of it.
+var key_cost := 0
+var key_short := false
 
 ## `core` is the scene's built core obstacle layer: {plan, root, proxies, recipe}. `body` is the
 ## scene (C-73), `outer` the drawn outer layer, {layout, root, recipe} (its walk profiles are
@@ -231,6 +247,7 @@ func update(delta: float, facing_cell: Vector2i, steering: bool, player = null, 
 		_draw_gathered()
 		_refresh_tip()
 	_refresh_key()
+	_refresh_energy()
 
 ## A tap picks an outer object under the ray (`from`, `dir`), else that ground cell, until the
 ## player moves again. A tap landing on a core cell keeps that cell even when a tall outer
@@ -302,6 +319,8 @@ func _refresh_key() -> void:
 		current = _gather_action(object)
 	_marker.visible = not current.is_empty()
 	_keys.visible = _marker.visible or farm.is_empty()
+	key_cost = 0
+	key_short = false
 	if unavailable and not busy:
 		_key.verb = "Retry"
 		_key.cost = ""
@@ -316,18 +335,29 @@ func _refresh_key() -> void:
 	_marker.position = spot + Vector3(0, 0.045, 0)
 	var refused := not str(current.refusal).is_empty()
 	_marker_material.albedo_color = Color(0.86, 0.32, 0.25, 0.42) if refused else Color(1, 0.98, 0.86, 0.42)
+	# C-148: the price of what the key does (P0's key: `Sow` over `3 Energy`; free actions carry no price, LOCK-02).
+	if not refused: key_cost = ParcelFarm.energy_cost(rules, current.command)
+	key_short = key_cost > 0 and energy_value() < key_cost
 	if current.refusal == Space.NOT_RIPE:
 		_key.verb = "Growing"
 		_key.cost = P0Logic.key_ready(float(current.ripe_in_ms))
 	elif current.verb == "gather":
-		var item: String = gatherables[current.object].item
 		_key.verb = "Regrowing" if current.refusal == REGROWING else "Gather"
 		_key.cost = P0Logic.key_ready(float(current.ready_in_ms)) if current.refusal == REGROWING \
-			else "Move closer" if current.refusal == TOO_FAR else _names.get(item, item)
+			else "Move closer" if current.refusal == TOO_FAR else _price()
+	elif current.verb == "rest":
+		_key.verb = VERBS.rest
+		_key.cost = REFUSALS.get(current.refusal, "+%d Energy" % int(current.get("gain", 0)))
 	else:
 		_key.verb = VERBS[current.verb]
-		_key.cost = REFUSALS.get(current.refusal, _names.get(current.command.get("crop", ""), "Free"))
-	_key.state = UiSceneAction.State.UNAVAILABLE if refused else UiSceneAction.State.DEFAULT
+		_key.cost = REFUSALS.get(current.refusal, _price())
+	_key.state = UiSceneAction.State.UNAVAILABLE if refused else UiSceneAction.State.INSUFFICIENT if key_short \
+		else UiSceneAction.State.DEFAULT
+
+## The key's second line for a priced action: `3 Energy`, short of it `Need 3 Energy` (LOCK-10); free: none.
+func _price() -> String:
+	if key_cost <= 0: return ""
+	return ("Need %d Energy" if key_short else "%d Energy") % key_cost
 
 func _on_key() -> void:
 	if held: return
@@ -335,6 +365,10 @@ func _on_key() -> void:
 		await enter()
 		return
 	if busy or current.is_empty(): return
+	if key_short:
+		# Short of Energy: the press opens the Energy card and sends nothing (LOCK-09 / LOCK-10).
+		open_energy_card(key_cost, VERBS.get(current.verb, ""))
+		return
 	if not str(current.refusal).is_empty():
 		var refusal := "Not ripe yet" if current.refusal == Space.NOT_RIPE else "Not ready yet" if current.refusal == REGROWING else _key.cost
 		_toast.show_toast(refusal, ToastLayer.Severity.REFUSED)
@@ -371,6 +405,9 @@ func work(cell: Vector2i, action: Dictionary) -> Dictionary:
 ## The cells one press works: the whole block of an obstacle (a tree covers four), else the cell.
 func work_cells(cell: Vector2i, action: Dictionary) -> Array[Vector2i]:
 	var cells: Array[Vector2i] = []
+	# Rest (C-148): the middle of the cottage's door row, so the player stands at the door.
+	var door = Space.door_cell(farm) if action.get("verb") == "rest" else null
+	if door != null: cells.append(door)
 	if action.get("verb") == "clear" and _obstacles.has(cell):
 		for at: Vector2i in _obstacles:
 			if _obstacles[at] == _obstacles[cell]: cells.append(at)
@@ -383,6 +420,7 @@ func send(command: Dictionary, hold_s := 0.0) -> Dictionary:
 	busy = true
 	var shown_at := Time.get_ticks_msec() + int(hold_s * 1000.0)
 	var before: Dictionary = farm.get("bag", {}).duplicate()
+	var energy_before := energy_value()
 	var result: Dictionary = await store.send(farm_version, [command])
 	if is_inside_tree() and Time.get_ticks_msec() < shown_at:
 		await get_tree().create_timer((shown_at - Time.get_ticks_msec()) / 1000.0).timeout
@@ -396,6 +434,12 @@ func send(command: Dictionary, hold_s := 0.0) -> Dictionary:
 				var gained := int(farm.bag.get(id, 0)) - int(before.get(id, 0))
 				if gained > 0: gains[id] = gained
 			announce_gains(gains, _gain_screen(command))
+		var cost := ParcelFarm.energy_cost(rules, command)
+		announce_energy(-cost if cost > 0 else energy_value() - energy_before if command.type == "rest" else 0, _gain_screen(command))
+	elif result.get("code") == "NO_ENERGY":
+		# The server's clock disagreed with the key's: the same card as a short key (LOCK-09).
+		var detail: Dictionary = result.get("detail", {})
+		open_energy_card(int(detail.get("need", ParcelFarm.energy_cost(rules, command))), VERBS.get(_verb_of(command), ""))
 	elif result.get("code") == "VERSION_CONFLICT":
 		_toast.show_toast("Your farm was updated. Try again.", ToastLayer.Severity.INFO)
 	elif result.get("code") == "NOT_RESPAWNED":
@@ -403,6 +447,125 @@ func send(command: Dictionary, hold_s := 0.0) -> Dictionary:
 	else:
 		_toast.show_toast("That didn't work.", ToastLayer.Severity.REFUSED)
 	return result
+
+# ------------------------------------------------------------------ Energy (C-148)
+
+## The farm's Energy now (server time), settled on a copy; 0 before the save is read.
+func energy_now() -> Dictionary:
+	if farm.is_empty() or rules.is_empty(): return {}
+	var probe := farm.duplicate()
+	var now := server_now()
+	var e := ParcelFarm.settle_energy(rules, probe, now)
+	return {"value": int(e.value), "max": ParcelFarm.max_energy(rules, probe), "next_in": ParcelFarm.next_tick_in(rules, probe, now),
+		"regen_ms": ParcelFarm.regen_ms(rules, probe, now), "blessing_left": ParcelFarm.blessing_left(rules, probe, now),
+		"rested": ParcelFarm.rested_today(rules, probe, now), "resets_in": ParcelFarm.next_rollover(rules, now) - now}
+
+func energy_value() -> int:
+	return int(energy_now().get("value", 0))
+
+## The facts P0's Energy views read (P0Logic.energy_card / energy_panel / hud_state), from the parcel's own save:
+## its Energy, the day's one Rest, the Newcomer time; no dishes, fish or tea here (those tiles stay greyed, as P0's).
+func energy_view() -> Dictionary:
+	var e := energy_now()
+	var view := {"energy": {"value": e.get("value", 0), "max": e.get("max", 200), "next_in": e.get("next_in"),
+		"regen_ms": e.get("regen_ms", 240000)}, "bag": {"slots": []}, "coins": int(farm.get("coins", 0)),
+		"rest": {"used": 1 if e.get("rested", false) else 0, "limit": 1, "resets_in": e.get("resets_in", 0),
+			"amount": int(rules.get("energy", {}).get("rest_amount", 60))}}
+	if int(e.get("blessing_left", 0)) > 0:
+		view.blessing = {"left": e.blessing_left, "regen_mult": float(rules.energy.blessing.regen_mult)}
+	return view
+
+## The top bar's chip follows the settled value every frame: `+1 in 2:41` ticks locally between replies (§3.7.1).
+func _refresh_energy() -> void:
+	if energy_chip == null: return
+	var e := energy_now()
+	energy_chip.visible = not e.is_empty() and not held
+	if e.is_empty(): return
+	var hud := P0Logic.hud_state(energy_view(), {"next_cost": key_cost if key_short else 0, "unread": 0})
+	energy_chip.show_energy(int(hud.energy), int(hud.energy_max), str(hud.regen), int(hud.next_cost))
+
+## P0's Energy card (LOCK-09) for an action short of Energy: facts, the RECOVER tiles that only guide, and the one
+## button `Free to do now` that closes it. Only Rest is on the parcel today; away from a cottage it reads `At home`.
+## Its guide `Show home` (q(30) before a bench) turns the camera to the cottage.
+func open_energy_card(need: int, verb: String) -> void:
+	close_energy()
+	var facts := P0Logic.energy_card(energy_view(), need, verb, farm.get("house") is Dictionary)
+	for t: Dictionary in facts.tiles:
+		t.icon = P0Logic.icon(str(t.icon))
+		if t.go == "bench":
+			t.guide = "Show home"
+			t.go = "home"
+	var card := UiEnergyCard.card(facts)
+	card.name = "EnergyCard"
+	card.free_pressed.connect(close_energy)
+	card.tile_pressed.connect(func(go: String):
+		close_energy()
+		if go == "home" and _body != null and _body.has_method("show_house"): _body.show_house())
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.add_child(card)
+	_open_energy_layer(center, SCRIM)
+	energy_modal = "card"
+
+## Tapping the Energy chip: P0's Energy panel under it (LOCK-09): the pool, the day's Rest, the Newcomer Blessing.
+## Meals come with cooking (0.4.7), so their tile is left out here.
+func open_energy_panel() -> void:
+	if farm.is_empty(): return
+	close_energy()
+	var facts := P0Logic.energy_panel(energy_view())
+	facts.uses = facts.uses.filter(func(u: Dictionary): return u.name != "Meals")
+	for u: Dictionary in facts.uses: u.icon = P0Logic.icon(str(u.icon))
+	if not facts.blessing.is_empty():
+		facts.blessing.detail = "Energy returns %s× faster" % str(snappedf(float(rules.energy.blessing.regen_mult), 0.1))
+	var panel := UiEnergyCard.panel(facts)
+	panel.name = "EnergyPanel"
+	var chip := energy_chip.visual_rect()
+	var width := _ui.size.x
+	var x := clampf(chip.position.x - UiTokens.SPACE_WITHIN, UiTokens.SIZE_HUD_X, maxf(UiTokens.SIZE_HUD_X, width - UiTokens.SIZE_ENERGY_PANEL_W - UiTokens.SIZE_HUD_X))
+	panel.position = Vector2(x, chip.end.y + UiTokens.SPACE_ROW)
+	panel.pointer_x = chip.get_center().x - x
+	_open_energy_layer(panel, Color(SCRIM, 0.0))
+	energy_modal = "panel"
+
+func _open_energy_layer(content: Control, scrim: Color) -> void:
+	_bar.cancel_drag()
+	_energy_layer = Control.new()
+	_energy_layer.name = "EnergyLayer"
+	_energy_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_energy_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var veil := ColorRect.new()
+	veil.name = "Scrim"
+	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	veil.color = scrim
+	veil.gui_input.connect(func(event: InputEvent):
+		if (event is InputEventMouseButton or event is InputEventScreenTouch) and event.pressed: close_energy())
+	_energy_layer.add_child(veil)
+	_energy_layer.add_child(content)
+	_ui.add_child(_energy_layer)
+	_ui.move_child(_toast, -1)
+
+## Closes the Energy card or panel; false when neither was open.
+func close_energy() -> bool:
+	if _energy_layer == null: return false
+	_energy_layer.queue_free()
+	_energy_layer = null
+	energy_modal = ""
+	return true
+
+## The Energy a reply spent or gave as one float over what it was spent on: `−3 Energy` / `+60 Energy` (P0's tones).
+func announce_energy(delta: int, from: Vector2) -> void:
+	if delta == 0: return
+	var line := UiGainFloat.new(("+%d Energy" if delta > 0 else "−%d Energy") % absi(delta),
+		UiGainFloat.Tone.ENERGY_GAIN if delta > 0 else UiGainFloat.Tone.ENERGY_COST)
+	line.name = "EnergyFloat"
+	line.theme = UiKit.theme()
+	_ui.add_child(line)
+	line.play(from - Vector2(0, FLOAT_ABOVE * 2.0), 0)
+
+## The key's verb for a command (the Energy card's `Sow needs 3 Energy`).
+static func _verb_of(command: Dictionary) -> String:
+	return {"clear_obstacle": "clear", "till": "till", "sow": "sow", "gather": "gather", "rest": "rest"}.get(command.get("type", ""), "")
 
 func _adopt(result: Dictionary) -> void:
 	var next := ParcelFarm.normalize(result.get("farm"))
@@ -716,6 +879,13 @@ func _build_ui(canvas: CanvasLayer) -> void:
 	_key = _keys.key()
 	_key.name = "MainKey"
 	_key.pressed_down.connect(_on_key)
+	# C-148: the main HUD's Energy chip; the scene puts it in its top bar (it is not under _ui).
+	energy_chip = UiEnergyChip.new()
+	energy_chip.name = "Energy"
+	energy_chip.theme = UiKit.theme()
+	energy_chip.visible = false
+	energy_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	energy_chip.pressed.connect(open_energy_panel)
 	_toast = ToastLayer.new()
 	_toast.name = "Toast"
 	_ui.add_child(_toast)
