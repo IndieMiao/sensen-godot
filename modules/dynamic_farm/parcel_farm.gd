@@ -12,15 +12,22 @@ extends RefCounted
 ## Energy (C-148, P0's numbers per the owner's C-137#15 q3) mirrors server/src/parcels/energy.ts: `energy` in the
 ## rules; the save's `energy` {value, at, rested_on} (absent on saves before it: full). Clearing, tilling, sowing
 ## and outer gathering cost Energy, the rest is free; `rest` at the cottage gives +60 once a player day.
+## Watering (C-151, owner SEN-C-137#6, #15) mirrors server/src/parcels/farm.ts: a sown crop is dry and counts no time
+## (`watered_at` null, `ripe_at` NEVER); `draw_water` at a built well (the rules' `watering.well`) fills the pail to
+## `watering.pail_uses` for 2 Energy, `water` uses one on a sown, unwatered cell and starts it growing then. A crop sown
+## before watering (no `watered_at`) counts as watered. The rules' `grants` (the well blueprint and the pail) are given
+## once per farm on entering; the save keeps the pail's water (`pail_water`) and what was granted (`grants`).
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
 const STATE_VERSION := 1
 const MAX_COORD := 1024
 const MAX_CELLS := 8192
 const MAX_BATCH := 50
 const COMMANDS := ["place_house", "place_building", "clear_obstacle", "till", "sow", "harvest", "sell", "claim_blueprint", "gather",
-	"rest"]
+	"rest", "draw_water", "water"]
 ## Commands priced by `energy.costs` (sowing is priced on the crop).
-const PRICED := ["clear_obstacle", "till", "gather"]
+const PRICED := ["clear_obstacle", "till", "gather", "draw_water"]
+## A dry crop's `ripe_at` (C-151): the latest time a JS Date holds, never reached (server farm.ts NEVER).
+const NEVER := 8640000000000000
 const DAY_MS := 86400000
 ## The first house's building type: an old save's `house` and `place_house` are cottages (server rules.ts HOME_BUILDING).
 const HOME_BUILDING := "cottage"
@@ -63,6 +70,16 @@ static func parse_rules(raw: Variant) -> Dictionary:
 			return {}
 	var energy := _parse_energy(raw.get("energy"))
 	if energy.is_empty(): return {}
+	var watering = raw.get("watering")
+	if not watering is Dictionary or not watering.get("well") is String or not raw.buildings.has(watering.well) \
+			or not watering.get("pail") is String or not whole_in(watering.get("pail_uses"), 1, 99):
+		return {}
+	if not raw.get("grants") is Dictionary: return {}
+	for id in raw.grants:
+		var items = raw.grants[id]
+		if not id is String or not items is Dictionary or items.is_empty(): return {}
+		for item in items:
+			if not item is String or not whole_in(items[item], 1, 999): return {}
 	var parsed: Dictionary = raw.duplicate(true)
 	for id in parsed.welcome_gift: parsed.welcome_gift[id] = int(parsed.welcome_gift[id])
 	for id in parsed.crops:
@@ -70,6 +87,9 @@ static func parse_rules(raw: Variant) -> Dictionary:
 		parsed.crops[id]["yield"] = int(parsed.crops[id]["yield"])
 		parsed.crops[id].energy = int(parsed.crops[id].energy)
 	parsed.energy = energy
+	parsed.watering.pail_uses = int(parsed.watering.pail_uses)
+	for id in parsed.grants:
+		for item in parsed.grants[id]: parsed.grants[id][item] = int(parsed.grants[id][item])
 	for id in parsed.buildings:
 		for field in ["width", "depth", "max"]: parsed.buildings[id][field] = int(parsed.buildings[id][field])
 	parsed["economy"] = _parse_economy(raw.get("economy"))
@@ -113,7 +133,7 @@ static func _parse_energy(raw: Variant) -> Dictionary:
 
 static func empty_state() -> Dictionary:
 	return {"v": STATE_VERSION, "buildings": [], "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {}, "welcomed_at": null,
-		"coins": 0, "sales": 0, "gathered": {}, "blueprints_claimed": {}}
+		"coins": 0, "sales": 0, "gathered": {}, "blueprints_claimed": {}, "pail_water": 0, "grants": {}}
 
 ## A state as returned by the server, with JSON floats turned back into integers.
 ## Returns {} for anything that is not a v1 farm.
@@ -132,6 +152,10 @@ static func normalize(raw: Variant) -> Dictionary:
 		if parse_key(key) == null or not crop is Dictionary or not crop.get("crop") is String: return {}
 		if not _number(crop.get("planted_at")) or not _number(crop.get("ripe_at")): return {}
 		state.crops[key] = {"crop": crop.crop, "planted_at": int(crop.planted_at), "ripe_at": int(crop.ripe_at)}
+		# C-151: null is sown but not watered; a number is when it was watered; absent (sown before watering) counts as watered.
+		if crop.has("watered_at"):
+			if crop.watered_at != null and not _number(crop.watered_at): return {}
+			state.crops[key].watered_at = int(crop.watered_at) if crop.watered_at != null else null
 	for id in raw.bag:
 		if not id is String or not whole_in(raw.bag[id], 0, 1 << 30): return {}
 		if int(raw.bag[id]) > 0: state.bag[id] = int(raw.bag[id])
@@ -159,11 +183,11 @@ static func normalize(raw: Variant) -> Dictionary:
 	if welcomed != null and not _number(welcomed): return {}
 	state.welcomed_at = int(welcomed) if welcomed != null else null
 	# C-58 economy: a save from before it has none and reads as 0 coins, nothing sold, gathered or claimed.
-	for field in ["coins", "sales"]:
+	for field in ["coins", "sales", "pail_water"]:
 		if raw.has(field):
 			if not whole_in(raw[field], 0, MAX_COINS): return {}
 			state[field] = int(raw[field])
-	for field in ["gathered", "blueprints_claimed"]:
+	for field in ["gathered", "blueprints_claimed", "grants"]:
 		if raw.get(field) == null: continue
 		if not raw[field] is Dictionary: return {}
 		for id in raw[field]:
@@ -175,6 +199,14 @@ static func normalize(raw: Variant) -> Dictionary:
 			and (energy.get("rested_on") == null or _is_day(energy.get("rested_on"))):
 		state.energy = {"value": int(energy.value), "at": int(energy.at), "rested_on": energy.get("rested_on")}
 	return state
+
+## Sown but not watered yet (C-151; server farm.ts isDry): `watered_at` is there and null.
+static func is_dry(crop: Dictionary) -> bool:
+	return crop.has("watered_at") and crop.watered_at == null
+
+## The state's buildings of the watering's well type (C-151).
+static func wells(rule_set: Dictionary, state: Dictionary) -> Array:
+	return buildings_of(state).filter(func(b): return b is Dictionary and b.get("type") == rule_set.watering.well)
 
 ## A house-shaped entry (C-31 `house`, or a building without id and type) with whole numbers, or {}.
 static func _house(raw: Variant) -> Dictionary:
@@ -316,6 +348,21 @@ static func welcome(rule_set: Dictionary, state: Dictionary, now: int) -> Varian
 	next.welcomed_at = now
 	return next
 
+## The rules' one-off grants (C-151) the state has not had yet, each given once and recorded in `grants`:
+## {state, gift} with the items given, or null when every grant was given before. The input is not changed.
+static func grant(rule_set: Dictionary, state: Dictionary, now: int) -> Variant:
+	var next := state.duplicate(true)
+	if not next.get("grants") is Dictionary: next.grants = {}
+	var gift := {}
+	for id: String in rule_set.grants:
+		if next.grants.has(id): continue
+		for item: String in rule_set.grants[id]:
+			var n := int(rule_set.grants[id][item])
+			next.bag[item] = int(next.bag.get(item, 0)) + n
+			gift[item] = int(gift.get(item, 0)) + n
+		next.grants[id] = now
+	return {"state": next, "gift": gift} if not gift.is_empty() else null
+
 ## A footprint's size: `base` is width × depth unturned; a quarter or three-quarter turn swaps them.
 static func turned(base: Vector2i, rotation: int) -> Vector2i:
 	return Vector2i(base.y, base.x) if rotation % 2 else base
@@ -346,7 +393,7 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 		return {"ok": false, "index": 0, "code": "SCHEMA"}
 	var next := state.duplicate(true)
 	var blank := empty_state()
-	for field in ["coins", "sales", "gathered", "blueprints_claimed"]:
+	for field in ["coins", "sales", "gathered", "blueprints_claimed", "pail_water", "grants"]:
 		if not next.has(field): next[field] = blank[field]
 	next.buildings = buildings_of(next).duplicate(true)
 	settle_energy(rule_set, next, now)
@@ -365,6 +412,8 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type == "rest":
 			pass
+		elif command.type == "draw_water":
+			if not whole_in(command.get("building"), 1, 1 << 30): return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type == "place_house" or command.type == "place_building":
 			if not whole_in(command.get("x"), 0, MAX_COORD - 1) or not whole_in(command.get("y"), 0, MAX_COORD - 1) \
 					or (command.has("rotation") and not whole_in(command.rotation, 0, 3)) \
@@ -418,10 +467,45 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				else:
 					_spend(rule_set, next, now, cost)
 					_take(next.bag, crop_rule.seed)
-					next.crops[cell] = {"crop": crop, "planted_at": now, "ripe_at": now + int(crop_rule.grow_seconds) * 1000}
+					# C-151: sown on dry soil, it counts no time until it is watered.
+					next.crops[cell] = {"crop": crop, "planted_at": now, "ripe_at": NEVER, "watered_at": null}
+			"draw_water":
+				# At the well (the scene keeps the key there); the server can check the well is built.
+				var water: Dictionary = rule_set.watering
+				var at := -1
+				for i in next.buildings.size():
+					if int(next.buildings[i].id) == int(command.building): at = i
+				if at < 0 or next.buildings[at].type != water.well:
+					failure = "NO_WELL"
+					detail = {"building": int(command.building)}
+				elif int(next.bag.get(water.pail, 0)) <= 0:
+					failure = "NO_PAIL"
+					detail = {"item": water.pail}
+				elif int(next.pail_water) >= int(water.pail_uses):
+					failure = "PAIL_FULL"
+					detail = {"water": int(next.pail_water)}
+				elif short: failure = "NO_ENERGY"
+				else:
+					_spend(rule_set, next, now, cost)
+					next.pail_water = int(water.pail_uses)
+			"water":
+				var planted = next.crops.get(cell)
+				var pail: String = rule_set.watering.pail
+				if int(next.bag.get(pail, 0)) <= 0:
+					failure = "NO_PAIL"
+					detail = {"item": pail}
+				elif planted == null: failure = "NO_CROP"
+				elif not is_dry(planted): failure = "ALREADY_WATERED"
+				elif int(next.pail_water) <= 0: failure = "PAIL_EMPTY"
+				elif not rule_set.crops.has(planted.crop): failure = "UNKNOWN_CROP"
+				else:
+					next.pail_water = int(next.pail_water) - 1
+					planted.watered_at = now
+					planted.ripe_at = now + int(rule_set.crops[planted.crop].grow_seconds) * 1000
 			"harvest":
 				var planted = next.crops.get(cell)
 				if planted == null: failure = "NO_CROP"
+				elif is_dry(planted): failure = "NOT_WATERED"
 				elif now < int(planted.ripe_at):
 					failure = "NOT_RIPE"
 					detail = {"ripe_at": planted.ripe_at}

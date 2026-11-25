@@ -3,6 +3,7 @@ extends SceneTree
 ## C-31 server, the client-only spatial rules and the local save standing in for the server.
 ## C-138: the carrot's seven stages and the dry / wet soil blocks (ParcelCropArt).
 ## C-148: Energy, P0's numbers, the same cases as the server (fixtures/energy_cases.json), the key's price and Rest.
+## C-151: watering, the same cases as the server (fixtures/watering_cases.json), the keys at the well and on dry crops.
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -36,8 +37,29 @@ func _run() -> void:
 	_energy()
 	_energy_cases()
 	_energy_space()
+	_watering()
+	_watering_cases()
+	_watering_space()
 	print("PARCEL_FARMING checks=%d failures=%d" % [checks, failures])
 	quit(1 if failures else 0)
+
+## C-151: water `cells` of `state` at `now`: without a well, the one-off grant first and a well at 30,30; a pail drawn
+## for every three cells. Fails the run when the rules refuse (a test helper, as farm.test.ts `watered`).
+func _wet(rules: Dictionary, state: Dictionary, cells: Array, now: int) -> Dictionary:
+	var s := state
+	if ParcelFarm.wells(rules, s).is_empty():
+		var granted = ParcelFarm.grant(rules, s, now)
+		if granted != null: s = granted.state
+		s = ParcelFarm.apply(rules, s, [{"type": "place_building", "building": "well", "x": 30, "y": 30, "rotation": 0}], now).state
+	var well := int(ParcelFarm.wells(rules, s)[0].id)
+	for i in range(0, cells.size(), 3):
+		var commands: Array = [{"type": "draw_water", "building": well}]
+		for cell in cells.slice(i, i + 3): commands.append({"type": "water", "cell": cell})
+		var out := ParcelFarm.apply(rules, s, commands, now)
+		_check(out.ok, "watering helper: %s" % out.get("code", ""))
+		if not out.ok: return s
+		s = out.state
+	return s
 
 func _rules() -> void:
 	var rules := ParcelFarm.rules()
@@ -69,11 +91,14 @@ func _commands() -> void:
 	_check(ParcelFarm.apply(rules, state, [{"type": "till", "cell": "10,10"}], T0).code == "ALREADY_TILLED", "a tilled cell stays tilled")
 	_check(ParcelFarm.apply(rules, state, [{"type": "sow", "cell": "11,10", "crop": "crop_carrot"}], T0).code == "NOT_TILLED", "sow only on tilled soil")
 	var sown := ParcelFarm.apply(rules, state, [{"type": "sow", "cell": "10,10", "crop": "crop_carrot"}], T0)
-	_check(sown.ok and sown.state.bag.seed_carrot == 2 and sown.state.crops["10,10"].ripe_at == T0 + 60000, "sowing takes one seed; ripe 60 s later")
+	_check(sown.ok and sown.state.bag.seed_carrot == 2 and sown.state.crops["10,10"] == {"crop": "crop_carrot", "planted_at": T0,
+		"ripe_at": ParcelFarm.NEVER, "watered_at": null}, "sowing takes one seed; dry, it does not count time (C-151)")
 	state = sown.state
-	var early := ParcelFarm.apply(rules, state, [{"type": "harvest", "cell": "10,10"}], T0 + 59999)
-	_check(not early.ok and early.code == "NOT_RIPE" and early.detail.ripe_at == T0 + 60000, "no harvest before 60 s")
-	var ripe := ParcelFarm.apply(rules, state, [{"type": "harvest", "cell": "10,10"}], T0 + 60000)
+	_check(ParcelFarm.apply(rules, state, [{"type": "harvest", "cell": "10,10"}], T0 + 86400000).code == "NOT_WATERED", "not watered, never harvested")
+	var wet := _wet(rules, state, ["10,10"], T0)
+	var early := ParcelFarm.apply(rules, wet, [{"type": "harvest", "cell": "10,10"}], T0 + 59999)
+	_check(not early.ok and early.code == "NOT_RIPE" and early.detail.ripe_at == T0 + 60000, "no harvest before 60 s after watering")
+	var ripe := ParcelFarm.apply(rules, wet, [{"type": "harvest", "cell": "10,10"}], T0 + 60000)
 	_check(ripe.ok and ripe.state.bag.crop_carrot == 1 and "10,10" in ripe.state.tilled and ripe.state.crops.is_empty(), "harvest puts the carrot in the bag, soil stays tilled")
 	var batch := ParcelFarm.apply(rules, state, [{"type": "till", "cell": "12,10"}, {"type": "harvest", "cell": "10,10"}], T0)
 	_check(not batch.ok and batch.index == 1 and "12,10" not in state.tilled, "a failed batch changes nothing")
@@ -106,8 +131,9 @@ func _commands() -> void:
 ## most 3, and a 4×2 coop, at most 1.
 func _buildings() -> void:
 	var rules := ParcelFarm.rules()
-	_check(rules.buildings == {"cottage": {"model": "cottage", "blueprint": "blueprint_cottage", "width": 3, "depth": 3, "max": 1}},
-		"buildings: the cottage only, one per parcel")
+	_check(rules.buildings == {"cottage": {"model": "cottage", "blueprint": "blueprint_cottage", "width": 3, "depth": 3, "max": 1},
+		"well": {"model": "well", "blueprint": "blueprint_well", "width": 1, "depth": 1, "max": 1}},
+		"buildings: one cottage and (C-151) one 1×1 well per parcel")
 	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH))
 	raw.buildings["well"] = {"model": "well", "blueprint": "blueprint_well", "width": 1, "depth": 1, "max": 3}
 	raw.buildings["coop"] = {"model": "coop", "blueprint": "blueprint_coop", "width": 4, "depth": 2, "max": 1}
@@ -215,7 +241,7 @@ func _space() -> void:
 	_check(Space.action(rules, data, path, obstacles, state, Vector2i(24, 9), T0).refusal == Space.PATH, "the key says why")
 	var tilled := ParcelFarm.apply(rules, state, [{"type": "till", "cell": "36,18"}], T0).state as Dictionary
 	_check(Space.action(rules, data, path, obstacles, tilled, free_cell, T0).command.get("crop") == "crop_carrot", "tilled soil offers Sow")
-	var growing := ParcelFarm.apply(rules, tilled, [{"type": "sow", "cell": "36,18", "crop": "crop_carrot"}], T0).state as Dictionary
+	var growing := _wet(rules, ParcelFarm.apply(rules, tilled, [{"type": "sow", "cell": "36,18", "crop": "crop_carrot"}], T0).state, ["36,18"], T0)
 	var waiting := Space.action(rules, data, path, obstacles, growing, free_cell, T0 + 18000)
 	_check(waiting.refusal == Space.NOT_RIPE and waiting.ripe_in_ms == 42000 and waiting.command.is_empty(), "a growing carrot counts down")
 	_check(Space.action(rules, data, path, obstacles, growing, free_cell, T0 + 60000).command.type == "harvest", "a ripe carrot offers Harvest")
@@ -228,8 +254,12 @@ func _store() -> void:
 	store.now_ms = func() -> int: return clock[0]
 	var first := store.enter()
 	_check(first.ok and first.granted and first.farm.bag.seed_carrot == 3 and first.farm_version == 1, "first entry grants and saves")
+	_check(first.gift == {"hoe_starter": 1, "seed_carrot": 3, "blueprint_cottage": 1, "blueprint_well": 1, "pail": 1}
+		and first.farm.grants == {"watering": T0}, "first entry: the gift and (C-151) the well blueprint and the pail, in one save")
 	var version: int = first.farm_version
-	for command in [{"type": "till", "cell": "36,18"}, {"type": "sow", "cell": "36,18", "crop": "crop_carrot"}]:
+	for command in [{"type": "till", "cell": "36,18"}, {"type": "sow", "cell": "36,18", "crop": "crop_carrot"},
+			{"type": "place_building", "building": "well", "x": 30, "y": 30, "rotation": 0}, {"type": "draw_water", "building": 1},
+			{"type": "water", "cell": "36,18"}]:
 		var result := store.send(version, [command])
 		_check(result.ok, "store applies " + command.type)
 		version = result.farm_version
@@ -238,13 +268,27 @@ func _store() -> void:
 	var reopened := LocalStore.new("p-A", dir)
 	reopened.now_ms = func() -> int: return clock[0]
 	var again := reopened.enter()
-	_check(again.ok and not again.granted and again.farm.bag.seed_carrot == 2, "reopening does not grant again")
-	_check(again.farm.crops["36,18"].ripe_at == T0 + 60000 and "36,18" in again.farm.tilled, "reopening keeps the soil and the original ripening time")
+	_check(again.ok and not again.granted and again.gift.is_empty() and again.farm.bag.seed_carrot == 2 and again.farm.bag.pail == 1,
+		"reopening does not grant again")
+	_check(again.farm.crops["36,18"].ripe_at == T0 + 60000 and again.farm.crops["36,18"].watered_at == T0 and again.farm.pail_water == 2
+		and "36,18" in again.farm.tilled, "reopening keeps the soil, the watering and the original ripening time")
 	_check(reopened.send(again.farm_version, [{"type": "harvest", "cell": "36,18"}]).code == "NOT_RIPE", "still 30 s to go")
 	clock[0] = T0 + 60000
 	var harvested := reopened.send(again.farm_version, [{"type": "harvest", "cell": "36,18"}])
 	_check(harvested.ok and harvested.farm.bag.crop_carrot == 1, "harvest after 60 s fills the bag")
 	_check(LocalStore.new("p-B", dir).enter().granted, "another parcel has its own save")
+	# C-151: a save from before watering (no grants) gets the well blueprint and the pail on its next entry, once.
+	var old := LocalStore.new("p-C", dir)
+	old.now_ms = func() -> int: return clock[0]
+	var welcomed: Dictionary = ParcelFarm.welcome(ParcelFarm.rules(), ParcelFarm.empty_state(), T0)
+	welcomed.erase("grants")
+	welcomed.erase("pail_water")
+	old._save(welcomed, 3)
+	var topped := old.enter()
+	_check(topped.ok and not topped.granted and topped.gift == {"blueprint_well": 1, "pail": 1} and topped.farm_version == 4
+		and topped.farm.bag.blueprint_well == 1 and topped.farm.bag.pail == 1, "an old save gets the watering grant on entry")
+	var twice := old.enter()
+	_check(twice.gift.is_empty() and twice.farm_version == 4, "the watering grant only once")
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
 
@@ -253,7 +297,7 @@ func _store() -> void:
 func _guide() -> void:
 	var rules := ParcelFarm.rules()
 	_check(Guide.step({}, T0) == "", "guide: nothing before the save is read")
-	var state: Dictionary = ParcelFarm.welcome(rules, ParcelFarm.empty_state(), T0)
+	var state: Dictionary = ParcelFarm.grant(rules, ParcelFarm.welcome(rules, ParcelFarm.empty_state(), T0), T0).state
 	_check(Guide.step(state, T0) == "build", "guide: a blueprint and no house -> Build Cottage")
 	var bare: Dictionary = state.duplicate(true)
 	bare.bag.erase("blueprint_cottage")
@@ -261,13 +305,20 @@ func _guide() -> void:
 	var steps := [[{"type": "place_house", "x": 4, "y": 4, "rotation": 0}, "till"],
 		[{"type": "clear_obstacle", "cell": "9,10"}, "till"],
 		[{"type": "till", "cell": "10,10"}, "sow"],
-		[{"type": "sow", "cell": "10,10", "crop": "crop_carrot"}, ""]]
+		[{"type": "sow", "cell": "10,10", "crop": "crop_carrot"}, "well"],
+		[{"type": "place_building", "building": "well", "x": 30, "y": 30, "rotation": 0}, "water"],
+		[{"type": "draw_water", "building": 2}, "water"],
+		[{"type": "water", "cell": "10,10"}, ""]]
 	for pair: Array in steps:
 		var result := ParcelFarm.apply(rules, state, [pair[0]], T0)
 		_check(result.ok, "guide: " + str(pair[0].type) + " applies")
 		if not result.ok: return
 		state = result.state
 		_check(Guide.step(state, T0) == pair[1], "guide: after %s -> '%s' (got '%s')" % [pair[0].type, pair[1], Guide.step(state, T0)])
+	var no_well_blueprint: Dictionary = state.duplicate(true)
+	no_well_blueprint.buildings = no_well_blueprint.buildings.filter(func(b): return b.type != "well")
+	no_well_blueprint.crops["10,10"].watered_at = null
+	_check(Guide.step(no_well_blueprint, T0) == "", "guide: a dry carrot, no well and no blueprint -> nothing")
 	_check(Guide.step(state, T0 + 59999) == "", "guide: quiet while the carrot grows")
 	_check(Guide.step(state, T0 + 60000) == "harvest", "guide: a ripe carrot -> Harvest")
 	var harvested := ParcelFarm.apply(rules, state, [{"type": "harvest", "cell": "10,10"}], T0 + 60000)
@@ -298,22 +349,25 @@ func _guide() -> void:
 	var regrown: Dictionary = carrots_left.duplicate(true)
 	regrown.gathered = {object: now}
 	_check(Guide.step(regrown, now) == "blueprint", "guide: gathered and sold -> the Carpenter")
-	for key: String in ["build", "till", "sow", "harvest", "sell", "gather", "sell_gathered", "blueprint"]:
+	for key: String in ["build", "till", "sow", "well", "water", "harvest", "sell", "gather", "sell_gathered", "blueprint"]:
 		_check(not Guide.text(key).is_empty(), "guide: copy for " + key)
 	for key: String in ["sell", "gather", "sell_gathered", "blueprint"]:
 		_check(not Guide.map_text(key).is_empty(), "guide: the map's line for " + key)
-	for key: String in ["build", "till", "sow", "harvest", ""]:
+	for key: String in ["build", "till", "sow", "well", "water", "harvest", ""]:
 		_check(Guide.map_text(key).is_empty(), "guide: no map line for '%s' (taught on the parcel)" % key)
 
 ## C-138: a sown carrot goes through stages 1..6 (stage 0 is tilled soil with nothing sown). Sowing to root thickening
 ## take a fifth of the growing time each; maturity starts exactly when the carrot ripens (Harvest opens).
+## C-151: the time counts from watering; a carrot not watered stays at sowing.
 func _crop_stages() -> void:
 	var rules := ParcelFarm.rules()
 	var state: Dictionary = ParcelFarm.welcome(rules, ParcelFarm.empty_state(), T0)
 	for command in [{"type": "till", "cell": "10,10"}, {"type": "sow", "cell": "10,10", "crop": "crop_carrot"}]:
-		state = ParcelFarm.apply(rules, state, [command], T0).state
+		state = ParcelFarm.apply(rules, state, [command], T0 - 90000).state
+	_check(CropArt.stage_of(state.crops["10,10"], T0 + 86400000) == 1, "stages: not watered, it stays at sowing")
+	state = _wet(rules, state, ["10,10"], T0)
 	var crop: Dictionary = state.crops["10,10"]
-	_check(crop.ripe_at - crop.planted_at == 60000, "stages: the carrot still ripens 60 s after sowing")
+	_check(crop.ripe_at - crop.watered_at == 60000 and crop.watered_at == T0, "stages: the carrot ripens 60 s after watering")
 	_check(CropArt.STAGES.size() == 7 and CropArt.MATURE == 6, "stages: seven, the last one mature")
 	var seen: Array = []
 	for second in range(0, 61):
@@ -330,9 +384,11 @@ func _crop_stages() -> void:
 		"stages: mature exactly when harvestable")
 	_check(CropArt.stage_of(crop, T0 + 86400000) == CropArt.MATURE, "stages: stays mature")
 	_check(CropArt.stage_of(crop, T0 - 5000) == 1, "stages: a clock behind the sowing shows sowing")
-	# A carrot sown before this change: the save has only planted_at / ripe_at, so it lands by how long it has grown.
-	var old := ParcelFarm.normalize(JSON.parse_string(JSON.stringify(state)))
-	_check(old.crops["10,10"] == crop and CropArt.stage_of(old.crops["10,10"], T0 + 40000) == 4, "stages: an existing save reads unchanged, 40 s in -> root shoulders")
+	_check(ParcelFarm.normalize(JSON.parse_string(JSON.stringify(state))).crops["10,10"] == crop, "stages: a JSON round trip keeps the watering")
+	# A carrot sown before C-138 and C-151: the save has only planted_at / ripe_at, so it lands by how long it has grown.
+	var legacy := {"crop": "crop_carrot", "planted_at": T0, "ripe_at": T0 + 60000}
+	var old := ParcelFarm.normalize(JSON.parse_string(JSON.stringify(state.merged({"crops": {"10,10": legacy}}, true))))
+	_check(old.crops["10,10"] == legacy and CropArt.stage_of(old.crops["10,10"], T0 + 40000) == 4, "stages: an existing save reads unchanged, 40 s in -> root shoulders")
 	_check(rules.crops.crop_carrot == {"seed": "seed_carrot", "grow_seconds": 60, "yield": 1, "energy": 3} and rules.economy.sell_prices.crop_carrot == 12,
 		"stages: seed, growing time, yield and price unchanged (C-148 adds the carrot's 3 Energy)")
 
@@ -340,9 +396,10 @@ func _crop_stages() -> void:
 func _crop_art() -> void:
 	var art := CropArt.new(func(cell: Vector2i) -> Vector3: return Vector3(cell.x, 0, -cell.y), 0.8)
 	var crops := {"2,1": {"crop": "crop_carrot", "planted_at": T0, "ripe_at": T0 + 60000},
-		"3,1": {"crop": "crop_carrot", "planted_at": T0 - 60000, "ripe_at": T0}}
-	art.sync({"1,1": CropArt.DRY, "2,1": CropArt.DRY, "3,1": CropArt.DRY}, crops, T0 + 13000)
-	_check(art.counts() == {"soil": {"dry": 3, "wet": 0}, "stages": [1, 0, 1, 0, 0, 0, 1]}, "art: three dry blocks, tilled / emergence / mature: %s" % [art.counts()])
+		"3,1": {"crop": "crop_carrot", "planted_at": T0 - 60000, "ripe_at": T0},
+		"4,1": {"crop": "crop_carrot", "planted_at": T0 - 60000, "ripe_at": ParcelFarm.NEVER, "watered_at": null}}
+	art.sync({"1,1": CropArt.DRY, "2,1": CropArt.DRY, "3,1": CropArt.DRY, "4,1": CropArt.DRY}, crops, T0 + 13000)
+	_check(art.counts() == {"soil": {"dry": 4, "wet": 0}, "stages": [1, 1, 1, 0, 0, 0, 1]}, "art: four dry blocks, tilled / sowing (not watered) / emergence / mature: %s" % [art.counts()])
 	art.sync({"1,1": CropArt.WET, "2,1": CropArt.WET, "3,1": CropArt.DRY}, crops, T0 + 13000)
 	_check(art.counts().soil == {"dry": 1, "wet": 2}, "art: wet blocks are drawn as wet")
 	var dry: MultiMeshInstance3D = art._soil[CropArt.DRY]
@@ -363,7 +420,7 @@ func _energy() -> void:
 	_check(e.max_base == int(p0.energy.max_base) and e.max_base == 200 and e.per_level == 10, "energy: pool 200, +10 a farm level (P0)")
 	_check(e.regen_ms == int(p0.energy.regen_ms) and e.rest_amount == int(p0.energy.rest_amount), "energy: +1 per 4 min, Rest +60 (P0)")
 	_check(e.blessing.days == int(p0.blessing.days) and is_equal_approx(e.blessing.regen_mult, float(p0.blessing.regen_mult)), "energy: Newcomer 7 days ×1.5 (P0)")
-	_check(e.costs == {"clear_obstacle": 2, "till": 2, "gather": 2}, "energy: clear 2, till 2, gather 2")
+	_check(e.costs == {"clear_obstacle": 2, "till": 2, "gather": 2, "draw_water": 2}, "energy: clear 2, till 2, gather 2, draw water 2 (C-151)")
 	for crop: Dictionary in p0.crops:
 		if crop.id == "crop_carrot": _check(rules.crops.crop_carrot.energy == int(crop.energy), "energy: a carrot sows for P0's 3")
 	var bad := JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH)) as Dictionary
@@ -461,3 +518,78 @@ func _energy_space() -> void:
 		and refused.farm.tilled.is_empty(), "store: short of Energy refuses and keeps the save")
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
+
+## C-151: the watering rules (owner SEN-C-137#6, #15), the one-off grant and old saves.
+func _watering() -> void:
+	var rules := ParcelFarm.rules()
+	_check(rules.watering == {"well": "well", "pail": "pail", "pail_uses": 3}, "watering: the well fills a pail of 3")
+	_check(rules.grants == {"watering": {"blueprint_well": 1, "pail": 1}}, "watering: every farm gets a well blueprint and a pail")
+	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH))
+	for broken: Array in [["watering", null], ["watering", {"well": "castle", "pail": "pail", "pail_uses": 3}],
+			["watering", {"well": "well", "pail": "pail", "pail_uses": 0}], ["grants", null], ["grants", {"watering": {}}],
+			["grants", {"watering": {"pail": 0}}]]:
+		var bad: Dictionary = raw.duplicate(true)
+		bad[broken[0]] = broken[1]
+		_check(ParcelFarm.parse_rules(bad).is_empty(), "watering: malformed %s refused: %s" % broken)
+	var water_priced: Dictionary = raw.duplicate(true)
+	water_priced.energy.costs.water = 1
+	_check(ParcelFarm.parse_rules(water_priced).is_empty(), "watering: watering itself is never priced")
+	# The grant: once, on a new farm with the first-entry gift, or on an old farm's next entry.
+	var welcomed: Dictionary = ParcelFarm.welcome(rules, ParcelFarm.empty_state(), T0)
+	var first = ParcelFarm.grant(rules, welcomed, T0)
+	_check(first != null and first.gift == {"blueprint_well": 1, "pail": 1} and first.state.grants == {"watering": T0}
+		and welcomed.bag == {"hoe_starter": 1, "seed_carrot": 3, "blueprint_cottage": 1}, "grant: given once, the input untouched")
+	_check(ParcelFarm.grant(rules, first.state, T0 + 5) == null, "grant: never twice")
+	var old := ParcelFarm.normalize({"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {"hoe_starter": 1}, "welcomed_at": T0})
+	_check(old.grants == {} and old.pail_water == 0, "an old save reads with no grant and an empty pail")
+	_check(ParcelFarm.grant(rules, old, T0).state.bag == {"hoe_starter": 1, "blueprint_well": 1, "pail": 1}, "grant: an old save gets it")
+	# Commands' shapes, as the server's parse.
+	var s: Dictionary = first.state
+	for bad_building in [0, -1, 1.5, "1", null]:
+		_check(ParcelFarm.apply(rules, s, [{"type": "draw_water", "building": bad_building}], T0).code == "SCHEMA", "draw_water: a whole building id (%s)" % [bad_building])
+	_check(ParcelFarm.apply(rules, s, [{"type": "water", "cell": "01,2"}], T0).code == "SCHEMA", "water: a canonical cell")
+	var trip := ParcelFarm.normalize(JSON.parse_string(JSON.stringify(_wet(rules, ParcelFarm.apply(rules, s,
+		[{"type": "till", "cell": "1,1"}, {"type": "sow", "cell": "1,1", "crop": "crop_carrot"}], T0).state, ["1,1"], T0))))
+	_check(trip.pail_water == 2 and trip.crops["1,1"].watered_at == T0 and trip.grants == {"watering": T0}, "watering: a JSON round trip keeps the pail and the watering")
+	_check(ParcelFarm.normalize({"v": 1, "house": null, "cleared": [], "tilled": ["1,1"], "bag": {},
+		"crops": {"1,1": {"crop": "crop_carrot", "planted_at": T0, "ripe_at": T0 + 1, "watered_at": "x"}}}).is_empty(), "watering: a malformed watered_at is refused")
+
+## The shared cases: the client's apply gives the server's outcome for every one of them.
+func _watering_cases() -> void:
+	var rules := ParcelFarm.rules()
+	var shared = JSON.parse_string(FileAccess.get_file_as_string("res://tests/dynamic_farm/fixtures/watering_cases.json"))
+	_check(shared is Dictionary and shared.cases.size() >= 20, "watering cases: the shared fixture reads")
+	for c: Dictionary in shared.cases:
+		var farm := ParcelFarm.normalize(c.farm)
+		var r := ParcelFarm.apply(rules, farm, c.commands, int(c.now), shared.parcel_id)
+		var got := {"ok": true, "crops": r.state.crops, "pail_water": r.state.pail_water, "bag": r.state.bag, "energy": r.state.energy} if r.ok \
+			else {"ok": false, "index": r.index, "code": r.code, "detail": r.get("detail", {})}
+		var want := JSON.stringify(_ints(c.expect), "", true)
+		_check(JSON.stringify(_ints(got), "", true) == want, "watering case '%s': %s, server %s" % [c.name, JSON.stringify(_ints(got)), want])
+
+## The key at the well and on a dry crop (C-151): Fill / Water, and why not.
+func _watering_space() -> void:
+	var rules := ParcelFarm.rules()
+	var data := Data.decode(Fixture.farm())
+	var path := Space.protected_path(data)
+	var state: Dictionary = ParcelFarm.grant(rules, ParcelFarm.welcome(rules, ParcelFarm.empty_state(), T0), T0).state
+	state = ParcelFarm.apply(rules, state, [{"type": "place_building", "building": "well", "x": 36, "y": 16, "rotation": 0},
+		{"type": "till", "cell": "36,18"}, {"type": "sow", "cell": "36,18", "crop": "crop_carrot"}], T0).state
+	_check(Space.well_cells(rules, state) == {Vector2i(36, 16): 1}, "the well's cell names the well")
+	var fill := Space.action(rules, data, path, {}, state, Vector2i(36, 16), T0)
+	_check(fill.verb == "fill" and fill.refusal == "" and fill.command == {"type": "draw_water", "building": 1}, "at the well the key fills the pail")
+	var water := Space.action(rules, data, path, {}, state, Vector2i(36, 18), T0)
+	_check(water.verb == "water" and water.refusal == Space.PAIL_EMPTY and water.command.is_empty(), "a dry carrot with an empty pail: Pail empty")
+	var full: Dictionary = ParcelFarm.apply(rules, state, [fill.command], T0).state
+	_check(Space.action(rules, data, path, {}, full, Vector2i(36, 16), T0).refusal == Space.PAIL_FULL, "a full pail: Pail full at the well")
+	water = Space.action(rules, data, path, {}, full, Vector2i(36, 18), T0)
+	_check(water.verb == "water" and water.refusal == "" and water.command == {"type": "water", "cell": "36,18"}, "a dry carrot and water in the pail: Water")
+	_check(ParcelFarm.energy_cost(rules, fill.command) == 2 and ParcelFarm.energy_cost(rules, water.command) == 0, "Fill costs 2 Energy, Water nothing")
+	var watered: Dictionary = ParcelFarm.apply(rules, full, [water.command], T0).state
+	var growing := Space.action(rules, data, path, {}, watered, Vector2i(36, 18), T0 + 18000)
+	_check(growing.refusal == Space.NOT_RIPE and growing.ripe_in_ms == 42000, "watered, it counts down from the watering")
+	var no_pail: Dictionary = full.duplicate(true)
+	no_pail.bag.erase("pail")
+	_check(Space.action(rules, data, path, {}, no_pail, Vector2i(36, 16), T0).refusal == Space.NO_PAIL
+		and Space.action(rules, data, path, {}, no_pail, Vector2i(36, 18), T0).refusal == Space.NO_PAIL, "no pail: Need a pail")
+	_check(Space.till_refusal(data, path, state, Vector2i(36, 16)) == Space.HOUSE, "no tilling under the well")

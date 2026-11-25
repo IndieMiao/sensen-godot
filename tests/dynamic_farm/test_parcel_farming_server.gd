@@ -2,7 +2,8 @@ extends SceneTree
 ## C-34 against a running C-31 server (real save, real server clock; nothing is shifted):
 ## `-- <base_url ending in /v1> <bearer token of the parcel's owner> <farm.json>`.
 ## The owner must already have claimed that parcel and not entered it yet. Takes ~70 s:
-## it waits for the carrot to ripen on the server clock.
+## it waits for the carrot to ripen on the server clock. C-151: the carrot is sown dry and the server does not ripen it;
+## Build Well, Fill at the well and Water start it, and it ripens 60 s after the watering.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const RemoteStore = preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -66,7 +67,8 @@ func _press(farming: Node, cell: Vector2i) -> void:
 func _first_visit() -> Vector2i:
 	var farming := await _open()
 	_check(farming.farm.bag.get("hoe_starter") == 1 and farming.farm.bag.get("seed_carrot") == 3, "the server grants 1 hoe, 3 carrot seeds")
-	_check(farming.last_gains == {"hoe_starter": 1, "seed_carrot": 3, "blueprint_cottage": 1}, "the gift is announced")
+	_check(farming.last_gains == {"hoe_starter": 1, "seed_carrot": 3, "blueprint_cottage": 1, "blueprint_well": 1, "pail": 1},
+		"the gift and the watering grant are announced: %s" % [farming.last_gains])
 	_check(absi(farming.server_now() - int(Time.get_unix_time_from_system() * 1000.0)) < 5000, "the clock follows server_time")
 	var obstacle := Vector2i(-1, -1)
 	for item: Dictionary in farming._core_plan.layout:
@@ -85,8 +87,31 @@ func _first_visit() -> Vector2i:
 	_check(ParcelFarm.key(cell) in farming.farm.tilled, "one press tills on the server")
 	await _press(farming, cell)
 	var crop: Dictionary = farming.farm.crops.get(ParcelFarm.key(cell), {})
-	_check(crop.get("ripe_at", 0) - crop.get("planted_at", 0) == 60000 and farming.farm.bag.get("seed_carrot") == 2, "the server ripens it 60 s after sowing")
+	_check(ParcelFarm.is_dry(crop) and crop.get("ripe_at") == ParcelFarm.NEVER and farming.farm.bag.get("seed_carrot") == 2, "the server sows it dry")
 	_check(farming.farm.bag.get("hoe_starter") == 1, "nothing but the seed was used")
+	var dry: Dictionary = await farming.store.send(farming.farm_version, [{"type": "harvest", "cell": ParcelFarm.key(cell)}])
+	_check(not dry.ok and dry.code == "NOT_WATERED", "the server refuses to harvest a carrot not watered")
+	var empty: Dictionary = await farming.store.send(farming.farm_version, [{"type": "water", "cell": ParcelFarm.key(cell)}])
+	_check(not empty.ok and empty.code == "PAIL_EMPTY", "the server refuses water from an empty pail")
+	# The Build key offers the cottage first (its blueprint is still in the bag here), then the well.
+	for _i in 2:
+		if not ParcelFarm.wells(farming.rules, farming.farm).is_empty() or not scene._build.visible: break
+		scene._build.activated.emit()
+		await process_frame
+		scene._placement._bar.confirmed.emit()
+		await _settle(farming)
+	var wells: Array = ParcelFarm.wells(farming.rules, farming.farm)
+	_check(wells.size() == 1, "Build Well stands the well on the server")
+	if wells.is_empty(): return cell
+	var well_cell := Vector2i(int(wells[0].x), int(wells[0].y))
+	var energy: int = farming.energy_value()
+	await _press(farming, well_cell)
+	_check(farming.farm.pail_water == 3 and farming.energy_value() == energy - 2, "Fill at the well: a pail of 3 for 2 Energy on the server")
+	await _press(farming, cell)
+	crop = farming.farm.crops.get(ParcelFarm.key(cell), {})
+	_check(crop.get("ripe_at", 0) - crop.get("watered_at", 0) == 60000 and farming.farm.pail_water == 2, "the server ripens it 60 s after watering")
+	var twice: Dictionary = await farming.store.send(farming.farm_version, [{"type": "water", "cell": ParcelFarm.key(cell)}])
+	_check(not twice.ok and twice.code == "ALREADY_WATERED", "the server refuses watering a cell twice")
 	# The server itself refuses an early harvest, whatever the client shows.
 	var early: Dictionary = await farming.store.send(farming.farm_version, [{"type": "harvest", "cell": ParcelFarm.key(cell)}])
 	_check(not early.ok and early.code == "NOT_RIPE", "the server refuses an early harvest")
@@ -96,11 +121,13 @@ func _first_visit() -> Vector2i:
 
 func _reopen(cell: Vector2i) -> void:
 	var farming := await _open()
-	_check(farming.farm.bag.get("seed_carrot") == 2 and farming.farm.bag.get("hoe_starter") == 1, "reopening grants nothing more")
+	_check(farming.farm.bag.get("seed_carrot") == 2 and farming.farm.bag.get("hoe_starter") == 1 and farming.farm.bag.get("pail") == 1
+		and not farming.farm.bag.has("blueprint_well") and not farming.farm.bag.has("blueprint_cottage"), "reopening grants nothing more")
 	_check(farming.last_gains.is_empty(), "no second gift announced")
 	_check(farming.farm.cleared.size() == 1 and ParcelFarm.key(cell) in farming.farm.tilled, "cleared and tilled cells come back")
 	var crop: Dictionary = farming.farm.crops.get(ParcelFarm.key(cell), {})
-	_check(crop.get("ripe_at", 0) > farming.server_now(), "the carrot is still growing")
+	_check(crop.get("ripe_at", 0) > farming.server_now() and crop.get("ripe_at", 0) < farming.server_now() + 120000, "the carrot is still growing")
+	if crop.get("ripe_at", 0) >= farming.server_now() + 120000: return
 	while farming.server_now() < int(crop.get("ripe_at", 0)) + 500: await create_timer(1.0).timeout
 	farming.pick(cell)
 	await process_frame

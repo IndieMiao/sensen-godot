@@ -6,6 +6,8 @@ extends RefCounted
 ## the community map says where to go for the steps done off the parcel (`map_text`).
 ## The 0.4.3 copy is for PM to finalise (C-45 / Q-61; docs/plans/C-61.md); English only, as the parcel's UI. C-115: the
 ## map's Market and Carpenter buttons became the Washington Square pin (Jasmine and Scott in its room; C-115#30), so the lines name it.
+## C-151: a sown carrot needs water before it grows, so after sowing the guide asks for the well (while its blueprint
+## waits) and then for watering, until every carrot in the ground is watered. Their copy is for PM to finalise.
 
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
@@ -14,10 +16,13 @@ const SEED := "seed_carrot"
 const CROP := "crop_carrot"
 ## The economy's blueprint the Carpenter gives (C-58 `economy.blueprints`).
 const COOP := "coop"
+const WELL_BLUEPRINT := "blueprint_well"
 const TIPS := {
 	"build": "Tap Build Cottage to place your first home.",
 	"till": "Pick a spot in your yard and press Till.",
 	"sow": "Press Sow to plant Carrot Seeds in your soil.",
+	"well": "Tap Build Well to place your well.",
+	"water": "Fill your pail at the well, then press Water on your seeds.",
 	"harvest": "Your carrot is ripe. Press Harvest!",
 	"sell": "Head back to the map and tap Washington Square to sell your carrot.",
 	"gather": "Walk up to a tree, flower or rock and press Gather.",
@@ -47,6 +52,10 @@ static func step(farm: Dictionary, now_ms: int) -> String:
 	if not crops.is_empty():
 		for key: String in crops:
 			if int(crops[key].get("ripe_at", 0)) <= now_ms: return "harvest"
+		for key: String in crops:
+			if ParcelFarm.is_dry(crops[key]):
+				if not ParcelFarm.wells(ParcelFarm.rules(), farm).is_empty(): return "water"
+				return "well" if int(bag.get(WELL_BLUEPRINT, 0)) > 0 else ""
 		return ""
 	if int(bag.get(SEED, 0)) <= 0: return ""
 	for key in farm.get("tilled", []):

@@ -598,8 +598,8 @@ describe('watering (C-151)', () => {
     expect(tryAt(s, [{ type: 'draw_water', building: 99 }])).toEqual({ ok: false, index: 0, code: 'NO_WELL', detail: { building: 99 } });
     const full = run(s, [draw(s)]);
     expect(tryAt(full, [draw(full)])).toEqual({ ok: false, index: 0, code: 'PAIL_FULL', detail: { water: 3 } });
-    const noPail = { ...structuredClone(full), bag: { ...full.bag, pail: 0 } };
-    delete noPail.bag.pail;
+    const { pail: _pail, ...rest } = full.bag;
+    const noPail = { ...structuredClone(full), bag: rest };
     expect(tryAt(noPail, [water('1,1')])).toEqual({ ok: false, index: 0, code: 'NO_PAIL', detail: { item: 'pail' } });
     expect(tryAt({ ...noPail, pail_water: 0 }, [draw(noPail)])).toEqual({ ok: false, index: 0, code: 'NO_PAIL', detail: { item: 'pail' } });
     // One well at level 1: a second is BUILDING_LIMIT.

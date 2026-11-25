@@ -22,7 +22,7 @@ The first review package contains ordinary 328/424 scenes in Mobile and Compatib
 
 ## Own parcel farming (C-34)
 
-`setup({..., own_parcel:true, farm_store?})` opens the owner's parcel for farming instead of a preview (the host passes both keys through; `preview_only` is then not required). `ParcelFarming` (`parcel_farming.gd`) adds the main key, the bag row, toasts, tilled soil and carrots (`parcel_crop_art.gd`, C-138, below) and a target-cell marker. The target is the cell in front of the player; a short tap on the ground picks a cell until the player moves. One press clears a core obstacle, tills, sows or harvests (owner decision Q-39, C-34#14): no Energy or coins; carrots ripen 60 s after sowing by the store's clock; the first entry grants 1 Starter Hoe and 3 Carrot Seeds once. The scene asks the store to enter only after `preview_ready` (building the scene blocks the main thread for seconds, which timed out a request started earlier, V-123); a lost request is retried once before the key shows Retry. A cleared obstacle leaves the walker and is redrawn out of the core layer (`Scenery.build(..., bind=false)`, `Walk.remove_prop`).
+`setup({..., own_parcel:true, farm_store?})` opens the owner's parcel for farming instead of a preview (the host passes both keys through; `preview_only` is then not required). `ParcelFarming` (`parcel_farming.gd`) adds the main key, the bag row, toasts, tilled soil and carrots (`parcel_crop_art.gd`, C-138, below) and a target-cell marker. The target is the cell in front of the player; a short tap on the ground picks a cell until the player moves. One press clears a core obstacle, tills, sows or harvests (owner decision Q-39, C-34#14): no Energy or coins; carrots ripen 60 s after watering (C-151; after sowing before it) by the store's clock; the first entry grants 1 Starter Hoe and 3 Carrot Seeds once. The scene asks the store to enter only after `preview_ready` (building the scene blocks the main thread for seconds, which timed out a request started earlier, V-123); a lost request is retried once before the key shows Retry. A cleared obstacle leaves the walker and is redrawn out of the core layer (`Scenery.build(..., bind=false)`, `Walk.remove_prop`).
 
 Rules and numbers: `assets/farm/data/dynamic_farm.json` (shared with the C-31 server; separate from the main farm) is read by `modules/dynamic_farm/parcel_farm.gd`, a copy of the server's farm state v1 and its commands. The server holds no parcel geometry, so `parcel_space.gd` keeps the spatial rules on the client: tilling only on core cells, refused outside the core (`Not farmland`), under a building (`House here`) and on the protected path (`On the path`). Schema 4 marks every core cell as reserved, so the protected path inside the core is derived: the shortest walk from the entry to the spawn widened by `PATH_HALF_WIDTH` (1) cell, plus the spawn's `SPAWN_CLEARANCE` (1) ring.
 
@@ -36,7 +36,24 @@ Packaging must also include `assets/farm/data/dynamic_farm.json` and the P0 cont
 
 Tests: `tests/dynamic_farm/test_parcel_farming.gd` (rules, commands, spatial rules, local save) and `test_parcel_farming_scene.gd` (the real scene; optional `-- <farm.json>`), both headless in the private preview project. `test_parcel_farming_server.gd -- <base …/v1> <owner token> <farm.json>` runs the scene against a running C-31 server on its real clock (~70 s; the owner has claimed that parcel and not entered it yet).
 
-Soil and carrot stages (C-138): `modules/dynamic_farm/parcel_crop_art.gd` draws every tilled cell as its own 1×1 soil block, dry or wet (wet is darker), and the carrot in seven stages after the owner's reference (C-134 attachment-1052, answer C-134#5 question 3): tilled soil (nothing sown), sowing, emergence, leaf growth, root shoulders, root thickening, maturity. Sowing to root thickening take a fifth of the growing time each (12 s of 60 s); maturity starts at `ripe_at`, exactly when Harvest opens. Stages come from the save's `planted_at` / `ripe_at` only, so the save format is unchanged and a carrot sown before the change lands in its stage. Seeds, growing time, yield and price are unchanged. Until watering exists (C-137) the game draws dry soil; the development setting `sensen/dynamic_farm/preview_wet_soil` draws it wet (`GATHER_QA_WET_SOIL=1` turns it on in the emulator QA package). The shapes are placeholders from the main farm's carrot meshes until C-139's art. Review captures: `tools/dev/dynamic_farm/crop_stages_probe.gd` (also writes a seeded save for the emulator package); notes in `docs/plans/C-138.md`.
+Soil and carrot stages (C-138): `modules/dynamic_farm/parcel_crop_art.gd` draws every tilled cell as its own 1×1 soil block, dry or wet (wet is darker), and the carrot in seven stages after the owner's reference (C-134 attachment-1052, answer C-134#5 question 3): tilled soil (nothing sown), sowing, emergence, leaf growth, root shoulders, root thickening, maturity. Sowing to root thickening take a fifth of the growing time each (12 s of 60 s); maturity starts at `ripe_at`, exactly when Harvest opens. Stages come from the save's `planted_at` / `ripe_at` only, so the save format is unchanged and a carrot sown before the change lands in its stage. Seeds, growing time, yield and price are unchanged. Since watering (C-151, below) a watered carrot's cell is wet, tilled soil with nothing sown or a carrot not watered yet dry, and a carrot grows from its `watered_at`; the development setting `sensen/dynamic_farm/preview_wet_soil` draws every cell wet (`GATHER_QA_WET_SOIL=1` turns it on in the emulator QA package). The shapes are placeholders from the main farm's carrot meshes until C-139's art. Review captures: `tools/dev/dynamic_farm/crop_stages_probe.gd` (also writes a seeded save for the emulator package); notes in `docs/plans/C-138.md`.
+
+## Well and pail (C-151, 0.4.5)
+
+The owner's SEN-C-137#6 and #15: watering keeps a farm's crops together. A sown carrot sits on dry soil and counts no
+time (`watered_at` null, `ripe_at` the server's `NEVER`); watered, it grows from that moment (the carrot's 60 s, the
+seven stages of C-138) and its soil turns wet. Every farm gets one Well Blueprint and one Pail once
+(`grants.watering` in `assets/farm/data/dynamic_farm.json`): a new player with the first-entry gift, an older farm on
+its next entry; the save records it in `grants`. The well is a building type (C-150): 1×1 as P0's well, `well.glb`,
+one at level 1 (more with farm levels, SEN-C-152), placed with `Build Well` like the cottage. At the well the key reads
+`Fill` · `2 Energy` and draws a full pail (`draw_water`, `watering.pail_uses` 3, the save's `pail_water`; `Pail full`
+when full); on a dry carrot it reads `Water` and uses one (`water`, free), `Pail empty` once the pail is spent, until
+it is filled at the well again. Only the client knows the player stands at the well (the press walks there); the
+server checks the well, the pail, its water, that the cell is sown and not watered, and Energy. A carrot sown before
+watering (no `watered_at`) counts as watered and ripens on its own time. Filling plays the hand-picking clip and
+watering P0's water clip until the pail art and actions (SEN-C-153) are wired in. The guide asks for the well and then
+for water while a dry carrot waits. Shared cases: `tests/dynamic_farm/fixtures/watering_cases.json` (server and client).
+Notes: `docs/plans/C-151.md`.
 
 ## Market and carpenter (C-59)
 
@@ -91,7 +108,8 @@ through the four turns, each refused spot, Build turned (three pop frames), the 
 
 `modules/dynamic_farm/parcel_guide.gd` reads the next step of the first ten minutes from the save alone, so a parcel
 reopened halfway picks up at the same step: a Cottage Blueprint and no house -> `build`, a house and seeds ->
-`till`, tilled soil with nothing on it -> `sow`, a ripe carrot -> `harvest`; nothing while the carrot grows and
+`till`, tilled soil with nothing on it -> `sow`, a dry carrot -> `well` (while its blueprint waits) or `water` (C-151),
+a ripe carrot -> `harvest`; nothing while the carrot grows and
 nothing once a carrot is in the bag or one has been sold. `ParcelFarming` shows it as the main farm's TipCard
 (`UiTipCard`), centred under the top bar; it hides while the house is placed or the bag is open, and a tap closes it
 until the next step. On the map, a package that enters one's own farm (`own_farm`) says where to go with nothing
