@@ -28,7 +28,7 @@ static func keys() -> Array:
 ## How many rows are done, in order (0 … TASKS.size()); the row at that index is the current one. Where the guide has
 ## no step to teach just now, the save still says how far the player got: a carrot growing waits on Harvest, a parcel
 ## that has sold waits on the blueprint (rules without one: it stays open), the coop blueprint ends the list.
-## `reached` is the most rows this device has counted done on the parcel: gathering again after selling what was
+## `reached` is the rows this device last counted done on the parcel: gathering again after selling what was
 ## gathered sends the guide back to Sell what you gathered, which the save cannot tell from a first gathering, so a
 ## parcel that already got past it keeps the row done.
 static func done_count(farm: Dictionary, now_ms: int, reached := 0) -> int:

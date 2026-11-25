@@ -361,6 +361,11 @@ func _scene() -> void:
 	_check(farming._seen() == "till" and farming._reached() == 1, "reopening reads the seen task and the rows done")
 	_check(Tasks.current(farming.farm, farming.server_now()) == "till" and not farming.task_button.badge,
 		"the cottage stands, Till already seen: no dot")
+	# Rows kept from before the parcel was reset do not hold a later Sell what you gathered done.
+	farming.tasks_reached = 7
+	farming._refresh_tasks()
+	_check(farming._reached() == 1 and int(JSON.parse_string(FileAccess.get_file_as_string(farming.phone_seen_path))[raw.block_id].reached) == 1,
+		"a lower count from the save replaces the rows kept on the device")
 	await _close()
 
 ## A 3×3 core block away from the path and the arrival, for the stand-in house (as test_parcel_farming_scene).

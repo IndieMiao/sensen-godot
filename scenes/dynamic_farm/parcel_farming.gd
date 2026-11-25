@@ -163,7 +163,7 @@ var task_button: UiTaskButton
 var phone_button: UiGlassButton
 var drop_down: UiTaskDropDown
 var phone: Control
-## The task last seen and the most rows counted done (PHONE_SEEN_PATH: {block_id: {seen, reached}}), and how many
+## The task last seen and the rows last counted done (PHONE_SEEN_PATH: {block_id: {seen, reached}}), and how many
 ## rows the drop-down last showed done.
 var seen_task := ""
 var tasks_reached := 0
@@ -1096,7 +1096,8 @@ func _refresh_tasks() -> void:
 	phone_button.visible = ready
 	if not ready: return
 	var done := Tasks.done_count(farm, server_now(), _reached())
-	if done > tasks_reached:
+	# Follows the count both ways: it holds itself up only on Sell what you gathered, so a lower count is a reset parcel.
+	if done != tasks_reached:
 		tasks_reached = done
 		_keep_local()
 	var current := Tasks.current(farm, server_now(), _reached())
@@ -1135,6 +1136,8 @@ func _read_local() -> void:
 	if entry is Dictionary:
 		seen_task = str(entry.get("seen", ""))
 		tasks_reached = int(entry.get("reached", 0))
+	elif entry is String:
+		seen_task = entry
 
 ## The current task has been seen (the drop-down or the phone opened on it): the buttons' dots go.
 func _mark_seen() -> void:
