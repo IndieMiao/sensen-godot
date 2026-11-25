@@ -84,6 +84,8 @@ var _town: Control
 var _profile_button: Button
 ## The profile and the pages opened from it, over the map (parcel_profile.gd), else null.
 var _profile: Control
+## A tap on the profile key waiting for the saved outfit's parts to load (C-133); the key is held meanwhile.
+var _profile_waiting := false
 ## The town that is loading after a tap on Market / Carpenter (C-61: the tap shows Loading… at once), else "".
 var _town_loading := ""
 ## The home's parcel save as last read or seen (the guide's line) and the parcel it belongs to; read again after
@@ -372,7 +374,7 @@ func _locate_player() -> void:
 ## Development builds on the in-memory claim stand-in have no account and hide it.
 func _render_account() -> void:
 	if _account_line == null: return
-	_profile_button.disabled = _opening or _profile != null or (_selector != null and _selector.busy)
+	_profile_button.disabled = _opening or _profile != null or _profile_waiting or (_selector != null and _selector.busy)
 	var net := get_node_or_null("/root/Net")
 	var shown := net != null and not _fake_claims()
 	_account_line.visible = shown
@@ -572,8 +574,18 @@ func _warm_outfit() -> void:
 	if avatar != null: avatar.warm_saved_outfit()
 
 ## The profile over the map (C-128), as the town is: the map's panels hide and its camera holds still until it closes.
+## A tap while the saved outfit is still loading (just after a cold start) holds the key until it has loaded, frame
+## by frame, so the profile opens with its figure, never with an empty frame for it (C-133).
 func _open_profile() -> void:
-	if _profile != null or _opening or _leaving or _suspended: return
+	if _profile != null or _opening or _leaving or _suspended or _profile_waiting: return
+	var avatar := get_node_or_null("/root/Avatar")
+	if avatar != null and avatar.warming():
+		_profile_waiting = true; _render()
+		while is_inside_tree() and avatar.warming(): await get_tree().process_frame
+		_profile_waiting = false
+		if not is_inside_tree(): return
+		_render()
+		if _profile != null or _opening or _leaving or _suspended: return
 	var view := Vector3.ZERO
 	if _camera != null: view = Vector3(float(_camera.center[1]), float(_camera.center[0]), float(_camera.zoom))
 	_profile = load(PROFILE).open(self, view)

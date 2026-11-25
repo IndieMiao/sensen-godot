@@ -17,6 +17,8 @@ var cache := PartCache.new()
 var store := LocalOutfitStore.new()
 var loader: PartLoader
 var user_id := "local"
+## The parts warm_saved_outfit last asked for.
+var _warming: Array[String] = []
 
 func _ready() -> void:
 	catalog = PartCatalog.load_from_file(MANIFEST_PATH)
@@ -87,7 +89,12 @@ func warm_saved_outfit() -> Array[String]:
 		if id.is_empty() or asked.has(id) or cache.get_part(id) != null: continue
 		loader.request_part(id)
 		asked.append(id)
+	_warming = asked
 	return asked
+
+## Whether a part warm_saved_outfit asked for is still loading (once each is cached or has failed, false).
+func warming() -> bool:
+	return loader != null and _warming.any(func(id: String): return loader.loading(id))
 
 ## Local player rigs follow committed outfits; editor drafts and remote rigs do not.
 func follow_saved_outfit(rig: AvatarRig) -> void:
