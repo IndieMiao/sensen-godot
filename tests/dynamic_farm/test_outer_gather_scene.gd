@@ -175,12 +175,15 @@ func _first_visit() -> Dictionary:
 		_stand_by(farming, index)
 		farming.picked_object = index
 		var key := await _key(farming)
-		_check(key == ["Gather", ITEMS[kind][1], UiSceneAction.State.DEFAULT], "beside a %s the key reads Gather %s" % [kind, ITEMS[kind][1]])
+		# C-148: the second line is the Energy price (P0's key: Gather · 2 Energy), no longer the item's name.
+		_check(key == ["Gather", "2 Energy", UiSceneAction.State.DEFAULT], "beside a %s the key reads Gather, 2 Energy: %s" % [kind, key])
 		var had := int(farming.farm.bag.get(ITEMS[kind][0], 0))
+		var energy_had: int = farming.energy_value()
 		var seen := await _press(farming)
 		_check(seen.clips.has("labour_harvest") and not seen.early and seen.moved < 0.01,
 			"gathering a %s: no walk, the harvest clip, the result as it ends (%s)" % [kind, seen])
 		_check(int(farming.farm.bag.get(ITEMS[kind][0], 0)) == had + 1, "one %s in the bag" % ITEMS[kind][0])
+		_check(farming.energy_value() == energy_had - 2, "gathering a %s costs 2 Energy (C-148)" % kind)
 		_check(farming.last_gains == {ITEMS[kind][0]: 1} and ("+1 " + ITEMS[kind][1]) in _floats(farming),
 			"the gain floats up and flies into the bag (%s)" % kind)
 		_check(ITEMS[kind][0] in farming.bag_ids(),
@@ -241,7 +244,7 @@ func _grown_back(picked: Dictionary) -> void:
 		if farming.gatherables[i].id == picked.tree: index = i
 	_stand_by(farming, index)
 	farming.picked_object = index
-	_check(await _key(farming) == ["Gather", "Timber", UiSceneAction.State.DEFAULT], "the tree can be gathered again")
+	_check(await _key(farming) == ["Gather", "2 Energy", UiSceneAction.State.DEFAULT], "the tree can be gathered again")
 	await _press(farming)
 	_check(farming.farm.bag.get("wood") == 2, "a second Timber after 24 h")
 	scene.queue_free()
