@@ -271,7 +271,7 @@ func _first_visit() -> void:
 	_check(farming.farm.bag.get("crop_carrot") == 1 and farming.last_gains == {"crop_carrot": 1}, "harvest goes to the bag")
 	_check("+1 Carrot" in _floats(farming) and _flights(farming) >= 1, "the harvest floats up and flies into the bag")
 	_check(_bar_counts(farming).get("crop_carrot") == 1, "the quick bar shows the carrot")
-	_check(_tip(farming) == "Head back to the map and tap Market to sell your carrot.", "after the first harvest the card sends the carrot to the Market (C-61): " + _tip(farming))
+	_check(_tip(farming) == "Head back to the map and tap Union Square to sell your carrot.", "after the first harvest the card sends the carrot to the Market (C-61, C-115: at Union Square): " + _tip(farming))
 	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crops.counts().get("C", 0) == 0, "the soil stays tilled, the carrot is gone")
 	await _press(farming, cell)
 	await _press(farming, cell)

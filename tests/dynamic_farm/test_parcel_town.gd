@@ -1,5 +1,5 @@
 extends SceneTree
-## C-59: the market (Jasmine) and the carpenter (Scott) over the dynamic farm map, on the local stand-in for the
+## C-59: the market (Jasmine) and the carpenter (Scott), on the local stand-in for the
 ## parcel save (C-58 rules mirrored in parcel_farm.gd). Headless: portraits stay blank, the flow and saves are real.
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -173,17 +173,19 @@ func _failures() -> void:
 	town.close()
 	await process_frame
 
-## The map's Market / Carpenter entries are only in internal packages (own_farm), like "Enter my farm" (C-59#29).
+## C-115: the map no longer opens Jasmine and Scott over itself; its Union Square pin (town_entry.gd) opens the 3D room
+## where they stand (test_parcel_outpost.gd, test_claim_controller.gd). Without a home nothing opens.
 func _entries() -> void:
 	for own in [false, true]:
 		ProjectSettings.set_setting("sensen/dynamic_farm/own_farm", own)
 		var map: Control = (load("res://scenes/dynamic_farm/dynamic_farm_map.tscn") as PackedScene).instantiate()
 		root.add_child(map)
 		await process_frame
-		_check(map._market.is_visible_in_tree() == own and map._carpenter.is_visible_in_tree() == own,
-			"map entries %s with own_farm=%s" % ["shown" if own else "hidden", own])
-		map._open_town("market")
-		_check(map._town == null, "no town without a home")
+		_check(not map.find_children("*", "Button", true, false).any(func(b): return b.text in ["Market", "Carpenter"]),
+			"no Market or Carpenter button on the map with own_farm=%s" % own)
+		_check(map._entry != null and not map._entry.visible, "the Union Square pin waits for the map (own_farm=%s)" % own)
+		map._open_town()
+		_check(not map._opening and map.find_children("*", "ParcelTown", true, false).is_empty(), "nothing opens without a home")
 		map.queue_free()
 		await process_frame
 	ProjectSettings.set_setting("sensen/dynamic_farm/own_farm", null)

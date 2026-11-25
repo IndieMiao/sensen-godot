@@ -9,6 +9,7 @@ const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.g
 const OWN_FARM := "sensen/dynamic_farm/own_farm"
 const LOCAL_SAVE := "sensen/dynamic_farm/local_farm_save"
 const Farm := preload("res://modules/dynamic_farm/parcel_farm.gd")
+const RouterFixture := preload("res://tests/dynamic_farm/app_router_fixture.gd")
 class Native extends MapBridge:
 	var states := {} # block_id -> {selected, claimed, own}, as native ParcelLayerState keeps them
 	var batches: Array = []
@@ -22,6 +23,15 @@ class Native extends MapBridge:
 			else: states.erase(row.block_id)
 	func set_parcel_claims(_gen: int, claims: String) -> void: names = JSON.parse_string(claims)
 	func set_parcel_building_highlight(gen: int, key: String, parcel := "") -> void: highlights.append([gen, key, parcel])
+## The map's 3D opening needs a bridge that can make the map opaque (C-115's room opens like the parcel).
+class OpaqueBridge extends MapBridge:
+	func supports_surface_opacity() -> bool: return true
+	func set_map_occlusion_color(_rgb: String) -> bool: return true
+	func set_godot_surface_opaque(_opaque: bool) -> bool: return true
+class Router extends Node:
+	var opened: Array = []
+	func open_instance(path: String, args: Dictionary) -> void: opened.append([path, args])
+	func top_instance() -> Node: return null
 class Selector extends Node:
 	signal changed
 	var selection := {}
@@ -32,7 +42,9 @@ class Selector extends Node:
 	var manifest := {"native_map": {"minzoom": 16}}
 	var _options: Array = []
 	var opened := 0
+	var taps := 0
 	func open_farm() -> void: opened += 1
+	func tap(_point: Vector2, _zoom: float) -> void: taps += 1
 	func pause() -> void: pass
 	func activate() -> void: pass
 var checks := 0
@@ -51,7 +63,6 @@ func controller(server: RefCounted, token: String, native: Native) -> Node:
 	return c
 
 func _run() -> void:
-	_town_load_on_free()
 	await _server_contract()
 	await _first_home_flow()
 	await _map_card()
@@ -251,11 +262,9 @@ func _map_card() -> void:
 	check(not guest.signed_out and guest.mine_known and guest.status(ids[1]) == "none" and page._claim.visible, "after signing in the card re-reads ownership and offers the claim")
 	page.queue_free(); selector.queue_free(); guest.queue_free()
 	await process_frame
-	check(ResourceLoader.load_threaded_get_status("res://scenes/dynamic_farm/parcel_town.gd") == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
-		"with the map gone no load of the town is left running")
 
-## C-61: the card names the next step done off the parcel (the home's save), and Market / Carpenter answer a tap at
-## once with Loading… before the town loads.
+## C-61: the card names the next step done off the parcel (the home's save). C-115: Market and Carpenter are gone; the
+## Union Square pin opens its place card and Go opens the 3D room through the router, with the home's parcel save.
 func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	var home := str(page._claims.mine.parcel_id)
 	var carrot := {"v": 1, "house": {"x": 4, "y": 4, "width": 3, "depth": 3, "rotation": 0}, "cleared": [], "tilled": [],
@@ -264,10 +273,10 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	page._render()
 	check(page._details.text == page.PICK_HOME, "a save of another parcel says nothing about this home")
 	page._farm_parcel = home
-	var lines := [[{}, "Tap Market to sell your carrot."],
+	var lines := [[{}, "Tap Union Square to sell your carrot."],
 		[{"sales": 1, "bag": {}}, "Enter my farm and gather from trees, flowers and rocks."],
-		[{"sales": 1, "bag": {"wood": 2}, "gathered": {"x": 1}}, "Tap Market to sell what you gathered."],
-		[{"sales": 2, "bag": {}, "gathered": {"x": 1}}, "Tap Carpenter to get your coop blueprint."],
+		[{"sales": 1, "bag": {"wood": 2}, "gathered": {"x": 1}}, "Tap Union Square to sell what you gathered."],
+		[{"sales": 2, "bag": {}, "gathered": {"x": 1}}, "Tap Union Square to get your coop blueprint."],
 		[{"sales": 2, "bag": {}, "gathered": {"x": 1}, "blueprints_claimed": {"coop": 1}}, page.PICK_HOME]]
 	for row: Array in lines:
 		var save: Dictionary = carrot.duplicate(true)
@@ -278,51 +287,58 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	page.home_farm = Farm.normalize(carrot)
 	selector.selection = home_pick
 	page._render()
-	check(page._details.text.ends_with("\nYour home\nTap Market to sell your carrot."), "the home selected: its card adds the next step")
+	check(page._details.text.ends_with("\nYour home\nTap Union Square to sell your carrot."), "the home selected: its card adds the next step")
 	selector.selection = {}
-	ProjectSettings.set_setting(LOCAL_SAVE, true) # the town reads the device save, not a server
 	page._render(); await process_frame
-	check(not page._carpenter.disabled and page._carpenter.text == "Carpenter", "with a home, Carpenter can be tapped")
-	page._carpenter.pressed.emit()
-	check(page._carpenter.text == page.TOWN_LOADING and page._carpenter.disabled and page._market.disabled and page._town == null,
-		"a tap shows Loading… on the entry at once, before the town loads")
-	page._market.pressed.emit()
-	check(page._market.text == "Market", "the other entry waits meanwhile")
+	check(not page.find_children("*", "Button", true, false).any(func(b): return b.text in ["Market", "Carpenter", "Loading…"]),
+		"the map has no Market or Carpenter button")
+	var entry: Control = page._entry
+	page._camera.frame_center(entry.LON, entry.LAT, 17.5)
+	page._render(); await process_frame
+	var at: Vector2 = entry.screen_point()
+	check(entry.visible and entry.pin.visible and entry.pin.text == "Union Square", "the Union Square pin shows in San Francisco")
+	check(at.distance_to(page._camera.size * 0.5) < 1.0, "the pin stands on its own spot (here the map's centre)")
+	var taps: int = selector.taps
+	page._on_map_tap((at + Vector2(0, 200)) / page._camera.size)
+	check(selector.taps == taps + 1 and not entry.is_open(), "a tap elsewhere still picks a building")
+	page._on_map_tap((at - Vector2(0, 16)) / page._camera.size)
 	await process_frame
-	check(page._town == null and page._carpenter.text == page.TOWN_LOADING, "Loading… stays for the frame that draws it")
-	check(not page._account_button.visible or page._account_button.disabled, "the account entry waits while the town loads")
-	# The town's script compiles on a worker thread, so wait on the clock, not a frame count.
-	var started := Time.get_ticks_msec()
-	var deadline := started + 30000
-	while page._town == null and Time.get_ticks_msec() < deadline: await process_frame
-	check(page._town != null and page._town.who == "carpenter" and not page._hud.visible and page._town_script != null,
-		"once its script is loaded the carpenter opens over the map (%d ms)" % (Time.get_ticks_msec() - started))
-	if page._town == null:
-		ProjectSettings.set_setting(LOCAL_SAVE, null)
-		return
-	deadline = Time.get_ticks_msec() + 10000
-	while page._town.busy and Time.get_ticks_msec() < deadline: await process_frame
-	var seen: Dictionary = page._town.farm.duplicate(true)
-	page._town.close(); await process_frame
-	check(page._town == null and page._hud.visible and page._carpenter.text == "Carpenter" and not page._carpenter.disabled,
-		"closing the town brings the map's entries back")
-	check(page._farm_parcel == home and not seen.is_empty() and page.home_farm == seen, "the map keeps the save the town read for its line")
+	check(selector.taps == taps + 1 and entry.is_open() and not page._bottom.visible, "a tap on the pin opens its place card instead")
+	var labels: Array = entry.card.find_children("*", "Label", true, false).map(func(l): return l.text)
+	check(labels.has("Union Square Travel Post") and labels.has("Market · Carpenter") and labels.has("Distance")
+		and entry.card.find_child("Primary", true, false) != null, "the card: name, Market · Carpenter, Distance from home, Go (%s)" % [labels])
+	check(page.is_back_navigation_locked() and not entry.is_open() and page._bottom.visible, "Back closes the card first")
+	page._camera.frame_center(entry.LON, entry.LAT + 0.0004, 17.5) # the pin low on the screen, where the card goes
+	await process_frame
+	var low: Vector2 = entry.screen_point()
+	page._on_map_tap((low - Vector2(0, 16)) / page._camera.size)
+	check(low.y > page._camera.size.y * page.PIN_CLEAR_OF_CARD and entry.is_open() and page._camera.flying(),
+		"a pin low on the screen flies to the middle as its card opens")
+	entry.close_card(); page._camera.stop(); page._camera.frame_center(entry.LON, entry.LAT, 17.5)
+	await process_frame
+	var router := Router.new()
+	var real_router := RouterFixture.install(root, router)
+	page._bridge = OpaqueBridge.new()
+	ProjectSettings.set_setting(LOCAL_SAVE, true) # the room trades through the device save, not a server
+	page._on_map_tap((at - Vector2(0, 16)) / page._camera.size)
+	await process_frame
+	(entry.card.find_child("Primary", true, false) as UiCommandButton).activated.emit()
+	await process_frame
+	var opened: Array = router.opened.back() if not router.opened.is_empty() else ["", {}]
+	check(opened[0] == "res://scenes/dynamic_farm/parcel_outpost.tscn" and str(opened[1].get("parcel_id")) == home
+		and opened[1].get("store") != null and opened[1].store.block_id == home and not entry.is_open(),
+		"Go opens the 3D room with the home's parcel save")
+	RouterFixture.restore(root, router, real_router)
+	page._bridge = null
 	ProjectSettings.set_setting(LOCAL_SAVE, null)
+	# Without a home the card says so and has no Go.
+	entry.home_center = []
+	entry.open_card()
+	check(entry.card.find_child("Primary", true, false) == null and entry.card.find_children("*", "Label", true, false).any(
+		func(l): return l.text == "Claim a home first."), "without a home: Claim a home first., no Go")
+	entry.close_card()
 	page.home_farm = {}; page._farm_parcel = ""
 	page._render()
-
-## C-61: a map freed while the town's script still loads on a thread takes that load, so a quitting Godot has none
-## left running (the merge check's run of this file passed, then hit its time limit on exit).
-func _town_load_on_free() -> void:
-	var page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
-	root.add_child(page)
-	var town: String = page.TOWN
-	page._prepare_town()
-	check(page._town_prepared and ResourceLoader.load_threaded_get_status(town) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
-		"the town's script loads on a thread before any tap")
-	page.free()
-	check(ResourceLoader.load_threaded_get_status(town) == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
-		"a map freed meanwhile leaves no load of it running")
 
 ## Parcel ids the fake neighbour does not own.
 func _free_ids(server: RefCounted, count: int) -> Array:

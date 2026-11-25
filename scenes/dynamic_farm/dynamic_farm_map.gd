@@ -3,9 +3,10 @@ extends Control
 ## giving that home up); no choose_home or old-farm state writes. Internal test packages and the invite-only
 ## release package (C-98) also open the player's own parcel for farming from "Enter my farm"
 ## (`sensen/dynamic_farm/own_farm`, C-34 Q-72); everywhere else that button opens the same read-only 3D preview.
-## Two fixed entries, Market (Jasmine) and Carpenter (Scott), open over the map for a player with a home
-## (C-59, C-30#29 question 1); they trade through that home's parcel save (parcel_town.gd). Like "Enter my farm"
-## they are only in packages with `own_farm` (C-59#29): internal test packages and the release package (C-98).
+## C-115 (C-103#17, replacing C-59's Market and Carpenter buttons): one fixed place pin in San Francisco, farm-dev's
+## Union Square Travel Post (town_entry.gd), opens its place card; Go opens the 3D room (parcel_outpost.tscn) where
+## Jasmine (Market) and Scott (Carpenter) trade through the home's parcel save. Like "Enter my farm" it is only in
+## packages with `own_farm` (C-59#29): internal test packages and the release package (C-98).
 ## C-110: the map frames the player's home on entry and has a "My home" button; the account state and its
 ## Sign in / Sign out entry stay on the top panel whether or not a parcel is selected.
 ## The guide (C-35, C-61) says on the bottom card where the next step is, from the home's parcel save (ParcelGuide).
@@ -22,7 +23,9 @@ const AndroidBridge := preload("res://scenes/map_poc/map_bridge_android.gd")
 const CONFIG := "res://modules/dynamic_farm/map/config.json"
 const HOST := "res://scenes/dynamic_farm/dynamic_farm_host.tscn"
 const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
-const TOWN := "res://scenes/dynamic_farm/parcel_town.gd"
+## The 3D space the Union Square pin opens (C-115).
+const ROOM := "res://scenes/dynamic_farm/parcel_outpost.tscn"
+const TownEntry := preload("res://scenes/dynamic_farm/town_entry.gd")
 const LocalFarmStore := preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const RemoteFarmStore := preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
 const ParcelFarm := preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -34,12 +37,11 @@ const AREA_REFRESH_SECONDS := 0.8
 const PICK_PREVIEW := "Choose a parcel to explore in 3D."
 const PICK_FIRST := "Tap a building to choose your first home."
 const PICK_HOME := "Tap your green parcel, then Enter my farm."
-## A Market / Carpenter entry while its town loads (C-61, C-59#135: a cold start's first open took ~10 s).
-const TOWN_LOADING := "Loading…"
-const TOWN_NAMES := {"market": "Market", "carpenter": "Carpenter"}
 ## Camera zoom when the map moves to the player's home (C-110); the parcel and its address labels show from 18.
 const HOME_ZOOM := 18.0
 const MY_HOME := "My home"
+## The Union Square pin stays above this fraction of the screen's height while its card is open (C-115).
+const PIN_CLEAR_OF_CARD := 0.55
 ## The locate key: farm-dev's MapLocateButton (scenes/p0/p0_map.gd _style_locate, LOCK-24) as it is, in its place
 ## over the bottom card. It flies back to the player's home, or to the dataset's area without one.
 const LOCATE_ICON := "res://assets/p0/icons/locate.svg"
@@ -73,19 +75,13 @@ var _places: Control
 var _home: Button
 var _locate: Button
 var _bottom: Control
-var _market: Button
-var _carpenter: Button
-var _town: Control
-## The town that is loading after a tap on Market / Carpenter (C-61: the tap shows Loading… at once), else "".
-var _town_loading := ""
+var _entry: Control # The Union Square pin and its place card (TownEntry).
 ## The home's parcel save as last read or seen (the guide's line) and the parcel it belongs to; read again after
 ## a visit to the parcel.
 var home_farm := {}
 var _farm_parcel := ""
 var _farm_fresh := false
 var _farm_reading := false
-var _town_prepared := false
-var _town_script: GDScript
 var _area_timer: Timer
 var _area_generation := -1
 var _retry: Button
@@ -127,7 +123,7 @@ func _ready() -> void:
 	_claims.changed.connect(_render); add_child(_claims)
 	_selector.candidates_found.connect(_show_candidates)
 	_selector.farm_ready.connect(_open_host)
-	_camera.tapped.connect(func(point: Vector2): _selector.tap(point, _camera.zoom))
+	_camera.tapped.connect(_on_map_tap)
 	_camera.camera_changed.connect(func(): _selector.camera_changed(_camera.zoom))
 	_camera.camera_changed.connect(func(): _area_timer.start(AREA_REFRESH_SECONDS))
 	_camera.setup_map(_bridge, token)
@@ -195,8 +191,6 @@ func _build_ui() -> void:
 	row.add_child(_button("Back", _leave))
 	_places = HBoxContainer.new(); _places.visible = _own_farm_entry(); top.add_child(_places)
 	_home = _button(MY_HOME, _go_home); _home.hide(); _places.add_child(_home)
-	_market = _button(TOWN_NAMES.market, _open_town.bind("market")); _market.disabled = true; _market.visible = _own_farm_entry(); _places.add_child(_market)
-	_carpenter = _button(TOWN_NAMES.carpenter, _open_town.bind("carpenter")); _carpenter.disabled = true; _carpenter.visible = _own_farm_entry(); _places.add_child(_carpenter)
 	var bottom := _panel(true)
 	_bottom = bottom.get_parent()
 	_details = _label(PICK_PREVIEW, 16); bottom.add_child(_details)
@@ -222,6 +216,9 @@ func _build_ui() -> void:
 		var credit := _button(item[0], ExternalLink.open.bind(item[1])); credit.flat = true; credits.add_child(credit)
 	bottom.add_child(_label("Parcels: DataSF · PDDL / CC0", 10))
 	_locate = _locate_key(); _hud.add_child(_locate)
+	_entry = TownEntry.new(); _entry.visible = false; _hud.add_child(_entry); _hud.move_child(_entry, 0)
+	_entry.go_requested.connect(_open_town)
+	_entry.card_changed.connect(_on_entry_card)
 	_bottom.item_rect_changed.connect(_place_locate); _hud.resized.connect(_place_locate)
 	_render_account()
 
@@ -283,7 +280,7 @@ func _render() -> void:
 	var state: String = _claims.status(id)
 	var idle: bool = not _selector.busy and _selector.map_ready and not _opening and not _claims.busy
 	_open.disabled = not idle or id.is_empty()
-	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy and _town == null
+	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy
 	if id.is_empty(): _details.text = _no_selection()
 	else:
 		var p: Dictionary = _selector.selection
@@ -303,17 +300,12 @@ func _render() -> void:
 	_enter.visible = state == "mine"; _enter.disabled = not idle
 	_open.visible = state != "mine"
 	_reselect.visible = state == "mine" and _claims.reselect; _reselect.disabled = not idle
-	var town_ready: bool = _claims.has_home() and not _opening and not _claims.busy and _town == null and _town_loading.is_empty()
-	_market.disabled = not town_ready; _carpenter.disabled = not town_ready
-	_market.text = TOWN_LOADING if _town_loading == "market" else TOWN_NAMES.market
-	_carpenter.text = TOWN_LOADING if _town_loading == "carpenter" else TOWN_NAMES.carpenter
 	_home.visible = _claims.has_home()
-	_home.disabled = _selector.manifest.is_empty() or _opening or _town != null
+	_home.disabled = _selector.manifest.is_empty() or _opening
 	_locate.disabled = _home.disabled
-	_places.visible = _own_farm_entry() or _home.visible
-	if _own_farm_entry() and _claims.has_home():
-		_prepare_town()
-		_read_farm()
+	_places.visible = _home.visible
+	_render_entry()
+	if _own_farm_entry() and _claims.has_home(): _read_farm()
 	if _selector._options.is_empty(): _choices.hide()
 
 ## First framing after the map loads: the player's home if they have one, else the dataset's area. It waits while the
@@ -340,12 +332,12 @@ func _frame_home(fly := false) -> bool:
 	return true
 
 func _go_home() -> void:
-	if _selector == null or _selector.manifest.is_empty() or _town != null: return
+	if _selector == null or _selector.manifest.is_empty() or _opening: return
 	_frame_home(true)
 
 ## The locate key: back to the player, who lives at their home; without a home, back to the dataset's area.
 func _locate_player() -> void:
-	if _selector == null or _selector.manifest.is_empty() or _town != null or _opening: return
+	if _selector == null or _selector.manifest.is_empty() or _opening: return
 	if not _frame_home(true): _reset_area(true)
 
 ## Top panel: who is signed in on this phone, with Sign in / Sign out, shown whether or not a parcel is selected.
@@ -362,7 +354,7 @@ func _render_account() -> void:
 	elif signed_in: _account_line.text = _account_name(net.account)
 	else: _account_line.text = NOT_SIGNED_IN
 	_account_button.text = "Sign out" if signed_in else "Sign in"
-	_account_button.disabled = _opening or _town != null or not _town_loading.is_empty() or (_claims != null and _claims.busy)
+	_account_button.disabled = _opening or (_claims != null and _claims.busy)
 	if not signed_in or _restoring or _signing_out: _sign_out_confirm.hide()
 	_account_button.visible = not _restoring and not _signing_out and not _sign_out_confirm.visible
 	_account_note.visible = signed_in and not _restoring and not str(net.restore_error).is_empty()
@@ -469,76 +461,42 @@ func _open_sign_in() -> void:
 	if signed_in: _account_changed()
 	else: _render()
 
-## The market or the carpenter over the map, trading through the player's own parcel save. The tapped entry reads
-## Loading… and is on screen before anything loads: on a cold start the town's first open took seconds with no sign
-## of the tap (C-59#135). A tap is handled before the frame's process step, so waiting for process_frame alone opened
-## the town before Loading… was ever drawn (C-61 V-243 on the emulator).
-func _open_town(who: String) -> void:
-	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _town != null or _opening or not _town_loading.is_empty(): return
-	var tapped := Time.get_ticks_msec()
-	_town_loading = who
-	_render()
-	await _on_screen()
-	var drawn := Time.get_ticks_msec()
-	if _town_cancelled(): return
-	await _town_ready()
-	var loaded := Time.get_ticks_msec()
-	if _town_cancelled(): return
+## The Union Square pin (C-115): in packages that enter one's own farm, once the map shows; the card's Distance and Go
+## need the home. Its card stands over the map's panels while it is open.
+func _render_entry() -> void:
+	if _entry == null: return
+	_entry.camera = _camera
+	_entry.visible = _own_farm_entry() and not _selector.manifest.is_empty() and not _suspended and not _leaving
+	var center = _claims.mine.get("center") if _claims != null and _claims.has_home() else null
+	_entry.home_center = center if Geo.valid_point(center) else []
+	if not _entry.visible: _entry.close_card()
+
+## A tap on the map: the Union Square pin first (farm-dev's city map takes a pin's tap before the ground), else the
+## building under it.
+func _on_map_tap(point: Vector2) -> void:
+	if _entry != null and _entry.visible and not _opening and _entry.hit(point * _camera.size):
+		_entry.open_card(); return
+	_selector.tap(point, _camera.zoom)
+
+## While the card is open it stands over the map's panels; a pin low on the screen, where the card would cover it,
+## flies to the middle first.
+func _on_entry_card(open: bool) -> void:
+	_hud.move_child(_entry, -1 if open else 0)
+	_bottom.visible = not open; _locate.visible = not open
+	if not open: return
+	_camera.stop()
+	var at: Vector2 = _entry.screen_point()
+	if at == Vector2.INF or at.y > _camera.size.y * PIN_CLEAR_OF_CARD:
+		_camera.fly_to(TownEntry.LON, TownEntry.LAT, _camera.zoom)
+
+## Go on the Union Square card: the 3D room above the map (AppRouter, as "Enter my farm"), trading through the home's
+## parcel save. Back or the room's door returns here; the map then reads the save again for the guide's line.
+func _open_town() -> void:
+	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _opening: return
 	var home: Dictionary = _claims.mine
-	_town = _town_script.open(self, who, _farm_store(str(home.parcel_id), str(home.get("dataset_version", ""))), str(home.parcel_id))
-	_town_loading = ""
-	_town.closed.connect(_town_closed.bind(_town, str(home.parcel_id)))
-	_hud.hide(); _camera.input_enabled = false
-	var opened := Time.get_ticks_msec()
-	await _on_screen()
-	print("DYNAMIC_TOWN_OPEN ", JSON.stringify({"who": who, "loading_ms": drawn - tapped, "ready_ms": loaded - tapped,
-		"open_ms": opened - tapped, "shown_ms": Time.get_ticks_msec() - tapped}))
-
-## Waits until what the map shows now has been drawn, then for the next frame (headless draws nothing: a frame).
-func _on_screen() -> void:
-	if DisplayServer.get_name() != "headless": await RenderingServer.frame_post_draw
-	else: await get_tree().process_frame
-	if is_inside_tree(): await get_tree().process_frame
-
-## A tap given up while its town loads (the map left, went to the parcel, or lost its home); the entries come back.
-func _town_cancelled() -> bool:
-	if is_inside_tree() and not _suspended and not _leaving and not _opening and _claims.has_home(): return false
-	_town_loading = ""
-	if is_inside_tree(): _render()
-	return true
-
-## The town's script: the thread's preload, waited for frame by frame so Loading… stays drawn, else loaded here.
-func _town_ready() -> void:
-	if _town_script != null: return
-	if _town_prepared:
-		while is_inside_tree() and ResourceLoader.load_threaded_get_status(TOWN) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-			await get_tree().process_frame
-		if not is_inside_tree(): return
-		_town_prepared = false
-		_town_script = ResourceLoader.load_threaded_get(TOWN)
-	if _town_script == null: _town_script = load(TOWN)
-
-## The town's script and what it preloads load on a thread once the player has a home, so the first tap opens sooner.
-## Not under Compatibility, where threaded loads never finished (AppRouter.sync_loads): the tap loads it there.
-func _prepare_town() -> void:
-	var router := get_node_or_null("/root/AppRouter")
-	if router != null and router.sync_loads: return
-	if not _town_prepared and _town_script == null:
-		_town_prepared = ResourceLoader.load_threaded_request(TOWN) == OK
-
-## A map freed with that load still running waits for it and takes it: a load left on its thread kept a quitting
-## Godot from exiting (C-61, the merge check's test_claim_controller ran into its time limit after passing).
-func _finish_town_load() -> void:
-	if not _town_prepared: return
-	_town_prepared = false
-	ResourceLoader.load_threaded_get(TOWN)
-
-func _town_closed(town: Control, parcel: String) -> void:
-	_town = null
-	if not town.farm.is_empty() and _claims != null and _claims.has_home() and str(_claims.mine.parcel_id) == parcel:
-		home_farm = town.farm; _farm_parcel = parcel; _farm_fresh = true
-	if _suspended or _leaving: return
-	_hud.show(); _render()
+	_entry.close_card()
+	await _open_scene(ROOM, {"store": _farm_store(str(home.parcel_id), str(home.get("dataset_version", ""))),
+		"parcel_id": str(home.parcel_id), "return_context": {"center": Array(_camera.center), "zoom": _camera.zoom}})
 
 ## The same save the parcel scene uses: the server, or the device stand-in with the development setting.
 func _farm_store(block_id: String, dataset: String) -> RefCounted:
@@ -569,6 +527,12 @@ func _open_host(farm: Dictionary) -> void:
 	# Only the player's own parcel, opened from "Enter my farm", in a package with `own_farm` is farmable.
 	var own: bool = _own_farm_entry() and _entering == str(farm.block_id) and _claims != null and _claims.status(_entering) == "mine"
 	_entering = ""
+	await _open_scene(HOST, {"farm": farm, "dataset": farm.dataset_version, "block_id": farm.block_id,
+		"own_parcel" if own else "preview_only": true, "return_context": {"center": Array(_camera.center), "zoom": _camera.zoom}})
+
+## Opens a 3D scene above the map through AppRouter: the parcel (dynamic_farm_host) or the Union Square room. The map's
+## occlusion colour is set first; the map goes opaque only once the router really pushes the scene (suspend).
+func _open_scene(path: String, args: Dictionary) -> void:
 	if _bridge == null or not _bridge.supports_surface_opacity() or not _bridge.set_map_occlusion_color(OCCLUSION_COLOR):
 		_render()
 		_message.text = "Use the latest Dynamic Farm preview build."; return
@@ -576,8 +540,7 @@ func _open_host(farm: Dictionary) -> void:
 	if router == null or not router.has_method("open_instance"):
 		_message.text = "This preview is missing its scene router."; return
 	_opening = true; _render()
-	await router.open_instance(HOST, {"farm": farm, "dataset": farm.dataset_version, "block_id": farm.block_id,
-		"own_parcel" if own else "preview_only": true, "return_context": {"center": Array(_camera.center), "zoom": _camera.zoom}})
+	await router.open_instance(path, args)
 	_opening = false
 	if not _suspended:
 		# Loading cancelled/failed before a host became top, or Back already returned here.
@@ -653,13 +616,11 @@ func _quit_preview() -> void:
 	get_tree().quit()
 
 func is_back_navigation_locked() -> bool:
-	if is_instance_valid(_town):
-		if not _town.stack.back(): _town.close()
-		return true
+	if _entry != null and _entry.is_open():
+		_entry.close_card(); return true
 	_leave(); return true
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_PREDELETE: _finish_town_load()
 	if not is_node_ready() or _selector == null: return
 	if what == NOTIFICATION_APPLICATION_PAUSED and not _suspended: _suspend_map(false)
 	elif what == NOTIFICATION_APPLICATION_RESUMED and _suspended:
