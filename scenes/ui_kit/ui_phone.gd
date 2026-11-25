@@ -294,9 +294,11 @@ func _on_scrim_input(e: InputEvent) -> void:
 	scrim.accept_event()
 	if not closing: close_requested.emit()
 
-## Greys a tab's icon (C-M4: unselected tabs show a grey icon): luminance, then the caller's `phone/textMuted` tint.
-const _GREY := "shader_type canvas_item;\nvoid fragment() {\n\tvec4 c = texture(TEXTURE, UV);\n" \
-	+ "\tCOLOR = vec4(vec3(dot(c.rgb, vec3(0.299, 0.587, 0.114))), c.a) * COLOR;\n}\n"
+## Greys a tab's icon (C-M4: unselected tabs show a grey icon). The incoming COLOR is already the texture times the
+## modulate (the caller's `phone/textMuted` and the phone's fades, as UiMapDestination._ink), so its luminance is the
+## grey icon; sampling TEXTURE again and multiplying left the icon in colour, only darker.
+const _GREY := "shader_type canvas_item;\nvoid fragment() {\n" \
+	+ "\tCOLOR.rgb = vec3(dot(COLOR.rgb, vec3(0.299, 0.587, 0.114)));\n}\n"
 static var _grey: ShaderMaterial
 
 static func grey_material() -> ShaderMaterial:

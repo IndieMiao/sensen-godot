@@ -134,6 +134,12 @@ func _kit() -> void:
 	await process_frame
 	_check(phone.frame.size == Vector2(UiTokens.SIZE_PHONE_W, UiTokens.SIZE_PHONE_H), "224 × 436 phone")
 	_check(phone.tab_count() == 2 and phone.selected == 0, "tabs, the first selected")
+	# C-M4: only the unselected tab is greyed, from the incoming COLOR (texture × modulate); sampling TEXTURE again
+	# and multiplying kept the icon in colour on the device.
+	var grey := UiPhone.grey_material().shader.code
+	_check(phone.tab(0).icon_rect().material == null and phone.tab(1).icon_rect().material == UiPhone.grey_material(),
+		"the unselected tab's icon greyed, the selected one in colour")
+	_check(grey.contains("dot(COLOR.rgb") and not grey.contains("texture(TEXTURE"), "grey from the incoming COLOR alone")
 	phone.set_badge(1, 3)
 	_check(phone.badge(1) == 3, "a red count on a tab")
 	phone.set_head("Fish", true, "9/20")
