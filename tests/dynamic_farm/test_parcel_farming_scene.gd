@@ -14,6 +14,11 @@ const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
 const House = preload("res://modules/dynamic_farm/farm_house.gd")
+## Pixels the quick bar's global rect may sit off its rest after M-16's slide back (C-147). Control only refreshes its
+## cached global transform when the position moves by more than is_equal_approx (relative 1e-5, about 0.006 px at
+## y 600), so a tween's last sub-0.006 px step leaves get_global_rect() one frame behind, for good. Far below the
+## 24 px slide (UiMotion.BAR_HIDE_Y) the assertion has to catch.
+const BAR_REST_TOLERANCE_PX := 0.1
 var checks := 0
 var failures := 0
 var raw: Dictionary
@@ -412,8 +417,8 @@ func _bag_drawer(farming: Node) -> void:
 	var bar_rect: Rect2 = farming._bar.get_global_rect()
 	var ui_rect: Rect2 = farming._ui.get_global_rect()
 	_check(farming._bar.visible and is_equal_approx(farming._bar.modulate.a, 1.0)
-		and is_equal_approx(bar_rect.end.y, ui_rect.end.y - UiTokens.SIZE_QUICK_BAR_BOTTOM)
-		and is_equal_approx(bar_rect.position.x, UiTokens.SIZE_QUICK_BAR_X),
+		and absf(bar_rect.end.y - (ui_rect.end.y - UiTokens.SIZE_QUICK_BAR_BOTTOM)) <= BAR_REST_TOLERANCE_PX
+		and absf(bar_rect.position.x - UiTokens.SIZE_QUICK_BAR_X) <= BAR_REST_TOLERANCE_PX,
 		"the quick bar comes back at the bottom, where it was: %s in %s" % [bar_rect, ui_rect])
 	# No long-press drag on this bar (no swap, Pin or Remove, C-74#39); a swipe up still opens the bag.
 	var cell: UiItemCell = farming._bar.cells()[0]
