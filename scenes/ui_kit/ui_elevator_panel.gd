@@ -90,8 +90,8 @@ func _row(i: int, r: Dictionary) -> Button:
 	floor_l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	floor_l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.add_child(floor_l)
-	var value_color: Color = {State.HERE: UiTokens.COLOR_SECONDARY, State.FREE: UiTokens.COLOR_PRIMARY,
-		State.EXPRESS: UiTokens.COLOR_PRIMARY, State.COST: UiTokens.COLOR_TEXT, State.LOCKED: UiTokens.COLOR_SECONDARY,
+	var value_color: Color = {State.HERE: UiTokens.COLOR_SECONDARY, State.FREE: UiTokens.COLOR_PRIMARY_INK,
+		State.EXPRESS: UiTokens.COLOR_PRIMARY_INK, State.COST: UiTokens.COLOR_TEXT, State.LOCKED: UiTokens.COLOR_SECONDARY,
 		State.SHORT: UiTokens.COLOR_WARNING}[state]
 	var value_l := UiKit.label(str(r.get("value", "")), UiTokens.STYLE_C12_XB, value_color)
 	value_l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

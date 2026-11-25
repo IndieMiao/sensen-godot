@@ -1,0 +1,148 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    156
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiGainFloat"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "ui-v3 C-W5 · M-10 · fig 6"
+    },
+    {
+      "type": "PanelContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        104
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            12,
+            64,
+            304,
+            80
+          ],
+          "children": [
+            {
+              "type": "UiGainFloat",
+              "rect": [
+                12,
+                64,
+                304,
+                24
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    12,
+                    64,
+                    24,
+                    24
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    40,
+                    66,
+                    107,
+                    20
+                  ],
+                  "variation": "TypeFloat",
+                  "text": "+3 Carrot Seeds"
+                }
+              ]
+            },
+            {
+              "type": "UiGainFloat",
+              "rect": [
+                12,
+                92,
+                304,
+                24
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    12,
+                    92,
+                    24,
+                    24
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    40,
+                    94,
+                    69,
+                    20
+                  ],
+                  "variation": "TypeFloat",
+                  "text": "+1 Timber"
+                }
+              ]
+            },
+            {
+              "type": "UiGainFloat",
+              "rect": [
+                12,
+                120,
+                304,
+                24
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    12,
+                    120,
+                    24,
+                    24
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    40,
+                    122,
+                    26,
+                    20
+                  ],
+                  "variation": "TypeFloat",
+                  "text": "+36"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

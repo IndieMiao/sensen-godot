@@ -35,7 +35,7 @@ func _init(farm_: Dictionary, prices_: Dictionary, npc: Dictionary, portrait: Te
 	body.add_child(keeper_bar)
 	_gap(_GAP)
 	coins = UiFactRow.new("Coins", "0")
-	coins.icon = P0Logic.icon("coin")
+	coins.icon = UiArt.COIN
 	body.add_child(coins)
 	_gap(_GAP)
 	var line := ColorRect.new()

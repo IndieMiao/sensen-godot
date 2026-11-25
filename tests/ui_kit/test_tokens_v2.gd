@@ -1,19 +1,66 @@
 extends GdUnitTestSuite
-## Tokens v2 -> UiTokens / gensen_theme.tres stay in sync, and kit code never hard-codes values (SGODOT-211).
+## Tokens v2 + v3 -> UiTokens / gensen_theme.tres stay in sync, and kit code never hard-codes values (SGODOT-211;
+## v3 since C-105: the v2 names hold their v3 alias values, every v3 token has its own constant).
 
 const GenTheme := preload("res://tools/ui/gen_theme.gd")
 const KIT_DIRS := ["res://scenes/ui_kit", "res://modules/ui/kit"]
 const GENERATED := ["res://modules/ui/kit/ui_tokens.gd"]
 
 var tokens: Dictionary
+var v3: Dictionary
 var consts: Dictionary
 
 func before() -> void:
-	tokens = GenTheme.load_tokens()
+	tokens = GenTheme.merged_tokens()
+	v3 = GenTheme.load_tokens_v3()
 	consts = (UiTokens as Script).get_script_constant_map()
 
 func test_version_matches_tokens_file() -> void:
-	assert_str(UiTokens.VERSION).is_equal(tokens.meta.version)
+	assert_str(UiTokens.VERSION).is_equal(v3.meta.version)
+	assert_str(UiTokens.VERSION_V2).is_equal(tokens.meta.version)
+
+## v3 colours by path; a name a v2 token holds with another value carries `_V3`.
+func test_every_v3_token_has_its_constant() -> void:
+	for k in v3.color:
+		var name := "COLOR_" + GenTheme.const_name(k)
+		if consts.has(name + "_V3"): name += "_V3"
+		assert_bool(consts.has(name)).override_failure_message("missing " + name).is_true()
+		assert_str((consts[name] as Color).to_html()).override_failure_message(name).is_equal(Color.html(v3.color[k].value).to_html())
+	for group in ["radius", "space", "size"]:
+		for k in v3[group]:
+			var name: String = group.to_upper() + "_" + GenTheme.const_name(k)
+			if consts.has(name + "_V3"): name += "_V3"
+			assert_bool(consts.has(name)).override_failure_message("missing " + name).is_true()
+			assert_float(float(consts[name])).override_failure_message(name).is_equal_approx(float(v3[group][k].value), 0.0001)
+	for k in v3.motion.duration:
+		assert_float(float(consts["MOTION_DURATION_%s_MS" % GenTheme.const_name(k)])).is_equal(float(v3.motion.duration[k].ms))
+	assert_array(UiTokens.MOTION_EASING_POP).is_equal([Tween.TRANS_BACK, Tween.EASE_OUT])
+	assert_array(UiTokens.MOTION_EASING_LINEAR).is_equal([Tween.TRANS_LINEAR, Tween.EASE_IN_OUT])
+
+## The v2 names that follow v3 (README §2.6): the action colour, paper, ink, the modal scrim and the radii.
+func test_v2_aliases_hold_v3_values() -> void:
+	assert_str(UiTokens.COLOR_PRIMARY.to_html()).is_equal(UiTokens.COLOR_ACTION_PRIMARY.to_html())
+	assert_str(UiTokens.COLOR_SURFACE.to_html()).is_equal(UiTokens.COLOR_SURFACE_PAPER.to_html())
+	assert_str(UiTokens.COLOR_TEXT.to_html()).is_equal(UiTokens.COLOR_TEXT_PRIMARY.to_html())
+	assert_float(UiTokens.OPACITY_SCRIM_MODAL).is_equal_approx(0.6, 0.001)
+	assert_float(float(UiTokens.RADIUS_CARD)).is_equal(float(UiTokens.RADIUS_LG))
+	assert_float(float(UiTokens.RADIUS_SHEET)).is_equal(float(UiTokens.RADIUS_XL))
+	assert_float(float(UiTokens.SIZE_HUD_AVATAR)).is_equal(38.0)   # the v2 HUD keeps its layout
+	assert_float(float(UiTokens.SIZE_HUD_AVATAR_V3)).is_equal(52.0)
+
+func test_v3_type_styles_and_white_variants() -> void:
+	var th := UiKit.theme()
+	for path in GenTheme.TYPE_STYLES:
+		var name: String = GenTheme.TYPE_STYLES[path][0]
+		var st: Dictionary = v3.font.styles["body" if path == "bodyBold" else path]
+		assert_str(String(th.get_type_variation_base(name))).is_equal("Label")
+		assert_int(th.get_font_size(&"font_size", name)).override_failure_message(name).is_equal(int(st.size))
+	assert_str(th.get_color(&"font_color", UiTokens.STYLE_TYPE_LABEL_ON_DARK).to_html()).is_equal(Color.WHITE.to_html())
+	# §2.1 exception (Q-121 item 1): white on lime carries the 1.5 dark outline
+	assert_int(th.get_constant(&"outline_size", &"CmdPrimary")).is_equal(GenTheme.ON_ACTION_OUTLINE)
+	assert_int(th.get_constant(&"outline_size", &"CtaBar")).is_equal(GenTheme.ON_ACTION_OUTLINE)
+	assert_str(th.get_color(&"font_outline_color", &"CtaBar").to_html()).is_equal(UiTokens.COLOR_ON_ACTION_OUTLINE.to_html())
+	assert_int(th.get_constant(&"outline_size", UiTokens.STYLE_TYPE_FLOAT)).is_equal(GenTheme.FLOAT_OUTLINE)
 
 func test_every_colour_token_has_a_matching_constant() -> void:
 	for k in tokens.color:
@@ -65,7 +112,7 @@ func test_command_colours_follow_tokens() -> void:
 	var th := UiKit.theme()
 	assert_str(th.get_stylebox(&"normal", &"CmdPrimary").bg_color.to_html()).is_equal(UiTokens.COLOR_PRIMARY.to_html())
 	assert_str(th.get_stylebox(&"disabled", &"CmdPrimary").bg_color.to_html()).is_equal(UiTokens.COLOR_DISABLED.to_html())
-	assert_str(th.get_color(&"font_color", &"CmdPrimary").to_html()).is_equal(UiTokens.COLOR_SURFACE_RAISED.to_html())
+	assert_str(th.get_color(&"font_color", &"CmdPrimary").to_html()).is_equal(UiTokens.COLOR_TEXT_ON_DARK.to_html())
 
 func test_compact_command_draws_34_inside_a_44_hit_area() -> void:
 	var box: UiStyleBox = UiKit.theme().get_stylebox(&"normal", &"CmdPrimaryCompact")

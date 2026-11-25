@@ -168,7 +168,7 @@ func _build_strip() -> Control:
 	_strip_icon = UiKit.icon(null, _STRIP_ICON)
 	_strip_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(_strip_icon)
-	_strip_text = UiKit.label("", UiTokens.STYLE_CAPTION_XB12, UiTokens.COLOR_PRIMARY)
+	_strip_text = UiKit.label("", UiTokens.STYLE_CAPTION_XB12, UiTokens.COLOR_PRIMARY_INK)
 	_strip_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_strip_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	h.add_child(_strip_text)
@@ -275,7 +275,7 @@ func _refresh() -> void:
 	if _note == null: return
 	_event.text = event
 	_event.visible = event != ""
-	_event.add_theme_color_override(&"font_color", [UiTokens.COLOR_PRIMARY, UiTokens.COLOR_SECONDARY, UiTokens.COLOR_TEXT][tone])
+	_event.add_theme_color_override(&"font_color", [UiTokens.COLOR_PRIMARY_INK, UiTokens.COLOR_SECONDARY, UiTokens.COLOR_TEXT][tone])
 	var disc_bg: Color = [UiTokens.COLOR_PRIMARY_TINT, UiTokens.COLOR_DISABLED, UiTokens.COLOR_QUALITY_GOLD][tone]
 	var art := item_art != null and is_instance_valid(item_art)
 	_disc.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new() if art else UiStyleBox.make(disc_bg, _DISC * 0.5))
