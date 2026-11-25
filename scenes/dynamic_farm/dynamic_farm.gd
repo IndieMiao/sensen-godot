@@ -41,6 +41,14 @@ const ROUTE_STUCK_RATIO := 0.2
 const ROUTE_STUCK_S := 0.5
 ## Standing this close to a cell (centre to centre, in cells) is close enough to work it.
 const REACH_CELLS := 1.5
+## The pail (C-153's art; C-151 wires it in): the pail in the right hand (BucketGesture, a child of the rig beside its
+## Skeleton3D) and its actions, added to the rig's AnimationPlayer as the `pail` library. Fill draws at the well,
+## Water pours on one cell; the pail shows only while one of them plays.
+const PAIL_GESTURE = preload("res://assets/dynamic_farm/watering/bucket_gesture.tscn")
+const PAIL_ACTIONS = preload("res://assets/dynamic_farm/watering/bucket_actions.tres")
+const PAIL_LIBRARY := &"pail"
+## Labour verbs played with the pail -> their action in PAIL_ACTIONS.
+const PAIL_MOTIONS := {"fill": "draw", "water": "pour"}
 
 var _args := {}
 var _data := {}
@@ -97,6 +105,8 @@ var _route_stuck_s := 0.0
 var _labour_left := 0.0
 ## The Energy card's `Show home` (C-148) holds the camera on the cottage until the player moves.
 var _showing_house := false
+## The pail in the hand (PAIL_GESTURE), made the first time Fill or Water plays; hidden between them.
+var _pail: Node3D
 
 func setup(args: Dictionary) -> void:
 	_args = args.duplicate(true)
@@ -458,7 +468,9 @@ func _process(delta: float) -> void:
 	if _labour_left > 0.0:
 		# The labour clip holds the player still, stick or not (the main farm's labour beat).
 		_labour_left -= dt
-		if _labour_left <= 0.0: _play("idle")
+		if _labour_left <= 0.0:
+			_play("idle")
+			_put_pail_away()
 	else:
 		if steering and not _route.is_empty(): _end_route("cancelled")
 		if not _route.is_empty():
@@ -524,11 +536,37 @@ func approach(cells: Array) -> String:
 
 ## Plays the main farm's labour clip for `verb` (AnimPlaceholders.clip_for) facing `cells`,
 ## holding the player still for `seconds`. Presentation only: commands are the caller's.
+## C-151: Fill and Water play the pail's own actions with the pail in hand (PAIL_MOTIONS).
 func labour(verb: String, cells: Array, seconds: float) -> void:
 	_face_cells(cells)
 	_labour_left = seconds
+	if PAIL_MOTIONS.has(verb) and _take_pail():
+		_clip = ""   # the same action twice in a row (watering cell after cell) starts again
+		_play("%s/%s" % [PAIL_LIBRARY, PAIL_MOTIONS[verb]])
+		return
+	_put_pail_away()
 	_play(AnimPlaceholders.clip_for(verb))
 	if AnimPlaceholders.is_placeholder(verb) and _rig != null: AnimPlaceholders.play_fallback(_rig, seconds)
+
+## How long `verb`'s labour plays: a pail action its own length (Fill 2.22 s, Water 2.28 s), else `default`.
+func labour_seconds(verb: String, default: float) -> float:
+	var motion = PAIL_MOTIONS.get(verb)
+	return PAIL_ACTIONS.get_animation(motion).length if motion != null and PAIL_ACTIONS.has_animation(motion) else default
+
+## The pail in the right hand with its actions on the rig's player; false without a rig (nothing to hold it).
+func _take_pail() -> bool:
+	var player := _rig.get_node_or_null("AnimationPlayer") as AnimationPlayer if _rig != null else null
+	if player == null or _rig.get_node_or_null("Skeleton3D") == null: return false
+	if not player.has_animation_library(PAIL_LIBRARY): player.add_animation_library(PAIL_LIBRARY, PAIL_ACTIONS)
+	if _pail == null:
+		_pail = PAIL_GESTURE.instantiate() as Node3D
+		_pail.name = "BucketGesture"   # the actions' tracks name it
+		_rig.add_child(_pail)
+	_pail.visible = true
+	return true
+
+func _put_pail_away() -> void:
+	if _pail != null: _pail.visible = false
 
 ## Standing on a cell beside `cells`, not on one of them, near enough to reach.
 func _within_reach(cells: Array) -> bool:
@@ -734,6 +772,7 @@ func suspend() -> void:
 	end_placement()
 	if not _route.is_empty(): _end_route("cancelled")
 	_labour_left = 0.0
+	_put_pail_away()
 	_movement = Vector2.ZERO
 	_controls.reset()
 	_canvas.visible = false

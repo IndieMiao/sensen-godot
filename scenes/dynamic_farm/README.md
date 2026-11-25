@@ -50,8 +50,9 @@ one at level 1 (more with farm levels, SEN-C-152), placed with `Build Well` like
 when full); on a dry carrot it reads `Water` and uses one (`water`, free), `Pail empty` once the pail is spent, until
 it is filled at the well again. Only the client knows the player stands at the well (the press walks there); the
 server checks the well, the pail, its water, that the cell is sown and not watered, and Energy. A carrot sown before
-watering (no `watered_at`) counts as watered and ripens on its own time. Filling plays the hand-picking clip and
-watering P0's water clip until the pail art and actions (SEN-C-153) are wired in. The guide asks for the well and then
+watering (no `watered_at`) counts as watered and ripens on its own time. Fill and Water play SEN-C-153's
+`draw` and `pour` with the pail in the right hand (`bucket_gesture.tscn`, `bucket_actions.tres` as the rig's `pail`
+library), for their own lengths; the pail is put away when they end. The guide asks for the well and then
 for water while a dry carrot waits. Shared cases: `tests/dynamic_farm/fixtures/watering_cases.json` (server and client).
 Notes: `docs/plans/C-151.md`.
 

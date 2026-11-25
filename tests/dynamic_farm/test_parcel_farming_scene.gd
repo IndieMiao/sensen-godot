@@ -133,7 +133,7 @@ func _press(farming: Node, cell: Vector2i) -> Dictionary:
 	farming.pick(cell)
 	await process_frame
 	await process_frame
-	var seen := {"clips": {}, "moved": 0.0, "early": false}
+	var seen := {"clips": {}, "moved": 0.0, "early": false, "pail": false}
 	var start: Vector3 = scene._walk.position
 	var version: int = farming.farm_version
 	var player := scene._rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
@@ -141,6 +141,8 @@ func _press(farming: Node, cell: Vector2i) -> Dictionary:
 	var deadline := Time.get_ticks_msec() + 30000
 	while farming.busy and Time.get_ticks_msec() < deadline:
 		if player != null: seen.clips[player.current_animation] = true
+		var pail = scene._rig.get_node_or_null("BucketGesture")
+		if pail != null and pail.visible and scene._labour_left > 0.0: seen.pail = true
 		if scene._labour_left > 0.0 and farming.farm_version != version: seen.early = true
 		await process_frame
 	_check(not farming.busy, "a press finishes")
@@ -314,8 +316,8 @@ func _first_visit() -> void:
 	seen = await _press(farming, well_cell)
 	_check(_beside([well_cell]) and farming.farm.pail_water == 3 and farming.energy_value() == 191, "fill: beside the well, the pail full, 2 Energy")
 	seen = await _press(farming, cell)
-	_check(_beside([cell]) and seen.clips.has("labour_water") and not ParcelFarm.is_dry(farming.farm.crops[ParcelFarm.key(cell)])
-		and farming.farm.pail_water == 2, "water: beside the cell, the water clip, one of the pail's 3 used")
+	_check(_beside([cell]) and seen.clips.has("pail/pour") and not ParcelFarm.is_dry(farming.farm.crops[ParcelFarm.key(cell)])
+		and farming.farm.pail_water == 2, "water: beside the cell, the pail's pour (C-153), one of the pail's 3 used")
 	_check(farming._crop_art.counts().soil == {"dry": 0, "wet": 1}, "C-151: the watered cell's soil turns wet")
 	_check(_tip(farming) == "", "no card while the carrot grows")
 	key = await _key(farming, cell)
@@ -775,11 +777,29 @@ func _watering_loop() -> void:
 	var seen := await _press(farming, well_cell)
 	_check(_beside([well_cell]) and farming.farm.pail_water == 3 and farming.energy_value() == energy - 2 and "−2 Energy" in _floats(farming),
 		"Fill: beside the well, a full pail of 3, 2 Energy")
+	_check(seen.clips.has("pail/draw") and seen.pail, "Fill plays C-153's draw with the pail in hand")
+	var hand: Node3D = scene._rig.get_node_or_null("BucketGesture")
+	_check(hand != null and not hand.visible and (hand.get_node("Hand") as BoneAttachment3D).get_skeleton() == scene._rig.skeleton,
+		"the pail hangs from the rig's right wrist, put away once the action ends")
+	var player := scene._rig.get_node("AnimationPlayer") as AnimationPlayer
+	var resolved := true
+	for motion in ["pail/draw", "pail/pour"]:
+		var anim := player.get_animation(motion)
+		for t in anim.get_track_count():
+			var path := anim.track_get_path(t)
+			var node: Node = scene._rig.get_node_or_null(NodePath(path.get_concatenated_names()))
+			var sub := String(path.get_concatenated_subnames())
+			resolved = resolved and node != null and (sub.is_empty() or (node is Skeleton3D and (node as Skeleton3D).find_bone(sub) >= 0)
+				or (not node is Skeleton3D and node.get_indexed(NodePath(sub)) != null))
+	_check(resolved, "every track of the pail's draw and pour finds its node on the rig")
+	_check(is_equal_approx(scene.labour_seconds("fill", 1.2), 2.22) and is_equal_approx(scene.labour_seconds("water", 1.2), 2.28)
+		and is_equal_approx(scene.labour_seconds("till", 1.2), 1.2), "the pail's actions play for their own lengths")
 	_check(await _key(farming, well_cell) == ["Fill", "Pail full", UiSceneAction.State.UNAVAILABLE], "a full pail is not filled again")
 	for i in 3:
 		_check(await _key(farming, cells[i]) == ["Water", "", UiSceneAction.State.DEFAULT], "a dry carrot: Water, free (LOCK-02)")
 		seen = await _press(farming, cells[i])
-		_check(_beside([cells[i]]) and seen.clips.has("labour_water") and farming.farm.pail_water == 2 - i, "watering carrot %d: the water clip, the pail at %d" % [i + 1, 2 - i])
+		_check(_beside([cells[i]]) and seen.clips.has("pail/pour") and seen.pail and farming.farm.pail_water == 2 - i,
+			"watering carrot %d: the pail's pour, the pail at %d" % [i + 1, 2 - i])
 	_check(farming.energy_value() == energy - 2, "watering costs no Energy")
 	_check(farming._crop_art.counts().soil == {"dry": 1, "wet": 3}, "three wet cells, one still dry: %s" % [farming._crop_art.counts()])
 	_check(await _key(farming, cells[3]) == ["Water", "Pail empty", UiSceneAction.State.UNAVAILABLE], "the fourth: the pail is empty")

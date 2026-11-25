@@ -44,9 +44,6 @@ const REFUSALS := {Space.OUTSIDE: "Not farmland", Space.PATH: "On the path", Spa
 	Space.NO_PAIL: "Need a pail", Space.PAIL_EMPTY: "Pail empty", Space.PAIL_FULL: "Pail full"}
 ## The server's pail refusals (C-151), when its state disagreed with the key's: shown as the key would have said.
 const POUR_REFUSALS := {"PAIL_EMPTY": Space.PAIL_EMPTY, "PAIL_FULL": Space.PAIL_FULL, "NO_PAIL": Space.NO_PAIL}
-## The labour clip a verb plays when it has none of its own (AnimPlaceholders): filling the pail lifts it with the
-## hand-picking clip until the pail actions are wired in (another card).
-const LABOUR := {"fill": "harvest"}
 ## Crop stages follow server time; redraw them this often.
 const REDRAW_S := 0.25
 ## How close (m, ground plane) the player must be to an outer object's bounds to gather it.
@@ -411,8 +408,10 @@ func work(cell: Vector2i, action: Dictionary) -> Dictionary:
 		job = null
 		if reached == "unreachable": _toast.show_toast(UNREACHABLE, ToastLayer.Severity.REFUSED)
 		return {"ok": false, "code": reached.to_upper()}
-	_body.labour(LABOUR.get(action.verb, action.verb), cells, LABOUR_S)
-	var result := await send(action.command, LABOUR_S)
+	# C-151: Fill and Water play C-153's pail actions, as long as they last (the scene's labour_seconds).
+	var seconds: float = _body.labour_seconds(action.verb, LABOUR_S) if _body.has_method("labour_seconds") else LABOUR_S
+	_body.labour(action.verb, cells, seconds)
+	var result := await send(action.command, seconds)
 	job = null
 	return result
 
