@@ -22,6 +22,15 @@ class Router extends Node:
 		pops+=1
 		if is_instance_valid(top):top.suspend()
 		top=null
+## The Android map plugin's visibility state as the host reads it (GodotMapPlugin.getMapVisibilityState): transparent
+## (the UI thread's snapshot from before the map asked for opaque) for `stale` calls, then opaque.
+class SurfacePlugin extends Object:
+	var stale:=0
+	var calls:=0
+	func getMapVisibilityState() -> String:
+		calls+=1
+		if calls<=stale:return JSON.stringify({"godot_surface_mode":2,"godot_requested_format":-3,"godot_observed_format":-3})
+		return JSON.stringify({"godot_surface_mode":5,"godot_requested_format":2,"godot_observed_format":2})
 var checked:=0
 var failed:=0
 var _fixture_fail:=false
@@ -34,6 +43,42 @@ func _factory() -> Node3D:
 	var v:=View.new();v.fail=_fixture_fail;return v
 func args() -> Dictionary:
 	return {"dataset":"sf-dynamic-farm-20261118-r4","block_id":"p-A","preview_only":true,"farm":{"schema":4,"dataset_version":"sf-dynamic-farm-20261118-r4","selection_unit":"parcel","block_id":"p-A"},"return_context":{"zoom":18.5}}
+## C-168: the parcel is built only once Android has made the opaque surface the map asked for, and its loading limit
+## counts drawn frames only.
+func _surface_checks(router:Node) -> void:
+	var Host_:=preload("res://scenes/dynamic_farm/dynamic_farm_host.gd")
+	verify(Host_.surface_is_opaque("{}"),"C-168: an older plugin without surface state is not waited for")
+	verify(not Host_.surface_is_opaque(JSON.stringify({"godot_surface_mode":2,"godot_requested_format":-3,"godot_observed_format":-3})),
+		"C-168: a snapshot from before the opaque request is not ready")
+	verify(not Host_.surface_is_opaque(JSON.stringify({"godot_surface_mode":5,"godot_requested_format":2,"godot_observed_format":-2147483648})),
+		"C-168: opaque asked for but no surface made in it yet is not ready")
+	verify(Host_.surface_is_opaque(JSON.stringify({"godot_surface_mode":5,"godot_requested_format":2,"godot_observed_format":2})),
+		"C-168: the opaque surface made is ready")
+	var plugin:=SurfacePlugin.new();plugin.stale=2
+	Engine.register_singleton("GodotMap",plugin)
+	var host=Host.instantiate();host.view_factory=_factory;host.setup(args());router.top=host;root.add_child(host)
+	verify(host._state=="loading" and not is_instance_valid(host._view),"C-168: no parcel is built while Android still has the old surface")
+	for frame in 8:
+		if host._state!="loading":break
+		await process_frame
+	verify(host._state=="ready" and plugin.calls==3,"C-168: the parcel is built after the opaque surface is reported")
+	verify(host.surface_wait_frames==2+host.SURFACE_SETTLE_FRAMES,"C-168: then two more frames on the new surface first")
+	host.queue_free();await process_frame
+	plugin.calls=0
+	var left=Host.instantiate();left.view_factory=_factory;left.setup(args());router.top=left;root.add_child(left)
+	left._leave();await process_frame;await process_frame;await process_frame;await process_frame
+	verify(not is_instance_valid(left._view),"C-168: Back while waiting for the surface builds no parcel")
+	if is_instance_valid(left):left.queue_free()
+	await process_frame
+	Engine.unregister_singleton("GodotMap");plugin.free()
+	var farm:Node3D=load("res://scenes/dynamic_farm/dynamic_farm.gd").new()
+	verify(not farm.loading_timed_out(19.0),"C-168: one long stalled frame (the build, a lost surface) is not a timeout")
+	var spent:=false
+	for frame in 59:spent=farm.loading_timed_out(1.0) or spent
+	verify(not spent,"C-168: 60 drawn frames, capped at 0.25 s each, stay under the 15 s limit")
+	verify(farm.loading_timed_out(1.0),"C-168: past 15 s of drawn frames the scene still gives up")
+	farm.free()
+
 func _run() -> void:
 	var router:=Router.new();var real_router:=RouterFixture.install(root,router)
 	verify(root.get_node_or_null("AppRouter")==router,"fixture router is the one the host resolves")
@@ -68,6 +113,7 @@ func _run() -> void:
 	next.setup(next_args);root.add_child(next)
 	verify(next._state=="ready","C-43: configured next dataset release opens the preview")
 	next.queue_free();await process_frame
+	await _surface_checks(router)
 	RouterFixture.restore(root,router,real_router)
 	print("PREVIEW HOST ",checked-failed,"/",checked)
 	quit(1 if failed else 0)
