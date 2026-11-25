@@ -216,6 +216,38 @@ for (const [name, enabled, makeStores] of makers) {
       expect(await reclaimIdleParcels(stores.parcels, 30, T0 + 20 * DAY_MS + IDLE + 1)).toBe(2);
     });
 
+    it('signing out or revoking every token keeps the real last activity (C-120)', async () => {
+      const one = await install(app), all = await install(app), rotated = await install(app);
+      await claim(app, one.token, A); await claim(app, all.token, B); await claim(app, rotated.token, C);
+      clock = T0 + 20 * DAY_MS; // each guest plays with the token they signed in with at T0
+      for (const g of [one, all, rotated]) await mine(app, g.token);
+      clock = T0 + 25 * DAY_MS; // then the token goes: sign out of this phone, of every phone, or a new install key
+      expect((await app.inject({ method: 'DELETE', url: '/v1/auth/token', headers: bearer(one.token) })).statusCode).toBe(200);
+      expect((await app.inject({ method: 'DELETE', url: '/v1/auth/tokens', headers: bearer(all.token) })).statusCode).toBe(200);
+      expect((await app.inject({ method: 'POST', url: '/v1/auth/rotate-install-key', headers: bearer(rotated.token),
+        payload: { current_install_key: rotated.key, new_install_key: newInstallKey() } })).statusCode).toBe(200);
+      for (const g of [one, all, rotated]) expect(await mine(app, g.token)).toBeUndefined(); // 401: no token left
+      expect(await reclaimIdleParcels(stores.parcels, 30, T0 + IDLE + 1)).toBe(0); // the sign-in at T0 alone would be idle
+      // DELETE /v1/auth/token does not use the token, so its last use stays T0 + 20 days; the other two used it at T0 + 25 days.
+      expect(await reclaimIdleParcels(stores.parcels, 30, T0 + 20 * DAY_MS + IDLE)).toBe(0);
+      expect(await reclaimIdleParcels(stores.parcels, 30, T0 + 20 * DAY_MS + IDLE + 1)).toBe(1);
+      expect(await reclaimIdleParcels(stores.parcels, 30, T0 + 25 * DAY_MS + IDLE)).toBe(0);
+      expect(await reclaimIdleParcels(stores.parcels, 30, T0 + 25 * DAY_MS + IDLE + 1)).toBe(2);
+      expect((await stores.archived()).map(r => [r.parcel_id, r.last_active_at])).toEqual([
+        [A.parcel_id, T0 + 20 * DAY_MS], [B.parcel_id, T0 + 25 * DAY_MS], [C.parcel_id, T0 + 25 * DAY_MS]]);
+    });
+
+    it('an expired token keeps its last use as activity', async () => {
+      const g = await install(app);
+      await claim(app, g.token, A);
+      clock = T0 + 20 * DAY_MS;
+      await mine(app, g.token);
+      clock = T0 + 20 * DAY_MS + 91 * DAY_MS; // past the 90-day token idle limit: the token is dropped on use
+      expect(await mine(app, g.token)).toBeUndefined();
+      expect(await reclaimIdleParcels(stores.parcels, 400, T0 + 20 * DAY_MS + 400 * DAY_MS)).toBe(0);
+      expect(await reclaimIdleParcels(stores.parcels, 400, T0 + 20 * DAY_MS + 400 * DAY_MS + 1)).toBe(1);
+    });
+
     it('never reclaims a parcel of a player with an account', async () => {
       const ada = await account(app, 'Ada');
       await claim(app, ada, A);
