@@ -33,7 +33,7 @@ func test_the_wordmark_is_the_sprout_and_gensen_in_primary() -> void:
 	add_child(auto_free(w))
 	await get_tree().process_frame
 	var name_label := w.get_child(1) as Label
-	assert_that([name_label.text, name_label.get_theme_color(&"font_color")]).is_equal(["Gensen", UiTokens.COLOR_PRIMARY])
+	assert_that([name_label.text, name_label.get_theme_color(&"font_color")]).is_equal(["Gensen", UiTokens.COLOR_PRIMARY_INK])
 	assert_float(w.size.x).is_between(130.0, 170.0)   # 148 in the main; the font's width decides the last pixels
 
 func test_a_spinner_held_still_keeps_its_angle_and_a_running_one_turns() -> void:

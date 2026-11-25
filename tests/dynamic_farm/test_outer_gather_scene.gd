@@ -249,4 +249,4 @@ func _grown_back(picked: Dictionary) -> void:
 
 ## The texts of the gain floats on screen (C-74).
 func _floats(farming: Node) -> Array:
-	return farming._ui.get_children().filter(func(n): return n is UiFloatText).map(func(n): return n.text)
+	return farming._ui.get_children().filter(func(n): return n is UiGainFloat).map(func(n): return n.text)

@@ -1,0 +1,220 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    195
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "v3 glass: back, capsules, round buttons"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        36
+      ],
+      "variation": "CaptionR12",
+      "text": "ui-v3 C-H4 · C-R1 · fig 2 / 3 (quick slots on glass: item_cell_quick, quick_bar)"
+    },
+    {
+      "type": "PanelContainer",
+      "rect": [
+        0,
+        70,
+        328,
+        125
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            12,
+            82,
+            304,
+            101
+          ],
+          "children": [
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                12,
+                82,
+                304,
+                45
+              ],
+              "children": [
+                {
+                  "type": "UiGlassButton",
+                  "rect": [
+                    12,
+                    82,
+                    44,
+                    44
+                  ],
+                  "variation": "GlassRound",
+                  "text": ""
+                },
+                {
+                  "type": "UiGlassCapsule",
+                  "rect": [
+                    62,
+                    82,
+                    192,
+                    45
+                  ],
+                  "variation": "Glass",
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        74,
+                        86,
+                        168,
+                        37
+                      ],
+                      "children": [
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            74,
+                            86,
+                            168,
+                            37
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                74,
+                                86,
+                                168,
+                                19
+                              ],
+                              "variation": "TypeHudNumberOnDark",
+                              "text": "Sunset Parcel 12"
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                74,
+                                105,
+                                168,
+                                18
+                              ],
+                              "variation": "TypeCaptionOnDark",
+                              "text": "Core 64 · Walk-only 120"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "UiGlassCapsule",
+                  "rect": [
+                    260,
+                    92,
+                    56,
+                    24
+                  ],
+                  "variation": "Glass",
+                  "children": [
+                    {
+                      "type": "HBoxContainer",
+                      "rect": [
+                        270,
+                        92,
+                        43,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            270,
+                            94,
+                            21,
+                            19
+                          ],
+                          "children": [
+                            {
+                              "type": "Label",
+                              "rect": [
+                                270,
+                                94,
+                                21,
+                                19
+                              ],
+                              "variation": "TypeHudNumberOnDark",
+                              "text": "1533"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            295,
+                            95,
+                            18,
+                            18
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "HBoxContainer",
+              "rect": [
+                12,
+                139,
+                304,
+                44
+              ],
+              "children": [
+                {
+                  "type": "UiGlassButton",
+                  "rect": [
+                    12,
+                    139,
+                    44,
+                    44
+                  ],
+                  "variation": "GlassRound",
+                  "text": ""
+                },
+                {
+                  "type": "UiGlassButton",
+                  "rect": [
+                    64,
+                    139,
+                    44,
+                    44
+                  ],
+                  "variation": "GlassRound",
+                  "text": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

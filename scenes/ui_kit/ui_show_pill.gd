@@ -30,7 +30,7 @@ func _init(text_: String = "Show", kind_: Kind = Kind.TODAY) -> void:
 		.with_margins(s.left, s.y, s.right, s.y)
 	for st in [&"normal", &"hover", &"focus", &"disabled"]: add_theme_stylebox_override(st, box)
 	for st in [&"pressed", &"hover_pressed"]: add_theme_stylebox_override(st, down)
-	_label = UiKit.label(text_, UiTokens.STYLE_CAPTION_XB12, UiTokens.COLOR_PRIMARY)
+	_label = UiKit.label(text_, UiTokens.STYLE_CAPTION_XB12, UiTokens.COLOR_PRIMARY_INK)
 	_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_label)
 	_label.resized.connect(_fit)

@@ -12,7 +12,7 @@ func _init(text_: String = "") -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	custom_minimum_size.y = UiTokens.SIZE_STATE_BADGE_H
-	_label = UiKit.label("", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_PRIMARY)
+	_label = UiKit.label("", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_PRIMARY_INK)
 	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	add_child(_label)
 	text = text_

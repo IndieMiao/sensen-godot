@@ -12,16 +12,15 @@ const TOKENS := "res://docs/design/tokens/tokens-v2.json"
 ## UI v3 (C-84 D-177, owner Q-121): read on top of v2. v2 names listed in ALIASES now hold the v3 value (kept one
 ## version, docs/design/ui-v3-2026-11-24 §2.6 / §7.2); every v3 token is also emitted under its own path name
 ## (COLOR_SURFACE_PAPER, RADIUS_LG, SPACE_S4, SIZE_PANEL_W, MOTION_DURATION_BASE_MS …). A v3 name that meets a v2
-## name of another meaning (a v2 layout this card keeps) gets a `_V3` suffix: SIZE_HUD_AVATAR_V3.
+## name of another meaning (a v2 layout this card keeps) gets a `_V3` suffix: SIZE_HUD_AVATAR_V3, and the v3 float
+## colours (bright, for outlined text over the scene: COLOR_FLOAT_COINS_V3), apart from the v2 floats' cream pills.
 const TOKENS_V3 := "res://docs/design/tokens/tokens-v3.json"
 const ALIASES := {
 	"color": {"surface": "surface/paper", "surfaceRaised": "surface/raised", "text": "text/primary",
 		"secondary": "text/secondary", "muted": "text/muted", "primary": "action/primary",
 		"primaryPressed": "action/primaryPressed", "primaryTint": "action/primaryTint", "disabled": "action/disabled",
 		"disabledInk": "action/disabledInk", "danger": "action/danger", "scrimModal": "scrim/modal",
-		"scrimDrawer": "scrim/drawer", "unreadBadge": "badge/unread", "energyBonus": "hud/energyBonus",
-		"float/coins": "float/coins", "float/energyCost": "float/energyCost", "float/energyGain": "float/energyGain",
-		"float/xp": "float/xp", "float/affinity": "float/affinity"},
+		"scrimDrawer": "scrim/drawer", "unreadBadge": "badge/unread", "energyBonus": "hud/energyBonus"},
 	"radius": {"card": "lg", "sheet": "xl", "bagDrawerTop": "xl", "counterDrawerTop": "xl", "cell": "md",
 		"hudChip": "md", "pinMenu": "lg", "chip": "pill", "pill": "pill"},
 }
@@ -84,12 +83,20 @@ static func load_tokens_v3() -> Dictionary:
 	assert(data is Dictionary and int(data.meta.schema) == 3, "tokens-v3.json missing or wrong schema")
 	return data
 
-## The v2 keys in ALIASES take their v3 values; the scrim base colour and the modal scrim opacity follow v3.
 func _apply_aliases() -> void:
-	for k in ALIASES.color: t.color[k] = String(t3.color[ALIASES.color[k]].value)
-	for k in ALIASES.radius: t.radius[k] = t3.radius[ALIASES.radius[k]].value
-	t.color["scrim"] = DERIVED.scrim
-	t.opacity["scrimModal"] = snappedf(Color.html(t3.color["scrim/modal"].value).a, 0.01)
+	apply_aliases(t, t3)
+
+## The v2 keys in ALIASES take their v3 values; the scrim base colour and the modal scrim opacity follow v3.
+static func apply_aliases(v2: Dictionary, v3: Dictionary) -> Dictionary:
+	for k in ALIASES.color: v2.color[k] = String(v3.color[ALIASES.color[k]].value)
+	for k in ALIASES.radius: v2.radius[k] = v3.radius[ALIASES.radius[k]].value
+	v2.color["scrim"] = DERIVED.scrim
+	v2.opacity["scrimModal"] = snappedf(Color.html(v3.color["scrim/modal"].value).a, 0.01)
+	return v2
+
+## tokens-v2 as UiTokens holds it: the v2 names with the v3 aliases applied.
+static func merged_tokens() -> Dictionary:
+	return apply_aliases(load_tokens(), load_tokens_v3())
 
 func c(key: String) -> Color: return Color.html(t.color[key])
 ## A v3 colour, by its path ("surface/paper").
@@ -258,13 +265,13 @@ func _buttons(th: Theme) -> void:
 		b.visual_height = s("filterChip")
 		return b
 	_button(th, "FilterChip", chip.call(c("surface")), chip_on.call(), chip.call(c("disabled")),
-		"C11B", c("secondary"), c("primary"), c("disabledInk"))
+		"C11B", c("secondary"), Color.html(DERIVED.primaryInk), c("disabledInk"))
 	# SegmentedTabs 1225:83884 (LOCK-13): segments sit on a border-coloured track (UiSegmentTab draws it); the
 	# selected one is white with a primary outline (radius 14), never the command green. Labels are UiSegmentTab's.
 	var seg_r := 14.0   # SegmentedTabs segment radius (WP1b, not exported yet)
 	_button(th, "SegmentTab", _margins(_box(Color.TRANSPARENT, seg_r), float(t.space.within), 0.0),
 		_margins(_box(c("surfaceRaised"), seg_r, c("primary"), stroke), float(t.space.within), 0.0),
-		_margins(_box(Color.TRANSPARENT, seg_r), float(t.space.within), 0.0), "C12B", c("secondary"), c("primary"), c("disabledInk"))
+		_margins(_box(Color.TRANSPARENT, seg_r), float(t.space.within), 0.0), "C12B", c("secondary"), Color.html(DERIVED.primaryInk), c("disabledInk"))
 	# v3 C-N6: the NPC card's full-width action bar, 48 high, square top and the card's lg bottom corners. Without an
 	# action it shows its reason and stays still (the caller disables it), still lime.
 	var lg := r3("lg")

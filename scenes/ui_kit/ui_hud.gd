@@ -276,7 +276,7 @@ func _build_row1() -> void:
 	_buff_icon = UiKit.icon(null, _ICON_BUFF)
 	_buff_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	bh.add_child(_buff_icon)
-	_buff_left = UiKit.label("", UiTokens.STYLE_C11_XB, UiTokens.COLOR_PRIMARY)
+	_buff_left = UiKit.label("", UiTokens.STYLE_C11_XB, UiTokens.COLOR_PRIMARY_INK)
 	_buff_left.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	bh.add_child(_buff_left)
 	row.add_child(_buff)
@@ -595,7 +595,7 @@ class _BuffRings extends Control:
 		var box := UiStyleBox.make(UiTokens.COLOR_SURFACE, _BUFF_PILL_H * 0.5, UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT)
 		pill.add_theme_stylebox_override(&"panel", box.with_margins(_BUFF_PILL_PAD, 0, _BUFF_PILL_PAD, 0))
 		pill.custom_minimum_size.y = _BUFF_PILL_H
-		var label := UiKit.label("", UiTokens.STYLE_C10_XB, UiTokens.COLOR_PRIMARY)
+		var label := UiKit.label("", UiTokens.STYLE_C10_XB, UiTokens.COLOR_PRIMARY_INK)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		pill.add_child(label)

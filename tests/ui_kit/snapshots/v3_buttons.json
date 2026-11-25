@@ -1,0 +1,132 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    232
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "v3 buttons and CTA bar"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "ui-v3 C-B1–C-B4 · C-N6 · fig 11"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        180
+      ],
+      "children": [
+        {
+          "type": "HFlowContainer",
+          "rect": [
+            0,
+            52,
+            328,
+            104
+          ],
+          "children": [
+            {
+              "type": "UiCommandButton",
+              "rect": [
+                0,
+                52,
+                84,
+                48
+              ],
+              "variation": "CmdPrimary",
+              "text": "Deliver"
+            },
+            {
+              "type": "UiCommandButton",
+              "rect": [
+                92,
+                52,
+                84,
+                48
+              ],
+              "variation": "CmdSecondary",
+              "text": "Deliver"
+            },
+            {
+              "type": "UiCommandButton",
+              "rect": [
+                184,
+                52,
+                86,
+                48
+              ],
+              "variation": "CmdDestructive",
+              "text": "Discard"
+            },
+            {
+              "type": "UiCommandButton",
+              "rect": [
+                0,
+                108,
+                140,
+                48
+              ],
+              "variation": "CmdBlocked",
+              "text": "Need 2 Carrots"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            164,
+            328,
+            68
+          ],
+          "children": [
+            {
+              "type": "UiCommandButton",
+              "rect": [
+                0,
+                164,
+                328,
+                48
+              ],
+              "variation": "CtaBar",
+              "text": "Sell"
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                218,
+                328,
+                14
+              ],
+              "variation": "C9B",
+              "text": "CTA bar (C-N6)"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

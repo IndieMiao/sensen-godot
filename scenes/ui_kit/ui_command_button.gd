@@ -50,6 +50,10 @@ var visual_inset_x := 0.0: set = set_visual_inset_x
 ## (unavailable_pressed: the caller opens the Energy card). Other gaps stay grey.
 var need_energy := false: set = set_need_energy
 
+## UI v3 action bar (C-N6, C-105): the NPC card's full-width 48 key, lime with white ExtraBold; an unavailable or
+## offline one keeps the bar and reads its reason. UiNpcCard sets it on the buttons put in its `content`.
+var bar := false: set = set_bar
+
 ## Sends a server command when activated: greys to `Offline` while offline, and the command it sends is tracked
 ## (P0Ui.track_pressed: SUBMITTING / PENDING, F-08).
 var sends := false: set = set_sends
@@ -72,6 +76,7 @@ func _init(text_: String = "", kind_: Kind = Kind.PRIMARY, compact_ := false) ->
 	compact = compact_
 	pressed.connect(_on_pressed)
 	add_to_group(GROUP)
+	UiMotion.press_feedback(self)   # v3 M-01
 	_apply()
 
 func set_kind(v: Kind) -> void: kind = v; _apply()
@@ -83,6 +88,7 @@ func set_phase(v: CommandLifecycle.State) -> void: phase = v; _apply()
 func set_fit_text(v: bool) -> void: fit_text = v; _fit()
 func set_sends(v: bool) -> void: sends = v; _apply()
 func set_min_width(v: float) -> void: min_width = v; _apply()
+func set_bar(v: bool) -> void: bar = v; _apply()
 func set_visual_inset_x(v: float) -> void: visual_inset_x = v; _fit()
 func set_need_energy(v: bool) -> void:
 	need_energy = v
@@ -176,6 +182,11 @@ func _apply() -> void:
 	else:
 		theme_type_variation = _VARIATIONS[kind][i]
 		text = label
+	if bar:
+		theme_type_variation = UiTokens.BUTTON_CTA_BAR
+		custom_minimum_size = Vector2(min_width, UiTokens.SIZE_NPC_CTA_H)
+		modulate.a = UiTokens.OPACITY_PENDING if phase == CommandLifecycle.State.PENDING else 1.0
+		return
 	if compact:
 		custom_minimum_size = Vector2(min_width, 0.0)
 		UiKit.ensure_hit_area(self)

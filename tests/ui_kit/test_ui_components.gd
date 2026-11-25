@@ -71,7 +71,7 @@ func test_pin_adds_warm_fill_strip_and_badge_and_stacks_with_selected() -> void:
 	await _settle()
 	var box := _surface(c).get_theme_stylebox(&"panel") as UiStyleBox
 	assert_str(box.bg_color.to_html()).is_equal(UiTokens.COLOR_PIN_WARM.to_html())
-	assert_str(box.border_color.to_html()).is_equal(UiTokens.COLOR_PRIMARY.to_html())
+	assert_str(box.border_color.to_html()).is_equal(UiTokens.COLOR_ACTION_SELECTED.to_html())   # v3 C-Q2
 	var amber := _visible_named(c, "Panel").filter(func(p):
 		var b := (p as Panel).get_theme_stylebox(&"panel") as UiStyleBox
 		return b != null and b.bg_color.to_html() == UiTokens.COLOR_PIN_AMBER.to_html())
@@ -97,7 +97,7 @@ func test_zero_quick_slot_dims_the_icon_and_greys_the_count() -> void:
 	var icon: TextureRect = _visible_named(c, "TextureRect").filter(func(t): return (t as TextureRect).texture != UiItemCell.PIN_GLYPH)[0]
 	assert_float(icon.modulate.a).is_equal_approx(UiTokens.OPACITY_ZERO_ICON, 0.001)
 	var count: Label = _visible_named(c, "Label").filter(func(l): return (l as Label).text == "×0")[0]
-	assert_str(count.get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())
+	assert_str(count.get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())   # pinned: warm fill, dark ink
 
 func test_ghost_quick_slot_is_dashed_with_a_dimmed_icon_and_a_grey_family_name() -> void:
 	var c := _quick({state = UiItemCell.State.GHOST, title = "Seeds", quantity = "×5", pinned = true})
@@ -106,7 +106,8 @@ func test_ghost_quick_slot_is_dashed_with_a_dimmed_icon_and_a_grey_family_name()
 	assert_float(icon.modulate.a).is_equal_approx(UiTokens.OPACITY_ZERO_ICON, 0.001)
 	var labels := _visible_named(c, "Label")
 	assert_array(labels.map(func(l): return (l as Label).text)).contains_exactly(["Seeds"])   # no count
-	assert_str((labels[0] as Label).get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())
+	# v3: a ghost is glass (a pin shows only on a filled slot), its name the quiet white
+	assert_str((labels[0] as Label).get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_TEXT_ON_DARK_MUTED.to_html())
 	assert_bool(_visible_named(c, "TextureRect").any(func(t): return (t as TextureRect).texture == UiItemCell.PIN_GLYPH)).is_false()
 	var box := _surface(c).get_theme_stylebox(&"panel") as UiStyleBox
 	assert_bool(box.dashed).is_true()
@@ -390,7 +391,7 @@ func test_segment_tab_keeps_exactly_one_selected() -> void:
 	assert_int(seg.selected).is_equal(1)
 	assert_bool(seg.tabs()[0].button_pressed).is_false()
 	var titles := seg.find_children("Title", "Label", true, false)
-	assert_str((titles[1] as Label).get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_PRIMARY.to_html())
+	assert_str((titles[1] as Label).get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_PRIMARY_INK.to_html())
 	assert_str((titles[0] as Label).get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_SECONDARY.to_html())
 
 func test_selecting_a_segment_in_code_releases_the_others_silently() -> void:

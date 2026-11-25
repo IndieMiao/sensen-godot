@@ -119,7 +119,7 @@ func refresh(view_: Dictionary) -> void:
 	name_row.edit_pressed.connect(func(): edit_name_pressed.emit())
 	id.add_child(name_row)
 	if str(d.home_line) != "": id.add_child(UiKit.label(str(d.home_line), UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY))
-	if look_saved: id.add_child(UiKit.label("Look saved", UiTokens.STYLE_C10_B, UiTokens.COLOR_PRIMARY))   # KEEP-P0-2
+	if look_saved: id.add_child(UiKit.label("Look saved", UiTokens.STYLE_C10_B, UiTokens.COLOR_PRIMARY_INK))   # KEEP-P0-2
 	col.add_child(id)
 	var skills := HBoxContainer.new()
 	skills.add_theme_constant_override(&"separation", int(_SKILL_GAP))
