@@ -49,6 +49,11 @@ const LOCATE_ICON := "res://assets/p0/icons/locate.svg"
 const LOCATE_GAP := 12.0
 ## The profile key (C-128): the same round key at the left, with the account glyph; it opens the profile.
 const PROFILE_ICON := "res://assets/ui/icons/lucide/user-round.svg"
+## How long a profile tap waits for the saved outfit's parts at most (C-135), in seconds; then the profile opens all the
+## same and its figure may show late or stay blank. 5 s: a cold start's load took ~3 s on the phone (C-133), and a
+## stuck loader must not keep the profile and Settings out of reach. Overridden by the project setting below.
+const PROFILE_WAIT_SECONDS := 5.0
+const PROFILE_WAIT_SETTING := "sensen/dynamic_farm/profile_outfit_wait_seconds"
 const CHECKING := "Checking your account…"
 const SIGNED_IN := "Signed in as %s"
 const SIGNED_IN_NO_NAME := "Signed in"
@@ -86,6 +91,8 @@ var _profile_button: Button
 var _profile: Control
 ## A tap on the profile key waiting for the saved outfit's parts to load (C-133); the key is held meanwhile.
 var _profile_waiting := false
+## The most a profile tap waits for the outfit (PROFILE_WAIT_SECONDS).
+var profile_wait_seconds := float(ProjectSettings.get_setting(PROFILE_WAIT_SETTING, PROFILE_WAIT_SECONDS))
 ## The town that is loading after a tap on Market / Carpenter (C-61: the tap shows Loading… at once), else "".
 var _town_loading := ""
 ## The home's parcel save as last read or seen (the guide's line) and the parcel it belongs to; read again after
@@ -575,16 +582,19 @@ func _warm_outfit() -> void:
 
 ## The profile over the map (C-128), as the town is: the map's panels hide and its camera holds still until it closes.
 ## A tap while the saved outfit is still loading (just after a cold start) holds the key until it has loaded, frame
-## by frame, so the profile opens with its figure, never with an empty frame for it (C-133).
+## by frame, so the profile opens with its figure, never with an empty frame for it (C-133). It waits
+## profile_wait_seconds at most: a load that never ends opens the profile all the same (C-135).
 func _open_profile() -> void:
 	if _profile != null or _opening or _leaving or _suspended or _profile_waiting: return
 	var avatar := get_node_or_null("/root/Avatar")
 	if avatar != null and avatar.warming():
 		_profile_waiting = true; _render()
 		var start := Time.get_ticks_msec()
-		while is_inside_tree() and avatar.warming(): await get_tree().process_frame
+		var limit := int(profile_wait_seconds * 1000.0)
+		while is_inside_tree() and avatar.warming() and Time.get_ticks_msec() - start < limit: await get_tree().process_frame
 		_profile_waiting = false
-		print("PARCEL_PROFILE_WAIT ", JSON.stringify({"ms": Time.get_ticks_msec() - start}))
+		var timed_out: bool = is_inside_tree() and avatar.warming()
+		print("PARCEL_PROFILE_WAIT ", JSON.stringify({"ms": Time.get_ticks_msec() - start, "timed_out": timed_out}))
 		if not is_inside_tree(): return
 		_render()
 		if _profile != null or _opening or _leaving or _suspended: return
