@@ -1,0 +1,53 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/watering/orchard_pail.gltf" id="bucket"]
+[ext_resource type="ArrayMesh" path="res://assets/dynamic_farm/watering/pour_geometry.res" id="jet"]
+[ext_resource type="Shader" path="res://assets/dynamic_farm/watering/pour_water.gdshader" id="shader"]
+
+[sub_resource type="StandardMaterial3D" id="surface"]
+albedo_color = Color(0.30, 0.68, 0.70, 1)
+roughness = 0.48
+
+[sub_resource type="CylinderMesh" id="meniscus"]
+material = SubResource("surface")
+top_radius = 0.120
+bottom_radius = 0.119
+height = 0.003
+radial_segments = 12
+rings = 0
+
+[sub_resource type="ShaderMaterial" id="water"]
+resource_local_to_scene = true
+shader = ExtResource("shader")
+shader_parameter/beat = 0.0
+shader_parameter/landing = Vector3(-0.108, -0.446, 0.246)
+
+[node name="BucketGesture" type="Node3D"]
+
+[node name="Hand" type="BoneAttachment3D" parent="."]
+bone_name = "Wrist_R"
+use_external_skeleton = true
+external_skeleton = NodePath("../../Skeleton3D")
+
+[node name="Grip" type="Node3D" parent="Hand"]
+position = Vector3(0.106178, -0.000381, -0.018197)
+quaternion = Quaternion(-0.055876, -0.090488, -0.697081, -0.709062)
+
+[node name="Pail" parent="Hand/Grip" instance=ExtResource("bucket")]
+
+[node name="Water" type="MeshInstance3D" parent="Hand/Grip/Pail/Bowl"]
+visible = false
+cast_shadow = 0
+position = Vector3(0, -0.016, 0)
+rotation = Vector3(0, 0.261799, 0)
+mesh = SubResource("meniscus")
+
+[node name="Pour" type="MeshInstance3D" parent="."]
+visible = false
+cast_shadow = 0
+position = Vector3(-0.262197, 0.483570, 0.372637)
+mesh = ExtResource("jet")
+custom_aabb = AABB(-0.36, -0.51, -0.08, 0.50, 0.62, 0.59)
+material_override = SubResource("water")
+
+[editable path="Hand/Grip/Pail"]
