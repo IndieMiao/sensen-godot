@@ -1,13 +1,14 @@
 extends SceneTree
 ## C-107 the in-game phone on one's own parcel (design C-85 ⑦ / ⑧):
 ## - ParcelTasks: the guide's eight steps as rows, done / current / todo from the save alone, at every stage of the
-##   first visit (a growing carrot waits on Harvest, the coop blueprint ends the list);
+##   first visit (a growing carrot waits on Harvest, the coop blueprint ends the list), and gathering again after
+##   selling what was gathered not taking the rows back once the device saw them further on;
 ## - the kit: UiTaskRow's finishing beat, UiTaskDropDown's rows / More… / fold, UiPhone's tabs, badge and head;
 ## - the phone's pages over data: tasks with groups and only the current row tappable, the inbox's rows and Claim all,
 ##   empty Parcels / Updates, collection cards opening their grid (silhouettes for what is not got) and ‹ back;
 ## - the real scene on the local save: the task button in the top bar with its new-task dot, the drop-down (three rows,
 ##   More… opening the phone), the phone (quick bar away, three tabs, the current task's tip on a tap, Back closes it),
-##   a step finished while the drop-down is up moving the rows on, and the seen task kept after reopening.
+##   a step finished while the drop-down is up moving the rows on, and the seen task and rows done kept after reopening.
 ## Run in the private preview project (README), optionally with `-- <farm.json>`.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -79,6 +80,13 @@ func _task_progress() -> void:
 		for i in rows.size(): want.append("done" if i < c[2] else "current" if i == c[2] else "todo")
 		_check(states == want, c[0] + ": row states follow the count")
 	_check(Tasks.current(_farm(cases[9][1]), NOW) == "", "all done: no current task")
+	# Gathering again after selling what was gathered: the guide asks to sell it again, the rows do not go back.
+	var again := _farm({"buildings": [HOUSE], "sales": 2, "bag": {"wood": 1}, "gathered": {"x": NOW, "y": NOW}})
+	_check(Tasks.done_count(again, NOW) == 6, "gathered again, nothing seen further on this device: Sell it")
+	_check(Tasks.done_count(again, NOW, 7) == 7 and Tasks.current(again, NOW, 7) == "blueprint"
+		and Tasks.rows(again, NOW, 7)[6].state == "done", "gathered again after the blueprint row: still the blueprint")
+	_check(Tasks.done_count(again, NOW, 6) == 6, "the first sale of what was gathered is still to do")
+	_check(Tasks.done_count(_farm(cases[6][1]), NOW, 7) == 5, "only Sell what you gathered keeps what the device saw")
 	_check(Tasks.rows({}, NOW)[0].state == "current" and Tasks.rows({}, NOW)[0].group == "GET STARTED"
 		and Tasks.rows({}, NOW)[4].group == "TOWN", "groups: GET STARTED then TOWN")
 	_check(Tasks.title("sell") == "Sell to Jasmine" and Tasks.title("blueprint") == "Take Scott's blueprint", "design copy")
@@ -288,7 +296,8 @@ func _scene() -> void:
 	_check(not farming._tip.visible, "the tip card steps aside for the drop-down")
 	_check(drop.get_global_rect().position.y >= scene._header.get_global_rect().end.y, "the rows sit under the top bar")
 	var saved = JSON.parse_string(FileAccess.get_file_as_string(farming.phone_seen_path))
-	_check(saved is Dictionary and saved.get(raw.block_id) == "build", "the seen task is kept on the device")
+	_check(saved is Dictionary and saved.get(raw.block_id) is Dictionary and saved[raw.block_id].get("seen") == "build",
+		"the seen task is kept on the device")
 	# A step finished while the drop-down is up: the row's beat, then the rows move on.
 	var next: Dictionary = farming.farm.duplicate(true)
 	var at := _free_block(preload("res://modules/dynamic_farm/farm_data.gd").decode(raw))
@@ -301,6 +310,8 @@ func _scene() -> void:
 	await process_frame
 	_check(drop.rows[0].state == UiTaskRow.State.DONE, "the finished row turns done in place")
 	_check(button.badge == false, "a step finished in view counts as seen")
+	saved = JSON.parse_string(FileAccess.get_file_as_string(farming.phone_seen_path))
+	_check(int(saved[raw.block_id].get("reached", 0)) == 1, "the rows counted done are kept on the device")
 	await create_timer(UiTaskDropDown.DONE_STAY_S + 0.6).timeout
 	_check(drop.showing and drop.rows[1].title == "Till your yard" and drop.rows[1].state == UiTaskRow.State.CURRENT,
 		"a second later the rows show Till as current")
@@ -347,7 +358,7 @@ func _scene() -> void:
 	file.store_string(JSON.stringify({"block_id": raw.block_id, "farm_version": 1, "farm": next}))
 	file.close()
 	farming = await _open()
-	_check(farming._seen() == "till", "reopening reads the seen task")
+	_check(farming._seen() == "till" and farming._reached() == 1, "reopening reads the seen task and the rows done")
 	_check(Tasks.current(farming.farm, farming.server_now()) == "till" and not farming.task_button.badge,
 		"the cottage stands, Till already seen: no dot")
 	await _close()

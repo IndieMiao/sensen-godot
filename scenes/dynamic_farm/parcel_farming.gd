@@ -163,8 +163,10 @@ var task_button: UiTaskButton
 var phone_button: UiGlassButton
 var drop_down: UiTaskDropDown
 var phone: Control
-## The task last seen (PHONE_SEEN_PATH), and how many rows the drop-down last showed done.
+## The task last seen and the most rows counted done (PHONE_SEEN_PATH: {block_id: {seen, reached}}), and how many
+## rows the drop-down last showed done.
 var seen_task := ""
+var tasks_reached := 0
 var phone_seen_path := PHONE_SEEN_PATH
 var _drop_done := -1
 var _seen_read := false
@@ -1012,8 +1014,8 @@ func _refresh_tip() -> void:
 ## The drop-down's rows: up to three ending at the current task (the two before it done), so the next step is in view;
 ## `More…` opens the phone for the rest. {rows: [{title, state}], done: rows done above the window, start}.
 func drop_rows() -> Dictionary:
-	var rows := Tasks.rows(farm, server_now())
-	var done := Tasks.done_count(farm, server_now())
+	var rows := Tasks.rows(farm, server_now(), _reached())
+	var done := Tasks.done_count(farm, server_now(), _reached())
 	var start := clampi(done - (UiTaskDropDown.MAX_ROWS - 1), 0, maxi(0, rows.size() - UiTaskDropDown.MAX_ROWS))
 	var shown := []
 	for row: Dictionary in rows.slice(start, start + UiTaskDropDown.MAX_ROWS):
@@ -1048,7 +1050,7 @@ func open_phone(tab := Phone.TASKS_TAB) -> void:
 	phone.task_pressed.connect(_on_task_pressed)
 	_ui.add_child(phone)
 	_ui.move_child(_toast, -1)
-	phone.refresh(Tasks.rows(farm, server_now()), {}, [])
+	phone.refresh(Tasks.rows(farm, server_now(), _reached()), {}, [])
 	_place_phone()
 	phone.show_tab(tab)
 	phone.open()
@@ -1093,11 +1095,14 @@ func _refresh_tasks() -> void:
 	task_button.visible = ready
 	phone_button.visible = ready
 	if not ready: return
-	var current := Tasks.current(farm, server_now())
+	var done := Tasks.done_count(farm, server_now(), _reached())
+	if done > tasks_reached:
+		tasks_reached = done
+		_keep_local()
+	var current := Tasks.current(farm, server_now(), _reached())
 	var fresh := not current.is_empty() and current != _seen()
 	task_button.badge = fresh
 	phone_button.badge = fresh
-	var done := Tasks.done_count(farm, server_now())
 	if drop_down.showing and _drop_done >= 0 and done > _drop_done:
 		# The finished row is the one that was current in the rows still showing.
 		var index := _drop_done - _drop_start()
@@ -1107,7 +1112,7 @@ func _refresh_tasks() -> void:
 	elif done != _drop_done:
 		_drop_done = done
 	if phone != null:
-		var rows := Tasks.rows(farm, server_now())
+		var rows := Tasks.rows(farm, server_now(), _reached())
 		if rows != phone.tasks: phone.refresh(rows, {}, [])
 
 ## Where the drop-down's showing rows start in the task list (its rows were built from the last count).
@@ -1115,27 +1120,40 @@ func _drop_start() -> int:
 	return clampi(_drop_done - (UiTaskDropDown.MAX_ROWS - 1), 0, maxi(0, Tasks.TASKS.size() - UiTaskDropDown.MAX_ROWS))
 
 func _seen() -> String:
-	if not _seen_read:
-		_seen_read = true
-		var raw = JSON.parse_string(FileAccess.get_file_as_string(phone_seen_path)) if FileAccess.file_exists(phone_seen_path) else null
-		if raw is Dictionary: seen_task = str(raw.get(str(_data.get("block_id", "")), ""))
+	_read_local()
 	return seen_task
+
+func _reached() -> int:
+	_read_local()
+	return tasks_reached
+
+func _read_local() -> void:
+	if _seen_read: return
+	_seen_read = true
+	var raw = JSON.parse_string(FileAccess.get_file_as_string(phone_seen_path)) if FileAccess.file_exists(phone_seen_path) else null
+	var entry = raw.get(str(_data.get("block_id", ""))) if raw is Dictionary else null
+	if entry is Dictionary:
+		seen_task = str(entry.get("seen", ""))
+		tasks_reached = int(entry.get("reached", 0))
 
 ## The current task has been seen (the drop-down or the phone opened on it): the buttons' dots go.
 func _mark_seen() -> void:
-	var current := Tasks.current(farm, server_now())
+	var current := Tasks.current(farm, server_now(), _reached())
 	if current.is_empty() or current == _seen(): return
 	seen_task = current
+	_keep_local()
+	task_button.badge = false
+	phone_button.badge = false
+
+func _keep_local() -> void:
 	var raw = JSON.parse_string(FileAccess.get_file_as_string(phone_seen_path)) if FileAccess.file_exists(phone_seen_path) else null
 	var all: Dictionary = raw if raw is Dictionary else {}
-	all[str(_data.get("block_id", ""))] = current
+	all[str(_data.get("block_id", ""))] = {"seen": seen_task, "reached": tasks_reached}
 	DirAccess.make_dir_recursive_absolute(phone_seen_path.get_base_dir())
 	var file := FileAccess.open(phone_seen_path, FileAccess.WRITE)
 	if file != null:
 		file.store_string(JSON.stringify(all))
 		file.close()
-	task_button.badge = false
-	phone_button.badge = false
 
 ## Places a scene button (the house's Build Cottage, C-33) at the left on the action key's baseline, so it never
 ## covers the quick bar or the key; it keeps its own `custom_minimum_size`.
