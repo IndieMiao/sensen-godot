@@ -13,7 +13,7 @@
   - 只有 app 在主机回环地址 `127.0.0.1:3160` 发布端口；数据库不发布端口。
 - **正式配置**：以下设置写死在 `compose.yml`，`.env` 里写同名项不生效。`ops.sh check` 发现 `.env` 里有这些项会拒绝。
   - 开放邮箱注册（`ACCOUNT_SIGNUP=open`，C-101），邀请账号照常登录。注册后发验证码，找回密码和站外删号也发验证码，所以 `SMTP_URL`、`MAIL_FROM` 是 `.env` 必填项；`ops.sh check` 和 `deploy` 缺它们会拒绝（备份、回滚、恢复不查）。
-  - Google 登录开启（C-101）：`GOOGLE_CLIENT_IDS` 写死为 Google Cloud 项目 gensen-preview 的 OAuth Web 客户端 ID（不是秘密）。手机上能拿到令牌，还要求同一个项目里有包名 `com.sensen.dynamicfarm.cardigan` 加签名证书 SHA-1 的 Android 客户端，这一项由所有者在 Google Cloud 控制台配置。
+  - Google 登录开启（C-101）：`GOOGLE_CLIENT_IDS` 写死为正式包实际使用的 OAuth Web 客户端 ID（`project.godot` 的 `sensen/auth/google_web_client_id`，所有者的正式 Google Cloud 项目，870347303349 开头；不是秘密），两边不一致时 `server/test/ops/dynamicfarm.test.ts` 和 `tools/android/test_worker_apk.py` 会失败。手机上能拿到令牌，还要求同一个项目里有包名 `com.sensen.dynamicfarm.cardigan` 加签名证书 SHA-1 的 Android 客户端，这一项由所有者在 Google Cloud 控制台配置。
   - Apple 登录关闭，返回 503 `APPLE_UNAVAILABLE`。
   - 以后要回到只用邀请账号：把 `ACCOUNT_SIGNUP` 改回 `closed` 再部署，邮箱注册和 Google 首次登录建号都回 403 `SIGNUP_CLOSED`，已有账号照常登录。
   - 游客只读：认领和存档返回 401 `LOGIN_REQUIRED`。

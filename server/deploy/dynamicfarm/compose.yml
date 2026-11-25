@@ -15,14 +15,15 @@ services:
       # 正式配置写死在这里：compose 的 environment 优先于 env_file，.env 里写了同名项也不生效。
       # 开放邮箱注册和 Google 登录（C-101），邀请账号照常登录；Apple 登录关；游客只读；不开放“放弃并重选”；
       # 不用 QA 固定验证码和 QA 玩家。开放注册后验证邮箱和找回密码要发信，SMTP_URL、MAIL_FROM 是 .env 必填项。
-      # GOOGLE_CLIENT_IDS 是 Google Cloud 项目 gensen-preview 的 OAuth Web 客户端 ID（不是秘密），安卓包向它要登录令牌；
+      # GOOGLE_CLIENT_IDS 是正式包向 Google 要登录令牌用的 OAuth Web 客户端 ID（不是秘密），必须与 project.godot 的
+      # sensen/auth/google_web_client_id 一致（所有者的正式 Google Cloud 项目，870347303349 开头；测试会比对）。
       # 同一个项目里要有包名 com.sensen.dynamicfarm.cardigan 加签名证书 SHA-1 的 Android 客户端，手机上才拿得到令牌。
       # 装上即建号（C-100，游客认领和存档自己的地块）还关着：什么时候对外开放由所有者另定，到时改这一行并重新部署。
       ACCOUNT_SIGNUP: open
       GUEST_WRITES: "0"
       PARCEL_GUEST_WRITES: "0"
       DYNAMIC_FARM_RESELECT: "0"
-      GOOGLE_CLIENT_IDS: 105022638066-s710gs2tsaikbkhbtvstdino7cq661go.apps.googleusercontent.com
+      GOOGLE_CLIENT_IDS: 870347303349-bkbtvblhsj7epud9cm2ma2ia9r0blj5i.apps.googleusercontent.com
       APPLE_BUNDLE_IDS: ""
       QA_EMAIL_DOMAIN: ""
       QA_EMAIL_CODE: ""

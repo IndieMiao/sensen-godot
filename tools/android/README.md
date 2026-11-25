@@ -210,7 +210,10 @@ choose a production signing identity, install an app or authorize publication.
    If the server still takes no new accounts (`ACCOUNT_SIGNUP=closed`), sign-up and a first Google
    sign-in say so. Google sign-in needs an Android OAuth client for `com.sensen.dynamicfarm.cardigan`
    and the signing certificate's SHA-1 in the same Google Cloud project as the web client id the
-   package asks tokens for (`sensen/auth/google_web_client_id`, default in `google_sign_in.gd`).
+   package asks tokens for (`sensen/auth/google_web_client_id` in `project.godot`, the owner's
+   production project starting 870347303349, not gensen-preview). The production compose's
+   `GOOGLE_CLIENT_IDS` must contain that id; `test_worker_apk.py` and
+   `server/test/ops/dynamicfarm.test.ts` check it.
    `online_qa` stays on, so `Net` never signs in anonymously; without an account the player can only
    look at the map.
    Building it does not sign or publish it: signing with the 0.4.1 certificate and distribution are C-99.

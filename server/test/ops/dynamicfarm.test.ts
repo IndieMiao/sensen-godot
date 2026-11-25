@@ -16,7 +16,9 @@ import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../../src/doma
 import { loadParcelRules } from '../../src/parcels/rules.js';
 import { MemoryParcelStore } from '../../src/parcels/store.js';
 import { firstInvite, runSmoke } from '../../src/ops/dynamicfarm_smoke.js';
-import { makeKeys } from '../fixtures/firebase_tokens.js';
+import { makeKeys, signToken } from '../fixtures/firebase_tokens.js';
+import { sha256Hex } from '../../src/accounts/apple_token.js';
+import { verifyGoogleIdToken } from '../../src/accounts/google_token.js';
 
 const content = loadContent(DEFAULT_CONTENT_DIR);
 const CV = contentVersion(DEFAULT_CONTENT_DIR);
@@ -84,7 +86,7 @@ describe('dynamic farm deploy files', () => {
   const ops = readFileSync(path.join(DEPLOY, 'ops.sh'), 'utf8');
   const FORCED: Record<string, string> = {
     ACCOUNT_SIGNUP: 'open', GUEST_WRITES: '"0"', PARCEL_GUEST_WRITES: '"0"', DYNAMIC_FARM_RESELECT: '"0"',
-    GOOGLE_CLIENT_IDS: '105022638066-s710gs2tsaikbkhbtvstdino7cq661go\\.apps\\.googleusercontent\\.com', APPLE_BUNDLE_IDS: '""',
+    GOOGLE_CLIENT_IDS: '870347303349-bkbtvblhsj7epud9cm2ma2ia9r0blj5i\\.apps\\.googleusercontent\\.com', APPLE_BUNDLE_IDS: '""',
     QA_EMAIL_DOMAIN: '""', QA_EMAIL_CODE: '""', QA_PLAYER_IDS: '""', EMAIL_LOG_CODES: '"0"',
   };
 
@@ -95,6 +97,22 @@ describe('dynamic farm deploy files', () => {
     }
     const forbidden = /for k in (ACCOUNT_SIGNUP[^;]*); do/.exec(ops)?.[1].split(' ') ?? [];
     expect(forbidden.sort()).toEqual(Object.keys(FORCED).filter(k => k !== 'EMAIL_LOG_CODES').sort());
+  });
+
+  it('accepts the Google web client id the release package asks tokens for (V-315)', async () => {
+    // The package requests ID tokens for sensen/auth/google_web_client_id, so that is the token's aud.
+    const project = readFileSync(path.join(ROOT, 'project.godot'), 'utf8');
+    const sensen = /^\[sensen\]$([\s\S]*?)(?=^\[|(?![\s\S]))/m.exec(project)?.[1] ?? '';
+    expect(sensen).not.toMatch(/^auth\/google_web_client_id\./m);
+    const webClient = /^auth\/google_web_client_id="([^"]+)"$/m.exec(sensen)?.[1];
+    expect(webClient).toMatch(/\.apps\.googleusercontent\.com$/);
+    const audiences = /^ {6}GOOGLE_CLIENT_IDS: (.+)$/m.exec(compose)?.[1].split(',').map(s => s.trim()) ?? [];
+    expect(audiences).toContain(webClient);
+    // A token issued to the package's web client verifies under the production audiences.
+    const keys = makeKeys('v315'), nonce = 'n'.repeat(32), now = Date.UTC(2026, 10, 25, 2), s = Math.floor(now / 1000);
+    const token = signToken(keys, { iss: 'https://accounts.google.com', aud: webClient, sub: '1', iat: s - 5, exp: s + 3600,
+      nonce: sha256Hex(nonce), email: 'ada@gmail.com', email_verified: true });
+    await expect(verifyGoogleIdToken(token, nonce, { audiences, keys: keys.keys, now: () => now })).resolves.toMatchObject({ aud: webClient });
   });
 
   it('publishes only the app, only on loopback, with its own database volume and no other project network', () => {

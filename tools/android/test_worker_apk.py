@@ -1,6 +1,7 @@
 import hashlib
 import os
 from pathlib import Path
+import re
 import shutil
 import struct
 import subprocess
@@ -182,6 +183,17 @@ class WorkerAPK(unittest.TestCase):
             for release_build in (False, True):
                 with self.subTest(setting=setting, release=release_build), self.assertRaisesRegex(ValueError, 'pre-existing'):
                     farm.staged_project(PROJECT.replace('[sensen]', '[sensen]\n' + setting), None, release_build)
+
+    def test_release_google_web_client_is_an_audience_of_the_production_server(self):
+        # V-315: the package asks Google for ID tokens issued to this web client, so it is the token's aud;
+        # the production compose must accept it or Google sign-in fails with GOOGLE_TOKEN_BAD_AUDIENCE.
+        staged = farm.staged_project(PROJECT, None, True)
+        self.assertNotRegex(staged, r'(?m)^auth/google_web_client_id\.')
+        web_client = exported_settings('dynamic-farm-release')['sensen/auth/google_web_client_id']
+        self.assertRegex(web_client, r'\.apps\.googleusercontent\.com$')
+        compose = (ROOT / 'server' / 'deploy' / 'dynamicfarm' / 'compose.yml').read_text()
+        audiences = re.search(r'(?m)^ {6}GOOGLE_CLIENT_IDS: (.+)$', compose).group(1)
+        self.assertIn(web_client, [audience.strip() for audience in audiences.split(',')])
 
     def test_release_preset_upgrades_the_preview_package_with_the_same_version(self):
         preset, identity = worker_preset(PRESETS, 'dynamic-farm-release')
