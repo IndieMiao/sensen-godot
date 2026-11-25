@@ -10,7 +10,7 @@
 #   ops.sh backup [标签]                       备份：pg_dump → 在临时库里试恢复并记下行数和指纹 → 用 AGE_RECIPIENT 加密
 #   ops.sh restore <备份> --confirm-drop       停 app → 先备份现库 → 删库重建 → 恢复 → 核对行数和指纹 → 起 app
 #   ops.sh invites <create|list|reset|disable> ...  邀请账号；create / reset 的输出必须重定向到受控存储
-#   ops.sh smoke [--invite] [<入口地址>]        冒烟（只读，不认领地块）；带 --invite 时从标准输入读一行 email,password 核对登录
+#   ops.sh smoke [--invite] [<入口地址>]        冒烟（只读，不建号、不认领地块）；带 --invite 时从标准输入读一行 email,password 核对登录
 #   ops.sh status                             容器、健康检查、最近的发布和备份
 set -euo pipefail
 umask 077
@@ -74,6 +74,13 @@ check_env() {
   for k in ACCOUNT_SIGNUP GUEST_WRITES PARCEL_GUEST_WRITES DYNAMIC_FARM_RESELECT QA_EMAIL_DOMAIN QA_EMAIL_CODE QA_PLAYER_IDS GOOGLE_CLIENT_IDS APPLE_BUNDLE_IDS; do
     ! grep -qE "^$k=" "$ENV_FILE" || die ".env 里不要写 ${k}：正式配置写死在 compose.yml"
   done
+}
+# 开放注册（C-101）后，验证邮箱、找回密码和站外删号的验证码都要真的发出去。只在 check 和 deploy 时核对：
+# 备份（cron）、回滚和恢复不因为缺发信配置而停。SMTP_URL 里有发信密码，只核对格式，不打印。
+check_mail() {
+  local k
+  for k in SMTP_URL MAIL_FROM; do [ -n "$(envget "$k")" ] || die ".env 缺少 ${k}（开放注册后必填，见 env.example）"; done
+  [[ "$(envget SMTP_URL)" =~ ^smtps?:// ]] || die "SMTP_URL 要以 smtp:// 或 smtps:// 开头"
 }
 check_release_env() {
   [[ "$(envget GIT_SHA)" =~ ^[0-9a-f]{40}$ ]] || die ".env 的 GIT_SHA 不是完整提交号"
@@ -196,7 +203,7 @@ do_deploy() {
   local sha="${1:-}" id="${2:-}"
   [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || die "用法：ops.sh deploy <完整提交号> <镜像ID sha256:...>"
   [[ "$id" =~ ^sha256:[0-9a-f]{64}$ ]] || die "镜像 ID 要写完整的 sha256:<64 位>"
-  check_env
+  check_env; check_mail
   local got; got=$(docker image inspect --format '{{.Id}}' "$IMAGE_REPO:$sha" 2>/dev/null) || die "主机上没有 $IMAGE_REPO:${sha}（先 ops.sh load）"
   [ "$got" = "$id" ] || die "镜像 ID 不符：主机上是 ${got}，要部署的是 $id"
   wait_pg
@@ -286,7 +293,7 @@ do_status() {
 
 cmd="${1:-}"; [ $# -gt 0 ] && shift
 case "$cmd" in
-  check) check_env; dc config -q; say ".env 和 compose 配置通过" ;;
+  check) check_env; check_mail; dc config -q; say ".env 和 compose 配置通过" ;;
   load) lock; do_load "$@" ;;
   deploy) lock; do_deploy "$@" ;;
   init-db) lock; do_init_db ;;

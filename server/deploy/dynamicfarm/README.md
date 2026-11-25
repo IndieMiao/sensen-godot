@@ -2,6 +2,8 @@
 
 **状态：只准备，未部署。** 部署由 C-97 的主机操作员按本文执行。主机费用和正式建库开工前，先请所有者本人批准。准备过程中没有登录任何服务器。
 
+**C-101 更新**：本目录的 compose 已改为开放邮箱注册和 Google 登录。正式服重新部署之前仍是只用邀请账号。重新部署要所有者本人同意，部署前先在 `.env` 填好 `SMTP_URL`、`MAIL_FROM`，并确认 Google Cloud 里已有动态农场安卓包的 Android 客户端。
+
 ## 部署的是什么
 
 - **服务**：Journey 服务端（`server/`，镜像用 `server/Dockerfile` 构建）。动态农场用到的是地块认领、地块存档、市场（出售）和木匠（领蓝图），接口见 [docs/plans/C-31.md](../../../docs/plans/C-31.md)。Journey 的其它接口仍在，游客对它们也只读。
@@ -10,8 +12,10 @@
   - 不加入 P0 或旧 farm 的网络，不挂它们的卷，不连 P0 演示服的数据。
   - 只有 app 在主机回环地址 `127.0.0.1:3160` 发布端口；数据库不发布端口。
 - **正式配置**：以下设置写死在 `compose.yml`，`.env` 里写同名项不生效。`ops.sh check` 发现 `.env` 里有这些项会拒绝。
-  - 只用邀请账号（`ACCOUNT_SIGNUP=closed`）：邮箱自助注册返回 403 `SIGNUP_CLOSED`。
-  - Google 和 Apple 登录整个关闭，返回 503 `GOOGLE_UNAVAILABLE` / `APPLE_UNAVAILABLE`。以后如果打开它们，`ACCOUNT_SIGNUP=closed` 仍然不让首次登录建号（403 `SIGNUP_CLOSED`），已有账号照常登录。
+  - 开放邮箱注册（`ACCOUNT_SIGNUP=open`，C-101），邀请账号照常登录。注册后发验证码，找回密码和站外删号也发验证码，所以 `SMTP_URL`、`MAIL_FROM` 是 `.env` 必填项；`ops.sh check` 和 `deploy` 缺它们会拒绝（备份、回滚、恢复不查）。
+  - Google 登录开启（C-101）：`GOOGLE_CLIENT_IDS` 写死为 Google Cloud 项目 gensen-preview 的 OAuth Web 客户端 ID（不是秘密）。手机上能拿到令牌，还要求同一个项目里有包名 `com.sensen.dynamicfarm.cardigan` 加签名证书 SHA-1 的 Android 客户端，这一项由所有者在 Google Cloud 控制台配置。
+  - Apple 登录关闭，返回 503 `APPLE_UNAVAILABLE`。
+  - 以后要回到只用邀请账号：把 `ACCOUNT_SIGNUP` 改回 `closed` 再部署，邮箱注册和 Google 首次登录建号都回 403 `SIGNUP_CLOSED`，已有账号照常登录。
   - 游客只读：认领和存档返回 401 `LOGIN_REQUIRED`。
   - “放弃并重选”关闭：返回 403 `RESELECT_DISABLED`。
   - 不用 QA 固定验证码和 QA 玩家，验证码不写进日志。
@@ -42,9 +46,9 @@ handle_path /dynamicfarm/* {
 
 | 类别 | 名字 |
 |---|---|
-| `.env` 必填 | `POSTGRES_PASSWORD`、`TOKEN_PEPPER`、`TRUSTED_PROXIES`、`INVITE_EMAIL_DOMAIN`、`PG_IMAGE`、`AGE_RECIPIENT` |
+| `.env` 必填 | `POSTGRES_PASSWORD`、`TOKEN_PEPPER`、`TRUSTED_PROXIES`、`INVITE_EMAIL_DOMAIN`、`PG_IMAGE`、`AGE_RECIPIENT`、`SMTP_URL`、`MAIL_FROM`（后两项 C-101 起必填，含发信密码，只放 `.env`） |
 | `ops.sh deploy` / `rollback` 写入，不要手改 | `APP_IMAGE`、`APP_IMAGE_ID`、`GIT_SHA` |
-| `.env` 选填 | `DF_HOST_PORT`、`DF_SUBNET`、`DF_BACKUP_DIR`、`DF_BACKUP_KEEP`、`SMTP_URL`、`MAIL_FROM`、`PARCEL_IDLE_RECLAIM_DAYS`（游客地块闲置多少天收回，不写为 30，0 为不收回；C-100） |
+| `.env` 选填 | `DF_HOST_PORT`、`DF_SUBNET`、`DF_BACKUP_DIR`、`DF_BACKUP_KEEP`、`PARCEL_IDLE_RECLAIM_DAYS`（游客地块闲置多少天收回，不写为 30，0 为不收回；C-100） |
 | `compose.yml` 写死 | `ACCOUNT_SIGNUP`、`GUEST_WRITES`、`PARCEL_GUEST_WRITES`、`DYNAMIC_FARM_RESELECT`、`GOOGLE_CLIENT_IDS`、`APPLE_BUNDLE_IDS`、`QA_EMAIL_DOMAIN`、`QA_EMAIL_CODE`、`QA_PLAYER_IDS`、`EMAIL_LOG_CODES`、`NODE_OPTIONS`、`DATABASE_URL` |
 | 只在操作员一侧，恢复加密备份时用 | `AGE_IDENTITY`（age 私钥文件的路径；私钥不放在服务器上） |
 
@@ -146,7 +150,8 @@ P0 正式服那台机器还剩多少资源没有核过。C-97 开工前先看 `f
 `./ops.sh smoke [--invite] [<入口地址>]` 默认在 app 容器里打它自己的端口。逐项检查：
 
 - 健康检查通过，运行的是 `.env` 里写的提交号；
-- 自助注册被拒；
+- 邮箱注册已开放：用一个太短的密码试注册，应回 400 `WEAK_PASSWORD`（不建号、不发信）；
+- Google 登录已开启：用一个不成形的令牌试登录，应回 401 `GOOGLE_TOKEN_*`（不去 Google 取公钥）；
 - 游客能读，但认领和存档都被拒。
 
 带 `--invite` 并从标准输入给一行 `email,password` 时，再加两项：邀请账号能登录，“放弃并重选”被拒。例如 `ssh <主机> '/opt/dynamicfarm/ops.sh smoke --invite' < 冒烟账号.csv`。

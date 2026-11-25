@@ -151,15 +151,17 @@ class WorkerAPK(unittest.TestCase):
                 with self.subTest(setting=setting, target=target), self.assertRaisesRegex(ValueError, 'pre-existing'):
                     farm.staged_project(source, target, release)
 
-    def test_release_project_is_fixed_to_production_with_own_farm_and_invite_sign_in(self):
+    def test_release_project_is_fixed_to_production_with_own_farm_and_the_full_account_panel(self):
         release = exported_settings('dynamic-farm-release')
         self.assertEqual(farm.RELEASE_TARGET, 'https://farm.sensenjoy.cn/dynamicfarm/v1')
         for key in ('sensen/network/base_url', 'sensen/network/mobile_base_url'):
             self.assertEqual(release[key], farm.RELEASE_TARGET)
-        # Net never boots, so nothing signs in anonymously; the map reloads only a saved invite sign-in.
+        # Net never boots, so nothing signs in anonymously; the map reloads only a saved account sign-in.
         self.assertIs(release['sensen/network/online_qa'], True)
-        for key in ('sensen/dynamic_farm/own_farm', 'sensen/dynamic_farm/account_restore', 'sensen/account/invite_only'):
+        for key in ('sensen/dynamic_farm/own_farm', 'sensen/dynamic_farm/account_restore', 'sensen/network/fixed_server'):
             self.assertIs(release[key], True)
+        # C-101: no account/* setting, so the account panel offers email sign-up, password reset and Google.
+        self.assertEqual([key for key in release if key.startswith('sensen/account/')], [])
         # Install-and-play (C-100) stays out until the owner decides to open it.
         for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/fake_claims', 'sensen/dynamic_farm/local_farm_save',
                     'sensen/dynamic_farm/guest_play'):
@@ -169,14 +171,17 @@ class WorkerAPK(unittest.TestCase):
                          exported_settings('dynamic-farm')['application/config/custom_user_dir_name'])
         for variant in ('dynamic-farm', 'dynamic-farm-internal', 'android'):
             settings = exported_settings(variant)
-            self.assertNotIn('sensen/account/invite_only', settings)
+            self.assertNotIn('sensen/network/fixed_server', settings)
             self.assertNotIn(farm.RELEASE_TARGET, settings.values())
         # No target can be chosen for it, approved or not.
         for target in (TARGET, farm.RELEASE_TARGET, 'https://farm.sensenjoy.cn/preview/p0/v1'):
             with self.subTest(target=target), self.assertRaises(ValueError):
                 farm.staged_project(PROJECT, target, True)
-        with self.assertRaisesRegex(ValueError, 'pre-existing'):
-            farm.staged_project(PROJECT.replace('[sensen]', '[sensen]\naccount/invite_only=true'))
+        for setting in ('account/invite_only=true', 'account/invite_only=false', 'network/fixed_server=true',
+                        'network/fixed_server.mobile=false'):
+            for release_build in (False, True):
+                with self.subTest(setting=setting, release=release_build), self.assertRaisesRegex(ValueError, 'pre-existing'):
+                    farm.staged_project(PROJECT.replace('[sensen]', '[sensen]\n' + setting), None, release_build)
 
     def test_release_preset_upgrades_the_preview_package_with_the_same_version(self):
         preset, identity = worker_preset(PRESETS, 'dynamic-farm-release')
@@ -215,7 +220,7 @@ class WorkerAPK(unittest.TestCase):
                 self.assertEqual(config['reselect'], internal)
                 self.assertEqual(config['guest_play'], internal)
                 self.assertEqual((config['account_restore'], config['own_farm']), (internal or release,) * 2)
-                self.assertEqual(config['invite_only'], release)
+                self.assertEqual(config['fixed_server'], release)
                 self.assertEqual(config['journey_mobile_base_url'] == TARGET, internal)
                 self.assertEqual(config['journey_mobile_base_url'] == farm.RELEASE_TARGET, release)
         internal = exported_settings('dynamic-farm-internal')
@@ -254,6 +259,10 @@ class WorkerAPK(unittest.TestCase):
                ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/reselect': True})),
                ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/guest_play': True})),
                ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/guest_play': False})),
+               ('dynamic-farm-release', dict(release, **{'sensen/network/fixed_server': False})),
+               ('dynamic-farm-release', {k: v for k, v in release.items() if k != 'sensen/network/fixed_server'}),
+               # The C-98 invite-only switch is gone from every package, the release included.
+               ('dynamic-farm-release', dict(release, **{'sensen/account/invite_only': True})),
                ('dynamic-farm-release', dict(release, **{'sensen/account/invite_only': False})),
                ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/own_farm': False})),
                ('dynamic-farm-release', dict(release, **{'sensen/dynamic_farm/account_restore': False})),
@@ -267,9 +276,11 @@ class WorkerAPK(unittest.TestCase):
                ('dynamic-farm-release', dict(release, **{'sensen/network/mobile_base_url':
                                                           'https://farm.sensenjoy.cn/preview/p0/v1'})),
                ('dynamic-farm-release', dict(release, **{'sensen/network/mobile_base_url.android': TARGET})),
-               ('dynamic-farm-release', dict(release, **{'sensen/account/invite_only.mobile': False})),
+               ('dynamic-farm-release', dict(release, **{'sensen/network/fixed_server.mobile': False})),
+               ('dynamic-farm-internal', dict(internal, **{'sensen/network/fixed_server': True})),
+               ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/network/fixed_server': True})),
+               ('android', dict(exported_settings('android'), **{'sensen/network/fixed_server': True})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/account/invite_only': True})),
-               ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/account/invite_only': True})),
                ('android', dict(exported_settings('android'), **{'sensen/account/invite_only': True})),
                ('android', dict(exported_settings('android'), **{'sensen/network/mobile_base_url': farm.RELEASE_TARGET}))]
         for variant, settings in bad:

@@ -124,7 +124,9 @@ age-keygen -o "$R/secrets/age.key" 2>/dev/null
 sed -e "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$(openssl rand -hex 24)|" -e "s|^TOKEN_PEPPER=.*|TOKEN_PEPPER=$(openssl rand -hex 32)|" \
   -e "s|^TRUSTED_PROXIES=.*|TRUSTED_PROXIES=127.0.0.1|" -e "s|^INVITE_EMAIL_DOMAIN=.*|INVITE_EMAIL_DOMAIN=invite.rehearsal.invalid|" \
   -e "s|^PG_IMAGE=.*|PG_IMAGE=postgres@sha256:$(printf 'rehearsal' | shasum -a 256 | cut -d' ' -f1)|" -e "s|^DF_HOST_PORT=.*|DF_HOST_PORT=$APP_PORT|" \
-  -e "s|^AGE_RECIPIENT=.*|AGE_RECIPIENT=$(grep -o 'age1[0-9a-z]*' "$R/secrets/age.key")|" "$DEPLOY/env.example" > "$DEPLOY/.env"
+  -e "s|^AGE_RECIPIENT=.*|AGE_RECIPIENT=$(grep -o 'age1[0-9a-z]*' "$R/secrets/age.key")|" \
+  -e "s|^SMTP_URL=.*|SMTP_URL=smtp://127.0.0.1:9|" -e "s|^MAIL_FROM=.*|MAIL_FROM=Rehearsal <no-reply@rehearsal.invalid>|" \
+  "$DEPLOY/env.example" > "$DEPLOY/.env"
 chmod 600 "$DEPLOY/.env"
 ops check
 ok "ops.sh check 通过"
@@ -133,7 +135,7 @@ step "空库部署当前版本：ops.sh deploy"
 ops deploy "$HEAD_SHA" "$(image_id "$HEAD_SHA")"
 ok "建表后 public 下 $(sql "SELECT count(*) FROM information_schema.tables WHERE table_schema='public'") 张表；服务日志：$(grep -o 'farm-server listening.*' "$R/app.log" | tail -n1 | sed 's/content=[^ ]* //')"
 
-step "只读冒烟（没有账号）：健康检查、自助注册被拒、游客能读不能认领"
+step "只读冒烟（没有账号、不建号）：健康检查、邮箱注册和 Google 登录已开放、游客能读不能认领"
 ops smoke "http://127.0.0.1:$APP_PORT/v1"
 
 step "邀请账号：ops.sh invites create，输出重定向到受控文件（0600）"

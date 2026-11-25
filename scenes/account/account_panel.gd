@@ -18,9 +18,6 @@ const MONTHS := ["January", "February", "March", "April", "May", "June", "July",
 const MIN_AGE := 13
 ## Lines kept free for the status message; the longest current message wraps to two at the narrowest width.
 const STATUS_LINES := 2
-## Invite-only package (the dynamic farm release, C-98): set at export, never in the project.
-const INVITE_ONLY_SETTING := "sensen/account/invite_only"
-const INVITE_SIGN_IN := "Sign in with your invite account."
 
 var mode := "sign_in"
 var reason := ""
@@ -234,14 +231,8 @@ func _option(node_name: String, labels: Array, parent: Control = null) -> Option
 		parent.add_child(o)
 	return o
 
-## Accounts come only from invites: no sign-up, Apple or Google, and no password reset (invite addresses get
-## no mail). The server refuses them too (ACCOUNT_SIGNUP=closed); this keeps them off the screen.
-static func invite_only() -> bool:
-	return bool(ProjectSettings.get_setting(INVITE_ONLY_SETTING, false))
-
 ## 状态切换：显示哪些输入框、标题文案、按钮列表。
 func set_mode(next: String) -> void:
-	if invite_only() and next in ["sign_up", "forgot"]: next = "sign_in"
 	mode = next
 	# A new step starts at its title, not wherever the previous step was scrolled to. Refreshing the same
 	# step ("Send a new code" re-enters it) keeps the scroll, so the buttons stay under the finger.
@@ -260,12 +251,8 @@ func set_mode(next: String) -> void:
 	match mode:
 		"sign_in":
 			_show([_email, _password, _show_passwords])
-			if invite_only():
-				_texts("Sign in", reason if not reason.is_empty() else INVITE_SIGN_IN)
-				_set_actions([["sign_in", "Sign in", "accent"]])
-			else:
-				_texts("Sign in", reason if not reason.is_empty() else "Sign in with your email to keep your farm on every device.")
-				_set_actions(_with_apple([["sign_in", "Sign in", "accent"], ["to_sign_up", "Create an account"], ["to_forgot", "Forgot password?"]]))
+			_texts("Sign in", reason if not reason.is_empty() else "Sign in with your email to keep your farm on every device.")
+			_set_actions(_with_apple([["sign_in", "Sign in", "accent"], ["to_sign_up", "Create an account"], ["to_forgot", "Forgot password?"]]))
 		"sign_up":
 			_show([_email, _password, _confirm_password, _show_passwords])
 			_texts("Create account", reason if not reason.is_empty() else "Your farm is saved to this account.")

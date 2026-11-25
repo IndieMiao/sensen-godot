@@ -151,6 +151,8 @@ static func describe(code: String) -> String:
 		"PASSWORD_MISMATCH": return "The two passwords don't match."
 		"TRANSPORT": return "Can't reach the server. Check your connection."
 		"EMAIL_IN_USE": return "This email already has an account. Sign in with your email and password first."
+		# The server takes no new accounts (invite accounts only): sign-up and a first Google or Apple sign-in.
+		"SIGNUP_CLOSED": return "New accounts aren't open yet. Sign in with an existing account."
 		"APPLE_CANCELED", "GOOGLE_CANCELED": return ""
 		"GOOGLE_NO_ACCOUNT": return "Add a Google account to this phone first."
 		"GOOGLE_UNAVAILABLE": return "Sign in with Google isn't available on this phone."

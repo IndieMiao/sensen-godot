@@ -355,35 +355,39 @@ func test_google_button_follows_apple_or_the_primary_action() -> void:
 	GoogleSignIn.force_available = false
 	_restore_net()
 
-## The invite-only release package (C-98): sign in only, with its own line; every other package is unchanged.
-func test_invite_only_package_signs_in_with_an_invite_account_only() -> void:
-	AppleSignIn.force_available = true
+## The dynamic farm release package (C-101): the full panel, as in every other package. The C-98 invite-only
+## switch is gone, so an old setting left behind changes nothing; invite accounts sign in with email and password.
+func test_release_package_offers_sign_up_reset_and_google() -> void:
 	GoogleSignIn.force_available = true
-	ProjectSettings.set_setting(AccountPanel.INVITE_ONLY_SETTING, true)
+	ProjectSettings.set_setting("sensen/account/invite_only", true)
 	var p := _panel()
 	assert_array(_visible_fields(p)).contains_exactly(["Email", "Password"])
-	assert_array(_actions(p)).contains_exactly(["sign_in"])
-	assert_str(p._subtitle.text).is_equal("Sign in with your invite account.")
-	# No way into sign-up or reset, whoever asks.
-	for step in ["sign_up", "forgot"]:
-		p.set_mode(step)
-		assert_str(p.mode).is_equal("sign_in")
-		assert_array(_actions(p)).contains_exactly(["sign_in"])
-	p.queue_free()
-	var opened := _panel("sign_up")
-	assert_str(opened.mode).is_equal("sign_in")
-	opened.queue_free()
-	var walled := _panel("sign_in", "Sign in to create your farm.")
-	assert_str(walled._subtitle.text).is_equal("Sign in to create your farm.")
-	walled.queue_free()
-	ProjectSettings.set_setting(AccountPanel.INVITE_ONLY_SETTING, null)
-	var normal := _panel()
-	assert_array(_actions(normal)).contains_exactly(["sign_in", "Providers", "to_sign_up", "to_forgot"])
-	assert_str(normal._subtitle.text).is_equal("Sign in with your email to keep your farm on every device.")
+	assert_array(_actions(p)).contains_exactly(["sign_in", "Providers", "to_sign_up", "to_forgot"])
+	assert_array(_providers(p)).is_equal(["google"])
+	assert_str(p._subtitle.text).is_equal("Sign in with your email to keep your farm on every device.")
+	p.set_mode("sign_up")
+	assert_str(p.mode).is_equal("sign_up")
+	assert_array(_actions(p)).contains_exactly(["sign_up", "Providers", "to_sign_in"])
+	p.set_mode("forgot")
+	assert_str(p.mode).is_equal("forgot")
+	assert_array(_actions(p)).contains_exactly(["send_reset", "to_sign_in"])
 	await get_tree().process_frame
-	normal.queue_free()
-	AppleSignIn.force_available = false
+	p.queue_free()
+	ProjectSettings.set_setting("sensen/account/invite_only", null)
 	GoogleSignIn.force_available = false
+	_restore_net()
+
+## A server that takes no new accounts (invite accounts only) answers sign-up with a plain line, not "went wrong".
+func test_sign_up_on_a_closed_server_says_so() -> void:
+	_apple_net([{"status": 403, "json": {"code": "SIGNUP_CLOSED"}}])
+	var p := _panel("sign_up")
+	p._email.text = "ada@example.com"
+	p._password.text = "correct horse"
+	p._confirm_password.text = "correct horse"
+	await p._submit_login(true)
+	assert_str(_status(p)).is_equal("New accounts aren't open yet. Sign in with an existing account.")
+	assert_bool(Net.account.signed_in()).is_false()
+	p.queue_free()
 	_restore_net()
 
 func test_google_sign_in_sends_the_raw_nonce_and_adopts_the_account() -> void:
