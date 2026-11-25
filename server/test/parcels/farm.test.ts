@@ -3,9 +3,9 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONTENT_DIR } from '../../src/domain/content.js';
-import { applyFarmCommands, emptyFarm, MAX_BATCH, MAX_COINS, MAX_SELL_COUNT, parseCell, parseFarmCommands, welcome, withEconomy,
+import { applyFarmCommands, emptyFarm, MAX_BATCH, MAX_COINS, MAX_SELL_COUNT, parseCell, parseFarmCommands, rebaseFarm, welcome, withEconomy,
   type FarmCommand, type ParcelFarmState } from '../../src/parcels/farm.js';
-import { communityOf, loadParcelRules, parseParcelRules } from '../../src/parcels/rules.js';
+import { communityOf, isNewerDataset, loadParcelRules, parseParcelRules } from '../../src/parcels/rules.js';
 
 const rules = loadParcelRules(DEFAULT_CONTENT_DIR);
 const T0 = Date.UTC(2026, 10, 23, 4);
@@ -295,5 +295,51 @@ describe('parcel economy (C-58)', () => {
     expect(tryAt(sold, [{ type: 'claim_blueprint', blueprint: '__proto__' }])).toMatchObject({ ok: false, code: 'UNKNOWN_BLUEPRINT' });
     // Selling and claiming in one batch works (the sale counts at once).
     expect(runAt(s, [{ type: 'sell', item: 'crop_carrot', count: 1 }, { type: 'claim_blueprint', blueprint: 'coop' }]).bag.blueprint_coop).toBe(1);
+  });
+});
+
+describe('rebase onto a newer dataset (C-136, Q-168)', () => {
+  const R4 = 'sf-dynamic-farm-20261118-r4', R6 = 'sf-dynamic-farm-20261124-r6';
+
+  it('only to a later registered dataset of the same community, never back', () => {
+    expect(isNewerDataset(rules, R4, R6)).toBe(true);
+    expect(isNewerDataset(rules, R6, R4)).toBe(false);
+    expect(isNewerDataset(rules, R6, R6)).toBe(false);
+    expect(isNewerDataset(rules, R4, 'sf-dynamic-farm-20261124-r5')).toBe(false); // not registered
+    expect(isNewerDataset(rules, 'nope', R6)).toBe(false);
+    const two = parseParcelRules({ ...rules, communities: [...rules.communities, { id: 'ny', datasets: ['ny-1', 'ny-2'] }] });
+    expect(isNewerDataset(two, R4, 'ny-2')).toBe(false); // another community
+    expect(isNewerDataset(two, 'ny-1', 'ny-2')).toBe(true);
+  });
+
+  it('clears what sits on cells and gives back a seed per crop and the cottage blueprint; keeps bag, coins, sales, blueprints, gift', () => {
+    let s = run(welcomed(), [{ type: 'place_house', x: 9, y: 9 }, { type: 'clear_obstacle', cell: '3,3' }, { type: 'till', cell: '1,1' },
+      { type: 'till', cell: '2,1' }, { type: 'till', cell: '3,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' }]);
+    s = run(s, [{ type: 'harvest', cell: '1,1' }, { type: 'sell', item: 'crop_carrot', count: 1 }, { type: 'claim_blueprint', blueprint: 'coop' },
+      { type: 'sow', cell: '1,1', crop: 'crop_carrot' }, { type: 'sow', cell: '2,1', crop: 'crop_carrot' }], T0 + 60_000);
+    const tree = 'p-3512001:outer-groves-v2:wild_pz_tree_20:41,7:0';
+    const out = applyFarmCommands(rules, s, [{ type: 'gather', object: tree }], T0 + 61_000, { parcel_id: 'p-3512001' });
+    if (!out.ok) throw new Error(out.code);
+    s = out.state;
+    // One crop is ripe, one is not: both are in the ground and each gives its seed back.
+    expect(s).toMatchObject({ coins: 12, sales: 1, bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1 }, welcomed_at: T0 });
+    expect(s.bag.seed_carrot).toBeUndefined();
+    const before = structuredClone(s);
+    const moved = rebaseFarm(rules, s);
+    expect(moved).toEqual({ ...before, house: null, cleared: [], tilled: [], crops: {}, gathered: {},
+      bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1, seed_carrot: 2, blueprint_cottage: 1 } });
+    expect(s).toEqual(before); // the input is untouched
+    // The cottage goes back up on the new cells with the returned blueprint.
+    expect(run(moved, [{ type: 'place_house', x: 2, y: 2 }]).house).toMatchObject({ x: 2, y: 2 });
+  });
+
+  it('an empty or never-entered farm stays as it is; a crop no longer in the rules gives nothing back', () => {
+    expect(rebaseFarm(rules, emptyFarm())).toEqual(emptyFarm());
+    expect(rebaseFarm(rules, welcomed())).toEqual(welcomed());
+    const odd = { ...welcomed(), tilled: ['1,1'], crops: { '1,1': { crop: 'crop_gone', planted_at: T0, ripe_at: T0 + 1 } } };
+    expect(rebaseFarm(rules, odd).bag).toEqual(welcomed().bag);
+    // A C-31 era save without the economy fields comes out with them.
+    const legacy = { v: 1, house: null, cleared: ['1,2'], tilled: [], crops: {}, bag: { hoe_starter: 1 }, welcomed_at: T0 } as unknown as ParcelFarmState;
+    expect(rebaseFarm(rules, legacy)).toEqual({ ...legacy, cleared: [], coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} });
   });
 });

@@ -15,8 +15,10 @@ func _init(p_client: ApiClient, parcel_block_id: String, dataset_version: String
 	block_id = parcel_block_id
 	dataset = dataset_version
 
+## Sends the client's own dataset (C-136): the server moves a claim made on an older registered dataset of the
+## same community onto it, so an r4 claim opens in this r6 package; cell progress restarts (Q-168).
 func enter() -> Dictionary:
-	return _result(await _call("/parcels/mine/enter", {}), true)
+	return _result(await _call("/parcels/mine/enter", {"dataset_version": dataset}), true)
 
 ## The farm without entering it (C-31 `GET /parcels/mine`): no welcome gift. The market and the
 ## carpenter on the map read it this way (C-59).
