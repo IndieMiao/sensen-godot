@@ -8,7 +8,8 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { PlayerRow } from '../http/store.js';
 import { applyFarmCommands, emptyFarm, parseFarmCommands, welcome, withEconomy } from './farm.js';
 import { communityOf, type ParcelRules } from './rules.js';
-import { DEFAULT_LAYER, type OwnedParcel, type ParcelStore } from './store.js';
+import { activeZone, zoneView, type StarterZones } from './starter_zone.js';
+import { DEFAULT_LAYER, sameParcel, type OwnedParcel, type ParcelStore } from './store.js';
 
 export interface ParcelRouteDeps {
   store: ParcelStore;
@@ -18,6 +19,8 @@ export interface ParcelRouteDeps {
   reselect: boolean;
   /** 装上即建号（C-100，PARCEL_GUEST_WRITES=1）：游客也能认领、进入和存档；默认关，对外开放由所有者另定。 */
   guestWrites?: boolean;
+  /** 起步区（C-130）：开着时新玩家只能认领区内地块；不传等于不限制。 */
+  starterZones?: StarterZones;
 }
 
 interface Auth {
@@ -78,6 +81,7 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
   });
 
   /** 认领：每人一块免费地，只能认领无主地块，认领后永久归属。重复认领自己那块返回 200。
+   * 起步区开着时（C-130），没有地块的玩家只能认领区内地块，区外 403 OUTSIDE_STARTER_ZONE。
    * 认领只建空农场；赠品在首次进入（/mine/enter）时发。 */
   app.post('/v1/parcels/claim', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (req, reply) => {
     const p = await parcelWriter(req, reply);
@@ -89,15 +93,40 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
     const community = communityOf(deps.rules, b.dataset_version);
     if (!community) return reply.code(422).send({ code: 'UNKNOWN_DATASET', server_time: now() });
     const at = now();
-    const out = await deps.store.claim(p.id, {
-      community_id: community, layer: DEFAULT_LAYER, parcel_id: b.parcel_id, dataset_version: b.dataset_version, center,
-    }, emptyFarm(), at);
+    const claim = { community_id: community, layer: DEFAULT_LAYER, parcel_id: b.parcel_id, dataset_version: b.dataset_version, center };
+    // C-130 起步区：区外地块不进存储层，所以绝不会为它新建认领。已有地块的玩家照旧拿到自己的地块
+    // （重试认领自己那块 200，换一块 409 ALREADY_CLAIMED），不因起步区被误拒；区内认领存数据集里的中心点。
+    const zone = activeZone(deps.starterZones, community);
+    if (zone) {
+      const inZone = zone.parcels.get(b.parcel_id);
+      if (!inZone) {
+        const own = await deps.store.mine(p.id);
+        if (own && sameParcel(own, claim)) return reply.send({ parcel: parcelView(own), server_time: at });
+        if (own) return reply.code(409).send({ code: 'ALREADY_CLAIMED', parcel: parcelView(own), server_time: at });
+        return reply.code(403).send({ code: 'OUTSIDE_STARTER_ZONE', starter_zone: zone.id, server_time: at });
+      }
+      claim.center = { lng: inZone[0], lat: inZone[1] };
+    }
+    const out = await deps.store.claim(p.id, claim, emptyFarm(), at);
     switch (out.kind) {
       case 'claimed': return reply.code(201).send({ parcel: parcelView(out.parcel), server_time: at });
       case 'already_mine': return reply.send({ parcel: parcelView(out.parcel), server_time: at });
       case 'player_has_parcel': return reply.code(409).send({ code: 'ALREADY_CLAIMED', parcel: parcelView(out.parcel), server_time: at });
       default: return reply.code(409).send({ code: 'PARCEL_TAKEN', server_time: at });
     }
+  });
+
+  /**
+   * 起步区（C-130）：地图默认落点、标识边界和区内地块编号。公开配置，不要账号；关闭或该数据集所属社区没有起步区时
+   * enabled=false、zone=null，地图照旧落在数据集中心，认领不限制。
+   */
+  app.get('/v1/parcels/starter-zone', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (req, reply) => {
+    const q = req.query as { dataset_version?: unknown };
+    if (typeof q.dataset_version !== 'string') return reply.code(400).send({ code: 'SCHEMA', server_time: now() });
+    const community = communityOf(deps.rules, q.dataset_version);
+    if (!community) return reply.code(422).send({ code: 'UNKNOWN_DATASET', server_time: now() });
+    const zone = activeZone(deps.starterZones, community);
+    return reply.send({ enabled: zone !== null, zone: zone ? zoneView(zone) : null, server_time: now() });
   });
 
   /**

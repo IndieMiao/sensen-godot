@@ -22,6 +22,8 @@ class Native extends MapBridge:
 			else: states.erase(row.block_id)
 	func set_parcel_claims(_gen: int, claims: String) -> void: names = JSON.parse_string(claims)
 	func set_parcel_building_highlight(gen: int, key: String, parcel := "") -> void: highlights.append([gen, key, parcel])
+	var zones: Array = [] # [generation, zone JSON] as sent (C-130)
+	func set_starter_zone(gen: int, json: String) -> void: zones.append([gen, json])
 class Selector extends Node:
 	signal changed
 	var selection := {}
@@ -60,6 +62,7 @@ func _run() -> void:
 	await _account_row()
 	await _home_framing()
 	await _guest_play_sign_in()
+	await _starter_zone()
 	print("DYNAMIC CLAIM ", checks - failures, "/", checks)
 	quit(1 if failures else 0)
 
@@ -594,3 +597,88 @@ func _guest_play_sign_in() -> void:
 	calls.clear()
 	check(await net.dynamic_farm_sign_in(false, true) and net.client.token == "guest-token", "a package that does not restore accounts plays as a guest")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+## C-130 starter zone: the server's zone (fake stand-in with the same answers) decides where a player without a home may
+## claim; the map lands there, hides the claim button outside it and sends the zone to its own native layer.
+const ZONE_CENTER := [-122.40732, 37.79925]
+func _zone(ids: Array) -> Dictionary:
+	return {"id": "north-beach", "name": "North Beach", "community_id": "sf", "dataset_version": "x",
+		"boundary": [[-122.409202, 37.800444], [-122.406038, 37.800839], [-122.405498, 37.79802], [-122.408632, 37.797627], [-122.409202, 37.800444]],
+		"center": ZONE_CENTER, "zoom": 17, "parcel_ids": ids}
+
+func _starter_zone() -> void:
+	var server := FakeServer.new()
+	var ids := _free_ids(server, 3)
+	var api := ClaimApi.new(server.client("fake-a"))
+	var off: Dictionary = await api.starter_zone()
+	check(off.ok and off.zone.is_empty(), "zone switched off: an empty zone")
+	server.zone = _zone([ids[0], ids[1]])
+	var on: Dictionary = await ClaimApi.new(server.client("nobody")).starter_zone()
+	check(on.ok and on.zone.parcel_ids.has(ids[0]) and not on.zone.parcel_ids.has(ids[2]) and on.zone.zoom == 17.0, "the zone is public and parsed")
+	for bad in [{"boundary": []}, {"center": [0, 99]}, {"zoom": 30}, {"parcel_ids": ["3139001"]}, {"parcel_ids": []}]:
+		var broken := _zone([ids[0]]); broken.merge(bad, true)
+		check(ClaimApi.parse_zone(broken).is_empty(), "a malformed zone is refused: %s" % JSON.stringify(bad))
+	var outside: Dictionary = await api.claim(ids[2], [-122.45, 37.73])
+	check(not outside.ok and outside.status == 403 and outside.code == "OUTSIDE_STARTER_ZONE", "the stand-in refuses a claim outside the zone like the server")
+	# Controller: the zone is read with the home and sent to its own native layer for every generation.
+	var native := Native.new()
+	var c := controller(server, "fake-b", native)
+	await c.start(); await process_frame
+	check(c.zone_known and c.in_zone(ids[0]) and not c.in_zone(ids[2]), "the controller knows which parcels are in the zone")
+	c.attach(4, "")
+	var sent: Dictionary = JSON.parse_string(native.zones.back()[1])
+	check(native.zones.back()[0] == 4 and sent.boundary.size() == 5 and sent.line_color == "#3E7D43" and sent.mask_opacity == 0.55, "the zone goes to the native layer with its style")
+	var count := native.zones.size()
+	c.attach(4, ids[0]); await process_frame
+	check(native.zones.size() == count, "the zone is not resent for the same generation")
+	c.attach(5, ids[0]); await process_frame
+	check(native.zones.back()[0] == 5, "a new generation gets the zone again")
+	await c.claim({"block_id": ids[2], "center": [-122.45, 37.73]})
+	check(not c.has_home() and c.message == Claims.OUTSIDE_ZONE, "a claim outside the zone says so and gives no home")
+	await process_frame
+	await c.claim({"block_id": ids[0], "center": [-122.45, 37.73]})
+	check(c.has_home() and c.status(ids[0]) == "mine", "a claim inside the zone gives the home")
+	c.queue_free()
+	var plain := Native.new()
+	var unzoned := controller(FakeServer.new(), "fake-a", plain)
+	await unzoned.start(); unzoned.attach(4, "")
+	check(unzoned.in_zone(ids[2]) and plain.zones.back() == [4, ""], "without a zone every parcel may be claimed and the layer is cleared")
+	unzoned.queue_free()
+	# Map: lands on the zone without a home, offers claiming only inside it.
+	var page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
+	root.add_child(page)
+	var selector := Selector.new(); root.add_child(selector)
+	selector.manifest = {"native_map": {"minzoom": 16, "center": [-122.4519, 37.7294], "initial_zoom": 16.5}}
+	page._selector = selector; page._camera = CameraInput.new(); page.add_child(page._camera)
+	page._camera.user_moved.connect(func(): page._player_moved = true)
+	page._area_generation = selector.generation
+	var other := FakeServer.new(); other.zone = _zone([ids[0], ids[1]])
+	page._claims = controller(other, "fake-b", Native.new()); page._claims.changed.connect(page._render)
+	page._camera.frame_center(-122.50, 37.80, 15.0)
+	await page._claims.start(); await process_frame
+	var near := func(point: Array, zoom: float) -> bool:
+		return absf(page._camera.center[0] - point[0]) < 1e-6 and absf(page._camera.center[1] - point[1]) < 1e-6 and is_equal_approx(page._camera.zoom, zoom)
+	check(page._framed and near.call(ZONE_CENTER, 17.0), "without a home the map opens on the starter zone")
+	ProjectSettings.set_setting(OWN_FARM, true)
+	selector.selection = Fixture.metadata(ids[2]); selector.selection.block_id = ids[2]
+	page._render(); await process_frame
+	check(not page._claim.visible and page._details.text.ends_with(Claims.OUTSIDE_ZONE) and page._open.visible, "a free parcel outside the zone: no claim button, 'Not in the starter area.', preview still offered")
+	selector.selection = Fixture.metadata(ids[1]); selector.selection.block_id = ids[1]
+	page._render(); await process_frame
+	check(page._claim.visible and not page._details.text.ends_with(Claims.OUTSIDE_ZONE), "a free parcel inside the zone can be claimed")
+	page._camera.frame_center(-122.43, 37.76, 18.0); page._camera.user_moved.emit()
+	page._locate.pressed.emit()
+	await create_timer(page._camera.FLIGHT_MAX_S + 0.3).timeout
+	check(near.call(ZONE_CENTER, 17.0), "without a home the locate key goes back to the starter zone")
+	ProjectSettings.set_setting(OWN_FARM, false)
+	page.queue_free(); selector.queue_free()
+	# A home outside the zone (claimed before it) is still the home: the map opens there, never on the zone.
+	var before := FakeServer.new()
+	var far_home := [-122.4101, 37.7801]
+	await ClaimApi.new(before.client("fake-a")).claim(ids[2], far_home)
+	before.zone = _zone([ids[0]])
+	var kept := controller(before, "fake-a", Native.new())
+	await kept.start()
+	check(kept.has_home() and kept.mine.parcel_id == ids[2], "a home outside the zone is kept")
+	kept.queue_free()
+	await process_frame
