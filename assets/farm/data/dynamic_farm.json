@@ -55,6 +55,9 @@
       "wild_herb": 1,
       "stone": 2
     },
+    "buy_prices": {
+      "seed_carrot": 9
+    },
     "gather": {
       "recipe_version": "outer-groves-v2",
       "respawn_seconds": 86400,

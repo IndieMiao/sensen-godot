@@ -11,6 +11,8 @@
 # GATHER_QA_ABI follows the emulator image; by default it is the host's own architecture
 # (x86_64 on x86_64 hosts such as cardigan-ci, arm64-v8a on Apple silicon such as mac-mini).
 # GATHER_QA_WET_SOIL=1 turns on the development switch that draws tilled soil wet (C-138).
+# GATHER_QA_ENTRY=trade (C-149) makes the main scene tools/dev/dynamic_farm/trade_loop_qa.tscn instead, package
+# com.sensen.dynamicfarm.tradeqa: a stand-in for the map opening the Washington Square room and the parcel on one save.
 # On macOS the copied editor is re-signed ad hoc (the copy's signature is otherwise invalid and
 # the system kills it) and templates default to ~/Library/Application Support/Godot.
 # Staging is a disposable copy under $TMPDIR (committed sources at HEAD); nothing in the
@@ -27,6 +29,11 @@ cd "$root"
 os=$(uname -s)
 case $(uname -m) in arm64 | aarch64) host_abi=arm64-v8a ;; *) host_abi=x86_64 ;; esac
 abi=${GATHER_QA_ABI:-$host_abi}
+case ${GATHER_QA_ENTRY:-parcel} in
+parcel) entry=own_parcel_qa qa_id=gatherqa qa_ver=gather-qa qa_name='Gather QA' qa_dir=DynamicFarmGatherQa ;;
+trade) entry=trade_loop_qa qa_id=tradeqa qa_ver=trade-qa qa_name='Trade QA' qa_dir=DynamicFarmTradeQa ;;
+*) fail 'GATHER_QA_ENTRY must be parcel or trade' ;;
+esac
 case $abi in
 x86_64) x86_64=true arm64=false ;;
 arm64-v8a) x86_64=false arm64=true ;;
@@ -54,17 +61,17 @@ if [[ -n $cache ]]; then
     cp -a "$cache/.godot" "$p/.godot"
     rm -f "$p/.godot/export_credentials.cfg"
 fi
-python3 -I - "$p/project.godot" "$parcel" "${GATHER_QA_WET_SOIL:-}" <<'PY'
+python3 -I - "$p/project.godot" "$parcel" "${GATHER_QA_WET_SOIL:-}" "$entry" "$qa_dir" <<'PY'
 import re, sys
 from pathlib import Path
-path, parcel, wet = Path(sys.argv[1]), sys.argv[2], sys.argv[3] == '1'
+path, parcel, wet, entry, qa_dir = Path(sys.argv[1]), sys.argv[2], sys.argv[3] == '1', sys.argv[4], sys.argv[5]
 text = path.read_text()
 def one(pattern, repl):
     global text
     text, n = re.subn(pattern, repl, text, flags=re.M)
     if n != 1: sys.exit('gather QA APK: unexpected project setting ' + pattern)
-one(r'^run/main_scene="[^"]+"$', 'run/main_scene="res://tools/dev/dynamic_farm/own_parcel_qa.tscn"')
-one(r'^\[application\]$', '[application]\nconfig/use_custom_user_dir=true\nconfig/custom_user_dir_name="DynamicFarmGatherQa"')
+one(r'^run/main_scene="[^"]+"$', f'run/main_scene="res://tools/dev/dynamic_farm/{entry}.tscn"')
+one(r'^\[application\]$', f'[application]\nconfig/use_custom_user_dir=true\nconfig/custom_user_dir_name="{qa_dir}"')
 one(r'^\[sensen\]$', '[sensen]\nnetwork/online_qa=true\ndynamic_farm/local_farm_save=true\n'
     f'dynamic_farm/qa_parcel="res://tests/dynamic_farm/fixtures/r4/{parcel}.json"'
     + ('\ndynamic_farm/preview_wet_soil=true' if wet else ''))
@@ -103,9 +110,9 @@ architectures/arm64-v8a=$arm64
 architectures/x86=false
 architectures/x86_64=$x86_64
 version/code=1
-version/name="gather-qa"
-package/unique_name="com.sensen.dynamicfarm.gatherqa"
-package/name="Gather QA"
+version/name="$qa_ver"
+package/unique_name="com.sensen.dynamicfarm.$qa_id"
+package/name="$qa_name"
 package/signed=true
 package/retain_data_on_uninstall=false
 screen/immersive_mode=true

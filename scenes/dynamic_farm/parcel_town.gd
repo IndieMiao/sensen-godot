@@ -5,7 +5,8 @@ extends Control
 ## existing avatar parts and their portraits drawn from them (P0KeeperPortraits), with no painted art or new model
 ## (C-30#29 question 6).
 ## - Jasmine introduces coins in a line the first time she is met (kept on this device per parcel), then says hello;
-##   Sell opens her counter (parcel_counter.gd), which sells through the parcel save's `sell` command (C-58).
+##   Trade opens her counter (parcel_counter.gd), which sells through the parcel save's `sell` command (C-58) and,
+##   since C-149, sells carrot seeds through `buy` (the P0 keeper greeting's Trade, LOCK-16).
 ## - Scott gives one Coop Blueprint once the parcel has sold something (`claim_blueprint`, C-58 rules: C-30#29
 ##   question 5); it only goes into the bag, building comes later (0.4.4).
 ## The parcel save (store: read / send, parcel_farm_remote_store.gd or the local stand-in) is authoritative; this
@@ -135,11 +136,11 @@ func _greet_market() -> void:
 		card.line = LINES.intro
 		mark_met(MARKET)
 	elif card.line == "" or card.line == "…" or card.line == LINES.intro: card.line = LINES.hello
-	var sell := UiCommandButton.new("Sell")
-	sell.name = "Sell"
-	sell.activated.connect(open_counter)
-	card.content.add_child(sell)
-	keys.sell = sell
+	var trade := UiCommandButton.new("Trade")
+	trade.name = "Trade"
+	trade.activated.connect(open_counter)
+	card.content.add_child(trade)
+	keys.trade = trade
 
 func _greet_carpenter() -> void:
 	var rule: Dictionary = ParcelFarm.rules().get("economy", {}).get("blueprints", {}).get(BLUEPRINT, {})
@@ -160,10 +161,12 @@ func _greet_carpenter() -> void:
 func open_counter() -> void:
 	if farm.is_empty(): return
 	var data := npc(MARKET)
-	counter = Counter.new(farm, ParcelFarm.rules().get("economy", {}).get("sell_prices", {}), data, portrait(MARKET, false))
+	var economy: Dictionary = ParcelFarm.rules().get("economy", {})
+	counter = Counter.new(farm, economy.get("sell_prices", {}), data, portrait(MARKET, false), economy.get("buy_prices", {}))
 	counter.keeper_bar.line = LINES.hello
 	counter.close_requested.connect(func(): stack.close_drawer())
 	counter.sell_requested.connect(sell)
+	counter.buy_requested.connect(buy)
 	_switching = true
 	stack.open_drawer(counter, {"scrim": UiTokens.OPACITY_SCRIM_COUNTER})
 	_switching = false
@@ -175,6 +178,15 @@ func sell(item: String, count: int) -> Dictionary:
 	var result := await _send({"type": "sell", "item": item, "count": count})
 	if result.get("ok", false) and counter != null and is_instance_valid(counter):
 		counter.keeper_bar.line = LINES.thanks % (int(farm.coins) - before)
+	return result
+
+## C-149: buys `count` of `item` at the rules' price (the server's own; none is sent). The row's `Bag ×N` and the
+## coins follow the answer; a toast says what came in.
+func buy(item: String, count: int) -> Dictionary:
+	if busy or count <= 0: return {}
+	var result := await _send({"type": "buy", "item": item, "count": count})
+	if result.get("ok", false):
+		toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(item), count], ToastLayer.Severity.SUCCESS)
 	return result
 
 func claim_blueprint() -> Dictionary:
