@@ -49,3 +49,5 @@ position = Vector3(-0.262197, 0.483570, 0.372637)
 mesh = ExtResource("jet")
 custom_aabb = AABB(-0.36, -0.51, -0.08, 0.50, 0.62, 0.59)
 material_override = SubResource("water")
+
+[editable path="Hand/Grip/Pail"]
