@@ -5,7 +5,7 @@
  * PARCEL_STARTER_ZONE=0）。地块数据集本身不改。
  *
  *   pnpm --dir server exec tsx tools/starter_zone_build.ts --index <index.geojson> --dataset <dataset_version> \
- *     --id north-beach --name "North Beach" --community sf --boundary '[[lng,lat],...]' --center lng,lat --zoom 17 \
+ *     --id sf-starter --name "San Francisco starter area" --community sf --boundary '[[lng,lat],...]' --center lng,lat --zoom 17 \
  *     [--enabled true|false] [--out ../assets/farm/data/dynamic_farm_starter_zone.json]
  */
 import { readFileSync, writeFileSync } from 'node:fs';

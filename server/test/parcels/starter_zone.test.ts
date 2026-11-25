@@ -1,4 +1,4 @@
-/** C-130 起步区配置：解析失败就拒绝启动；环境变量开关；仓库里的北滩起步区按真实边界生成。 */
+/** C-130 起步区配置：解析失败就拒绝启动；环境变量开关；仓库里的旧金山起步区按真实边界生成。 */
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -68,39 +68,45 @@ describe('starter zone config', () => {
   });
 });
 
-describe('shipped North Beach starter zone', () => {
+describe('shipped San Francisco starter zone', () => {
   const shipped = loadStarterZones(DEFAULT_CONTENT_DIR);
-  const nb = shipped.zones[0];
+  const sf = shipped.zones[0];
   const raw = JSON.parse(readFileSync(path.join(DEFAULT_CONTENT_DIR, STARTER_ZONE_FILE), 'utf8'));
+  const inside = (p: LngLat) => pointInRing(p, sf.boundary);
 
   it('is on, belongs to the San Francisco community and names a registered dataset', () => {
     expect(shipped.enabled).toBe(true);
     expect(shipped.zones).toHaveLength(1);
-    expect(nb).toMatchObject({ id: 'north-beach', community_id: 'sf', name: 'North Beach', zoom: 16.4 });
-    expect(communityOf(loadParcelRules(DEFAULT_CONTENT_DIR), nb.dataset_version)).toBe('sf');
+    expect(sf).toMatchObject({ id: 'sf-starter', community_id: 'sf', zoom: 16.4 });
+    expect(communityOf(loadParcelRules(DEFAULT_CONTENT_DIR), sf.dataset_version)).toBe('sf');
     expect(raw.zones[0].dataset_version).toBe('sf-dynamic-farm-20261124-r6');
   });
 
-  it('Union, Kearny, Broadway and Stockton bound it; Grant Ave between Green and Vallejo is the landing point', () => {
-    // Street centre-line crossings from OpenStreetMap, 2026-11-25 (C-130#11).
-    const crossing = { stocktonUnion: [-122.409202, 37.800444], kearnyUnion: [-122.406038, 37.800839],
-      kearnyBroadway: [-122.405498, 37.79802], stocktonBroadway: [-122.408632, 37.797627] };
-    expect(nb.boundary).toEqual([crossing.stocktonUnion, crossing.kearnyUnion, crossing.kearnyBroadway, crossing.stocktonBroadway, crossing.stocktonUnion]);
+  it('California, Hyde, Bay and The Embarcadero bound it (C-130#45); Grant Ave between Green and Vallejo is the landing point', () => {
+    // Street centre-line crossings from OpenStreetMap, 2026-11-25 (C-130 rework of D-270).
+    const crossing: Record<string, LngLat> = { hydeCalifornia: [-122.417411, 37.791], drummCalifornia: [-122.396352, 37.793687],
+      bayEmbarcadero: [-122.40596, 37.806627], hydeBay: [-122.420194, 37.804801] };
+    const ring = sf.boundary.map((p) => JSON.stringify(p));
+    for (const c of Object.values(crossing)) expect(ring).toContain(JSON.stringify(c));
+    expect(sf.boundary[0]).toEqual(crossing.hydeCalifornia);
+    expect(sf.boundary[sf.boundary.length - 1]).toEqual(crossing.hydeCalifornia);
     const grantGreen: LngLat = [-122.407414, 37.799719], grantVallejo: LngLat = [-122.407227, 37.798778];
-    expect(pointInRing(nb.center, nb.boundary)).toBe(true);
-    expect(nb.center[1]).toBeGreaterThan(grantVallejo[1]);
-    expect(nb.center[1]).toBeLessThan(grantGreen[1]);
-    expect(Math.abs(nb.center[0] - (grantGreen[0] + grantVallejo[0]) / 2)).toBeLessThan(0.0002);
-    // Washington Square Park lies just outside the north-west corner (its south-east corner is Stockton & Union).
-    expect(pointInRing([-122.4100, 37.8008], nb.boundary)).toBe(false);
+    expect(inside(sf.center)).toBe(true);
+    expect(sf.center[1]).toBeGreaterThan(grantVallejo[1]);
+    expect(sf.center[1]).toBeLessThan(grantGreen[1]);
+    expect(Math.abs(sf.center[0] - (grantGreen[0] + grantVallejo[0]) / 2)).toBeLessThan(0.0002);
+    // Inside: North Beach, Russian Hill, Telegraph Hill, Nob Hill, Chinatown and the north of the Financial District.
+    for (const p of [[-122.4100, 37.8008], [-122.40582, 37.80239], [-122.4194, 37.8021], [-122.41322, 37.79251],
+      [-122.40630, 37.79410], [-122.40280, 37.79520]] as LngLat[]) expect(inside(p)).toBe(true);
+    // Outside: Fisherman's Wharf (north of Bay), the piers and the Ferry Building (east of The Embarcadero), south of
+    // California (Union Square) and Market, west of Hyde.
+    for (const p of [[-122.41700, 37.80800], [-122.39750, 37.80150], [-122.39350, 37.79550], [-122.40750, 37.78800],
+      [-122.39700, 37.79250], [-122.42050, 37.79800]] as LngLat[]) expect(inside(p)).toBe(false);
   });
 
-  it('lists the 147 parcels of the r6 dataset whose centre is inside, all within the boundary', () => {
-    expect(nb.parcels.size).toBe(147);
-    for (const [id, c] of nb.parcels) {
-      expect(id).toMatch(/^p-01(15|16|31|32|45|46)/);
-      expect(pointInRing(c, nb.boundary)).toBe(true);
-    }
+  it('lists the 2968 parcels of the r6 dataset whose centre is inside, all within the boundary', () => {
+    expect(sf.parcels.size).toBe(2968);
+    for (const c of sf.parcels.values()) expect(inside(c)).toBe(true);
     expect(Object.keys(raw.zones[0].parcels)).toEqual([...Object.keys(raw.zones[0].parcels)].sort());
   });
 });
