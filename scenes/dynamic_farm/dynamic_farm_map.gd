@@ -240,8 +240,8 @@ func _build_ui() -> void:
 	var credits := HBoxContainer.new(); bottom.add_child(credits)
 	for item in [["© Mapbox", "https://www.mapbox.com/about/maps/"], ["© OpenStreetMap", "https://www.openstreetmap.org/copyright"]]:
 		var credit := _button(item[0], ExternalLink.open.bind(item[1])); credit.flat = true; credits.add_child(credit)
-	# r8 fills buildings DataSF lacks from OpenStreetMap (C-113): ODbL asks for the source on the map.
-	bottom.add_child(_label("Parcels: DataSF · PDDL / CC0 · Buildings: DataSF, OpenStreetMap · ODbL", 10))
+	# r8 fills buildings DataSF lacks from OpenStreetMap (C-113): ODbL asks for "© OpenStreetMap contributors" on the map.
+	bottom.add_child(_label("Parcels: DataSF · PDDL / CC0 · Buildings: DataSF, © OpenStreetMap contributors · ODbL", 10))
 	_locate = _round_key(LOCATE_ICON); _locate.name = "MapLocate"; _locate.disabled = true
 	_locate.pressed.connect(_locate_player); _hud.add_child(_locate)
 	_profile_button = _round_key(PROFILE_ICON, UiTokens.COLOR_TEXT); _profile_button.name = "MapProfile"
