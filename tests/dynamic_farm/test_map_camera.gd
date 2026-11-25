@@ -21,6 +21,7 @@ func check(value: bool, text: String) -> void:
 
 func _run() -> void:
 	_ground_matches_camera()
+	_geo_screen()
 	_grab_ground()
 	_inertia()
 	_pinch()
@@ -75,6 +76,21 @@ func _ground_matches_camera() -> void:
 	var top: Vector2 = c.ground_offset(Vector2(0, -SIZE.y * 0.5))
 	check(is_finite(top.y) and top.y < 0 and top.length() < 40.0 * SIZE.y, "70°: the top edge still lands on the ground ahead")
 	view.queue_free(); c.queue_free()
+
+## C-115: geo_screen is screen_geo's inverse, flat and tilted (the Washington Square pin rides on it); past a tilted view's
+## clipped horizon it gives no point.
+func _geo_screen() -> void:
+	var c := camera(17.5)
+	var worst := 0.0
+	for pitch in [0.0, 30.0, 60.0]:
+		c.pitch = pitch
+		for point in [SIZE * 0.5, Vector2(12, 40), Vector2(390, 120), Vector2(200, 780), Vector2(0, 800)]:
+			var geo: PackedFloat64Array = c.screen_geo(point)
+			worst = maxf(worst, c.geo_screen(geo[0], geo[1]).distance_to(point))
+	check(worst < 0.05, "geo_screen puts a ground point back where screen_geo read it (worst %s px)" % str(worst))
+	c.pitch = 60.0
+	check(c.geo_screen(c.center[0], c.center[1] + 0.5) == Vector2.INF, "60°: a point far past the horizon has no screen point")
+	c.queue_free()
 
 ## A drag keeps the ground point it pressed under the finger, flat or tilted.
 func _grab_ground() -> void:

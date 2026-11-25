@@ -1,6 +1,6 @@
 extends Control
-## The market (Jasmine) and the carpenter (Scott) of the dynamic farm (C-59, the C-30 0.4.3 plan). They open from
-## the two fixed entries on the community map (C-30#29 question 1: no shop pins at real places), over the map.
+## The market (Jasmine) and the carpenter (Scott) of the dynamic farm (C-59, the C-30 0.4.3 plan). Since C-115 they
+## stand in the Washington Square room (parcel_outpost.gd), which opens this greeting over itself when one is tapped.
 ## Each keeper greets first in the UI v3 NPC card (UiNpcCard, C-105; the main farm's KeeperGreeting before); their looks are built from the
 ## existing avatar parts and their portraits drawn from them (P0KeeperPortraits), with no painted art or new model
 ## (C-30#29 question 6).
