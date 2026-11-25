@@ -148,13 +148,15 @@ static func version_line() -> String:
 	if context == null: return ""
 	var info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0)
 	if info == null: return ""
-	# versionName is a field, not a method: read through reflection. `call`, not `.get()`, which is Godot's own
-	# Object.get and never reaches Java.
+	# versionName is a field, which a JavaObject does not expose, and Field.get is hidden behind Godot's own Object.get:
+	# read it through a public getter handle instead (it comes back as a Java String object).
 	var field = info.getClass().getField("versionName")
-	var name = field.call("get", info) if field != null else null
+	var getter = JavaClassWrapper.wrap("java.lang.invoke.MethodHandles").publicLookup().unreflectGetter(field) if field != null else null
+	var value = getter.invokeWithArguments(JavaClassWrapper.wrap("java.util.Collections").singletonList(info)) if getter != null else null
+	var name := str(value.toString()) if value is Object else ""
 	var code = info.getLongVersionCode()
-	if code == null or name == null: return ""
-	return P0Legal.version_line({"version": int(code), "name": str(name)})
+	if code == null or name.is_empty() or name.begins_with("<"): return ""
+	return P0Legal.version_line({"version": int(code), "name": name})
 
 ## System insets (status bar, gesture bar) in UI units; 0 on desktop, as P0Ui's.
 func _safe_top() -> float:
