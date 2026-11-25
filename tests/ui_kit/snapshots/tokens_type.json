@@ -4,7 +4,7 @@
     0,
     0,
     328,
-    852
+    1246
   ],
   "children": [
     {
@@ -35,7 +35,7 @@
         0,
         52,
         328,
-        800
+        1194
       ],
       "children": [
         {
@@ -400,6 +400,193 @@
           ],
           "variation": "TitleXB20",
           "text": "TitleXB20 · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            854,
+            328,
+            20
+          ],
+          "variation": "TypeBody",
+          "text": "TypeBody · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            876,
+            328,
+            20
+          ],
+          "variation": "TypeBodyBold",
+          "text": "TypeBodyBold · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            898,
+            328,
+            22
+          ],
+          "variation": "TypeButton",
+          "text": "TypeButton · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            922,
+            328,
+            22
+          ],
+          "variation": "TypeButtonOnAction",
+          "text": "TypeButtonOnAction · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            946,
+            328,
+            18
+          ],
+          "variation": "TypeCaption",
+          "text": "TypeCaption · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            966,
+            328,
+            18
+          ],
+          "variation": "TypeCaptionOnDark",
+          "text": "TypeCaptionOnDark · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            986,
+            328,
+            39
+          ],
+          "variation": "TypeDisplay",
+          "text": "TypeDisplay · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            1027,
+            328,
+            20
+          ],
+          "variation": "TypeFloat",
+          "text": "TypeFloat · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            1049,
+            328,
+            23
+          ],
+          "variation": "TypeHeadline",
+          "text": "TypeHeadline · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            1074,
+            328,
+            23
+          ],
+          "variation": "TypeHeadlineOnAction",
+          "text": "TypeHeadlineOnAction · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            1099,
+            328,
+            19
+          ],
+          "variation": "TypeHudNumber",
+          "text": "TypeHudNumber · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            1120,
+            328,
+            19
+          ],
+          "variation": "TypeHudNumberOnDark",
+          "text": "TypeHudNumberOnDark · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            1141,
+            328,
+            19
+          ],
+          "variation": "TypeLabel",
+          "text": "TypeLabel · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            1162,
+            328,
+            19
+          ],
+          "variation": "TypeLabelOnDark",
+          "text": "TypeLabelOnDark · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            1183,
+            328,
+            15
+          ],
+          "variation": "TypeMicro",
+          "text": "TypeMicro · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            1200,
+            328,
+            15
+          ],
+          "variation": "TypeMicroOnDark",
+          "text": "TypeMicroOnDark · Radish ×24"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            1217,
+            328,
+            29
+          ],
+          "variation": "TypeTitle",
+          "text": "TypeTitle · Radish ×24"
         }
       ]
     }

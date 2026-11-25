@@ -139,7 +139,8 @@ func test_the_gift_drawer_marks_what_each_dish_adds() -> void:
 		var box := g.get_theme_stylebox(&"panel") as UiStyleBox
 		marks[str(it.id)] = [label.text, box.bg_color.to_html(false), label.get_theme_color(&"font_color").to_html(false),
 			g.get_global_rect().end.y - c.get_global_rect().position.y, g.size.y]
-	var green := [UiTokens.COLOR_PRIMARY_TINT.to_html(false), UiTokens.COLOR_PRIMARY.to_html(false), -2.0, 17.0]
+	# text in the action colour is the v3 ink (C-105: lime text would be 1.8:1 on the tint)
+	var green := [UiTokens.COLOR_PRIMARY_TINT.to_html(false), UiTokens.COLOR_PRIMARY_INK.to_html(false), -2.0, 17.0]
 	var white := [UiTokens.COLOR_SURFACE_RAISED.to_html(false), UiTokens.COLOR_SECONDARY.to_html(false), -2.0, 17.0]
 	assert_dict(marks).is_equal({
 		"dish_grilled_crucian": ["♥ +2"] + green,

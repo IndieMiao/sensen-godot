@@ -1,0 +1,215 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    302
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiNpcCard"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "ui-v3 C-N1–C-N7 · fig 5"
+    },
+    {
+      "type": "Control",
+      "rect": [
+        0,
+        52,
+        328,
+        250
+      ],
+      "children": [
+        {
+          "type": "ColorRect",
+          "rect": [
+            0,
+            52,
+            328,
+            250
+          ]
+        },
+        {
+          "type": "UiNpcCard",
+          "rect": [
+            8,
+            107,
+            312,
+            166
+          ],
+          "children": [
+            {
+              "type": "PanelContainer",
+              "rect": [
+                8,
+                107,
+                312,
+                166
+              ],
+              "variation": "NpcCard",
+              "children": [
+                {
+                  "type": "VBoxContainer",
+                  "rect": [
+                    8,
+                    107,
+                    312,
+                    166
+                  ],
+                  "children": [
+                    {
+                      "type": "MarginContainer",
+                      "rect": [
+                        8,
+                        107,
+                        312,
+                        118
+                      ],
+                      "children": [
+                        {
+                          "type": "VBoxContainer",
+                          "rect": [
+                            120,
+                            125,
+                            184,
+                            86
+                          ],
+                          "children": [
+                            {
+                              "type": "HBoxContainer",
+                              "rect": [
+                                120,
+                                125,
+                                184,
+                                18
+                              ],
+                              "children": [
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    120,
+                                    125,
+                                    49,
+                                    18
+                                  ],
+                                  "variation": "TypeCaption",
+                                  "text": "Stranger"
+                                },
+                                {
+                                  "type": "Control",
+                                  "rect": [
+                                    175,
+                                    131,
+                                    56,
+                                    6
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Label",
+                              "rect": [
+                                120,
+                                149,
+                                184,
+                                62
+                              ],
+                              "variation": "TypeBodyBold",
+                              "text": "Hi, I'm Jasmine! Bring me crops and wild finds, and I'll pay you in coins."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        8,
+                        225,
+                        312,
+                        48
+                      ],
+                      "children": [
+                        {
+                          "type": "UiCommandButton",
+                          "rect": [
+                            8,
+                            225,
+                            312,
+                            48
+                          ],
+                          "variation": "CtaBar",
+                          "text": "Sell"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "TextureRect",
+              "rect": [
+                12,
+                79,
+                96,
+                112
+              ]
+            },
+            {
+              "type": "UiTagPill",
+              "rect": [
+                120,
+                95,
+                125,
+                28
+              ],
+              "variation": "TagPill",
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    132,
+                    99,
+                    101,
+                    19
+                  ],
+                  "variation": "TypeLabelOnDark",
+                  "text": "Market · Jasmine"
+                }
+              ]
+            },
+            {
+              "type": "Button",
+              "rect": [
+                279,
+                95,
+                44,
+                44
+              ],
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
