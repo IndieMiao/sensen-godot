@@ -831,10 +831,15 @@ func _open_profile() -> void:
 		if _profile != null or _opening or _leaving or _suspended: return
 	var view := Vector3.ZERO
 	if _camera != null: view = Vector3(float(_camera.center[1]), float(_camera.center[0]), float(_camera.zoom))
-	_profile = load(PROFILE).open(self, view)
+	_profile = load(PROFILE).open(self, view, _profile_home())
 	_profile.closed.connect(_profile_closed)
 	_hud.hide()
 	if _camera != null: _camera.input_enabled = false
+
+## The profile's `My farm` (C-108, ①): the player's home once there is one; its card flies the map home (My home).
+func _profile_home() -> Dictionary:
+	if _claims == null or not _claims.has_home(): return {}
+	return {"name": "Your Home", "pressed": _go_home}
 
 func _profile_closed() -> void:
 	_profile = null

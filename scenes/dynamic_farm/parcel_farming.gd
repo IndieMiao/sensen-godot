@@ -7,7 +7,8 @@ extends Node3D
 ## at the cottage's door the key rests (+60 once a player day). The store (server or local stand-in) is authoritative; this node
 ## only checks the spatial rules the server cannot (ParcelSpace) and draws the result.
 ## Soil and carrots are drawn by ParcelCropArt (C-138: 1×1 dry or wet soil blocks, seven
-## carrot stages). Main-farm pieces are reused read-only: P0 names and icons, and the main
+## carrot stages). Watering (C-151): a sown carrot sits on dry soil and does not grow; at the well the key
+## fills the pail (`Fill`, 2 Energy), on a dry carrot it waters it (`Water`, one of the pail's 3) and the soil turns wet. Main-farm pieces are reused read-only: P0 names and icons, and the main
 ## farm's UI kit (C-74): the quick bar, the action key and item flights into the bag; the bag
 ## is the UI v3 modal panel and gains the v3 float (C-105). Nothing of P0Ui / P0Runtime; the
 ## parcel's own coins (C-59) show in the scene's top bar as the main HUD's coins capsule, its
@@ -41,15 +42,22 @@ const PHONE_RIGHT := 14.0
 const PHONE_BUTTON_GAP := UiTokens.SPACE_S4
 ## The drop-down's first row under the top bar (C-T1: 10 under the HUD).
 const DROP_DOWN_GAP := 10.0
-## Development only: draw every tilled cell as wet soil. Until watering exists (C-137) the game shows dry soil.
+## Development only: draw every tilled cell as wet soil (C-138 captures). The game draws a watered crop's cell wet (C-151).
 const WET_SOIL_SETTING := "sensen/dynamic_farm/preview_wet_soil"
-const BAG_ORDER := ["hoe_starter", "seed_carrot", "crop_carrot"]
+## The tools first (C-151: the pail beside the hoe), then seeds and crops.
+const BAG_ORDER := ["hoe_starter", "pail", "seed_carrot", "crop_carrot"]
 ## Parcel items the main farm's content table does not name (C-74#33, copy per C-45). The icon is a placeholder from
 ## the existing set (the HUD's home), no new art.
-const VERBS := {"clear": "Clear", "till": "Till", "sow": "Sow", "harvest": "Harvest", "rest": "Rest", "gather": "Gather"}
+## C-151: `Water` is P0's key (P0Logic, the plot's Water); `Fill` draws the pail at the well (打水, SEN-C-151).
+const VERBS := {"clear": "Clear", "till": "Till", "sow": "Sow", "harvest": "Harvest", "rest": "Rest", "gather": "Gather",
+	"fill": "Fill", "water": "Water"}
 ## C-148: Rested today / Energy full are P0's Rest copy (P0Logic.energy_card, rest_state).
+## C-151: the pail's refusals in the hoe's form (`Need a hoe`): Need a pail / Pail empty / Pail full.
 const REFUSALS := {Space.OUTSIDE: "Not farmland", Space.PATH: "On the path", Space.HOUSE: "House here",
-	Space.NO_TOOL: "Need a hoe", Space.NO_SEED: "No seeds", Space.RESTED: "Rested today", Space.FULL: "Energy full"}
+	Space.NO_TOOL: "Need a hoe", Space.NO_SEED: "No seeds", Space.RESTED: "Rested today", Space.FULL: "Energy full",
+	Space.NO_PAIL: "Need a pail", Space.PAIL_EMPTY: "Pail empty", Space.PAIL_FULL: "Pail full"}
+## The server's pail refusals (C-151), when its state disagreed with the key's: shown as the key would have said.
+const POUR_REFUSALS := {"PAIL_EMPTY": Space.PAIL_EMPTY, "PAIL_FULL": Space.PAIL_FULL, "NO_PAIL": Space.NO_PAIL}
 ## Crop stages follow server time; redraw them this often.
 const REDRAW_S := 0.25
 ## How close (m, ground plane) the player must be to an outer object's bounds to gather it.
@@ -153,6 +161,12 @@ var _spent_material: ShaderMaterial
 ## The first visit's next step (C-35, ParcelGuide) as the main farm's TipCard, under the top bar.
 var _tip: UiTipCard
 var _tip_box: CenterContainer
+## Where the guide's card starts, in canvas units (the safe top included); the scene sets it under its own top bar
+## (two rows since C-108). Negative: TIP_TOP under the status bar.
+var tip_top := -1.0
+## Where the scene's top bar ends, in canvas units (the safe top included): the drop-down's rows start 10 under it.
+## Negative: the one-row bar under the status bar.
+var bar_bottom := -1.0
 ## The step on the card, and the step the player closed with a tap (it comes back only at another step).
 var tip_step := ""
 var _tip_closed := ""
@@ -240,6 +254,9 @@ func enter() -> void:
 	_refresh_tip()
 	if not result.get("ok", false):
 		_toast.show_toast(OPEN_FAILED, ToastLayer.Severity.ERROR)
+	elif not (result.get("gift", {}) as Dictionary).is_empty():
+		# C-151: everything this entry gave: the first-entry gift and the one-off grants (the well blueprint, the pail).
+		announce_gains(result.gift, _player_screen())
 	elif result.get("granted", false):
 		announce_gains(rules.welcome_gift, _player_screen())
 
@@ -429,8 +446,10 @@ func work(cell: Vector2i, action: Dictionary) -> Dictionary:
 		job = null
 		if reached == "unreachable": _toast.show_toast(UNREACHABLE, ToastLayer.Severity.REFUSED)
 		return {"ok": false, "code": reached.to_upper()}
-	_body.labour(action.verb, cells, LABOUR_S)
-	var result := await send(action.command, LABOUR_S)
+	# C-151: Fill and Water play C-153's pail actions, as long as they last (the scene's labour_seconds).
+	var seconds: float = _body.labour_seconds(action.verb, LABOUR_S) if _body.has_method("labour_seconds") else LABOUR_S
+	_body.labour(action.verb, cells, seconds)
+	var result := await send(action.command, seconds)
 	job = null
 	return result
 
@@ -440,6 +459,11 @@ func work_cells(cell: Vector2i, action: Dictionary) -> Array[Vector2i]:
 	# Rest (C-148): the middle of the cottage's door row, so the player stands at the door.
 	var door = Space.door_cell(farm) if action.get("verb") == "rest" else null
 	if door != null: cells.append(door)
+	# Fill (C-151): the well's own cells, so the player walks up beside the well.
+	if action.get("verb") == "fill":
+		var wells := Space.well_cells(rules, farm)
+		for at: Vector2i in wells:
+			if wells[at] == action.get("building"): cells.append(at)
 	if action.get("verb") == "clear" and _obstacles.has(cell):
 		for at: Vector2i in _obstacles:
 			if _obstacles[at] == _obstacles[cell]: cells.append(at)
@@ -476,6 +500,8 @@ func send(command: Dictionary, hold_s := 0.0) -> Dictionary:
 		_toast.show_toast("Your farm was updated. Try again.", ToastLayer.Severity.INFO)
 	elif result.get("code") == "NOT_RESPAWNED":
 		_toast.show_toast("Not ready yet", ToastLayer.Severity.REFUSED)
+	elif result.get("code") in POUR_REFUSALS:
+		_toast.show_toast(REFUSALS[POUR_REFUSALS[result.code]], ToastLayer.Severity.REFUSED)
 	else:
 		_toast.show_toast("That didn't work.", ToastLayer.Severity.REFUSED)
 	return result
@@ -598,7 +624,8 @@ func announce_energy(delta: int, from: Vector2) -> void:
 
 ## The key's verb for a command (the Energy card's `Sow needs 3 Energy`).
 static func _verb_of(command: Dictionary) -> String:
-	return {"clear_obstacle": "clear", "till": "till", "sow": "sow", "gather": "gather", "rest": "rest"}.get(command.get("type", ""), "")
+	return {"clear_obstacle": "clear", "till": "till", "sow": "sow", "gather": "gather", "rest": "rest", "draw_water": "fill",
+		"water": "water"}.get(command.get("type", ""), "")
 
 func _adopt(result: Dictionary) -> void:
 	var next := ParcelFarm.normalize(result.get("farm"))
@@ -683,7 +710,11 @@ func _draw_gathered() -> void:
 func _draw_crops() -> void:
 	if farm.is_empty(): return
 	var soil := {}
-	for key: String in farm.tilled: soil[key] = CropArt.WET if wet_soil_preview else CropArt.DRY
+	# C-151: a watered crop's cell is wet; tilled soil with nothing sown, or a crop not watered yet, is dry.
+	for key: String in farm.tilled:
+		var crop = farm.crops.get(key)
+		var wet: bool = crop is Dictionary and not ParcelFarm.is_dry(crop)
+		soil[key] = CropArt.WET if wet or wet_soil_preview else CropArt.DRY
 	_crop_art.sync(soil, farm.crops, server_now())
 
 ## The bag's items in bar order: the farming items first, then anything else with a name.
@@ -989,10 +1020,8 @@ func _place_bar() -> void:
 	phone_button.offset_left = phone_button.offset_right - UiTokens.SIZE_TOUCH_MIN
 	phone_button.offset_bottom = -phone_bottom
 	phone_button.offset_top = -phone_bottom - UiTokens.SIZE_TOUCH_MIN
-	# The drop-down's rows from the bar's left edge, 10 under it (C-T1).
 	drop_down.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	drop_down.offset_left = UiTokens.SIZE_SCREEN_EDGE
-	drop_down.offset_top = TIP_TOP - UiTokens.SPACE_PAGE + DROP_DOWN_GAP + _safe_top()
+	_place_drop_down()
 	if phone != null: _place_phone()
 
 ## The guide's card (C-35): the current step's sentence while nothing else holds the screen. A tap closes it until
@@ -1007,7 +1036,7 @@ func _refresh_tip() -> void:
 	_tip.visible = not tip_step.is_empty() and tip_step != _tip_closed and not held and _bag == null and phone == null \
 		and not (drop_down != null and drop_down.showing)
 	# Under the top bar (the main farm puts its TipCard under the HUD, clear of the key and the bar).
-	if _tip.visible: _tip_box.offset_top = TIP_TOP + _safe_top()
+	if _tip.visible: _tip_box.offset_top = tip_top if tip_top >= 0.0 else TIP_TOP + _safe_top()
 
 # ------------------------------------------------------------------ Tasks and the phone (C-107)
 
@@ -1035,8 +1064,15 @@ func toggle_tasks() -> void:
 func _open_drop_down() -> void:
 	var view := drop_rows()
 	_drop_done = view.done
+	_place_drop_down()
 	drop_down.open(view.rows, view.more)
 	_refresh_tip()
+
+## The drop-down's rows from the bar's left edge, 10 under it (C-T1).
+func _place_drop_down() -> void:
+	drop_down.offset_left = UiTokens.SIZE_SCREEN_EDGE
+	var top := bar_bottom if bar_bottom >= 0.0 else TIP_TOP - UiTokens.SPACE_PAGE + _safe_top()
+	drop_down.offset_top = top + DROP_DOWN_GAP
 
 ## Opens the phone on `tab` (M-08 from its button; the quick bar slides away, M-16): Tasks, Inbox or Collection.
 func open_phone(tab := Phone.TASKS_TAB) -> void:

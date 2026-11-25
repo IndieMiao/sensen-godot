@@ -1,14 +1,16 @@
 class_name UiGlassButton
 extends Button
 ## UI v3 round glass button (C-R1 / C-R2, C-105): a Ø36 `glass/fill` disc in a 44 hit area with a white 24 icon or a
-## drawn glyph (‹ Back). Pressed raises the glass to 0.75 and plays M-01 (×0.94). An optional Ø14 `badge/notify` dot
+## drawn glyph (‹ Back, the gear of Settings). Pressed raises the glass to 0.75 and plays M-01 (×0.94). An optional Ø14 `badge/notify` dot
 ## sits on its top right. Emits `pressed`.
 
-enum Glyph { NONE, BACK }
+enum Glyph { NONE, BACK, GEAR }
 
 const _ICON := 24.0
 const _BADGE := 14.0
 const _GLYPH_STROKE := 2.5
+const _GEAR_RING := 5.0    # the gear: a 10 ring, its teeth out to 18 across (in a 24 icon box)
+const _GEAR_TOOTH := 9.0
 
 var glyph: Glyph = Glyph.NONE
 var badge := false: set = set_badge
@@ -39,6 +41,13 @@ func _draw() -> void:
 	if glyph == Glyph.BACK:
 		draw_polyline(PackedVector2Array([c + Vector2(3, -7), c + Vector2(-4, 0), c + Vector2(3, 7)]),
 			UiTokens.COLOR_TEXT_ON_DARK, _GLYPH_STROKE, true)
+	elif glyph == Glyph.GEAR:
+		# A ring with eight teeth, all strokes: no filled hole that would show the glass darker than the disc around it.
+		draw_arc(c, _GEAR_RING, 0.0, TAU, 32, UiTokens.COLOR_TEXT_ON_DARK, _GLYPH_STROKE, true)
+		for i in 8:
+			var d := Vector2.from_angle(TAU * float(i) / 8.0)
+			draw_line(c + d * (_GEAR_RING + 1.0), c + d * _GEAR_TOOTH, UiTokens.COLOR_TEXT_ON_DARK, _GLYPH_STROKE + 0.5, true)
+		draw_circle(c, 1.6, UiTokens.COLOR_TEXT_ON_DARK, true, -1.0, true)
 	if badge:
 		var r := UiTokens.SIZE_HUD_SIDE_BUTTON * 0.5
 		draw_circle(c + Vector2(r, -r) * 0.72, _BADGE * 0.5, UiTokens.COLOR_BADGE_NOTIFY, true, -1.0, true)

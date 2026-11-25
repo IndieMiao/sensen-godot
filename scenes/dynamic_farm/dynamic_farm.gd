@@ -29,6 +29,10 @@ const Farming = preload("res://scenes/dynamic_farm/parcel_farming.gd")
 const FarmPath = preload("res://modules/dynamic_farm/farm_path.gd")
 const LocalFarmStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const RemoteFarmStore = preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
+const ParcelItems = preload("res://modules/dynamic_farm/parcel_items.gd")
+const PROFILE := "res://scenes/dynamic_farm/parcel_profile.gd"
+## Over the parcel's own HUD (20) and under the host's loading panel (30, hidden once the parcel is up).
+const PROFILE_LAYER := 25
 ## Development only: keep the own-parcel farm on the device instead of the C-31 server.
 const LOCAL_SAVE_SETTING := "sensen/dynamic_farm/local_farm_save"
 const SPEED := 3.75
@@ -41,6 +45,16 @@ const ROUTE_STUCK_RATIO := 0.2
 const ROUTE_STUCK_S := 0.5
 ## Standing this close to a cell (centre to centre, in cells) is close enough to work it.
 const REACH_CELLS := 1.5
+## The pail (C-153's art; C-151 wires it in): the pail in the right hand (BucketGesture, a child of the rig beside its
+## Skeleton3D) and its actions, added to the rig's AnimationPlayer as the `pail` library. Fill draws at the well,
+## Water pours on one cell; the pail shows only while one of them plays.
+const PAIL_GESTURE = preload("res://assets/dynamic_farm/watering/bucket_gesture.tscn")
+const PAIL_ACTIONS = preload("res://assets/dynamic_farm/watering/bucket_actions.tres")
+const PAIL_LIBRARY := &"pail"
+## Labour verbs played with the pail -> their action in PAIL_ACTIONS.
+const PAIL_MOTIONS := {"fill": "draw", "water": "pour"}
+## The top bar's second row, the place capsule (two 13 / 12 lines and its 4 + 4): what it is drawn at, give or take.
+const PLACE_ROW_H := 36.0
 
 var _args := {}
 var _data := {}
@@ -63,6 +77,13 @@ var _header: HBoxContainer
 var _title: Label
 var _status: Label
 var _coins_capsule: PanelContainer
+## The top bar's second row: the parcel's name over its status (C-108).
+var _place_chip: UiGlassCapsule
+## The HUD avatar (C-H1): the profile (C-108).
+var _avatar: UiHudAvatar
+## The profile and the pages opened from it, over the parcel (parcel_profile.gd), else null.
+var _profile: Control
+var _profile_layer: CanvasLayer
 var _coins: Label
 var _movement := Vector2.ZERO
 var _focus := Vector3.ZERO
@@ -97,6 +118,8 @@ var _route_stuck_s := 0.0
 var _labour_left := 0.0
 ## The Energy card's `Show home` (C-148) holds the camera on the cottage until the player moves.
 var _showing_house := false
+## The pail in the hand (PAIL_GESTURE), made the first time Fill or Water plays; hidden between them.
+var _pail: Node3D
 
 func setup(args: Dictionary) -> void:
 	_args = args.duplicate(true)
@@ -197,8 +220,11 @@ func _ready() -> void:
 		# C-107: the task button (C-H3) beside the Energy chip, before it.
 		_header.add_child(_farming.task_button)
 		_header.move_child(_farming.task_button, _farming.energy_chip.get_index())
+		_farming.tip_top = top_bar_bottom() + UiTokens.SPACE_S5
+		_farming.bar_bottom = top_bar_bottom()
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
+	_fit_place_chip()
 	_summary = {"schema":4,"dataset":_data.dataset_version,"block_id":_data.block_id,
 		"core_cells":_data.counts.core,"extension_cells":_data.counts.extension,
 		"protected_cells":_data.protected.size(),"reserved_placement_cells":_walk.reserved.size(),
@@ -461,7 +487,9 @@ func _process(delta: float) -> void:
 	if _labour_left > 0.0:
 		# The labour clip holds the player still, stick or not (the main farm's labour beat).
 		_labour_left -= dt
-		if _labour_left <= 0.0: _play("idle")
+		if _labour_left <= 0.0:
+			_play("idle")
+			_put_pail_away()
 	else:
 		if steering and not _route.is_empty(): _end_route("cancelled")
 		if not _route.is_empty():
@@ -527,11 +555,37 @@ func approach(cells: Array) -> String:
 
 ## Plays the main farm's labour clip for `verb` (AnimPlaceholders.clip_for) facing `cells`,
 ## holding the player still for `seconds`. Presentation only: commands are the caller's.
+## C-151: Fill and Water play the pail's own actions with the pail in hand (PAIL_MOTIONS).
 func labour(verb: String, cells: Array, seconds: float) -> void:
 	_face_cells(cells)
 	_labour_left = seconds
+	if PAIL_MOTIONS.has(verb) and _take_pail():
+		_clip = ""   # the same action twice in a row (watering cell after cell) starts again
+		_play("%s/%s" % [PAIL_LIBRARY, PAIL_MOTIONS[verb]])
+		return
+	_put_pail_away()
 	_play(AnimPlaceholders.clip_for(verb))
 	if AnimPlaceholders.is_placeholder(verb) and _rig != null: AnimPlaceholders.play_fallback(_rig, seconds)
+
+## How long `verb`'s labour plays: a pail action its own length (Fill 2.22 s, Water 2.28 s), else `default`.
+func labour_seconds(verb: String, default: float) -> float:
+	var motion = PAIL_MOTIONS.get(verb)
+	return PAIL_ACTIONS.get_animation(motion).length if motion != null and PAIL_ACTIONS.has_animation(motion) else default
+
+## The pail in the right hand with its actions on the rig's player; false without a rig (nothing to hold it).
+func _take_pail() -> bool:
+	var player := _rig.get_node_or_null("AnimationPlayer") as AnimationPlayer if _rig != null else null
+	if player == null or _rig.get_node_or_null("Skeleton3D") == null: return false
+	if not player.has_animation_library(PAIL_LIBRARY): player.add_animation_library(PAIL_LIBRARY, PAIL_ACTIONS)
+	if _pail == null:
+		_pail = PAIL_GESTURE.instantiate() as Node3D
+		_pail.name = "BucketGesture"   # the actions' tracks name it
+		_rig.add_child(_pail)
+	_pail.visible = true
+	return true
+
+func _put_pail_away() -> void:
+	if _pail != null: _pail.visible = false
 
 ## Standing on a cell beside `cells`, not on one of them, near enough to reach.
 func _within_reach(cells: Array) -> bool:
@@ -637,9 +691,11 @@ func _build_ui() -> void:
 			_focus = _actor.position
 			_overview = false
 			_place_camera())
-	# Top bar (C-74; UI v3 since C-105, docs/design/ui-v3-2026-11-24 §4.1 / C-L2): over the scene, in glass (S-2):
-	# a Ø36 glass Back in its 44 hit area, the parcel's name over its status in a glass capsule, and on one's own
-	# parcel its coins (C-59) in the C-H4 glass coin capsule at the right. 12 from the screen's sides, safe top + 8.
+	# Top bar (C-74; UI v3 since C-105, docs/design/ui-v3-2026-11-24 §4.1 / C-L2): over the scene, in glass (S-2), two
+	# rows as the main HUD's (LOCK-06: the HUD row, the location chip under it). Row 1: a Ø36 glass Back in its 44 hit
+	# area, the HUD avatar (C-H1, C-108: it opens the profile), and on one's own parcel its Energy (C-148) and coins
+	# (C-59) in the C-H4 glass capsule at the right. Row 2: the parcel's name over its status in a glass capsule, as wide
+	# as its lines. 12 from the screen's sides, safe top + 8.
 	_header = HBoxContainer.new()
 	_header.name = "TopBar"
 	_header.theme = UiKit.theme()
@@ -648,6 +704,7 @@ func _build_ui() -> void:
 	_header.offset_left = UiTokens.SIZE_SCREEN_EDGE - (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5
 	_header.offset_right = -UiTokens.SIZE_SCREEN_EDGE
 	_header.offset_top = UiTokens.SIZE_SCREEN_SAFE_INSET + _safe_top()
+	_header.offset_bottom = _header.offset_top + UiTokens.SIZE_HUD_AVATAR_V3
 	_header.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_canvas.add_child(_header)
 	var back := UiGlassButton.new(null, UiGlassButton.Glyph.BACK)
@@ -655,18 +712,14 @@ func _build_ui() -> void:
 	back.tooltip_text = "Back"
 	back.pressed.connect(_request_back)
 	_header.add_child(back)
-	var chip := UiGlassCapsule.new()
-	chip.name = "Place"
-	chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_header.add_child(chip)
-	_title = chip.label()
-	_title.theme_type_variation = UiTokens.STYLE_TYPE_LABEL_ON_DARK
-	# The place capsule takes the room left (on 360 that is ~110 beside the Energy chip and coins); its lines cut with …
-	_title.custom_minimum_size.x = 0
-	chip.text = "Dynamic farm"
-	chip.detail = "Loading preview…"
-	_status = chip.detail_label()
+	_avatar = UiHudAvatar.new()
+	_avatar.pressed.connect(open_profile)
+	_header.add_child(_avatar)
+	var spacer := Control.new()
+	spacer.name = "Spacer"
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_header.add_child(spacer)
 	# One's own parcel: its coins (C-59, apart from the main farm's) in the v3 coin capsule, at the right.
 	_coins_capsule = UiGlassCapsule.coins(UiArt.COIN)
 	_coins_capsule.name = "Coins"
@@ -675,7 +728,22 @@ func _build_ui() -> void:
 	_coins = (_coins_capsule as UiGlassCapsule).label()
 	_coins.text = "0"
 	_header.add_child(_coins_capsule)
-	_controls.top_exclusion_y = UiTokens.SIZE_SCREEN_SAFE_INSET + _safe_top() + UiTokens.SIZE_TOUCH_MIN + UiTokens.SPACE_PAGE
+	_place_chip = UiGlassCapsule.new()
+	_place_chip.name = "Place"
+	_place_chip.theme = UiKit.theme()
+	_place_chip.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	_place_chip.position = Vector2(UiTokens.SIZE_SCREEN_EDGE, _header.offset_bottom + UiTokens.SPACE_S2)
+	_canvas.add_child(_place_chip)
+	_title = _place_chip.label()
+	_title.theme_type_variation = UiTokens.STYLE_TYPE_LABEL_ON_DARK
+	# The capsule is as wide as its longer line, up to the screen less its sides; past that its lines cut with …
+	_title.custom_minimum_size.x = 0
+	_place_chip.text = "Dynamic farm"
+	_place_chip.detail = "Loading preview…"
+	_status = _place_chip.detail_label()
+	_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_fit_place_chip()
+	_controls.top_exclusion_y = top_bar_bottom()
 	_hint = UiKit.label("Art preview · Walk and explore", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
 	_hint.theme = UiKit.theme()
 	_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
@@ -692,6 +760,27 @@ func _build_ui() -> void:
 	_build.visible = false
 	_build.activated.connect(begin_placement)
 	_canvas.add_child(_build)
+
+## The place capsule as wide as its longer line (name or status), at most the screen less its 12 sides; past that
+## the lines cut with … (a Label that may cut asks for no width of its own, so the width is measured here).
+func _fit_place_chip() -> void:
+	if _place_chip == null or not is_inside_tree(): return
+	var widest := 0.0
+	for l: Label in [_title, _status]:
+		if not l.visible or l.text.is_empty(): continue
+		var font := l.get_theme_font(&"font")
+		widest = maxf(widest, font.get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.get_theme_font_size(&"font_size")).x)
+	var box := _place_chip.get_theme_stylebox(&"panel")
+	var sides := box.get_margin(SIDE_LEFT) + box.get_margin(SIDE_RIGHT) if box != null else 0.0
+	var room := get_viewport().get_visible_rect().size.x - UiTokens.SIZE_SCREEN_EDGE * 2.0 - sides
+	_title.custom_minimum_size.x = ceilf(minf(widest, maxf(0.0, room)))
+	_place_chip.size = Vector2.ZERO
+
+## Where the top bar ends (its second row's bottom, a 34 two-line capsule), in canvas units: the world's touches start
+## under it and the farming tip sits under it.
+func top_bar_bottom() -> float:
+	return UiTokens.SIZE_SCREEN_SAFE_INSET + _safe_top() + UiTokens.SIZE_HUD_AVATAR_V3 + UiTokens.SPACE_S2 + PLACE_ROW_H \
+		+ UiTokens.SPACE_S2
 
 ## Top system inset (status bar, notch) in UI units; 0 on desktop (as P0Ui.safe_top).
 func _safe_top() -> float:
@@ -728,18 +817,88 @@ func is_back_navigation_locked() -> bool:
 	_request_back()
 	return true
 
-## Closes the farming UI's open drawer (the bag), Energy card / panel or phone (C-107); false when none was open.
+## Closes the page on top of the profile (the profile last), else the farming UI's open drawer (the bag), Energy
+## card / panel or phone (C-107); false when none was open.
 func close_modal() -> bool:
+	if is_instance_valid(_profile):
+		_profile.back()
+		return true
 	return _farming != null and (_farming.close_energy() or _farming.close_bag() or _farming.close_phone())
+
+## The profile over the parcel (C-108; C-85 ①: the HUD avatar opens it): the parcel's HUD hides and its touches stop
+## until it closes; Settings and the dressing room open from it (parcel_profile.gd). The player stops where they are.
+func open_profile() -> Control:
+	if is_instance_valid(_profile) or _suspended or _back_sent: return null
+	end_placement()
+	if not _route.is_empty(): _end_route("cancelled")
+	_movement = Vector2.ZERO
+	_controls.reset()
+	if _farming != null:
+		_farming.close_energy()
+		_farming.close_bag()
+		_farming.close_phone()
+		if _farming.drop_down != null: _farming.drop_down.fold()
+	_profile_layer = CanvasLayer.new()
+	_profile_layer.name = "ProfileLayer"
+	_profile_layer.layer = PROFILE_LAYER
+	add_child(_profile_layer)
+	_profile = load(PROFILE).open(_profile_layer, Vector3.ZERO, profile_home())
+	_profile.closed.connect(_profile_closed)
+	_canvas.visible = false
+	_controls.process_mode = Node.PROCESS_MODE_DISABLED
+	return _profile
+
+func profile_open() -> bool: return is_instance_valid(_profile) and not _profile.is_queued_for_deletion()
+
+func _profile_closed() -> void:
+	_profile = null
+	if is_instance_valid(_profile_layer): _profile_layer.queue_free()
+	_profile_layer = null
+	_controls.process_mode = Node.PROCESS_MODE_INHERIT
+	_controls.reset()
+	if not _suspended: _canvas.visible = true
+
+## `My farm` on the profile: one's own parcel, its name and what grows there (the main farm's line: `Carrots ready to
+## harvest`, `Carrots ready in 3h 32m`); the card closes the profile, back on the parcel. None on a preview.
+func profile_home() -> Dictionary:
+	if _args.get("own_parcel") != true or _data.is_empty(): return {}
+	var status := home_status(_farming.farm if _farming != null else {}, _farming.server_now() if _farming != null else 0)
+	return {"name": _data.address if not str(_data.get("address", "")).is_empty() else str(_data.get("name", "")),
+		"status": status.text, "ready": status.ready, "pressed": Callable()}
+
+## The earliest crop on the parcel, as the main farm's profile words it (P0ProfilePage._farm_status); "" with none.
+static func home_status(farm: Dictionary, now_ms: int) -> Dictionary:
+	var ready := ""
+	var best := INF
+	var growing := ""
+	for cell in farm.get("crops", {}):
+		var c: Dictionary = farm.crops[cell]
+		# A dry crop (C-151) is not growing: its ripe_at is NEVER, and the main farm leaves an unwatered plot out too.
+		if ParcelFarm.is_dry(c): continue
+		var left := float(int(c.get("ripe_at", 0)) - now_ms)
+		if left <= 0.0:
+			if ready == "": ready = str(c.get("crop", ""))
+		elif left < best:
+			best = left
+			growing = str(c.get("crop", ""))
+	if ready != "": return {"text": "%s ready to harvest" % P0Logic.plural(_crop_name(ready)), "ready": true}
+	if growing != "": return {"text": "%s ready in %s" % [P0Logic.plural(_crop_name(growing)), P0Logic.span(best)], "ready": false}
+	return {"text": "", "ready": false}
+
+static func _crop_name(id: String) -> String:
+	var n := ParcelItems.name_of(id)
+	return n if n != "" else id.trim_prefix("crop_").capitalize()
 
 func suspend() -> void:
 	_suspended = true
 	end_placement()
 	if not _route.is_empty(): _end_route("cancelled")
 	_labour_left = 0.0
+	_put_pail_away()
 	_movement = Vector2.ZERO
 	_controls.reset()
 	_canvas.visible = false
+	if is_instance_valid(_profile_layer): _profile_layer.visible = false
 	visible = false
 	if _environment != null:
 		_saved_environment = _environment.environment
@@ -751,7 +910,9 @@ func resume() -> void:
 	_suspended = false
 	_back_sent = false
 	visible = true
-	_canvas.visible = true
+	# Back from the dressing room: the profile is still over the parcel, its HUD stays hidden under it.
+	_canvas.visible = not profile_open()
+	if is_instance_valid(_profile_layer): _profile_layer.visible = true
 	if _environment != null: _environment.environment = _saved_environment
 	if _camera != null: _camera.make_current()
 	_movement = Vector2.ZERO
@@ -770,9 +931,11 @@ func _fail(message: String) -> void:
 	_failed = true
 	_movement = Vector2.ZERO
 	_status.text = message
+	_fit_place_chip()
 	preview_error.emit(message)
 
 func _on_viewport_resized() -> void:
+	_fit_place_chip()
 	_normal_size = CameraRules.close_view_size(get_viewport().get_visible_rect().size) * CameraRules.P0_VIEW_K
 	if _overview and _ready_sent:
 		set_review_overview(true)

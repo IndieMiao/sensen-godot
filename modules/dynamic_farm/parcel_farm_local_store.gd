@@ -3,7 +3,7 @@ extends RefCounted
 ## kept on this device until the client talks to the server. It applies the same rules
 ## with the device clock standing in for server time. Results use the store contract the
 ## scene reads (await-able like the remote store):
-##   {ok, granted?, farm, farm_version, server_time} or
+##   {ok, granted?, gift?, farm, farm_version, server_time} or
 ##   {ok:false, code, index, detail?, farm, farm_version, server_time}.
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const DIR := "user://dynamic_farm_local"
@@ -23,10 +23,16 @@ func enter() -> Dictionary:
 	var saved := _load()
 	var now: int = now_ms.call()
 	var welcomed = ParcelFarm.welcome(rules, saved.farm, now)
-	if welcomed == null:
-		return {"ok": true, "granted": false, "farm": saved.farm, "farm_version": saved.version, "server_time": now}
-	if not _save(welcomed, saved.version + 1): return _failure("SAVE", 0, {}, saved.farm, saved.version)
-	return {"ok": true, "granted": true, "farm": welcomed, "farm_version": saved.version + 1, "server_time": now}
+	# C-151: the one-off grants the farm has not had yet, in the same write (the server's enter).
+	var gift: Dictionary = rules.welcome_gift.duplicate() if welcomed != null else {}
+	var granted = ParcelFarm.grant(rules, welcomed if welcomed != null else saved.farm, now)
+	if granted != null:
+		for id: String in granted.gift: gift[id] = int(gift.get(id, 0)) + int(granted.gift[id])
+	var next = granted.state if granted != null else welcomed
+	if next == null:
+		return {"ok": true, "granted": false, "gift": {}, "farm": saved.farm, "farm_version": saved.version, "server_time": now}
+	if not _save(next, saved.version + 1): return _failure("SAVE", 0, {}, saved.farm, saved.version)
+	return {"ok": true, "granted": welcomed != null, "gift": gift, "farm": next, "farm_version": saved.version + 1, "server_time": now}
 
 ## The farm as saved, without entering it (no welcome gift), like the server's `GET /parcels/mine`.
 func read() -> Dictionary:
