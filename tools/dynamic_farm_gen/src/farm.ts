@@ -12,6 +12,8 @@ export const SURFACE_PALETTE = [
   { id: 2, name: 'Path', color: '#BBA882' },
 ];
 export const ATTRIBUTION = 'DataSF building footprints and parcels (PDDL 1.0); scene extension is procedural';
+/** A farm whose buildings come from OpenStreetMap (C-113): ODbL 1.0 asks for this credit. */
+export const OSM_ATTRIBUTION = 'Buildings © OpenStreetMap contributors (ODbL 1.0); DataSF parcels (PDDL 1.0); scene extension is procedural';
 const CAPABILITIES = {
   core: { walk: true, till: true, plant: true, arrange: true, place: true },
   extension: { walk: true, till: false, plant: false, arrange: false, place: false },
@@ -26,6 +28,8 @@ export interface FarmInput {
   /** Building footprints in UTM metres. */
   buildings: Polygon[];
   building_source: string;
+  /** Defaults to ATTRIBUTION (DataSF footprints). */
+  attribution?: string;
   parcel_area_m2: number;
   /** Direction from the buildings toward the street, in the rotated grid frame. */
   front: (rotation_deg: number) => Dir;
@@ -205,7 +209,7 @@ function farmJson(input: FarmInput, p: GeneratorParams, layout: Layout, core: Co
       recovery_flags: flags,
       parameters: { cell_m: p.cell_m, core_cell_cap: p.core_cell_cap, total_cell_cap: p.total_cell_cap, min_core_cells: p.min_core_cells, min_core_iou: p.min_core_iou },
     },
-    attribution: ATTRIBUTION,
+    attribution: input.attribution ?? ATTRIBUTION,
     source_geometry_hash: input.source_geometry_hash,
   };
 }
