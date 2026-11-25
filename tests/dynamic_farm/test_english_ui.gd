@@ -69,6 +69,10 @@ func _run() -> void:
 	await process_frame
 	verify(text_nodes(map_page).filter(func(n: Node): return n is Button and n.text == "Retry").all(func(n: Node): return String(n.atr(n.text)) == "Retry"), "preview ignores later global locale changes")
 	verify(String(outside.atr(outside.text)) == "重试", "preview does not disable global game translation")
+	# C-142 (owner's C-101#91): no player-facing text carries "sensen".
+	for page in [map_page, host, farm]:
+		var named := text_nodes(page).filter(func(n: Node): return "sensen" in (n.text + n.tooltip_text).to_lower())
+		verify(named.is_empty(), "no sensen in visible text: " + page.name)
 	map_page.queue_free(); host.queue_free(); farm.queue_free(); outside.queue_free()
 	await process_frame
 	TranslationServer.remove_translation(translation)
