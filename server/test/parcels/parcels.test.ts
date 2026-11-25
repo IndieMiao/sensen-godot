@@ -80,7 +80,7 @@ const mine = async (app: FastifyInstance, token: string) =>
 const enter = (app: FastifyInstance, token: string) =>
   app.inject({ method: 'POST', url: '/v1/parcels/mine/enter', headers: bearer(token) });
 const R6 = 'sf-dynamic-farm-20261124-r6';
-/** C-136：带上客户端自己的数据集进入（新客户端）。 */
+/** C-136：带上这次打开农场用的数据集进入（新客户端）。 */
 const enterAs = (app: FastifyInstance, token: string, dataset_version: unknown) =>
   app.inject({ method: 'POST', url: '/v1/parcels/mine/enter', headers: bearer(token), payload: { dataset_version } });
 /** r4 上认领、进入，盖房、清障碍、开垦三格、种两颗（一颗熟一颗没熟）、卖一次、领鸡舍蓝图、采一棵树；返回此时的地块。 */

@@ -133,7 +133,7 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
   /**
    * 进入自家地块（客户端每次打开自己的地块都调用）：第一次发 welcome_gift（Q-39 锄头与萝卜种子、Q-40 首栋住宅蓝图），
    * granted=true；之后重开、重试都只返回当前状态，granted=false，不重发。
-   * C-136（Q-168 rebase）：请求体可带 dataset_version（客户端自己的数据集）。认领的数据集比它旧、同属这块地的社区、
+   * C-136（Q-168 rebase）：请求体可带 dataset_version（客户端这次打开农场用的数据集）。认领的数据集比它旧、同属这块地的社区、
    * 两个都已登记时，在同一次加锁写入里把认领换到这个数据集，按格子记的进度清空并退还（rebaseFarm）；
    * 换过之后认领已是新版本，重试、并发请求都不会再换一次。不带或条件不满足时与以前一样。
    */

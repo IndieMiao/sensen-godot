@@ -6,7 +6,7 @@ extends SceneTree
 ## stand says so and sends nothing; the stick cancels a walk; the parcel stays covered until the
 ## save is applied. C-33: opening the house placement gives up a press still walking. C-114: Build pops the
 ## cottage in with dust round it; reopening shows it still, without dust. C-136: a claim made on an older dataset opens on the
-## server save once the enter request names this package's dataset (Q-168), the lost first try included. Run in the private preview project (README), optionally
+## server save once the enter request names the opened farm's dataset (Q-168), the lost first try included. Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -530,7 +530,7 @@ func _older_dataset_claim() -> void:
 	var deadline := Time.get_ticks_msec() + 30000
 	while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
 	_check(server.enters.size() == 2 and server.enters.all(func(b): return b is Dictionary and b.get("dataset_version") == raw.dataset_version),
-		"each enter, the lost one and its retry, names this package's dataset")
+		"each enter, the lost one and its retry, names the opened farm's dataset")
 	_check(farming.loaded() and not farming.unavailable and not farming._cover.visible, "the moved claim opens: no Could not open your farm")
 	_check(farming.farm.get("bag") == bag and farming.farm.get("coins") == 12 and farming.farm.get("house", 0) == null and farming.farm.get("tilled") == [],
 		"the moved save shows the kept bag and coins on fresh cells")
