@@ -569,9 +569,15 @@ func _town_closed(town: Control, parcel: String) -> void:
 
 ## The map has no player of its own, so after a cold start nothing had loaded the saved outfit and the profile's figure
 ## stayed blank ~3 s on its first open (C-133): its parts start loading on the loader's threads as the map opens.
+## The QA log says when it has loaded: `PARCEL_OUTFIT_WARM {"parts":…,"ms":…}`.
 func _warm_outfit() -> void:
 	var avatar := get_node_or_null("/root/Avatar")
-	if avatar != null: avatar.warm_saved_outfit()
+	if avatar == null: return
+	var parts: Array = avatar.warm_saved_outfit()
+	if parts.is_empty(): return
+	var start := Time.get_ticks_msec()
+	while is_inside_tree() and avatar.warming(): await get_tree().process_frame
+	print("PARCEL_OUTFIT_WARM ", JSON.stringify({"parts": parts.size(), "ms": Time.get_ticks_msec() - start}))
 
 ## The profile over the map (C-128), as the town is: the map's panels hide and its camera holds still until it closes.
 ## A tap while the saved outfit is still loading (just after a cold start) holds the key until it has loaded, frame
@@ -581,8 +587,10 @@ func _open_profile() -> void:
 	var avatar := get_node_or_null("/root/Avatar")
 	if avatar != null and avatar.warming():
 		_profile_waiting = true; _render()
+		var start := Time.get_ticks_msec()
 		while is_inside_tree() and avatar.warming(): await get_tree().process_frame
 		_profile_waiting = false
+		print("PARCEL_PROFILE_WAIT ", JSON.stringify({"ms": Time.get_ticks_msec() - start}))
 		if not is_inside_tree(): return
 		_render()
 		if _profile != null or _opening or _leaving or _suspended: return
