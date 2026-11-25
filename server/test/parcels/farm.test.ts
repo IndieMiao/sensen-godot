@@ -331,10 +331,11 @@ describe('parcel economy (C-58)', () => {
 
 /** C-149（0.4.5）：Jasmine 卖种子。胡萝卜种子 9 金币照 P0（所有者 C-137#15 第 3 题“照搬p0”）；单价只看服务端配置。 */
 describe('parcel buy (C-149)', () => {
-  /** 卖过 2 个萝卜、有 24 金币的农场（经种收卖得来，不直接改金币）。 */
+  /** 卖过 2 个萝卜、有 24 金币的农场（经种、浇（C-151）、收、卖得来，不直接改金币）。 */
   const with24 = (): ParcelFarmState => {
     let s = run(welcomed(), [{ type: 'till', cell: '1,1' }, { type: 'till', cell: '2,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' },
       { type: 'sow', cell: '2,1', crop: 'crop_carrot' }]);
+    s = watered(s, ['1,1', '2,1']);
     s = run(s, [{ type: 'harvest', cell: '1,1' }, { type: 'harvest', cell: '2,1' }, { type: 'sell', item: 'crop_carrot', count: 2 }], T0 + 60_000);
     expect(s).toMatchObject({ coins: 24, bag: { seed_carrot: 1 } });
     return s;
@@ -369,8 +370,11 @@ describe('parcel buy (C-149)', () => {
     const s = with24();
     const after = run(s, [{ type: 'buy', item: 'seed_carrot', count: 2 }], T0 + 60_000);
     expect(after).toEqual({ ...s, coins: 6, bag: { ...s.bag, seed_carrot: 3 } });
-    // The seeds bought can be sown.
-    expect(run(after, [{ type: 'sow', cell: '1,1', crop: 'crop_carrot' }], T0 + 60_000).bag.seed_carrot).toBe(2);
+    // The seeds bought can be sown; sown, they are dry soil like any seed and need water (C-151).
+    const resown = run(after, [{ type: 'sow', cell: '1,1', crop: 'crop_carrot' }], T0 + 60_000);
+    expect(resown.bag.seed_carrot).toBe(2);
+    expect(resown.crops['1,1']).toMatchObject({ ripe_at: NEVER, watered_at: null });
+    expect(watered(resown, ['1,1'], T0 + 120_000).crops['1,1']).toMatchObject({ ripe_at: T0 + 180_000, watered_at: T0 + 120_000 });
   });
 
   it('too few coins: refused, the whole batch unchanged; spending exactly all coins is allowed', () => {
