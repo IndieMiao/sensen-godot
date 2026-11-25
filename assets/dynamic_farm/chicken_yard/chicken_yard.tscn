@@ -1,0 +1,95 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/BD-05A.glb" id="BD-05A"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/BD-05B.glb" id="BD-05B"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/SC-09.glb" id="SC-09"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/FM-12.glb" id="FM-12"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/SC-10.glb" id="SC-10"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/Rear-Hedgerow.glb" id="Rear-Hedgerow"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/Hedge-End.glb" id="Hedge-End"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/Eave-Straw.glb" id="Eave-Straw"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/Verge.glb" id="Verge"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/Sand-Signs.glb" id="Sand-Signs"]
+[ext_resource type="ArrayMesh" path="res://assets/dynamic_farm/chicken_yard/GX-04.res" id="GX-04"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/chicken_yard/GX-09.glb" id="GX-09"]
+[ext_resource type="ArrayMesh" path="res://assets/dynamic_farm/chicken_yard/CS-05P.res" id="CS-05P"]
+[ext_resource type="ArrayMesh" path="res://assets/dynamic_farm/chicken_yard/CS-05R.res" id="CS-05R"]
+
+[sub_resource type="MultiMesh" id="Posts"]
+transform_format = 1
+instance_count = 24
+mesh = ExtResource("CS-05P")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 3, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 4, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 5, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 5, 1, 0, 0, 2, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 0, 1, 0, 0, 0, 0, 1, 5, 1, 0, 0, 3, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 3, 0, 1, 0, 0, 0, 0, 1, 5, 1, 0, 0, 4, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 4, 0, 1, 0, 0, 0, 0, 1, 5, 1, 0, 0, 5, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 5, 0, 1, 0, 0, 0, 0, 1, 5, 1, 0, 0, 6, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 6, 0, 1, 0, 0, 0, 0, 1, 5, 1, 0, 0, 7, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 7, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 7, 0, 1, 0, 0, 0, 0, 1, 2, 1, 0, 0, 7, 0, 1, 0, 0, 0, 0, 1, 3, 1, 0, 0, 7, 0, 1, 0, 0, 0, 0, 1, 4, 1, 0, 0, 7, 0, 1, 0, 0, 0, 0, 1, 5)
+
+[sub_resource type="MultiMesh" id="Rails"]
+transform_format = 1
+instance_count = 46
+mesh = ExtResource("CS-05R")
+buffer = PackedFloat32Array(1, 0, 0, 0.5, 0, 1, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 0.5, 0, 1, 0, 0.5, 0, 0, 1, 0, 1, 0, 0, 1.5, 0, 1, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 1.5, 0, 1, 0, 0.5, 0, 0, 1, 0, 1, 0, 0, 2.5, 0, 1, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 2.5, 0, 1, 0, 0.5, 0, 0, 1, 0, 1, 0, 0, 3.5, 0, 1, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 3.5, 0, 1, 0, 0.5, 0, 0, 1, 0, 1, 0, 0, 4.5, 0, 1, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 4.5, 0, 1, 0, 0.5, 0, 0, 1, 0, 1, 0, 0, 5.5, 0, 1, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 5.5, 0, 1, 0, 0.5, 0, 0, 1, 0, 1, 0, 0, 6.5, 0, 1, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 6.5, 0, 1, 0, 0.5, 0, 0, 1, 0, 1, 0, 0, 0.5, 0, 1, 0, 0.25, 0, 0, 1, 5, 1, 0, 0, 0.5, 0, 1, 0, 0.5, 0, 0, 1, 5, 1, 0, 0, 1.5, 0, 1, 0, 0.25, 0, 0, 1, 5, 1, 0, 0, 1.5, 0, 1, 0, 0.5, 0, 0, 1, 5, 1, 0, 0, 2.5, 0, 1, 0, 0.25, 0, 0, 1, 5, 1, 0, 0, 2.5, 0, 1, 0, 0.5, 0, 0, 1, 5, 1, 0, 0, 3.5, 0, 1, 0, 0.25, 0, 0, 1, 5, 1, 0, 0, 3.5, 0, 1, 0, 0.5, 0, 0, 1, 5, 1, 0, 0, 4.5, 0, 1, 0, 0.25, 0, 0, 1, 5, 1, 0, 0, 4.5, 0, 1, 0, 0.5, 0, 0, 1, 5, 1, 0, 0, 6.5, 0, 1, 0, 0.25, 0, 0, 1, 5, 1, 0, 0, 6.5, 0, 1, 0, 0.5, 0, 0, 1, 5, 0, 0, 1, 0, 0, 1, 0, 0.25, -1, 0, 0, 0.5, 0, 0, 1, 0, 0, 1, 0, 0.5, -1, 0, 0, 0.5, 0, 0, 1, 0, 0, 1, 0, 0.25, -1, 0, 0, 1.5, 0, 0, 1, 0, 0, 1, 0, 0.5, -1, 0, 0, 1.5, 0, 0, 1, 0, 0, 1, 0, 0.25, -1, 0, 0, 2.5, 0, 0, 1, 0, 0, 1, 0, 0.5, -1, 0, 0, 2.5, 0, 0, 1, 0, 0, 1, 0, 0.25, -1, 0, 0, 3.5, 0, 0, 1, 0, 0, 1, 0, 0.5, -1, 0, 0, 3.5, 0, 0, 1, 0, 0, 1, 0, 0.25, -1, 0, 0, 4.5, 0, 0, 1, 0, 0, 1, 0, 0.5, -1, 0, 0, 4.5, 0, 0, 1, 7, 0, 1, 0, 0.25, -1, 0, 0, 0.5, 0, 0, 1, 7, 0, 1, 0, 0.5, -1, 0, 0, 0.5, 0, 0, 1, 7, 0, 1, 0, 0.25, -1, 0, 0, 1.5, 0, 0, 1, 7, 0, 1, 0, 0.5, -1, 0, 0, 1.5, 0, 0, 1, 7, 0, 1, 0, 0.25, -1, 0, 0, 2.5, 0, 0, 1, 7, 0, 1, 0, 0.5, -1, 0, 0, 2.5, 0, 0, 1, 7, 0, 1, 0, 0.25, -1, 0, 0, 3.5, 0, 0, 1, 7, 0, 1, 0, 0.5, -1, 0, 0, 3.5, 0, 0, 1, 7, 0, 1, 0, 0.25, -1, 0, 0, 4.5, 0, 0, 1, 7, 0, 1, 0, 0.5, -1, 0, 0, 4.5)
+
+[sub_resource type="MultiMesh" id="Sand"]
+transform_format = 1
+instance_count = 35
+mesh = ExtResource("GX-04")
+buffer = PackedFloat32Array(1, 0, 0, 0.5, 0, 1, 0, 0, 0, 0, 1, 0.5, 0, 0, 1, 1.5, 0, 1, 0, 0, -1, 0, 0, 0.5, -1, 0, 0, 2.5, 0, 1, 0, 0, 0, 0, -1, 0.5, 0, 0, -1, 3.5, 0, 1, 0, 0, 1, 0, 0, 0.5, 1, 0, 0, 4.5, 0, 1, 0, 0, 0, 0, 1, 0.5, 0, 0, 1, 5.5, 0, 1, 0, 0, -1, 0, 0, 0.5, -1, 0, 0, 6.5, 0, 1, 0, 0, 0, 0, -1, 0.5, 0, 0, -1, 0.5, 0, 1, 0, 0, 1, 0, 0, 1.5, 1, 0, 0, 1.5, 0, 1, 0, 0, 0, 0, 1, 1.5, 0, 0, 1, 2.5, 0, 1, 0, 0, -1, 0, 0, 1.5, -1, 0, 0, 3.5, 0, 1, 0, 0, 0, 0, -1, 1.5, 0, 0, -1, 4.5, 0, 1, 0, 0, 1, 0, 0, 1.5, 1, 0, 0, 5.5, 0, 1, 0, 0, 0, 0, 1, 1.5, 0, 0, 1, 6.5, 0, 1, 0, 0, -1, 0, 0, 1.5, -1, 0, 0, 0.5, 0, 1, 0, 0, 0, 0, -1, 2.5, 0, 0, -1, 1.5, 0, 1, 0, 0, 1, 0, 0, 2.5, 1, 0, 0, 2.5, 0, 1, 0, 0, 0, 0, 1, 2.5, 0, 0, 1, 3.5, 0, 1, 0, 0, -1, 0, 0, 2.5, -1, 0, 0, 4.5, 0, 1, 0, 0, 0, 0, -1, 2.5, 0, 0, -1, 5.5, 0, 1, 0, 0, 1, 0, 0, 2.5, 1, 0, 0, 6.5, 0, 1, 0, 0, 0, 0, 1, 2.5, 0, 0, 1, 0.5, 0, 1, 0, 0, -1, 0, 0, 3.5, -1, 0, 0, 1.5, 0, 1, 0, 0, 0, 0, -1, 3.5, 0, 0, -1, 2.5, 0, 1, 0, 0, 1, 0, 0, 3.5, 1, 0, 0, 3.5, 0, 1, 0, 0, 0, 0, 1, 3.5, 0, 0, 1, 4.5, 0, 1, 0, 0, -1, 0, 0, 3.5, -1, 0, 0, 5.5, 0, 1, 0, 0, 0, 0, -1, 3.5, 0, 0, -1, 6.5, 0, 1, 0, 0, 1, 0, 0, 3.5, 1, 0, 0, 0.5, 0, 1, 0, 0, 0, 0, 1, 4.5, 0, 0, 1, 1.5, 0, 1, 0, 0, -1, 0, 0, 4.5, -1, 0, 0, 2.5, 0, 1, 0, 0, 0, 0, -1, 4.5, 0, 0, -1, 3.5, 0, 1, 0, 0, 1, 0, 0, 4.5, 1, 0, 0, 4.5, 0, 1, 0, 0, 0, 0, 1, 4.5, 0, 0, 1, 5.5, 0, 1, 0, 0, -1, 0, 0, 4.5, -1, 0, 0, 6.5, 0, 1, 0, 0, 0, 0, -1, 4.5)
+
+[node name="ChickenYard" type="Node3D"]
+metadata/footprint_cells = Vector2i(7, 5)
+metadata/placement_origin = "Rear-left post; +X right, +Z to entry. Scale by farm cell_m once."
+
+[node name="Posts" type="MultiMeshInstance3D" parent="."]
+multimesh = SubResource("Posts")
+
+[node name="Rails" type="MultiMeshInstance3D" parent="."]
+multimesh = SubResource("Rails")
+
+[node name="Sand" type="MultiMeshInstance3D" parent="."]
+multimesh = SubResource("Sand")
+
+[node name="Furnishings" type="Node3D" parent="."]
+
+[node name="RaisedCoop" parent="Furnishings" instance=ExtResource("BD-05A")]
+position = Vector3(4, 0, 0.75)
+
+[node name="CleatedRamp" parent="Furnishings" instance=ExtResource("BD-05B")]
+position = Vector3(4, 0, 1.6875)
+
+[node name="ThreeNests" parent="Furnishings" instance=ExtResource("SC-09")]
+position = Vector3(2, 0, 0.5)
+
+[node name="Haystack" parent="Furnishings" instance=ExtResource("FM-12")]
+position = Vector3(0.625, 0, 2.5)
+
+[node name="BowlFront" parent="Furnishings" instance=ExtResource("SC-10")]
+position = Vector3(2.5, 0, 3.5)
+
+[node name="BowlRight" parent="Furnishings" instance=ExtResource("SC-10")]
+position = Vector3(6.5, 0, 2.5)
+
+[node name="ContinuousRearHedge" parent="Furnishings" instance=ExtResource("Rear-Hedgerow")]
+position = Vector3(3.19, 0.385, -0.32)
+
+[node name="RoundShrubsLeft" parent="Furnishings" instance=ExtResource("Hedge-End")]
+position = Vector3(0.34, 0.28, -0.34)
+rotation = Vector3(0, 0.401425728, 0)
+scale = Vector3(0.92, 0.94, 0.9)
+
+[node name="RoundShrubsRight" parent="Furnishings" instance=ExtResource("Hedge-End")]
+position = Vector3(6.12, 0.3, -0.34)
+rotation = Vector3(0, -2.460914245, 0)
+scale = Vector3(1.16, 1.03, 1.11)
+
+[node name="StrawUnderCoop" parent="Furnishings" instance=ExtResource("Eave-Straw")]
+position = Vector3(3.05, 0, 1.1)
+
+[node name="WildflowerVerge" parent="Furnishings" instance=ExtResource("Verge")]
+position = Vector3(0, 0, 0)
+
+[node name="SandSurfaceMarks" parent="Furnishings" instance=ExtResource("Sand-Signs")]
+position = Vector3(0, 0, 0)
+
+[node name="Approach" type="Node3D" parent="."]
+metadata/note = "Optional surface link beyond the opening, not a reserved or blocked cell."
+
+[node name="EntryPath" parent="Approach" instance=ExtResource("GX-09")]
+position = Vector3(5.5, 0, 5.5)
