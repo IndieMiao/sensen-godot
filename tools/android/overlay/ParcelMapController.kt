@@ -87,6 +87,10 @@ internal class ParcelMapController(
     private class WaitingQuery(val requestId: Long, val generation: Long, val x: Double, val y: Double, val ticket: ParcelTicket, val revision: Long)
     init {
         subscriptions += map.subscribeStyleLoaded {
+            if (!closed && !state.active && hiddenPlaces.isNotEmpty()) {
+                // C-145: icons held hidden through clear() stay hidden in the new style too (its own layers, own values).
+                hiddenPlaces.clear(); map.style?.let { hidePlaceIcons(it) }
+            }
             if (!closed && state.active) {
                 query?.cancel(); query = null; waiting.drop(); hiddenPlaces.clear(); fadedBuildings = null // A new style has its own icons and buildings.
                 state.reloading(); mapIdle = false; mapboxLoadFailed = false; buildingSelection.clear(); sources.clear(); loaded.clear()
@@ -343,6 +347,15 @@ internal class ParcelMapController(
             style.setStyleLayerProperty(id, "visibility", Value("none"))
         }
     }
+    /**
+     * C-145 (C-103#17 "地图上不放poi"): the place icons stay hidden while the parcel layers are cleared (a 3D room or the
+     * dressing room over the map) and come back only on [close] or [releasePlaceIcons]. Restored on clear(), they showed
+     * on the way back to the map until the next sources were set (a client manifest request later), e.g. Coit Tower.
+     */
+    fun releasePlaceIcons() {
+        if (closed || state.active) return
+        restorePlaceIcons(if (map.isValid()) map.style else null)
+    }
     private fun restorePlaceIcons(style: Style?) {
         if (style != null) for ((id, visibility) in hiddenPlaces) if (style.styleLayerExists(id)) style.setStyleLayerProperty(id, "visibility", visibility)
         hiddenPlaces.clear()
@@ -465,7 +478,7 @@ internal class ParcelMapController(
             for ((kind, id) in sources) if (kind != "buildings" && style.styleSourceExists(id)) style.removeStyleSource(id)
         }
         removeZone(style)
-        restorePlaceIcons(style); restoreMapboxBuildings(style)
+        restoreMapboxBuildings(style) // Place icons stay hidden (C-145): only close() and releasePlaceIcons() restore them.
         sources.clear(); loaded.clear(); buildingSelection.clear(); settle.reset(emptySet()); sourceTimeout.reset()
     }
     fun close() {
@@ -474,7 +487,7 @@ internal class ParcelMapController(
         closed = true; query?.cancel(); query = null; waiting.drop()
         subscriptions.forEach { it.cancel() }; subscriptions.clear()
         handler.removeCallbacksAndMessages(null); config = null; claims = emptyMap()
-        removeLayers(); dropBuildings()
+        removeLayers(); dropBuildings(); restorePlaceIcons(if (map.isValid()) map.style else null)
     }
     private fun value(json: String): Value = requireNotNull(Value.fromJson(json).value)
 }
