@@ -7,7 +7,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { PlayerRow } from '../http/store.js';
 import { energyOf } from './energy.js';
-import { applyFarmCommands, emptyFarm, parseFarmCommands, rebaseFarm, welcome, withEconomy } from './farm.js';
+import { applyFarmCommands, emptyFarm, grant, parseFarmCommands, rebaseFarm, welcome, withEconomy } from './farm.js';
 import { communityOf, isNewerDataset, type ParcelRules } from './rules.js';
 import { activeZone, zoneView, type StarterZones } from './starter_zone.js';
 import { DEFAULT_LAYER, sameParcel, type OwnedParcel, type ParcelStore } from './store.js';
@@ -174,6 +174,8 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
    * C-136（Q-168 rebase）：请求体可带 dataset_version（客户端这次打开农场用的数据集）。认领的数据集比它旧、同属这块地的社区、
    * 两个都已登记时，在同一次加锁写入里把认领换到这个数据集，按格子记的进度清空并退还（rebaseFarm）；
    * 换过之后认领已是新版本，重试、并发请求都不会再换一次。不带或条件不满足时与以前一样。
+   * C-151：同一次写入里补上还没发过的一次性补发（grant：井的蓝图和水桶），每个农场只发一次。
+   * gift 是这次进入发的全部物品（首次进入的赠品加补发），什么都没发为 {}；granted 仍只表示首次进入的赠品。
    */
   app.post('/v1/parcels/mine/enter', { config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (req, reply) => {
     const p = await parcelWriter(req, reply);
@@ -182,8 +184,10 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
     if (want !== undefined && (typeof want !== 'string' || want.length > 128)) return reply.code(400).send({ code: 'SCHEMA', server_time: now() });
     const at = now();
     let rebased = null as { from: string; buildings: number; cleared: number; tilled: number; crops: number } | null;
+    let gift: Record<string, number> = {};
     const out = await deps.store.enter(p.id, parcel => {
       rebased = null;
+      gift = {};
       let farm = parcel.farm, dataset = parcel.dataset_version;
       if (want !== undefined && communityOf(deps.rules, want) === parcel.community_id && isNewerDataset(deps.rules, dataset, want)) {
         rebased = { from: dataset, buildings: withEconomy(farm).buildings.length, cleared: farm.cleared.length, tilled: farm.tilled.length, crops: Object.keys(farm.crops).length };
@@ -191,11 +195,15 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
         dataset = want;
       }
       const gifted = welcome(deps.rules, farm, at);
-      return gifted || rebased ? { farm: gifted ?? farm, dataset_version: dataset, granted: Boolean(gifted) } : null;
+      if (gifted) for (const [id, n] of Object.entries(deps.rules.welcome_gift)) gift[id] = (gift[id] ?? 0) + n;
+      const topped = grant(deps.rules, gifted ?? farm, at);
+      if (topped) for (const [id, n] of Object.entries(topped.gift)) gift[id] = (gift[id] ?? 0) + n;
+      const next = topped?.state ?? gifted;
+      return next || rebased ? { farm: next ?? farm, dataset_version: dataset, granted: Boolean(gifted) } : null;
     }, at);
     if (out.kind === 'no_parcel') return reply.code(404).send({ code: 'NO_PARCEL', server_time: at });
     if (rebased) req.log.info({ parcel_id: out.parcel.parcel_id, to: out.parcel.dataset_version, ...rebased }, 'parcel rebased to a newer dataset');
-    return reply.send({ granted: out.granted, parcel: parcelView(out.parcel), server_time: at });
+    return reply.send({ granted: out.granted, gift, parcel: parcelView(out.parcel), server_time: at });
   });
 
   /**

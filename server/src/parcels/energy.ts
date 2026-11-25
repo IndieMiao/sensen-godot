@@ -21,12 +21,12 @@ export interface EnergyRules {
   rest_amount: number;
   blessing: { days: number; regen_mult: number };
   day: { utc_offset_hours: number; rollover_hour: number };
-  /** 不按作物计价的动作的体力价；播种按 crops.<作物>.energy。不在表里的动作不花体力（收获、出售、领蓝图、放房子、休息）。 */
+  /** 不按作物计价的动作的体力价；播种按 crops.<作物>.energy。不在表里的动作不花体力（收获、出售、领蓝图、放房子、休息、浇水）。 */
   costs: Record<string, number>;
 }
 
-/** 有体力价的命令类型；播种的价在作物上。 */
-export const PRICED_COMMANDS = ['clear_obstacle', 'till', 'gather'] as const;
+/** 有体力价的命令类型；播种的价在作物上。打水（C-151）照所有者 SEN-C-137#15 第 3 题“照搬p0”时列的“打一桶水 2”。 */
+export const PRICED_COMMANDS = ['clear_obstacle', 'till', 'gather', 'draw_water'] as const;
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 /** 农场等级（C-152 之前一律 1 级）。 */
@@ -91,7 +91,7 @@ export function spendEnergy(rules: ParcelRules, s: ParcelFarmState, now: number,
   e.value -= amount;
 }
 
-/** 一条命令的体力价：播种看作物，清障碍、开垦、外围采集看 costs，其余 0。 */
+/** 一条命令的体力价：播种看作物，清障碍、开垦、外围采集、打水看 costs，其余 0。 */
 export function energyCost(rules: ParcelRules, c: FarmCommand): number {
   if (c.type === 'sow') return rules.crops[c.crop]?.energy ?? 0;
   return Object.hasOwn(rules.energy.costs, c.type) ? rules.energy.costs[c.type] : 0;

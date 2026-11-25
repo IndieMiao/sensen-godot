@@ -1,7 +1,9 @@
 extends SceneTree
 ## Carrot stage and soil review (C-138) on C-34's local save, not the server: seven tilled cells near the arrival, six
 ## of them sown so that each of the seven stages shows at once (tilled, sowing, emergence, leaf growth, root shoulders,
-## root thickening, maturity), captured with dry soil and with the development wet-soil switch.
+## root thickening, maturity), captured with the soil the game draws and with the development wet-soil switch.
+## C-151: a carrot grows from its watering, so each is watered as it is sown, from a well placed off the row on free
+## core ground.
 ##   godot --path "$QA" --script res://tools/dev/dynamic_farm/crop_stages_probe.gd -- <farm.json> <out> [<now_ms> <lead_s>]
 ## With <now_ms> (a device's clock) the save in <out>/save is written for that clock plus <lead_s> seconds, so
 ## each carrot is mid-stage when a package opens it later (emulator QA, gather_qa_apk.sh); nothing is captured.
@@ -44,6 +46,14 @@ func _run() -> void:
 	var version: int = farming.farm_version
 	for cell: Vector2i in row:
 		version = store.send(version, [{"type": "till", "cell": ParcelFarm.key(cell)}]).farm_version
+	var well_at = _well_spot(farming, row)
+	if well_at == null:
+		push_error("No free cell for the well")
+		quit(1)
+		return
+	var placed := store.send(version, [{"type": "place_building", "building": "well", "x": well_at.x, "y": well_at.y, "rotation": 0}])
+	version = placed.farm_version
+	var well := int(ParcelFarm.wells(ParcelFarm.rules(), placed.farm)[0].id)
 	# Enough seeds for six carrots; the save is a review fixture.
 	var saved = JSON.parse_string(FileAccess.get_file_as_string(save_dir.path_join(raw.block_id.validate_filename() + ".json")))
 	saved.farm.bag.seed_carrot = 6
@@ -53,7 +63,10 @@ func _run() -> void:
 		# Planted so that `now` is in the middle of the stage (maturity: just ripe).
 		var planted := now - grow - 1000 if stage == CropArt.MATURE else now - ((stage - 1) * 2 + 1) * grow / 10
 		clock[0] = planted
-		version = store.send(version, [{"type": "sow", "cell": ParcelFarm.key(row[stage]), "crop": "crop_carrot"}]).farm_version
+		var sown := store.send(version, [{"type": "sow", "cell": ParcelFarm.key(row[stage]), "crop": "crop_carrot"}])
+		var water: Array = [] if int(sown.farm.pail_water) > 0 else [{"type": "draw_water", "building": well}]
+		water.append({"type": "water", "cell": ParcelFarm.key(row[stage])})
+		version = store.send(sown.farm_version, water).farm_version
 	clock[0] = now
 	scene.queue_free()
 	await process_frame
@@ -94,6 +107,18 @@ func _shot(name: String) -> void:
 	if DisplayServer.get_name() == "headless": return
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(out.path_join(name + ".png"))
+
+## A free core cell for the well, off the path, obstacles, buildings, `row` and the arrival; null when none.
+func _well_spot(farming, row: Array) -> Variant:
+	var data: Dictionary = scene._data
+	var taken := ParcelFarm.building_cells(farming.farm)
+	var obstacles: Dictionary = farming.obstacle_cells()
+	for cell: Dictionary in data.cells:
+		var at := Vector2i(cell.x, cell.y)
+		if cell.zone == "core" and not farming._path.has(at) and not obstacles.has(at) and not taken.has(at) and not row.has(at) \
+				and (at - data.spawn).length() > 3:
+			return at
+	return null
 
 ## `count` free core cells off the path, obstacles and house, nearest a point just beyond the arrival, the row nearest
 ## the camera first, left to right, so the taller late stages stand behind the early ones. The player standing at the

@@ -22,6 +22,10 @@ const NOT_RIPE := "not_ripe"
 ## Rest at the cottage (C-148): once a player day, nothing to gain when full.
 const RESTED := "rested"
 const FULL := "full"
+## The pail (C-151): none in the bag, nothing left in it to water with, or already full at the well.
+const NO_PAIL := "no_pail"
+const PAIL_EMPTY := "pail_empty"
+const PAIL_FULL := "pail_full"
 
 ## Core cells of the protected path, as {Vector2i: true}.
 static func protected_path(data: Dictionary) -> Dictionary:
@@ -67,16 +71,21 @@ static func till_refusal(data: Dictionary, path: Dictionary, state: Dictionary, 
 ## does nothing; `refusal` names why. `obstacles` maps every cell an uncleared core obstacle covers
 ## to its anchor cell, which names the obstacle in `clear_obstacle` and `cleared` (a tree covers
 ## a block of cells). Returns {} for a cell off the parcel.
+## C-151: a well's cell fills the pail there (only beside the well: the server cannot tell where the player stands);
+## a sown, unwatered crop is watered from the pail.
 static func action(rules: Dictionary, data: Dictionary, path: Dictionary, obstacles: Dictionary,
 		state: Dictionary, cell: Vector2i, now: int) -> Dictionary:
 	if not data.by_cell.has(cell): return {}
 	if door_row(state).has(cell): return rest_action(rules, state, now)
+	var well = well_cells(rules, state).get(cell)
+	if well != null: return fill_action(rules, state, well)
 	var key := ParcelFarm.key(cell)
 	if obstacles.has(cell):
 		var anchor := ParcelFarm.key(obstacles[cell])
 		if anchor not in state.cleared:
 			return {"verb": "clear", "refusal": "", "command": {"type": "clear_obstacle", "cell": anchor}}
 	var crop = state.crops.get(key)
+	if crop is Dictionary and ParcelFarm.is_dry(crop): return water_action(rules, state, key)
 	if crop is Dictionary:
 		var left := int(crop.ripe_at) - now
 		if left > 0:
@@ -124,3 +133,24 @@ static func rest_action(rules: Dictionary, state: Dictionary, now: int) -> Dicti
 	var gain := mini(int(rules.energy.rest_amount), ParcelFarm.max_energy(rules, probe) - int(energy.value))
 	var refusal := RESTED if ParcelFarm.rested_today(rules, probe, now) else FULL if gain <= 0 else ""
 	return {"verb": "rest", "refusal": refusal, "command": {"type": "rest"} if refusal.is_empty() else {}, "gain": maxi(0, gain)}
+
+## The cells under the wells (C-151), as {Vector2i: the well's building id}.
+static func well_cells(rules: Dictionary, state: Dictionary) -> Dictionary:
+	var cells := {}
+	for well: Dictionary in ParcelFarm.wells(rules, state):
+		for at in ParcelFarm.building_footprint(well): cells[at] = int(well.id)
+	return cells
+
+## The key at a well: Fill draws a full pail (`draw_water`), refused without a pail or with the pail full.
+static func fill_action(rules: Dictionary, state: Dictionary, well: int) -> Dictionary:
+	var water: Dictionary = rules.watering
+	var refusal := NO_PAIL if int(state.bag.get(water.pail, 0)) <= 0 \
+		else PAIL_FULL if int(state.get("pail_water", 0)) >= int(water.pail_uses) else ""
+	return {"verb": "fill", "refusal": refusal, "building": well,
+		"command": {"type": "draw_water", "building": well} if refusal.is_empty() else {}}
+
+## The key on a sown, unwatered crop: Water uses one from the pail, refused without a pail or with it empty.
+static func water_action(rules: Dictionary, state: Dictionary, key: String) -> Dictionary:
+	var refusal := NO_PAIL if int(state.bag.get(rules.watering.pail, 0)) <= 0 \
+		else PAIL_EMPTY if int(state.get("pail_water", 0)) <= 0 else ""
+	return {"verb": "water", "refusal": refusal, "command": {"type": "water", "cell": key} if refusal.is_empty() else {}}
