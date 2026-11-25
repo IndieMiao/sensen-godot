@@ -97,7 +97,7 @@ internal class ParcelMapController(
         }
         subscriptions += map.subscribeCameraChanged {
             cameraRevision++; mapIdle = false; settle.cameraChanged()
-            if (!closed && state.active && !state.ready) watchSourceTimeout()
+            if (!closed && state.active) watchSourceTimeout() // Also retires a count once the source has loaded.
         }
         subscriptions += map.subscribeMapIdle {
             if (!closed) { mapIdle = true; if (state.active) emitReady(); resumeWaiting() }
