@@ -194,6 +194,9 @@ func _ready() -> void:
 		# C-148: the parcel's Energy in the top bar, P0's chip just before the coins.
 		_header.add_child(_farming.energy_chip)
 		_header.move_child(_farming.energy_chip, _coins_capsule.get_index())
+		# C-107: the task button (C-H3) beside the Energy chip, before it.
+		_header.add_child(_farming.task_button)
+		_header.move_child(_farming.task_button, _farming.energy_chip.get_index())
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_summary = {"schema":4,"dataset":_data.dataset_version,"block_id":_data.block_id,
@@ -725,9 +728,9 @@ func is_back_navigation_locked() -> bool:
 	_request_back()
 	return true
 
-## Closes the farming UI's open drawer (the bag) or Energy card / panel; false when none was open.
+## Closes the farming UI's open drawer (the bag), Energy card / panel or phone (C-107); false when none was open.
 func close_modal() -> bool:
-	return _farming != null and (_farming.close_energy() or _farming.close_bag())
+	return _farming != null and (_farming.close_energy() or _farming.close_bag() or _farming.close_phone())
 
 func suspend() -> void:
 	_suspended = true

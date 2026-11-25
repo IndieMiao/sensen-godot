@@ -17,6 +17,8 @@ extends Node3D
 ## block) until it grows back. Gathering never touches the walk, the layout or collision.
 ## With a body (the scene, C-73) a press first walks the player beside the cell and plays the
 ## main farm's labour clip; the command goes out with the clip and its result lands as it ends.
+## The in-game phone (C-107, design C-85 ⑧): the top bar's task button drops the guide's steps under the bar (C-T1–T3)
+## and the phone button at the right opens the phone (Tasks / Inbox / Collection, ParcelPhone); both read the save.
 signal state_changed(farm: Dictionary)
 
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -27,6 +29,18 @@ const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
 const Guide = preload("res://modules/dynamic_farm/parcel_guide.gd")
 const GATHERED_SHADER = preload("res://modules/dynamic_farm/gathered_prop.gdshader")
 const CropArt = preload("res://modules/dynamic_farm/parcel_crop_art.gd")
+const Tasks = preload("res://modules/dynamic_farm/parcel_tasks.gd")
+const Phone = preload("res://scenes/dynamic_farm/parcel_phone.gd")
+## Which task the player last saw in the drop-down or the phone, per parcel on this device: a newer one marks the task
+## and phone buttons (`badge/notify`) until it is seen.
+const PHONE_SEEN_PATH := "user://dynamic_farm_local/phone.json"
+## The phone's bottom sits this far above its button (C-L5), its right edge this far in from the screen's (C-L5), and the
+## phone button this far above the action key (C-L3's column spacing).
+const PHONE_ABOVE_BUTTON := UiTokens.SPACE_S4
+const PHONE_RIGHT := 14.0
+const PHONE_BUTTON_GAP := UiTokens.SPACE_S4
+## The drop-down's first row under the top bar (C-T1: 10 under the HUD).
+const DROP_DOWN_GAP := 10.0
 ## Development only: draw every tilled cell as wet soil. Until watering exists (C-137) the game shows dry soil.
 const WET_SOIL_SETTING := "sensen/dynamic_farm/preview_wet_soil"
 const BAG_ORDER := ["hoe_starter", "seed_carrot", "crop_carrot"]
@@ -82,8 +96,11 @@ var held := false:
 		if value:
 			close_bag()
 			close_energy()
+			close_phone()
+			if drop_down != null: drop_down.fold()
 		if _key != null: _refresh_key()
 		_refresh_tip()
+		_refresh_tasks()
 		if not value and _bar != null: _draw_bag()
 ## The cell a press is walking to or working; the key keeps it while the press runs.
 var job = null
@@ -139,6 +156,18 @@ var _tip_box: CenterContainer
 ## The step on the card, and the step the player closed with a tap (it comes back only at another step).
 var tip_step := ""
 var _tip_closed := ""
+
+## C-107: the top bar's task button (the scene puts it in its bar), the phone button, the task drop-down and the open
+## phone (null when closed; one closing plays out on its own).
+var task_button: UiTaskButton
+var phone_button: UiGlassButton
+var drop_down: UiTaskDropDown
+var phone: Control
+## The task last seen (PHONE_SEEN_PATH), and how many rows the drop-down last showed done.
+var seen_task := ""
+var phone_seen_path := PHONE_SEEN_PATH
+var _drop_done := -1
+var _seen_read := false
 
 ## The scene: approach(cells) -> "ok" | "unreachable" | "cancelled", labour(verb, cells, seconds).
 var _body: Node
@@ -246,6 +275,7 @@ func update(delta: float, facing_cell: Vector2i, steering: bool, player = null, 
 		_draw_crops()
 		_draw_gathered()
 		_refresh_tip()
+		_refresh_tasks()
 	_refresh_key()
 	_refresh_energy()
 
@@ -580,6 +610,7 @@ func _adopt(result: Dictionary) -> void:
 	_draw_gathered()
 	_draw_bag()
 	_refresh_tip()
+	_refresh_tasks()
 	state_changed.emit(farm.duplicate(true))
 
 ## Cleared obstacles leave the walk and the art (the layer is redrawn without them).
@@ -668,7 +699,7 @@ func _draw_bag() -> void:
 		if slots.size() >= UiQuickBar.SLOTS: break
 		slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": int(farm.bag[id])})
 	_bar.slots = slots
-	if _bag == null: _bar.visible = not farm.is_empty() and not held
+	if _bag == null and phone == null: _bar.visible = not farm.is_empty() and not held
 	_keys.tool_icon = item_icon(str(rules.get("till_tool", ""))) if int(farm.get("bag", {}).get(str(rules.get("till_tool", "")), 0)) > 0 else null
 	if _bag != null: _draw_bag_slots(ids)
 
@@ -761,6 +792,7 @@ func _cell_screen(cell: Vector2i) -> Vector2:
 func open_bag(focus := "") -> void:
 	if _bag != null or farm.is_empty(): return
 	_bar.cancel_drag()
+	close_phone()
 	_bag = UiModalPanel.new("Bag", BAG_HERO)
 	_bag.name = "BagPanel"
 	_bag.close_requested.connect(close_bag)
@@ -887,6 +919,22 @@ func _build_ui(canvas: CanvasLayer) -> void:
 	energy_chip.visible = false
 	energy_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	energy_chip.pressed.connect(open_energy_panel)
+	# C-107: the task button (C-H3; the scene puts it in its top bar), its drop-down under the bar (C-T1) and the phone
+	# button at the right above the action key (C-L3).
+	task_button = UiTaskButton.new()
+	task_button.name = "Tasks"
+	task_button.visible = false
+	task_button.pressed.connect(toggle_tasks)
+	drop_down = UiTaskDropDown.new()
+	drop_down.name = "TaskDropDown"
+	drop_down.more_pressed.connect(func(): open_phone(Phone.TASKS_TAB))
+	drop_down.folded.connect(_refresh_tip)
+	_ui.add_child(drop_down)
+	phone_button = UiGlassButton.new(UiArt.sys("phone"))
+	phone_button.name = "PhoneButton"
+	phone_button.visible = false
+	phone_button.pressed.connect(func(): open_phone())
+	_ui.add_child(phone_button)
 	_toast = ToastLayer.new()
 	_toast.name = "Toast"
 	_ui.add_child(_toast)
@@ -931,6 +979,19 @@ func _place_bar() -> void:
 	_keys.offset_left = -UiTokens.SPACE_PAGE - UiTokens.SIZE_ACTION_KEY_W
 	_keys.offset_bottom = -key_bottom
 	_keys.offset_top = -key_bottom - UiTokens.SIZE_ACTION_KEY_H
+	# C-107: the phone button right-aligned 12 (its Ø36 glass, in a 44 hit area) above the action key (C-L3).
+	var inset := (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5
+	var phone_bottom := key_bottom + UiTokens.SIZE_ACTION_KEY_H + PHONE_BUTTON_GAP - inset
+	phone_button.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	phone_button.offset_right = -UiTokens.SIZE_SCREEN_EDGE + inset
+	phone_button.offset_left = phone_button.offset_right - UiTokens.SIZE_TOUCH_MIN
+	phone_button.offset_bottom = -phone_bottom
+	phone_button.offset_top = -phone_bottom - UiTokens.SIZE_TOUCH_MIN
+	# The drop-down's rows from the bar's left edge, 10 under it (C-T1).
+	drop_down.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	drop_down.offset_left = UiTokens.SIZE_SCREEN_EDGE
+	drop_down.offset_top = TIP_TOP - UiTokens.SPACE_PAGE + DROP_DOWN_GAP + _safe_top()
+	if phone != null: _place_phone()
 
 ## The guide's card (C-35): the current step's sentence while nothing else holds the screen. A tap closes it until
 ## the next step; finishing the step moves it on.
@@ -941,9 +1002,140 @@ func _refresh_tip() -> void:
 		tip_step = step
 		if step != _tip_closed: _tip_closed = ""
 		if not step.is_empty(): _tip.show_tip(Guide.text(step))
-	_tip.visible = not tip_step.is_empty() and tip_step != _tip_closed and not held and _bag == null
+	_tip.visible = not tip_step.is_empty() and tip_step != _tip_closed and not held and _bag == null and phone == null \
+		and not (drop_down != null and drop_down.showing)
 	# Under the top bar (the main farm puts its TipCard under the HUD, clear of the key and the bar).
 	if _tip.visible: _tip_box.offset_top = TIP_TOP + _safe_top()
+
+# ------------------------------------------------------------------ Tasks and the phone (C-107)
+
+## The drop-down's rows: up to three ending at the current task (the two before it done), so the next step is in view;
+## `More…` opens the phone for the rest. {rows: [{title, state}], done: rows done above the window, start}.
+func drop_rows() -> Dictionary:
+	var rows := Tasks.rows(farm, server_now())
+	var done := Tasks.done_count(farm, server_now())
+	var start := clampi(done - (UiTaskDropDown.MAX_ROWS - 1), 0, maxi(0, rows.size() - UiTaskDropDown.MAX_ROWS))
+	var shown := []
+	for row: Dictionary in rows.slice(start, start + UiTaskDropDown.MAX_ROWS):
+		shown.append({"title": row.title, "key": row.key, "state": UiTaskRow.State.DONE if row.state == "done"
+			else UiTaskRow.State.CURRENT if row.state == "current" else UiTaskRow.State.TODO})
+	return {"rows": shown, "done": done, "start": start, "more": rows.size() > UiTaskDropDown.MAX_ROWS}
+
+## The task button: drops the rows under the top bar (no scrim, the scene plays on), or folds them.
+func toggle_tasks() -> void:
+	if drop_down.showing:
+		drop_down.fold()
+		return
+	if farm.is_empty() or held: return
+	_open_drop_down()
+	_mark_seen()
+
+func _open_drop_down() -> void:
+	var view := drop_rows()
+	_drop_done = view.done
+	drop_down.open(view.rows, view.more)
+	_refresh_tip()
+
+## Opens the phone on `tab` (M-08 from its button; the quick bar slides away, M-16): Tasks, Inbox or Collection.
+func open_phone(tab := Phone.TASKS_TAB) -> void:
+	if phone != null or farm.is_empty() or held: return
+	close_bag()
+	close_energy()
+	drop_down.fold()
+	_bar.cancel_drag()
+	phone = Phone.new()
+	phone.close_requested.connect(close_phone)
+	phone.task_pressed.connect(_on_task_pressed)
+	_ui.add_child(phone)
+	_ui.move_child(_toast, -1)
+	phone.refresh(Tasks.rows(farm, server_now()), {}, [])
+	_place_phone()
+	phone.show_tab(tab)
+	phone.open()
+	_mark_seen()
+	UiMotion.bar_shown(_bar, false, _bar.position.y)
+	_refresh_tip()
+
+## Closes the phone (M-09, input released at once); the quick bar comes back (M-16). False when it was not open.
+func close_phone() -> bool:
+	if phone == null: return false
+	phone.close()
+	phone = null
+	_place_bar()
+	if not farm.is_empty() and not held and _bag == null:
+		var rest := _bar.position.y
+		_bar.position.y = rest + UiMotion.BAR_HIDE_Y
+		UiMotion.bar_shown(_bar, true, rest)
+	_refresh_tip()
+	return true
+
+func phone_open() -> bool: return phone != null
+
+## C-L5: right 14, its bottom 8 above the phone button; on a short screen it may cover the top bar (under its scrim),
+## never past the safe top.
+func _place_phone() -> void:
+	var glass_top := phone_button.position.y + (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5
+	phone.place(Vector2(_ui.size.x - PHONE_RIGHT, glass_top - PHONE_ABOVE_BUTTON), UiTokens.SIZE_SCREEN_SAFE_INSET + _safe_top())
+
+## The current row tapped in the phone: the phone closes and that step's tip shows again (C-85 ⑧-B), nothing more.
+func _on_task_pressed(key: String) -> void:
+	close_phone()
+	if key == Guide.step(farm, server_now()):
+		_tip_closed = ""
+		tip_step = ""
+		_refresh_tip()
+
+## Buttons follow the save: shown once it is read and nothing holds the screen; a task not yet seen marks both. A step
+## done while the drop-down is up plays its finishing beat there, and the rows move on a second later.
+func _refresh_tasks() -> void:
+	if task_button == null: return
+	var ready := not farm.is_empty() and not held
+	task_button.visible = ready
+	phone_button.visible = ready
+	if not ready: return
+	var current := Tasks.current(farm, server_now())
+	var fresh := not current.is_empty() and current != _seen()
+	task_button.badge = fresh
+	phone_button.badge = fresh
+	var done := Tasks.done_count(farm, server_now())
+	if drop_down.showing and _drop_done >= 0 and done > _drop_done:
+		# The finished row is the one that was current in the rows still showing.
+		var index := _drop_done - _drop_start()
+		_drop_done = done
+		drop_down.complete(index, _open_drop_down)
+		_mark_seen()
+	elif done != _drop_done:
+		_drop_done = done
+	if phone != null:
+		var rows := Tasks.rows(farm, server_now())
+		if rows != phone.tasks: phone.refresh(rows, {}, [])
+
+## Where the drop-down's showing rows start in the task list (its rows were built from the last count).
+func _drop_start() -> int:
+	return clampi(_drop_done - (UiTaskDropDown.MAX_ROWS - 1), 0, maxi(0, Tasks.TASKS.size() - UiTaskDropDown.MAX_ROWS))
+
+func _seen() -> String:
+	if not _seen_read:
+		_seen_read = true
+		var raw = JSON.parse_string(FileAccess.get_file_as_string(phone_seen_path)) if FileAccess.file_exists(phone_seen_path) else null
+		if raw is Dictionary: seen_task = str(raw.get(str(_data.get("block_id", "")), ""))
+	return seen_task
+
+## The current task has been seen (the drop-down or the phone opened on it): the buttons' dots go.
+func _mark_seen() -> void:
+	var current := Tasks.current(farm, server_now())
+	if current.is_empty() or current == _seen(): return
+	seen_task = current
+	var raw = JSON.parse_string(FileAccess.get_file_as_string(phone_seen_path)) if FileAccess.file_exists(phone_seen_path) else null
+	var all: Dictionary = raw if raw is Dictionary else {}
+	all[str(_data.get("block_id", ""))] = current
+	DirAccess.make_dir_recursive_absolute(phone_seen_path.get_base_dir())
+	var file := FileAccess.open(phone_seen_path, FileAccess.WRITE)
+	if file != null:
+		file.store_string(JSON.stringify(all))
+		file.close()
+	task_button.badge = false
+	phone_button.badge = false
 
 ## Places a scene button (the house's Build Cottage, C-33) at the left on the action key's baseline, so it never
 ## covers the quick bar or the key; it keeps its own `custom_minimum_size`.
