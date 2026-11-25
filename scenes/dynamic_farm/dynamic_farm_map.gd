@@ -309,7 +309,11 @@ func _build_ui() -> void:
 		var credit := MapUi.link(item[0], UiTokens.COLOR_TEXT_SECONDARY); credit.custom_minimum_size.y = CREDIT_H
 		credit.add_theme_font_size_override("font_size", MapUi.theme().get_font_size("font_size", UiTokens.STYLE_TYPE_MICRO))
 		credit.pressed.connect(ExternalLink.open.bind(item[1])); credits.add_child(credit)
-	var data := MapUi.label("Parcels: DataSF · PDDL / CC0", UiTokens.STYLE_TYPE_MICRO, UiTokens.COLOR_TEXT_SECONDARY)
+	# r8 fills buildings DataSF lacks from OpenStreetMap (C-113): ODbL asks for "© OpenStreetMap contributors" on the map.
+	# The longer line wraps beside the two links instead of widening the row past a portrait screen.
+	var data := MapUi.wrap(MapUi.label("Parcels: DataSF · PDDL / CC0 · Buildings: DataSF, © OpenStreetMap contributors · ODbL",
+		UiTokens.STYLE_TYPE_MICRO, UiTokens.COLOR_TEXT_SECONDARY))
+	data.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	data.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; data.custom_minimum_size.y = CREDIT_H; credits.add_child(data)
 	# Side keys over the card: farm-dev's round locate key (C-112, LOCK-24) at the right with My home (C-110) above it;
 	# the same round profile key (C-128) at the left, level with locate. Market and Carpenter are in the Washington
@@ -594,7 +598,15 @@ func _frame_home(fly := false) -> bool:
 
 func _go_home() -> void:
 	if _selector == null or _selector.manifest.is_empty() or _opening: return
-	_frame_home(true)
+	if not _frame_home(true): return
+	# A home claimed on an earlier release opens in that release's farm (Q-172), which the map's release may not draw.
+	if not _own_farm_entry(): return
+	var release := _home_release()
+	if release != str(_selector.manifest.get("dataset_version", "")): _selector.select_home(str(_claims.mine.parcel_id), release)
+
+## The release the player's own farm opens in: the one the home was claimed on while it still serves its farms.
+func _home_release() -> String:
+	return _selector.home_release(str(_claims.mine.get("dataset_version", ""))) if _claims.has_home() else str(_selector.manifest.get("dataset_version", ""))
 
 ## The locate key: back to the player, who lives at their home; without a home, back to the starter zone (C-130) or the
 ## dataset's area.
@@ -735,7 +747,8 @@ func _preview() -> void:
 
 func _enter_farm() -> void:
 	if _selector != null and not _opening:
-		_entering = str(_selector.selection.get("block_id", "")); _selector.open_farm()
+		_entering = str(_selector.selection.get("block_id", ""))
+		_selector.open_farm(_home_release() if _claims != null and _claims.status(_entering) == "mine" else "")
 
 func _claim_selection() -> void:
 	_confirm.hide()

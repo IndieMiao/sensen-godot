@@ -7,7 +7,9 @@ extends SceneTree
 ## save is applied. C-33: opening the house placement gives up a press still walking. C-114: Build pops the
 ## cottage in with dust round it; reopening shows it still, without dust. C-138: the carrot's stage and the dry soil block
 ## are drawn; the development switch draws the soil wet. C-136: a claim made on an older dataset opens on the
-## server save once the enter request names the opened farm's dataset (Q-168), the lost first try included. Run in the private preview project (README), optionally
+## server save once the enter request names the opened farm's dataset (Q-168), the lost first try included. C-113: with
+## the map on r8, an r6 home opens its r6 farm and its enter names r6 (Q-172: not moved); an r4 home opens in r8 and its
+## enter names r8 (moved, Q-168). Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -88,6 +90,7 @@ func _run() -> void:
 	await _placement_takes_over()
 	await _house_pops_once()
 	await _older_dataset_claim()
+	await _release_named_on_enter()
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
 	print("PARCEL_FARMING_SCENE checks=%d failures=%d" % [checks, failures])
@@ -98,9 +101,13 @@ func _store() -> RefCounted:
 	store.now_ms = func() -> int: return int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
 	return store
 
-func _open(store: RefCounted = null) -> Node:
+## `farm` defaults to the fixture; `net_store` leaves the save to the scene's own server store, as the map opens it.
+func _open(store: RefCounted = null, farm: Dictionary = {}, net_store := false) -> Node:
+	var opened := raw if farm.is_empty() else farm
+	var args := {"farm": opened, "dataset": opened.dataset_version, "block_id": opened.block_id, "own_parcel": true}
+	if not net_store: args.farm_store = store if store != null else _store()
 	scene = (load(SCENE_PATH) as PackedScene).instantiate()
-	scene.setup({"farm": raw, "dataset": raw.dataset_version, "block_id": raw.block_id, "own_parcel": true, "farm_store": store if store != null else _store()})
+	scene.setup(args)
 	if store is FlakyStore: store.scene = scene
 	var state := {"ready": false}
 	scene.preview_ready.connect(func(_summary): state.ready = true)
@@ -580,6 +587,37 @@ func _older_dataset_claim() -> void:
 		"Retry names the dataset and opens the moved claim")
 	scene.queue_free()
 	await process_frame
+
+## C-113: the scene's own server store (the one the map's "Enter my farm" gets) names the release of the farm file it
+## opened, not the map's: an r6 home's r6 farm names r6, so the server leaves it on r6 (Q-172); an r4 home opens in r8
+## and names r8, so the server moves it (Q-168).
+func _release_named_on_enter() -> void:
+	var net = root.get_node_or_null("Net")
+	if net == null:
+		_check(false, "Net autoload is present"); return
+	var was_client = net.client
+	var was_local = ProjectSettings.get_setting("sensen/dynamic_farm/local_farm_save", false)
+	ProjectSettings.set_setting("sensen/dynamic_farm/local_farm_save", false)
+	for case in [["sf-dynamic-farm-20261124-r6", "sf-dynamic-farm-20261124-r6", "an r6 home opened in its r6 farm names r6 and stays on r6"],
+			["sf-dynamic-farm-20261118-r4", "sf-dynamic-farm-20261125-r8", "an r4 home opened in r8 names r8 and moves to r8"]]:
+		var server := OldClaimServer.new()
+		server.block_id = raw.block_id
+		server.dataset = case[0]
+		server.farm = ParcelFarm.empty_state()
+		server.farm.bag = {"hoe_starter": 1}; server.farm.welcomed_at = 0
+		net.client = ApiClient.new("https://fake.invalid/v1", server.handle)
+		net.client.token = "player"
+		var farm := raw.duplicate(true)
+		farm.dataset_version = case[1]
+		var farming := await _open(null, farm, true)
+		var deadline := Time.get_ticks_msec() + 30000
+		while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
+		_check(server.enters.size() == 1 and server.enters[0].get("dataset_version") == case[1] and server.dataset == case[1]
+			and farming.loaded() and not farming.unavailable, case[2])
+		scene.queue_free()
+		await process_frame
+	net.client = was_client
+	ProjectSettings.set_setting("sensen/dynamic_farm/local_farm_save", was_local)
 
 func _dust() -> Array:
 	return scene.get_children().filter(func(n): return n is CPUParticles3D)

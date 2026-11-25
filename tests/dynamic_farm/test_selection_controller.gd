@@ -27,7 +27,9 @@ var options: Array = []
 var hold := false
 var hold_manifest := false
 var wrong_farm := false
+var stale_release := false
 signal release
+const R6 := "sf-dynamic-farm-20261124-r6"
 func _initialize() -> void: _run.call_deferred()
 func check(value: bool, text: String) -> void:
 	checks += 1
@@ -39,6 +41,8 @@ func transport(path: String) -> Dictionary:
 		if hold_manifest: await release
 		return Fixture.manifest()
 	var data: Dictionary = Fixture.farm("p-B" if wrong_farm else path.get_file().get_basename())
+	# An earlier release's directory (full URL, C-113) serves that release's farms.
+	if path.begins_with("https://") and not stale_release: data.dataset_version = R6
 	if hold: await release
 	return data
 func ready_signal(style := 1) -> void:
@@ -249,6 +253,43 @@ func burst_errors() -> void:
 	check(native.sources.size() == boots and controller.message == Controller.MAP_FAILED, "reported map failure stays until the player retries")
 	controller.retry(); for i in 4: await process_frame
 	ready_signal()
+## C-113 Q-172: a home claimed on an earlier release keeps opening that release's farm (its save's cells belong to that
+## grid), read from the release's own directory; everything else uses the map's release.
+func earlier_release() -> void:
+	hold = false
+	controller.config.releases = {R6: "https://old.invalid/r6/", "sf-dynamic-farm-20261118-r9": "http://plain.invalid/r9/"}
+	await controller.activate(); ready_signal()
+	var current := str(controller.manifest.dataset_version)
+	check(controller.home_release(R6) == R6 and controller.home_release(current) == current, "a home claimed on r6 opens in r6; one on the map's release opens in it")
+	check(controller.home_release("sf-dynamic-farm-20261118-r9") == current and controller.home_release("sf-dynamic-farm-20261020-r3") == current and controller.home_release("") == current,
+		"a release without an https directory, or not listed, opens in the map's release")
+	reply("building", [Fixture.metadata()], "opaque")
+	var opened := farms.size(); paths.clear()
+	await controller.open_farm(R6)
+	check(paths == ["https://old.invalid/r6/farms/p-A.json"] and farms.size() == opened + 1 and farms.back().dataset_version == R6, "the own farm of an r6 home is read from r6's directory and stays an r6 farm")
+	await controller.open_farm(current)
+	check(paths.back() == "/farms/p-A.json" and farms.size() == opened + 2 and farms.back().dataset_version == current, "a home claimed on the map's release opens the map's farm")
+	await controller.open_farm("sf-dynamic-farm-20261020-r3")
+	check(paths.back() == "/farms/p-A.json" and farms.back().dataset_version == current, "a home on an unlisted release opens the map's farm")
+	stale_release = true; await controller.open_farm(R6); stale_release = false
+	check(farms.size() == opened + 3 and controller.message == "This farm could not load. Please try again.", "a farm of another release cannot open as the r6 farm")
+	# "My home" where the map's release has no farm for the parcel (r8 dropped a few r6 farms).
+	controller.camera_changed(); paths.clear()
+	await controller.select_home("p-Z", R6)
+	check(paths == ["https://old.invalid/r6/farms/p-Z.json"] and controller.selection.block_id == "p-Z" and controller.selection.release == R6, "'My home' selects an r6 home from r6's farm")
+	check(controller.selection.name == "424 TEST AVE" and controller.selection.core_cell_count == 800 and controller.selection.extension_cell_count == 544, "the selected home shows its r6 name and cells")
+	check(native.highlights.back()[1] == "", "no building of the map's release is highlighted for it")
+	await controller.open_farm(R6)
+	check(farms.back().block_id == "p-Z" and farms.back().dataset_version == R6, "the selected r6 home opens its r6 farm")
+	var asked := paths.size()
+	await controller.select_home("p-Z", current); await controller.select_home("p-Z", "sf-dynamic-farm-20261020-r3")
+	check(paths.size() == asked and controller.selection.block_id == "p-Z", "'My home' on the map's release or an unlisted one fetches nothing")
+	stale_release = true; await controller.select_home("p-Z", R6); stale_release = false
+	check(controller.selection.is_empty() and controller.message == "Your home could not load. Tap My home again.", "a farm of another release is not taken as the r6 home")
+	hold = true; controller.select_home("p-Z", R6); await process_frame
+	reply("building", [Fixture.metadata()], "opaque")
+	hold = false; release.emit(); await process_frame
+	check(controller.selection.block_id == "p-A" and not controller.selection.has("release"), "a tap while the home loads wins over it")
 ## C-94: a tap while the map is still loading ("Loading map details…", e.g. right after Retry) waits instead of being dropped.
 func loading_map_tap() -> void:
 	await controller.activate()
@@ -405,6 +446,7 @@ func _run() -> void:
 	await loading_map_tap()
 	await below_selectable_zoom_entry()
 	check(paths.all(func(path: String): return path == "/client-manifest.json" or path.begins_with("/farms/")), "preview never requests claims or account/gameplay endpoints")
+	await earlier_release()
 	controller.queue_free(); await process_frame
 	api.queue_free(); await process_frame
 	print("DYNAMIC SELECTION ", checks - failures, "/", checks)
