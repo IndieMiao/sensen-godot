@@ -72,6 +72,23 @@ func save_outfit(config: AvatarConfig) -> Error:
 	if error == OK: outfit_saved.emit(config.duplicate_config())
 	return error
 
+## Starts loading the saved outfit's parts into the cache on the loader's threads, so the first rig to wear it later
+## shows at once instead of waiting for a cold load (C-133: the dynamic farm map has no player of its own, so after a
+## cold start its profile's figure waited ~3 s). Nothing is applied or saved; a part already cached is not asked for
+## again, and one still loading is joined, not loaded twice (PartLoader). Not under Compatibility (AppRouter.sync_loads), where the loader would load on the main thread.
+## The parts asked for, by id.
+func warm_saved_outfit() -> Array[String]:
+	var asked: Array[String] = []
+	var router := get_node_or_null("/root/AppRouter")
+	if loader == null or (router != null and router.sync_loads): return asked
+	var cfg := load_outfit()
+	for slot in slot_table.slot_names():
+		var id := String(cfg.slots.get(slot, ""))
+		if id.is_empty() or asked.has(id) or cache.get_part(id) != null: continue
+		loader.request_part(id)
+		asked.append(id)
+	return asked
+
 ## Local player rigs follow committed outfits; editor drafts and remote rigs do not.
 func follow_saved_outfit(rig: AvatarRig) -> void:
 	rig.apply_config(load_outfit())

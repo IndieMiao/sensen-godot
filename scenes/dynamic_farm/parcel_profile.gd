@@ -71,7 +71,17 @@ func open_profile(look_saved := false) -> P0ProfilePage:
 	page.settings_pressed.connect(open_settings)
 	page.edit_look_pressed.connect(edit_look)
 	_push(page)
+	_time_figure(page)
 	return page
+
+## How long the figure took to show after the profile opened, for the QA log (C-133): `PARCEL_PROFILE_FIGURE {"ms":…}`.
+func _time_figure(page: P0ProfilePage) -> void:
+	var rig: AvatarRig = page.preview.rig if page.preview != null else null
+	if rig == null: return
+	var start := Time.get_ticks_msec()
+	var report := func(_config = null): print("PARCEL_PROFILE_FIGURE ", JSON.stringify({"ms": Time.get_ticks_msec() - start}))
+	if rig.is_busy(): rig.config_applied.connect(report, CONNECT_ONE_SHOT)
+	else: report.call()
 
 func profile_view() -> Dictionary:
 	var net := get_node_or_null("/root/Net")

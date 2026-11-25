@@ -115,6 +115,7 @@ var _player_moved := false # The player moved the camera since the last account 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_build_ui()
+	_warm_outfit()
 	# The isolated build must set this BEFORE Net's autoload _ready, not from this scene.
 	if not bool(ProjectSettings.get_setting("sensen/network/online_qa", false)):
 		_message.text = "Use the isolated Dynamic Farm preview build."; return
@@ -563,6 +564,12 @@ func _town_closed(town: Control, parcel: String) -> void:
 		home_farm = town.farm; _farm_parcel = parcel; _farm_fresh = true
 	if _suspended or _leaving: return
 	_hud.show(); _render()
+
+## The map has no player of its own, so after a cold start nothing had loaded the saved outfit and the profile's figure
+## stayed blank ~3 s on its first open (C-133): its parts start loading on the loader's threads as the map opens.
+func _warm_outfit() -> void:
+	var avatar := get_node_or_null("/root/Avatar")
+	if avatar != null: avatar.warm_saved_outfit()
 
 ## The profile over the map (C-128), as the town is: the map's panels hide and its camera holds still until it closes.
 func _open_profile() -> void:
