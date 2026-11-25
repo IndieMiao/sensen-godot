@@ -671,7 +671,7 @@ func _placement_turns() -> void:
 	var middle := Building.center(scene._walk, start, Vector2i(3, 3), 2)
 	_check(node != null and node.transform.basis.z.is_equal_approx(Vector3.FORWARD) and node.position.is_equal_approx(middle),
 		"reopened, the cottage stands where and as it was turned")
-	_check(not scene._walk.clear_position(middle) and scene._buildings[1].proxy != null, "its walls still stop the player")
+	_check(not scene._walk.clear_position(middle) and not scene._buildings[1].proxies.is_empty(), "its walls still stop the player")
 	scene.queue_free()
 	await process_frame
 	for name in DirAccess.get_files_at(turn_dir): DirAccess.remove_absolute(turn_dir.path_join(name))

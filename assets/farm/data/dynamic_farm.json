@@ -19,6 +19,23 @@
       "width": 3,
       "depth": 3,
       "max": 1
+    },
+    "coop": {
+      "model": "chicken_yard",
+      "blueprint": "blueprint_coop",
+      "width": 7,
+      "depth": 5,
+      "max": 1,
+      "materials": {},
+      "livestock": {
+        "animals": ["hen_white", "hen_brown", "hen_white"],
+        "feed": "crop_carrot",
+        "product": "egg",
+        "amount": 1,
+        "produce_seconds": 120,
+        "max_ground": 6,
+        "spots": [[0.7, 1.2], [1.6, 1.6], [2.8, 2.3], [1.4, 3.6], [3.6, 3.0], [4.6, 3.9], [5.8, 1.0], [6.2, 4.2], [3.4, 4.4], [5.6, 2.6]]
+      }
     }
   },
   "crops": {
@@ -45,7 +62,8 @@
     "costs": {
       "clear_obstacle": 2,
       "till": 2,
-      "gather": 2
+      "gather": 2,
+      "feed": 1
     }
   },
   "economy": {
@@ -53,7 +71,8 @@
       "crop_carrot": 12,
       "wood": 2,
       "wild_herb": 1,
-      "stone": 2
+      "stone": 2,
+      "egg": 20
     },
     "gather": {
       "recipe_version": "outer-groves-v2",

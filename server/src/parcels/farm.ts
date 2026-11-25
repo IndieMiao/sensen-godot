@@ -17,6 +17,12 @@
  * 体力（C-148，照搬 P0，见 energy.ts）：清障碍、开垦、播种、外围采集花体力，收获、出售、领蓝图、放建筑免费；
  * 不够时整批拒绝（NO_ENERGY），存档不变。有小屋（buildings 里的 cottage）时每个玩家日可以休息一次（rest）。
  * 体力存在 energy 字段，同样是在 v1 上追加的可选字段：没有它的存档按满体力算。
+ *
+ * 养殖和掉落物（C-154，0.4.5 鸡场）：规则里带 livestock 的建筑类型（鸡场 coop）放下时记下它的动物。在里面喂一次（feed）扣 1 个
+ * 饲料（胡萝卜）和 energy.costs.feed 的体力，喂过 produce_seconds 后这只动物把产物（蛋）下在地上：drops 里一条掉落物，
+ * 喂的那一刻就写好它在哪个落点、哪只动物下的、什么时候下（ready_at），到点前不能捡、客户端不画。人走近时客户端发 pick_up，
+ * 服务端只核实这条掉落物在、已经下了，捡一次就从 drops 删掉，同一个编号不会再出现（编号取 drop_seq 递增，不复用）。
+ * 不喂不产；每只动物同时只等一个；这栋建筑地上的（含没下的）到 max_ground 就不能再喂。drops、drop_seq 也是 v1 上追加的可选字段。
  */
 import { dayKey, energyCost, maxEnergy, nextRollover, nextTickIn, settleEnergy, spendEnergy, type EnergyState } from './energy.js';
 import { gatherSourceOf, HOME_BUILDING, MAX_BUILDINGS, type ParcelRules } from './rules.js';
@@ -30,6 +36,8 @@ export const MAX_BATCH = 50;
 export const MAX_COINS = 1_000_000_000;
 /** 一条出售命令最多卖的个数。 */
 export const MAX_SELL_COUNT = 999;
+/** 命令里建筑、掉落物编号的上限。 */
+export const MAX_ID = 2 ** 31 - 1;
 /** 采集记录最多条数（外围物件总数远低于此）；过了刷新时间的记录在下次采集时清掉。 */
 export const MAX_GATHERED = 4096;
 
@@ -39,7 +47,16 @@ export interface HouseState { model: string; x: number; y: number; width: number
  * rotation 是转了几个 90°（0–3），转 1、3 时宽深互换。id 在本块地现有建筑里唯一（放下时取现有最大 id + 1），
  * 以后按栋操作（喂鸡、移动）用它。
  */
-export interface BuildingState extends HouseState { id: number; type: string }
+export interface BuildingState extends HouseState {
+  id: number; type: string;
+  /** C-154：养殖建筑放下时的动物（规则 livestock.animals 的副本，以后改配置不影响已建的）；普通建筑没有。 */
+  animals?: string[];
+}
+/**
+ * 地上的一个掉落物（C-154）：id 在本块地永不复用；item × amount 是捡到什么；building / animal / spot 是哪栋建筑里哪只动物
+ * 下在第几个落点（建筑规则 livestock.spots）；ready_at 之后才在地上、才能捡。
+ */
+export interface DropState { id: number; item: string; amount: number; building: number; animal: number; spot: number; ready_at: number }
 export interface CropState { crop: string; planted_at: number; ripe_at: number }
 export interface ParcelFarmState {
   v: typeof FARM_STATE_VERSION;
@@ -65,6 +82,10 @@ export interface ParcelFarmState {
   blueprints_claimed: Record<string, number>;
   /** C-148：体力与上次结算时间、最近一次休息的玩家日；没有时按满体力（energy.ts energyOf）。 */
   energy?: EnergyState;
+  /** C-154：地上的掉落物（含已喂、还没下的），按产生先后。 */
+  drops: DropState[];
+  /** C-154：上一个掉落物的编号；新掉落物取它 + 1。 */
+  drop_seq: number;
 }
 
 export type FarmCommand =
@@ -78,7 +99,11 @@ export type FarmCommand =
   | { type: 'sell'; item: string; count: number }
   | { type: 'gather'; object: string }
   | { type: 'claim_blueprint'; blueprint: string }
-  | { type: 'rest' };
+  | { type: 'rest' }
+  /** C-154：在养殖建筑 building（建筑 id）里喂一次。 */
+  | { type: 'feed'; building: number }
+  /** C-154：捡起地上的掉落物 drop（掉落物 id）。 */
+  | { type: 'pick_up'; drop: number };
 
 /** 命令执行时服务端核实过的上下文：本人地块编号（来自 token 查到的那一行，不来自请求体）。 */
 export interface FarmContext { parcel_id: string }
@@ -90,7 +115,7 @@ export type FarmOutcome =
 /** 认领时的空农场：背包为空，赠品等首次进入时再发（认领和进入不是同一个动作）。 */
 export function emptyFarm(): ParcelFarmState {
   return { v: FARM_STATE_VERSION, buildings: [], house: null, cleared: [], tilled: [], crops: {}, bag: {}, welcomed_at: null,
-    coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} };
+    coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, drops: [], drop_seq: 0 };
 }
 
 /**
@@ -107,8 +132,18 @@ export function withEconomy(state: ParcelFarmState): ParcelFarmState {
   s.sales = count(s.sales);
   s.gathered = map(s.gathered);
   s.blueprints_claimed = map(s.blueprints_claimed);
+  // C-154 之前的存档没有掉落物：空列表、编号从 0 起；不成形的条目丢掉，编号至少是现有最大编号。
+  s.drops = Array.isArray(s.drops) ? s.drops.filter(isDrop) : [];
+  s.drop_seq = Math.max(count(s.drop_seq), ...s.drops.map(d => d.id));
   return s;
 }
+
+const isDrop = (d: unknown): d is DropState => {
+  const x = d as DropState;
+  const n = (v: unknown) => Number.isInteger(v) && (v as number) >= 0;
+  return Boolean(x) && typeof x === 'object' && n(x.id) && x.id > 0 && typeof x.item === 'string' && n(x.amount) && x.amount > 0
+    && n(x.building) && n(x.animal) && n(x.spot) && Number.isFinite(x.ready_at);
+};
 
 /**
  * C-150 之前的存档只有 house：转成 buildings 里 id 为 1 的一栋 cottage，位置、朝向、占地、模型和建成时间原样。
@@ -139,10 +174,11 @@ export function welcome(rules: ParcelRules, state: ParcelFarmState, now: number)
 /**
  * 换到新数据集（C-136，Q-168 rebase）：新数据集里同一块地是另一套格子，按格子记的进度放不上去，清空；
  * 和格子无关的保留。清空的是建筑、已清障碍、已开垦、作物和采集记录（采集冷却）；在地里的作物（不论熟没熟）
- * 每棵退一颗它的种子，每栋建筑退一张它那类的蓝图（C-150），可以重新盖。背包其余物品、金币、卖出次数、已领蓝图和赠品记录不动。
+ * 每棵退一颗它的种子，每栋建筑退一张它那类的蓝图（C-150），可以重新盖。地上的掉落物（C-154）随建筑清空：已经下了的进背包，
+ * 还没下的退回喂它的饲料。背包其余物品、金币、卖出次数、已领蓝图和赠品记录不动。
  * 规则里已没有的作物、建筑类型不知道该退什么，不退。返回新对象，不改入参。
  */
-export function rebaseFarm(rules: ParcelRules, state: ParcelFarmState): ParcelFarmState {
+export function rebaseFarm(rules: ParcelRules, state: ParcelFarmState, now: number): ParcelFarmState {
   const s = withEconomy(state);
   for (const crop of Object.values(s.crops)) {
     const seed = rules.crops[crop.crop]?.seed;
@@ -152,6 +188,14 @@ export function rebaseFarm(rules: ParcelRules, state: ParcelFarmState): ParcelFa
     const blueprint = Object.hasOwn(rules.buildings, b.type) ? rules.buildings[b.type].blueprint : undefined;
     if (blueprint) s.bag[blueprint] = (s.bag[blueprint] ?? 0) + 1;
   }
+  for (const d of s.drops) {
+    const b = s.buildings.find(x => x.id === d.building);
+    const feed = b && Object.hasOwn(rules.buildings, b.type) ? rules.buildings[b.type].livestock?.feed : undefined;
+    // 已经下了的照样归玩家；没下的退饲料（规则里已没有这类建筑就不知道退什么，不退）。
+    if (d.ready_at <= now || feed === undefined) s.bag[d.item] = (s.bag[d.item] ?? 0) + d.amount;
+    else s.bag[feed] = (s.bag[feed] ?? 0) + 1;
+  }
+  s.drops = [];
   s.buildings = [];
   s.house = null;
   s.cleared = [];
@@ -210,6 +254,14 @@ export function parseFarmCommands(raw: unknown): FarmCommand[] | null {
         break;
       case 'rest':
         out.push({ type: 'rest' });
+        break;
+      case 'feed':
+        if (!Number.isInteger(c.building) || (c.building as number) < 1 || (c.building as number) > MAX_ID) return null;
+        out.push({ type: 'feed', building: c.building as number });
+        break;
+      case 'pick_up':
+        if (!Number.isInteger(c.drop) || (c.drop as number) < 1 || (c.drop as number) > MAX_ID) return null;
+        out.push({ type: 'pick_up', drop: c.drop as number });
         break;
       default:
         return null;
@@ -290,9 +342,13 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
           return c.type === 'place_house' ? fail('HOUSE_PLACED') : fail('BUILDING_LIMIT', { building: type, max: rule.max });
         if (s.buildings.length >= MAX_BUILDINGS) return fail('BUILDING_LIMIT', { max: MAX_BUILDINGS });
         if (!(s.bag[rule.blueprint] > 0)) return fail('NO_BLUEPRINT', { item: rule.blueprint });
+        // C-154：除蓝图外的材料（默认没有）；不够就拒绝，什么都不扣。
+        for (const [item, need] of Object.entries(rule.materials ?? {}))
+          if ((s.bag[item] ?? 0) < need) return fail('NOT_ENOUGH', { item, have: s.bag[item] ?? 0, need });
         const id = s.buildings.reduce((m, b) => Math.max(m, b.id), 0) + 1;
         const building: BuildingState = { id, type, model: rule.model, x: c.x, y: c.y, width: rule.width, depth: rule.depth,
           rotation: c.rotation ?? 0, built_at: now };
+        if (rule.livestock) building.animals = [...rule.livestock.animals];
         const f = footprint(building);
         if (f.x1 >= MAX_COORD || f.y1 >= MAX_COORD) return fail('OUT_OF_BOUNDS');
         const overlap = overlapped(s, f);
@@ -303,6 +359,7 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         });
         if (covered.length) return fail('CELL_OCCUPIED', { cells: [...new Set(covered)].sort() });
         take(s.bag, rule.blueprint, 1);
+        for (const [item, need] of Object.entries(rule.materials ?? {})) take(s.bag, item, need);
         s.buildings.push(building);
         s.house = homeOf(s.buildings);
         break;
@@ -398,9 +455,48 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         if (e.value >= max) e.at = now;
         break;
       }
+      case 'feed': {
+        // 服务端不知道人站在哪：在食盆前喂由客户端限定；这里核实建筑在、是养殖建筑、有饲料、有动物空着、地上没满。
+        const b = s.buildings.find(x => x.id === c.building);
+        if (!b) return fail('NO_BUILDING', { building: c.building });
+        const rule = Object.hasOwn(rules.buildings, b.type) ? rules.buildings[b.type].livestock : undefined;
+        if (!rule || !b.animals?.length) return fail('NOT_LIVESTOCK', { building: c.building });
+        if (!(s.bag[rule.feed] > 0)) return fail('NO_FEED', { item: rule.feed });
+        const mine = s.drops.filter(d => d.building === b.id);
+        if (mine.length >= rule.max_ground) return fail('GROUND_FULL', { max: rule.max_ground });
+        const waiting = new Set(mine.filter(d => d.ready_at > now).map(d => d.animal));
+        const animal = b.animals.findIndex((_, i) => !waiting.has(i));
+        if (animal < 0) return fail('ANIMALS_FED', { next_at: Math.min(...mine.filter(d => d.ready_at > now).map(d => d.ready_at)) });
+        if ((refused = pay())) return refused;
+        take(s.bag, rule.feed, 1);
+        const id = ++s.drop_seq;
+        s.drops.push({ id, item: rule.product, amount: rule.amount, building: b.id, animal, spot: freeSpot(rule.spots.length, mine, id),
+          ready_at: now + rule.produce_seconds * 1000 });
+        break;
+      }
+      case 'pick_up': {
+        // “人走近”只有客户端知道；服务端核实掉落物在、已经下了。捡过就删，同一个编号不会再有。
+        const at = s.drops.findIndex(d => d.id === c.drop);
+        if (at < 0) return fail('NO_DROP', { drop: c.drop });
+        const d = s.drops[at];
+        if (now < d.ready_at) return fail('NOT_READY', { ready_at: d.ready_at });
+        s.drops.splice(at, 1);
+        s.bag[d.item] = (s.bag[d.item] ?? 0) + d.amount;
+        break;
+      }
     }
   }
   return { ok: true, state: s };
+}
+
+/**
+ * 新掉落物的落点：这栋建筑地上没被占的落点里挑一个（落点数不少于地上上限，总有空的）。按掉落物编号错开，
+ * 同一份存档总是挑同一个，不靠随机数。
+ */
+function freeSpot(spots: number, taken: DropState[], id: number): number {
+  const used = new Set(taken.map(d => d.spot));
+  const free = Array.from({ length: spots }, (_, i) => i).filter(i => !used.has(i));
+  return free[(id * 7) % free.length];
 }
 
 function take(bag: Record<string, number>, id: string, n: number): void {

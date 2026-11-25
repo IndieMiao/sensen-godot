@@ -43,7 +43,7 @@ describe('C-148 numbers are P0’s (assets/p0/p0_content.json, server/src/p0/rul
     expect(rules.energy.day.rollover_hour).toBe(p0.day.rollover_hour);
     const carrot = p0.crops.find((c: { id: string }) => c.id === 'crop_carrot');
     expect(rules.crops.crop_carrot.energy).toBe(carrot.energy);
-    expect(rules.energy.costs).toEqual({ clear_obstacle: 2, till: 2, gather: 2 });
+    expect(rules.energy.costs).toEqual({ clear_obstacle: 2, till: 2, gather: 2, feed: 1 }); // C-154: feeding an animal 1, P0's
     expect(maxEnergy(rules, emptyFarm())).toBe(200);
   });
 
@@ -228,7 +228,7 @@ describe('C-148 old saves read at full Energy', () => {
 
   it('moving to a newer dataset keeps Energy and the day’s rest (they are not cell progress)', () => {
     const s = withEnergy(legacy(), 42, T0, '2026-11-23');
-    expect(rebaseFarm(rules, s).energy).toEqual({ value: 42, at: T0, rested_on: '2026-11-23' });
+    expect(rebaseFarm(rules, s, T0).energy).toEqual({ value: 42, at: T0, rested_on: '2026-11-23' });
   });
 });
 

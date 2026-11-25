@@ -102,12 +102,14 @@ func _commands() -> void:
 	_check(ParcelFarm.normalize({"v": 2}).is_empty(), "other versions are refused")
 
 ## C-150: several buildings by type, four turns, the same refusals as the server (farm.test.ts 'buildings (C-150)').
-## The shipped rules have only the cottage; a copy adds two test-only types (not new buildings): a 1×1 well, at
-## most 3, and a 4×2 coop, at most 1.
+## The shipped rules have the cottage and (C-154) the 7×5 coop; a copy adds a test-only 1×1 well, at most 3, and
+## stands a plain 4×2 coop, at most 1, in for the shipped one.
 func _buildings() -> void:
 	var rules := ParcelFarm.rules()
-	_check(rules.buildings == {"cottage": {"model": "cottage", "blueprint": "blueprint_cottage", "width": 3, "depth": 3, "max": 1}},
-		"buildings: the cottage only, one per parcel")
+	_check(rules.buildings.cottage == {"model": "cottage", "blueprint": "blueprint_cottage", "width": 3, "depth": 3, "max": 1, "materials": {}},
+		"buildings: one 3×3 cottage per parcel")
+	_check(rules.buildings.keys() == ["cottage", "coop"] and rules.buildings.coop.width == 7 and rules.buildings.coop.depth == 5 \
+		and rules.buildings.coop.max == 1 and rules.buildings.coop.blueprint == "blueprint_coop", "buildings: one 7×5 coop per parcel (C-154)")
 	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH))
 	raw.buildings["well"] = {"model": "well", "blueprint": "blueprint_well", "width": 1, "depth": 1, "max": 3}
 	raw.buildings["coop"] = {"model": "coop", "blueprint": "blueprint_coop", "width": 4, "depth": 2, "max": 1}
@@ -363,7 +365,7 @@ func _energy() -> void:
 	_check(e.max_base == int(p0.energy.max_base) and e.max_base == 200 and e.per_level == 10, "energy: pool 200, +10 a farm level (P0)")
 	_check(e.regen_ms == int(p0.energy.regen_ms) and e.rest_amount == int(p0.energy.rest_amount), "energy: +1 per 4 min, Rest +60 (P0)")
 	_check(e.blessing.days == int(p0.blessing.days) and is_equal_approx(e.blessing.regen_mult, float(p0.blessing.regen_mult)), "energy: Newcomer 7 days ×1.5 (P0)")
-	_check(e.costs == {"clear_obstacle": 2, "till": 2, "gather": 2}, "energy: clear 2, till 2, gather 2")
+	_check(e.costs == {"clear_obstacle": 2, "till": 2, "gather": 2, "feed": 1}, "energy: clear 2, till 2, gather 2, feed an animal 1 (P0)")
 	for crop: Dictionary in p0.crops:
 		if crop.id == "crop_carrot": _check(rules.crops.crop_carrot.energy == int(crop.energy), "energy: a carrot sows for P0's 3")
 	var bad := JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH)) as Dictionary

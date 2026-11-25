@@ -10,6 +10,10 @@ extends RefCounted
 ## three-quarter turn swapping width and depth. The server checks only buildings, tilled cells and crops (C-31).
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
+const Art = preload("res://modules/farm/farm_art.gd")
+## C-154: a type the art file (`assets/farm/data/dynamic_farm_art.json`) describes, such as the coop, takes its name,
+## model, fence and parts from there (FarmLivestock) instead of KINDS.
+const Livestock = preload("res://modules/dynamic_farm/farm_livestock.gd")
 ## Per type: `asset` (FarmArt model, its pivot on the footprint's middle, +Z the front), `name` (the Build key says
 ## "Build <name>") and `profile` (the walls the player stops at, a FarmPropProxy profile in the model's frame).
 ## The cottage (house_cottage.glb, 3×3): walls and plinth below the eaves, measured from its cross-sections at
@@ -25,9 +29,19 @@ const TAKEN := "Space taken"
 const PATH := "Keep the path clear"
 const AROUND := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 
-## The client art of a type: {asset, name, profile}, or {} for a type this client has no art for.
+## The client art of a type: {asset, name, profile} (KINDS), {name, livestock: true} for a type the art file
+## describes (C-154), or {} for a type this client has no art for.
 static func kind(type: String) -> Dictionary:
-	return KINDS.get(type, {})
+	if KINDS.has(type): return KINDS[type]
+	var art := Livestock.building_art(type)
+	return {"name": str(art.get("name", type.capitalize())), "livestock": true} if not art.is_empty() else {}
+
+## The type's model in its own frame (pivot on the footprint's middle, +Z the front), or null without art here.
+static func model(type: String, base: Vector2i, cell_m: float) -> Node3D:
+	var k := kind(type)
+	if k.get("asset") is String: return Art.instance(k.asset)
+	if k.get("livestock", false): return Livestock.model(type, base, cell_m)
+	return null
 
 ## The unturned footprint of a rules entry or a saved building (width × depth).
 static func base_of(entry: Dictionary) -> Vector2i:
@@ -140,6 +154,14 @@ static func transform(walk: RefCounted, at: Vector2i, base: Vector2i, rotation :
 static func proxy(walk: RefCounted, type: String, at: Vector2i, base: Vector2i, rotation := 0) -> Proxy:
 	var profile = kind(type).get("profile")
 	return Proxy.new(profile, transform(walk, at, base, rotation), 1.0) if profile is Dictionary else null
+
+## Every wall of the type at that spot: the KINDS profile, or a livestock building's fence runs and parts (C-154; its
+## entry stays open, so the player walks in).
+static func proxies(walk: RefCounted, type: String, at: Vector2i, base: Vector2i, rotation := 0) -> Array:
+	if kind(type).get("livestock", false):
+		return Livestock.proxies(type, base, float(walk.cell_m), transform(walk, at, base, rotation))
+	var one := proxy(walk, type, at, base, rotation)
+	return [one] if one != null else []
 
 static func at_of(building: Dictionary) -> Vector2i:
 	return Vector2i(int(building.get("x", 0)), int(building.get("y", 0)))

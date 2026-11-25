@@ -12,15 +12,23 @@ extends RefCounted
 ## Energy (C-148, P0's numbers per the owner's C-137#15 q3) mirrors server/src/parcels/energy.ts: `energy` in the
 ## rules; the save's `energy` {value, at, rested_on} (absent on saves before it: full). Clearing, tilling, sowing
 ## and outer gathering cost Energy, the rest is free; `rest` at the cottage gives +60 once a player day.
+## Livestock and drops (C-154, the coop): a building type with `livestock` keeps its animals. `feed` takes one feed item
+## (a carrot) and `energy.costs.feed`; `produce_seconds` later that animal's product (an egg) lies on the ground: a
+## `drops` entry, written at feeding with its spot, animal and `ready_at`. `pick_up` takes a laid one into the bag once;
+## ids come from `drop_seq` and are never reused. One wait per animal; at `max_ground` drops (laid or not) no more feeding.
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
 const STATE_VERSION := 1
 const MAX_COORD := 1024
 const MAX_CELLS := 8192
 const MAX_BATCH := 50
 const COMMANDS := ["place_house", "place_building", "clear_obstacle", "till", "sow", "harvest", "sell", "claim_blueprint", "gather",
-	"rest"]
-## Commands priced by `energy.costs` (sowing is priced on the crop).
-const PRICED := ["clear_obstacle", "till", "gather"]
+	"rest", "feed", "pick_up"]
+## Commands priced by `energy.costs` (sowing is priced on the crop; feeding is P0's feed-an-animal 1, C-154).
+const PRICED := ["clear_obstacle", "till", "gather", "feed"]
+## Most animals in one livestock building, most drops on its ground, largest building / drop id in a command (server).
+const MAX_ANIMALS := 16
+const MAX_GROUND_DROPS := 64
+const MAX_ID := 2147483647
 const DAY_MS := 86400000
 ## The first house's building type: an old save's `house` and `place_house` are cottages (server rules.ts HOME_BUILDING).
 const HOME_BUILDING := "cottage"
@@ -53,6 +61,11 @@ static func parse_rules(raw: Variant) -> Dictionary:
 				or not whole_in(b.get("width"), 1, MAX_BUILDING_SIDE) or not whole_in(b.get("depth"), 1, MAX_BUILDING_SIDE) \
 				or not whole_in(b.get("max"), 1, MAX_BUILDINGS):
 			return {}
+		if b.has("materials"):
+			if not b.materials is Dictionary: return {}
+			for item in b.materials:
+				if not item is String or not whole_in(b.materials[item], 1, 999): return {}
+		if b.has("livestock") and _parse_livestock(b.livestock, b).is_empty(): return {}
 	for id in raw.welcome_gift:
 		if not id is String or not whole_in(raw.welcome_gift[id], 1, 999): return {}
 	if raw.crops.is_empty(): return {}
@@ -72,8 +85,31 @@ static func parse_rules(raw: Variant) -> Dictionary:
 	parsed.energy = energy
 	for id in parsed.buildings:
 		for field in ["width", "depth", "max"]: parsed.buildings[id][field] = int(parsed.buildings[id][field])
+		var materials := {}
+		for item in parsed.buildings[id].get("materials", {}): materials[item] = int(parsed.buildings[id].materials[item])
+		parsed.buildings[id].materials = materials
+		if parsed.buildings[id].has("livestock"):
+			parsed.buildings[id].livestock = _parse_livestock(parsed.buildings[id].livestock, parsed.buildings[id])
 	parsed["economy"] = _parse_economy(raw.get("economy"))
 	return parsed
+
+## C-154 a building's `livestock` with the server's bounds (rules.ts parseLivestock), whole numbers made ints; {} when
+## out of them. `spots` stay [x, z] floats in the building's own unturned frame, in cells.
+static func _parse_livestock(raw: Variant, building: Dictionary) -> Dictionary:
+	if not raw is Dictionary or not raw.get("animals") is Array or raw.animals.is_empty() or raw.animals.size() > MAX_ANIMALS: return {}
+	for a in raw.animals:
+		if not a is String: return {}
+	if not raw.get("feed") is String or not raw.get("product") is String or not whole_in(raw.get("amount"), 1, 99) \
+			or not whole_in(raw.get("produce_seconds"), 1, 7 * 24 * 3600) or not whole_in(raw.get("max_ground"), 1, MAX_GROUND_DROPS):
+		return {}
+	if not raw.get("spots") is Array or raw.spots.size() < int(raw.max_ground) or raw.spots.size() > MAX_GROUND_DROPS * 4: return {}
+	var spots := []
+	for p in raw.spots:
+		if not p is Array or p.size() != 2 or not _number(p[0]) or not _number(p[1]): return {}
+		if float(p[0]) < 0 or float(p[0]) > float(building.width) or float(p[1]) < 0 or float(p[1]) > float(building.depth): return {}
+		spots.append(Vector2(float(p[0]), float(p[1])))
+	return {"animals": raw.animals.duplicate(), "feed": raw.feed, "product": raw.product, "amount": int(raw.amount),
+		"produce_seconds": int(raw.produce_seconds), "max_ground": int(raw.max_ground), "spots": spots}
 
 ## C-58 `economy`: sell prices and one-off blueprints; {sell_prices:{}, blueprints:{}} when absent.
 static func _parse_economy(raw: Variant) -> Dictionary:
@@ -113,7 +149,7 @@ static func _parse_energy(raw: Variant) -> Dictionary:
 
 static func empty_state() -> Dictionary:
 	return {"v": STATE_VERSION, "buildings": [], "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {}, "welcomed_at": null,
-		"coins": 0, "sales": 0, "gathered": {}, "blueprints_claimed": {}}
+		"coins": 0, "sales": 0, "gathered": {}, "blueprints_claimed": {}, "drops": [], "drop_seq": 0}
 
 ## A state as returned by the server, with JSON floats turned back into integers.
 ## Returns {} for anything that is not a v1 farm.
@@ -145,6 +181,11 @@ static func normalize(raw: Variant) -> Dictionary:
 			if read.is_empty() or not b.get("type") is String or not whole_in(b.get("id"), 1, 1 << 30): return {}
 			read.id = int(b.id)
 			read.type = b.type
+			if b.get("animals") is Array:
+				read.animals = []
+				for a in b.animals:
+					if not a is String: return {}
+					read.animals.append(a)
 			state.buildings.append(read)
 	elif buildings != null:
 		return {}
@@ -169,12 +210,65 @@ static func normalize(raw: Variant) -> Dictionary:
 		for id in raw[field]:
 			if not id is String or not _number(raw[field][id]): return {}
 			state[field][id] = int(raw[field][id])
+	# C-154 drops: a save from before them has none; malformed entries are dropped, as the server reads them.
+	if raw.get("drops") is Array:
+		for d in raw.drops:
+			var drop := _drop(d)
+			if not drop.is_empty(): state.drops.append(drop)
+	state.drop_seq = int(raw.drop_seq) if whole_in(raw.get("drop_seq"), 0, MAX_ID) else 0
+	for d: Dictionary in state.drops: state.drop_seq = maxi(state.drop_seq, int(d.id))
 	# C-148 Energy: kept when well formed; without it (or malformed, as the server reads it) the farm is at full Energy.
 	var energy = raw.get("energy")
 	if energy is Dictionary and whole_in(energy.get("value"), 0, 1 << 30) and _number(energy.get("at")) \
 			and (energy.get("rested_on") == null or _is_day(energy.get("rested_on"))):
 		state.energy = {"value": int(energy.value), "at": int(energy.at), "rested_on": energy.get("rested_on")}
 	return state
+
+## A drop entry (C-154) with whole numbers, or {} when malformed (server farm.ts isDrop).
+static func _drop(d: Variant) -> Dictionary:
+	if not d is Dictionary or not d.get("item") is String or not _number(d.get("ready_at")): return {}
+	if not whole_in(d.get("id"), 1, MAX_ID) or not whole_in(d.get("amount"), 1, 1 << 30): return {}
+	for field in ["building", "animal", "spot"]:
+		if not whole_in(d.get(field), 0, MAX_ID): return {}
+	return {"id": int(d.id), "item": d.item, "amount": int(d.amount), "building": int(d.building), "animal": int(d.animal),
+		"spot": int(d.spot), "ready_at": int(d.ready_at)}
+
+## A building's livestock rule (C-154), {} for a type without one or unknown here.
+static func livestock_of(rule_set: Dictionary, building: Dictionary) -> Dictionary:
+	var rule = rule_set.get("buildings", {}).get(str(building.get("type", "")))
+	return rule.get("livestock", {}) if rule is Dictionary else {}
+
+## The drops on one building's ground, laid or not.
+static func drops_in(state: Dictionary, building_id: int) -> Array:
+	return state.get("drops", []).filter(func(d: Dictionary): return int(d.building) == building_id)
+
+## Why one more feeding at `building` is refused now, or "" when it is not (C-154, the server's checks in its order):
+## NOT_LIVESTOCK, NO_FEED, GROUND_FULL, ANIMALS_FED. Energy is checked apart (the key's price).
+static func feed_refusal(rule_set: Dictionary, state: Dictionary, building: Dictionary, now: int) -> String:
+	var rule := livestock_of(rule_set, building)
+	if rule.is_empty() or not building.get("animals") is Array or building.animals.is_empty(): return "NOT_LIVESTOCK"
+	if int(state.get("bag", {}).get(rule.feed, 0)) <= 0: return "NO_FEED"
+	var mine := drops_in(state, int(building.id))
+	if mine.size() >= int(rule.max_ground): return "GROUND_FULL"
+	return "" if _free_animal(building, mine, now) >= 0 else "ANIMALS_FED"
+
+## The first animal with no product on its way (laid ones do not count), or -1.
+static func _free_animal(building: Dictionary, mine: Array, now: int) -> int:
+	var waiting := {}
+	for d: Dictionary in mine:
+		if int(d.ready_at) > now: waiting[int(d.animal)] = true
+	for i in (building.animals as Array).size():
+		if not waiting.has(i): return i
+	return -1
+
+## A free spot for a new drop: one no drop of this building lies on, chosen by the drop's id (server farm.ts freeSpot).
+static func _free_spot(spots: int, mine: Array, id: int) -> int:
+	var used := {}
+	for d: Dictionary in mine: used[int(d.spot)] = true
+	var free := []
+	for i in spots:
+		if not used.has(i): free.append(i)
+	return free[(id * 7) % free.size()]
 
 ## A house-shaped entry (C-31 `house`, or a building without id and type) with whole numbers, or {}.
 static func _house(raw: Variant) -> Dictionary:
@@ -346,7 +440,7 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 		return {"ok": false, "index": 0, "code": "SCHEMA"}
 	var next := state.duplicate(true)
 	var blank := empty_state()
-	for field in ["coins", "sales", "gathered", "blueprints_claimed"]:
+	for field in ["coins", "sales", "gathered", "blueprints_claimed", "drops", "drop_seq"]:
 		if not next.has(field): next[field] = blank[field]
 	next.buildings = buildings_of(next).duplicate(true)
 	settle_energy(rule_set, next, now)
@@ -365,6 +459,9 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type == "rest":
 			pass
+		elif command.type == "feed" or command.type == "pick_up":
+			if not whole_in(command.get("building" if command.type == "feed" else "drop"), 1, MAX_ID):
+				return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type == "place_house" or command.type == "place_building":
 			if not whole_in(command.get("x"), 0, MAX_COORD - 1) or not whole_in(command.get("y"), 0, MAX_COORD - 1) \
 					or (command.has("rotation") and not whole_in(command.rotation, 0, 3)) \
@@ -483,6 +580,50 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 					e.value = int(e.value) + mini(int(rule_set.energy.rest_amount), top - int(e.value))
 					e.rested_on = today
 					if int(e.value) >= top: e.at = now
+			"feed":
+				var b := {}
+				for x: Dictionary in next.buildings:
+					if int(x.id) == int(command.building): b = x
+				if b.is_empty():
+					failure = "NO_BUILDING"
+					detail = {"building": int(command.building)}
+				else:
+					failure = feed_refusal(rule_set, next, b, now)
+					var rule := livestock_of(rule_set, b)
+					var mine := drops_in(next, int(b.id))
+					match failure:
+						"NOT_LIVESTOCK": detail = {"building": int(command.building)}
+						"NO_FEED": detail = {"item": rule.feed}
+						"GROUND_FULL": detail = {"max": int(rule.max_ground)}
+						"ANIMALS_FED":
+							var soonest := 0
+							for d: Dictionary in mine:
+								if int(d.ready_at) > now and (soonest == 0 or int(d.ready_at) < soonest): soonest = int(d.ready_at)
+							detail = {"next_at": soonest}
+						"":
+							if short: failure = "NO_ENERGY"
+							else:
+								_spend(rule_set, next, now, cost)
+								_take(next.bag, rule.feed)
+								next.drop_seq = int(next.drop_seq) + 1
+								var id := int(next.drop_seq)
+								next.drops.append({"id": id, "item": rule.product, "amount": int(rule.amount), "building": int(b.id),
+									"animal": _free_animal(b, mine, now), "spot": _free_spot((rule.spots as Array).size(), mine, id),
+									"ready_at": now + int(rule.produce_seconds) * 1000})
+			"pick_up":
+				var at := -1
+				for i in (next.drops as Array).size():
+					if int(next.drops[i].id) == int(command.drop): at = i
+				if at < 0:
+					failure = "NO_DROP"
+					detail = {"drop": int(command.drop)}
+				elif now < int(next.drops[at].ready_at):
+					failure = "NOT_READY"
+					detail = {"ready_at": int(next.drops[at].ready_at)}
+				else:
+					var d: Dictionary = next.drops[at]
+					next.drops.remove_at(at)
+					next.bag[d.item] = int(next.bag.get(d.item, 0)) + int(d.amount)
 		if failure == "NO_ENERGY":
 			detail = {"need": cost, "have": int(next.energy.value), "next_in": next_tick_in(rule_set, next, now)}
 		if not failure.is_empty():
@@ -508,6 +649,11 @@ static func _place(rule_set: Dictionary, next: Dictionary, command: Dictionary, 
 		return {"code": "HOUSE_PLACED", "detail": {}} if old else {"code": "BUILDING_LIMIT", "detail": {"building": type, "max": int(rule.max)}}
 	if next.buildings.size() >= MAX_BUILDINGS: return {"code": "BUILDING_LIMIT", "detail": {"max": MAX_BUILDINGS}}
 	if int(next.bag.get(rule.blueprint, 0)) <= 0: return {"code": "NO_BLUEPRINT", "detail": {"item": rule.blueprint}}
+	# C-154: materials besides the blueprint (none by default).
+	for item: String in rule.get("materials", {}):
+		var need := int(rule.materials[item])
+		if int(next.bag.get(item, 0)) < need:
+			return {"code": "NOT_ENOUGH", "detail": {"item": item, "have": int(next.bag.get(item, 0)), "need": need}}
 	var building := {"id": id + 1, "type": type, "model": rule.model, "x": int(command.x), "y": int(command.y),
 		"width": int(rule.width), "depth": int(rule.depth), "rotation": int(command.get("rotation", 0)), "built_at": now}
 	var cells := building_footprint(building)
@@ -527,6 +673,8 @@ static func _place(rule_set: Dictionary, next: Dictionary, command: Dictionary, 
 		covered.sort()
 		return {"code": "CELL_OCCUPIED", "detail": {"cells": covered}}
 	_take(next.bag, rule.blueprint)
+	for item: String in rule.get("materials", {}): _take(next.bag, item, int(rule.materials[item]))
+	if rule.has("livestock"): building.animals = (rule.livestock.animals as Array).duplicate()
 	next.buildings.append(building)
 	next.house = home_of(next.buildings)
 	return {"code": "", "detail": {}}

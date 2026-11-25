@@ -87,6 +87,23 @@ nothing of this shows.
 `tools/dev/dynamic_farm/building_probe.gd` drives the real scene on the local save: entry, a valid spot turned
 through the four turns, each refused spot, Build turned (three pop frames), the wall, reopen (`--headless`: states only).
 
+## Coop, feeding and eggs (C-154, 0.4.5)
+
+The coop is a building type of the C-150 rules: 7×5, one per parcel, for Scott's Coop Blueprint only, placed whole in
+any of the four turns (`Build Coop`). The rules' `livestock` (in `dynamic_farm.json`, shared with the server) give its
+three hens, the feed (one carrot, `energy.costs.feed` 1), the product (an egg `produce_seconds` 120 later), at most
+`max_ground` 6 on the ground and the laying spots. The save's `drops` hold every egg, laid or due, with its hen, spot
+and `ready_at`; `feed` writes one, `pick_up` takes a laid one into the bag once (ids from `drop_seq`, never reused).
+The client's art is `assets/farm/data/dynamic_farm_art.json` (`modules/dynamic_farm/farm_livestock.gd`): the yard's
+scene (SEN-C-155's `chicken_yard.tscn`; a placeholder of the parts and fence until it exists), its parts and fence
+(walls; the front's opening is the entry), the hens' models and clips (SEN-C-156) and the egg's model. The yard's cells
+are never farmed. `scenes/dynamic_farm/parcel_livestock.gd` walks the hens on the open floor (walk, peck, idle; they
+step away from the player; a fed hen pecks at a feeder; a hen walks to her spot before her egg is due) and draws laid
+eggs. Near a feeder the key reads `Feed` · `1 Energy`. An egg within 0.8 m of the player hops into them and flies on
+into the Bag (`+1 Egg`). Numbers, the pickup and the copy await the owner (SEN-C-154#19); details in
+`docs/plans/C-154.md`. Tests: `tests/dynamic_farm/test_coop.gd` (shared cases `fixtures/coop_cases.json` with the
+server, walls, hens, pickup); captures: `tools/dev/dynamic_farm/coop_probe.gd`.
+
 ## First-visit guide (C-35, 0.4.2; C-61, 0.4.3)
 
 `modules/dynamic_farm/parcel_guide.gd` reads the next step of the first ten minutes from the save alone, so a parcel

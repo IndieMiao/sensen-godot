@@ -334,8 +334,8 @@ func _sync_buildings(farm: Dictionary) -> void:
 	for id: int in _buildings.keys():
 		if wanted.has(id) and _spot(wanted[id]) == _spot(_buildings[id].state): continue
 		var built: Dictionary = _buildings[id]
-		if built.proxy != null: _walk.remove_prop(built.proxy)
-		for node in [built.node, built.wire]:
+		for proxy in built.proxies: _walk.remove_prop(proxy)
+		for node in [built.node] + built.wires:
 			if is_instance_valid(node): node.queue_free()
 		_buildings.erase(id)
 	for id: int in wanted:
@@ -344,9 +344,10 @@ func _sync_buildings(farm: Dictionary) -> void:
 static func _spot(b: Dictionary) -> String:
 	return "%s %d %d %d %d %d" % [b.type, int(b.x), int(b.y), int(b.width), int(b.depth), int(b.rotation)]
 
-## A saved building, its model (if this client has art for its type) and wall profile (C-19's model-fitted walking);
-## a player standing on the new walls steps out. A type without art here still keeps its cells from farming
-## (ParcelFarm.building_cells) but has nothing to show or bump into.
+## A saved building, its model (if this client has art for its type) and wall profiles (C-19's model-fitted walking;
+## a livestock building's fence runs and parts, its entry open, C-154); a player standing on the new walls steps out.
+## A type without art here still keeps its cells from farming (ParcelFarm.building_cells) but has nothing to show or
+## bump into.
 func _build_building(building: Dictionary) -> void:
 	var type := str(building.type)
 	var at := Building.at_of(building)
@@ -355,14 +356,15 @@ func _build_building(building: Dictionary) -> void:
 	var node := Node3D.new()
 	node.name = "Building%d" % int(building.id)
 	node.transform = Building.transform(_walk, at, base, turns)
-	var asset = Building.kind(type).get("asset")
-	if asset is String: node.add_child(Art.instance(asset))
+	var model := Building.model(type, base, _walk.cell_m)
+	if model != null: node.add_child(model)
 	add_child(node)
-	var proxy := Building.proxy(_walk, type, at, base, turns)
-	var wire: MeshInstance3D = null
-	if proxy != null: _walk.add_prop(proxy)
-	if proxy != null and get_tree().debug_collisions_hint:
-		wire = MeshInstance3D.new()
+	var proxies := Building.proxies(_walk, type, at, base, turns)
+	var wires := []
+	for proxy in proxies:
+		_walk.add_prop(proxy)
+		if not get_tree().debug_collisions_hint: continue
+		var wire := MeshInstance3D.new()
 		wire.mesh = proxy.debug_wire()
 		var material := StandardMaterial3D.new()
 		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -371,7 +373,8 @@ func _build_building(building: Dictionary) -> void:
 		wire.material_override = material
 		wire.transform = proxy.pose
 		add_child(wire)
-	_buildings[int(building.id)] = {"state": building.duplicate(), "node": node, "proxy": proxy, "wire": wire}
+		wires.append(wire)
+	_buildings[int(building.id)] = {"state": building.duplicate(), "node": node, "proxies": proxies, "wires": wires}
 	if _actor != null and not _walk.clear_position(_walk.position):
 		_walk.position = _step_out(_walk.position)
 		_actor.position = _walk.position

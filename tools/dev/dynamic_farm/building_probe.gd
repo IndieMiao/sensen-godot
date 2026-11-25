@@ -141,7 +141,7 @@ func _walk_to_wall() -> Dictionary:
 		for i in 40: scene._walk.move(-side * 0.05)
 		scene._actor.position = scene._walk.position
 		scene._actor.look_at(scene._actor.position - side, Vector3.UP)
-		var proxy = scene._buildings[int(_first().id)].proxy
+		var proxy = scene._buildings[int(_first().id)].proxies[0]
 		return {"side":[side.x, side.z], "position":[scene._walk.position.x, scene._walk.position.z],
 			"gap_m":proxy.gap(scene._walk.position) - 0.3}
 	return {}
