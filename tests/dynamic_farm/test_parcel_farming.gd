@@ -2,6 +2,7 @@ extends SceneTree
 ## C-34 rules (Q-39) without a scene: the shared numbers, the command rules mirrored from the
 ## C-31 server, the client-only spatial rules and the local save standing in for the server.
 ## C-138: the carrot's seven stages and the dry / wet soil blocks (ParcelCropArt).
+## C-148: Energy, P0's numbers, the same cases as the server (fixtures/energy_cases.json), the key's price and Rest.
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -32,6 +33,9 @@ func _run() -> void:
 	_guide()
 	_crop_stages()
 	_crop_art()
+	_energy()
+	_energy_cases()
+	_energy_space()
 	print("PARCEL_FARMING checks=%d failures=%d" % [checks, failures])
 	quit(1 if failures else 0)
 
@@ -329,8 +333,8 @@ func _crop_stages() -> void:
 	# A carrot sown before this change: the save has only planted_at / ripe_at, so it lands by how long it has grown.
 	var old := ParcelFarm.normalize(JSON.parse_string(JSON.stringify(state)))
 	_check(old.crops["10,10"] == crop and CropArt.stage_of(old.crops["10,10"], T0 + 40000) == 4, "stages: an existing save reads unchanged, 40 s in -> root shoulders")
-	_check(rules.crops.crop_carrot == {"seed": "seed_carrot", "grow_seconds": 60, "yield": 1} and rules.economy.sell_prices.crop_carrot == 12,
-		"stages: seed, growing time, yield and price unchanged")
+	_check(rules.crops.crop_carrot == {"seed": "seed_carrot", "grow_seconds": 60, "yield": 1, "energy": 3} and rules.economy.sell_prices.crop_carrot == 12,
+		"stages: seed, growing time, yield and price unchanged (C-148 adds the carrot's 3 Energy)")
 
 ## C-138: every tilled cell is one 1×1 soil block, dry or wet, with its carrot stage on it.
 func _crop_art() -> void:
@@ -350,3 +354,110 @@ func _crop_art() -> void:
 	art.sync({}, {}, T0)
 	_check(art.counts() == {"soil": {"dry": 0, "wet": 0}, "stages": [0, 0, 0, 0, 0, 0, 0]}, "art: nothing tilled, nothing drawn")
 	art.free()
+
+## C-148: P0's numbers (assets/p0/p0_content.json) and the client's settlement.
+func _energy() -> void:
+	var rules := ParcelFarm.rules()
+	var p0 = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/p0_content.json"))
+	var e: Dictionary = rules.energy
+	_check(e.max_base == int(p0.energy.max_base) and e.max_base == 200 and e.per_level == 10, "energy: pool 200, +10 a farm level (P0)")
+	_check(e.regen_ms == int(p0.energy.regen_ms) and e.rest_amount == int(p0.energy.rest_amount), "energy: +1 per 4 min, Rest +60 (P0)")
+	_check(e.blessing.days == int(p0.blessing.days) and is_equal_approx(e.blessing.regen_mult, float(p0.blessing.regen_mult)), "energy: Newcomer 7 days ×1.5 (P0)")
+	_check(e.costs == {"clear_obstacle": 2, "till": 2, "gather": 2}, "energy: clear 2, till 2, gather 2")
+	for crop: Dictionary in p0.crops:
+		if crop.id == "crop_carrot": _check(rules.crops.crop_carrot.energy == int(crop.energy), "energy: a carrot sows for P0's 3")
+	var bad := JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH)) as Dictionary
+	bad.energy.regen_ms = 0
+	_check(ParcelFarm.parse_rules(bad).is_empty(), "energy: malformed rules are refused")
+	var fresh := ParcelFarm.welcome(rules, ParcelFarm.empty_state(), T0) as Dictionary
+	_check(not fresh.has("energy") and ParcelFarm.energy_of(rules, fresh, T0) == {"value": 200, "at": T0, "rested_on": null}, "energy: none in the save reads full")
+	_check(ParcelFarm.regen_ms(rules, fresh, T0) == 160000 and ParcelFarm.regen_ms(rules, fresh, T0 + 7 * 86400000) == 240000, "energy: Newcomer 2:40, then 4:00")
+	_check(ParcelFarm.day_key(rules, T0) == "2026-11-22" and ParcelFarm.next_rollover(rules, T0) == T0 + 12 * 3600000, "energy: the day turns at 04:00 San Francisco time")
+	var low := fresh.duplicate(true)
+	low.energy = {"value": 0, "at": T0, "rested_on": null}
+	_check(ParcelFarm.next_tick_in(rules, low, T0 + 1000) == 159000, "energy: the next point's countdown")
+	var trip := ParcelFarm.normalize(JSON.parse_string(JSON.stringify(low)))
+	_check(trip.energy == low.energy, "energy: a JSON round trip keeps it")
+	var odd := low.duplicate(true)
+	odd.energy = {"value": -1, "at": "x"}
+	_check(not ParcelFarm.normalize(odd).has("energy"), "energy: a malformed field reads as full, as the server")
+
+## The shared cases: the client's apply gives the server's outcome for every one of them.
+func _energy_cases() -> void:
+	var rules := ParcelFarm.rules()
+	var shared = JSON.parse_string(FileAccess.get_file_as_string("res://tests/dynamic_farm/fixtures/energy_cases.json"))
+	_check(shared is Dictionary and shared.cases.size() >= 20, "energy cases: the shared fixture reads")
+	for c: Dictionary in shared.cases:
+		var farm := ParcelFarm.normalize(c.farm)
+		var r := ParcelFarm.apply(rules, farm, c.commands, int(c.now), shared.parcel_id)
+		var got := {"ok": true, "energy": r.state.energy} if r.ok else {"ok": false, "index": r.index, "code": r.code, "detail": r.get("detail", {})}
+		# JSON numbers read as floats: compare through JSON text.
+		var want := JSON.stringify(_ints(c.expect), "", true)
+		_check(JSON.stringify(_ints(got), "", true) == want, "energy case '%s': %s, server %s" % [c.name, JSON.stringify(_ints(got)), want])
+
+## Whole floats to ints, all the way down (JSON reads numbers as floats).
+func _ints(v: Variant) -> Variant:
+	if v is float and v == floorf(v): return int(v)
+	if v is Dictionary:
+		var out := {}
+		for k in v: out[k] = _ints(v[k])
+		return out
+	if v is Array: return v.map(_ints)
+	return v
+
+## The key's Rest at the cottage's door: the door row turns with the cottage; rested today or full refuses.
+func _energy_space() -> void:
+	var rules := ParcelFarm.rules()
+	var data := Data.decode(Fixture.farm())
+	var path := Space.protected_path(data)
+	var state := ParcelFarm.welcome(rules, ParcelFarm.empty_state(), T0) as Dictionary
+	_check(Space.door_row(state).is_empty() and Space.door_cell(state) == null, "rest: no cottage, no door")
+	# C-150: the cottage is found in the building list, whatever else stands there and whatever `house` says.
+	var cottage := {"model": "cottage", "x": 8, "y": 6, "width": 3, "depth": 3, "rotation": 0, "built_at": T0}
+	var other := {"id": 1, "type": "shed", "model": "shed", "x": 2, "y": 2, "width": 2, "depth": 2, "rotation": 0, "built_at": T0}
+	state.buildings = [other, cottage.merged({"id": 2, "type": "cottage"})]
+	state.house = null
+	_check(ParcelFarm.has_home(state) and ParcelFarm.home_building(state).id == 2, "rest: the cottage is building 2 of the list")
+	_check(Space.door_row(state).keys().size() == 3 and Space.door_row(state).has(Vector2i(9, 6)) and Space.door_cell(state) == Vector2i(9, 6),
+		"rest: rotation 0 opens to −y, the door in the middle")
+	var turned := state.duplicate(true)
+	for turn in [[1, Vector2i(10, 7)], [2, Vector2i(9, 8)], [3, Vector2i(8, 7)]]:
+		turned.buildings[1].rotation = turn[0]
+		_check(Space.door_cell(turned) == turn[1], "rest: rotation %d's door at %s" % [turn[0], turn[1]])
+	var no_cottage := state.duplicate(true)
+	no_cottage.buildings = [other]
+	no_cottage.house = cottage
+	_check(not ParcelFarm.has_home(no_cottage) and Space.door_cell(no_cottage) == null, "rest: buildings without a cottage, no door")
+	_check(ParcelFarm.apply(rules, no_cottage.merged({"energy": {"value": 50, "at": T0, "rested_on": null}}, true), [{"type": "rest"}], T0).code
+		== "NO_HOUSE", "rest: the client refuses it without a cottage in the list, as the server")
+	var old_save := state.duplicate(true)
+	old_save.erase("buildings")
+	old_save.house = cottage
+	_check(ParcelFarm.has_home(old_save) and Space.door_cell(old_save) == Vector2i(9, 6), "rest: an old house-only save reads its cottage")
+	state.energy = {"value": 50, "at": T0, "rested_on": null}
+	var rest := Space.action(rules, data, path, {}, state, Vector2i(8, 6), T0)
+	_check(rest.verb == "rest" and rest.refusal == "" and rest.command == {"type": "rest"} and rest.gain == 60, "rest: the door row offers Rest +60")
+	_check(Space.action(rules, data, path, {}, state, Vector2i(9, 7), T0).refusal == Space.HOUSE, "rest: the rest of the cottage still says House here")
+	state.energy.value = 170
+	_check(Space.action(rules, data, path, {}, state, Vector2i(9, 6), T0).gain == 30, "rest: near the top it gives what fits")
+	var rested: Dictionary = ParcelFarm.apply(rules, state, [{"type": "rest"}], T0).state
+	_check(rested.energy.value == 200 and rested.energy.rested_on == "2026-11-22", "rest: the client applies it as the server")
+	rested.energy.value = 100
+	_check(Space.action(rules, data, path, {}, rested, Vector2i(9, 6), T0 + 60000).refusal == Space.RESTED, "rest: once a player day")
+	rested.energy.at = T0 + 12 * 3600000
+	_check(Space.action(rules, data, path, {}, rested, Vector2i(9, 6), T0 + 12 * 3600000).refusal == "", "rest: again after 04:00")
+	state.energy.value = 200
+	_check(Space.action(rules, data, path, {}, state, Vector2i(9, 6), T0).refusal == Space.FULL, "rest: nothing to gain when full")
+	# The local stand-in refuses a short command and keeps its save.
+	var dir := "user://test_parcel_energy_%d" % Time.get_ticks_usec()
+	var store := LocalStore.new("p-E", dir)
+	store.now_ms = func() -> int: return T0
+	var first := store.enter()
+	var low: Dictionary = first.farm.duplicate(true)
+	low.energy = {"value": 1, "at": T0, "rested_on": null}
+	store._save(low, first.farm_version)
+	var refused := store.send(first.farm_version, [{"type": "till", "cell": "36,18"}])
+	_check(not refused.ok and refused.code == "NO_ENERGY" and refused.detail.need == 2 and refused.detail.have == 1 and refused.farm_version == first.farm_version
+		and refused.farm.tilled.is_empty(), "store: short of Energy refuses and keeps the save")
+	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
+	DirAccess.remove_absolute(dir)

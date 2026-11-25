@@ -1,14 +1,16 @@
 /**
  * 动态农场（C-31）的可调数值：社区与数据集、首次进入自家地块的赠品、各类建筑的占地与蓝图（C-150）、作物成熟时间；
  * 以及地块经济（C-58）：出售价格、外围采集与刷新时间、领蓝图条件；买入价格（C-149：Jasmine 卖种子，胡萝卜种子 9 照 P0，
- * 所有者 C-137#15 第 3 题“照搬p0”）。
+ * 所有者 C-137#15 第 3 题“照搬p0”）；体力（C-148，照搬 P0）：上限、恢复、休息和各动作的价。
  * 默认值按所有者拍板 Q-39（C-34#14）与 Q-40（C-33#14），经济按 C-30#29 第 3–5 题（C-30#30 写入的推荐）。
  * 来源是 assets/farm/data/dynamic_farm.json；它不在 content_version 的指纹里，改它不影响旧农场存档。
  */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { parseEnergyRules, type EnergyRules } from './energy.js';
 
-export interface CropRule { seed: string; grow_seconds: number; yield: number }
+/** energy：播一格这种作物花的体力（C-148，照 P0 作物表：胡萝卜 3）。 */
+export interface CropRule { seed: string; grow_seconds: number; yield: number; energy: number }
 /**
  * 外围一类物件（树、花丛、石堆）：采一次得 amount 个 item；models 是美术配方里该类的模型名；
  * max_objects 是一块地上该类最多摆多少个（等于配方 outer_groves.targets.<类>.cap），刷新期内最多采这么多个不同物件。
@@ -48,6 +50,8 @@ export interface ParcelRules {
    */
   buildings: Record<string, BuildingRule>;
   crops: Record<string, CropRule>;
+  /** C-148 体力：上限、恢复、新手期、休息、玩家日和各动作的价（见 energy.ts）。 */
+  energy: EnergyRules;
   economy: EconomyRules;
 }
 
@@ -86,7 +90,9 @@ export function parseParcelRules(raw: unknown): ParcelRules {
   if (!Object.hasOwn(r.buildings, HOME_BUILDING)) fail(`buildings 缺少 ${HOME_BUILDING}`);
   if (!r.crops || !Object.keys(r.crops).length) fail('crops 不能为空');
   for (const [id, c] of Object.entries(r.crops))
-    if (!isId(id) || !isId(c?.seed) || !count(c.grow_seconds, 1, 30 * 24 * 3600) || !count(c.yield, 1, 99)) fail(`crops.${id} 不对`);
+    if (!isId(id) || !isId(c?.seed) || !count(c.grow_seconds, 1, 30 * 24 * 3600) || !count(c.yield, 1, 99) || !count(c.energy, 0, 1000))
+      fail(`crops.${id} 不对`);
+  parseEnergyRules(r.energy, fail);
   parseEconomy(r.economy, fail);
   return r;
 }

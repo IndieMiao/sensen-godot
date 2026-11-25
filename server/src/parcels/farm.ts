@@ -15,7 +15,12 @@
  * 每类上限按 dynamic_farm.json 的 buildings 配置。服务端拒绝与其它建筑重叠、压开垦格或作物的放置，转向后的占地同样检查。
  * 旧存档只有 house（唯一一栋小屋）：读写时转成 buildings 里的一栋 cottage，位置、朝向、占地原样（见 withBuildings）；
  * house 字段保留为 buildings 里那栋 cottage 的镜像，0.4.4 及更早的客户端照常读出小屋。版本号不变。
+ *
+ * 体力（C-148，照搬 P0，见 energy.ts）：清障碍、开垦、播种、外围采集花体力，收获、出售、领蓝图、放建筑免费；
+ * 不够时整批拒绝（NO_ENERGY），存档不变。有小屋（buildings 里的 cottage）时每个玩家日可以休息一次（rest）。
+ * 体力存在 energy 字段，同样是在 v1 上追加的可选字段：没有它的存档按满体力算。
  */
+import { dayKey, energyCost, maxEnergy, nextRollover, nextTickIn, settleEnergy, spendEnergy, type EnergyState } from './energy.js';
 import { gatherSourceOf, HOME_BUILDING, MAX_BUILDINGS, type ParcelRules } from './rules.js';
 
 export const FARM_STATE_VERSION = 1;
@@ -62,6 +67,8 @@ export interface ParcelFarmState {
   gathered: Record<string, number>;
   /** C-58：已领取的一次性蓝图编号 → 领取时间。 */
   blueprints_claimed: Record<string, number>;
+  /** C-148：体力与上次结算时间、最近一次休息的玩家日；没有时按满体力（energy.ts energyOf）。 */
+  energy?: EnergyState;
 }
 
 export type FarmCommand =
@@ -75,7 +82,8 @@ export type FarmCommand =
   | { type: 'sell'; item: string; count: number }
   | { type: 'buy'; item: string; count: number }
   | { type: 'gather'; object: string }
-  | { type: 'claim_blueprint'; blueprint: string };
+  | { type: 'claim_blueprint'; blueprint: string }
+  | { type: 'rest' };
 
 /** 命令执行时服务端核实过的上下文：本人地块编号（来自 token 查到的那一行，不来自请求体）。 */
 export interface FarmContext { parcel_id: string }
@@ -210,6 +218,9 @@ export function parseFarmCommands(raw: unknown): FarmCommand[] | null {
         if (typeof c.blueprint !== 'string' || c.blueprint.length > 64) return null;
         out.push({ type: 'claim_blueprint', blueprint: c.blueprint });
         break;
+      case 'rest':
+        out.push({ type: 'rest' });
+        break;
       default:
         return null;
     }
@@ -261,12 +272,24 @@ function overlapped(s: ParcelFarmState, f: Rect): string[] {
 /**
  * 一批命令全部成功才生效；任一失败整批不变，返回失败的序号。
  * ctx 是服务端从 token 查到的本人地块；没有 ctx 时采集一律按不是自家物件拒绝。
+ * 体力先结算到 now；每条命令先做它自己的检查，再看体力够不够（NO_ENERGY 带 need / have / next_in），够了才改存档。
  */
 export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, commands: FarmCommand[], now: number, ctx?: FarmContext): FarmOutcome {
   const s = withEconomy(state);
   const eco = rules.economy;
+  settleEnergy(rules, s, now);
   for (const [index, c] of commands.entries()) {
     const fail = (code: string, detail?: Record<string, unknown>): FarmOutcome => ({ ok: false, index, code, ...(detail ? { detail } : {}) });
+    const cost = energyCost(rules, c);
+    /** 体力够这条命令就扣掉并返回 null，不够返回拒绝。 */
+    const pay = (): FarmOutcome | null => {
+      if (cost <= 0) return null;
+      const have = s.energy!.value;
+      if (have < cost) return fail('NO_ENERGY', { need: cost, have, next_in: nextTickIn(rules, s, now) });
+      spendEnergy(rules, s, now, cost);
+      return null;
+    };
+    let refused: FarmOutcome | null = null;
     switch (c.type) {
       case 'place_house': case 'place_building': {
         // 服务端没有地块几何：只在核心区、不挡入口到出生点通道由客户端判断（farm_building.gd）；这里管格子之间的冲突。
@@ -297,6 +320,7 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
       case 'clear_obstacle':
         if (s.cleared.includes(c.cell)) return fail('ALREADY_CLEARED');
         if (s.cleared.length >= MAX_CELLS) return fail('TOO_MANY_CELLS');
+        if ((refused = pay())) return refused;
         s.cleared.push(c.cell);
         break;
       case 'till':
@@ -304,6 +328,7 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         if (underBuilding(s, c.cell)) return fail('CELL_OCCUPIED', { cells: [c.cell] });
         if (s.tilled.includes(c.cell)) return fail('ALREADY_TILLED');
         if (s.tilled.length >= MAX_CELLS) return fail('TOO_MANY_CELLS');
+        if ((refused = pay())) return refused;
         s.tilled.push(c.cell);
         break;
       case 'sow': {
@@ -312,6 +337,7 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         if (!s.tilled.includes(c.cell)) return fail('NOT_TILLED');
         if (s.crops[c.cell]) return fail('CELL_OCCUPIED', { cells: [c.cell] });
         if (!(s.bag[rule.seed] > 0)) return fail('NO_SEED', { item: rule.seed });
+        if ((refused = pay())) return refused;
         take(s.bag, rule.seed, 1);
         s.crops[c.cell] = { crop: c.crop, planted_at: now, ripe_at: now + rule.grow_seconds * 1000 };
         break;
@@ -342,9 +368,9 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         // 单价只看服务端配置；请求里的价格在 parseFarmCommands 已丢掉。
         const price = Object.hasOwn(eco.buy_prices, c.item) ? eco.buy_prices[c.item] : undefined;
         if (price === undefined) return fail('NOT_FOR_SALE', { item: c.item });
-        const cost = price * c.count;
-        if (s.coins < cost) return fail('NOT_ENOUGH_COINS', { coins: s.coins, need: cost });
-        s.coins -= cost;
+        const total = price * c.count;
+        if (s.coins < total) return fail('NOT_ENOUGH_COINS', { coins: s.coins, need: total });
+        s.coins -= total;
         s.bag[c.item] = (s.bag[c.item] ?? 0) + c.count;
         break;
       }
@@ -366,6 +392,7 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         // 服务端不知道外围真有哪些物件：同一类刷新期内最多采配方里该类最多摆放的个数，编造编号也拿不到更多。
         const live = Object.keys(s.gathered).filter(k => src.models.includes(parseObjectId(k)?.model ?? '')).length;
         if (live >= src.max_objects) return fail('TOO_MANY_OBJECTS', { max: src.max_objects });
+        if ((refused = pay())) return refused;
         s.gathered[id] = now;
         s.bag[src.item] = (s.bag[src.item] ?? 0) + src.amount;
         break;
@@ -377,6 +404,18 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         if (s.sales < rule.min_sales) return fail('CONDITION_NOT_MET', { sales: s.sales, min_sales: rule.min_sales });
         s.blueprints_claimed[c.blueprint] = now;
         s.bag[rule.item] = (s.bag[rule.item] ?? 0) + rule.amount;
+        break;
+      }
+      case 'rest': {
+        // 在自家小屋门口休息（C-137#16）：服务端不知道人站在哪，能核实的是建筑里已经有一栋小屋（cottage）；每个玩家日一次，不超过上限。
+        if (!s.buildings.some(b => b.type === HOME_BUILDING)) return fail('NO_HOUSE');
+        const e = s.energy!, today = dayKey(rules, now);
+        if (e.rested_on === today) return fail('RESTED_TODAY', { resets_at: nextRollover(rules, now) });
+        const max = maxEnergy(rules, s);
+        if (e.value >= max) return fail('ENERGY_FULL');
+        e.value += Math.min(rules.energy.rest_amount, max - e.value);
+        e.rested_on = today;
+        if (e.value >= max) e.at = now;
         break;
       }
     }

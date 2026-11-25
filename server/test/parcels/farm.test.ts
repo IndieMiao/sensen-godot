@@ -25,7 +25,8 @@ describe('dynamic_farm.json', () => {
     expect(rules.welcome_gift).toEqual({ hoe_starter: 1, seed_carrot: 3, blueprint_cottage: 1 });
     // C-150: the cottage is the one building type so far, at most one per parcel, as Q-40's single first house.
     expect(rules.buildings).toEqual({ cottage: { model: 'cottage', blueprint: 'blueprint_cottage', width: 3, depth: 3, max: 1 } });
-    expect(rules.crops).toEqual({ crop_carrot: { seed: 'seed_carrot', grow_seconds: 60, yield: 1 } });
+    // C-148: sowing a carrot costs 3 Energy, P0's carrot (assets/p0/p0_content.json crops.crop_carrot.energy).
+    expect(rules.crops).toEqual({ crop_carrot: { seed: 'seed_carrot', grow_seconds: 60, yield: 1, energy: 3 } });
     expect(rules.till_tool).toBe('hoe_starter');
     expect(communityOf(rules, 'sf-dynamic-farm-20261118-r4')).toBe('sf');
     expect(communityOf(rules, 'sf-dynamic-farm-20261124-r6')).toBe('sf'); // C-43: r6, r5 without its broken building rings (V-167)

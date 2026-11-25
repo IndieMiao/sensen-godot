@@ -150,7 +150,7 @@ for (const [name, enabled, makeStores] of makers) {
       const res = await claim(app, ada, A);
       expect(res.statusCode).toBe(201);
       expect(res.json().parcel).toEqual({ community_id: 'sf', layer: 0, parcel_id: A.parcel_id, dataset_version: DATASET,
-        center: A.center, claimed_at: T0, farm_version: 0, farm: emptyFarm() });
+        center: A.center, claimed_at: T0, farm_version: 0, farm: { ...emptyFarm(), energy: { value: 200, at: T0, rested_on: null } } });
       const again = await claim(app, ada, A);
       expect(again.statusCode).toBe(200);
       expect(again.json().parcel).toEqual(res.json().parcel);
@@ -488,6 +488,26 @@ for (const [name, enabled, makeStores] of makers) {
       expect(again.json().parcel.farm.bag.wood).toBeUndefined();
     });
 
+    it('C-148 Energy over HTTP: the price comes off, 422 NO_ENERGY keeps the save and its version, time brings it back', async () => {
+      const ada = await account(app, 'Ada');
+      await claim(app, ada, A);
+      expect((await enter(app, ada)).json().parcel.farm.energy).toEqual({ value: 200, at: T0, rested_on: null });
+      // 100 tills at 2 Energy spend the whole pool of 200.
+      const row = (y: number) => Array.from({ length: 50 }, (_, x) => ({ type: 'till', cell: `${x},${y}` }));
+      expect((await command(app, ada, 1, row(0))).json().parcel.farm.energy).toEqual({ value: 100, at: T0, rested_on: null });
+      expect((await command(app, ada, 2, row(1))).json().parcel.farm.energy.value).toBe(0);
+      const refused = await command(app, ada, 3, [{ type: 'till', cell: '0,2' }]);
+      expect(refused.statusCode).toBe(422);
+      // Newcomer (entered at T0): the next point in 2:40.
+      expect(refused.json()).toMatchObject({ code: 'NO_ENERGY', index: 0, detail: { need: 2, have: 0, next_in: 160_000 },
+        parcel: { farm_version: 3, farm: { energy: { value: 0, at: T0 } } } });
+      expect((await mine(app, ada)).farm.tilled).toHaveLength(100);
+      clock = T0 + 2 * 160_000;
+      const later = await command(app, ada, 3, [{ type: 'till', cell: '0,2' }]);
+      expect(later.statusCode).toBe(200);
+      expect(later.json().parcel).toMatchObject({ farm_version: 4, farm: { energy: { value: 0, at: T0 + 2 * 160_000 } } });
+    });
+
     it('“abandon and pick again” is refused under the production configuration and leaves the parcel', async () => {
       expect(parcelReselectFromEnv({})).toBe(false);
       expect(parcelReselectFromEnv({ DYNAMIC_FARM_RESELECT: '0' })).toBe(false);
@@ -517,7 +537,8 @@ for (const [name, enabled, makeStores] of makers) {
         expect((await claim(test, await account(test, 'Bob'), A)).statusCode).toBe(201);
         const again = await claim(test, ada, B);
         expect(again.statusCode).toBe(201);
-        expect(again.json().parcel.farm).toEqual(emptyFarm());
+        // A fresh farm reads at full Energy (C-148), the rest as empty.
+        expect(again.json().parcel.farm).toEqual({ ...emptyFarm(), energy: { value: 200, at: clock, rested_on: null } });
       } finally { await test.close(); }
     });
 
@@ -763,14 +784,16 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
       await pool!.query('UPDATE parcel_claims SET farm_state = $1, farm_version = 4 WHERE parcel_id = $2', [JSON.stringify(legacy), A.parcel_id]);
       // C-150: the old house reads as building 1, a cottage, where it stood and facing as it did; house stays for old clients.
       const buildings = [{ id: 1, type: 'cottage', ...legacy.house }];
-      expect((await mine(app, ada)).farm).toEqual({ ...legacy, buildings, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} });
+      // C-148: a save from before Energy also reads at full Energy, nothing else changes.
+      const full = { value: 200, at: clock, rested_on: null };
+      expect((await mine(app, ada)).farm).toEqual({ ...legacy, buildings, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, energy: full });
       // Re-entering an old save still gives no gift and does not rewrite it.
       expect((await enter(app, ada)).json()).toMatchObject({ granted: false, parcel: { farm_version: 4 } });
       expect((await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state).toEqual(legacy);
       const sold = await command(app, ada, 4, [{ type: 'sell', item: 'crop_carrot', count: 1 }]);
       expect(sold.statusCode).toBe(200);
       const stored = (await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state;
-      expect(stored).toEqual({ ...legacy, buildings, bag: { hoe_starter: 1, seed_carrot: 2 }, coins: 12, sales: 1, gathered: {}, blueprints_claimed: {} });
+      expect(stored).toEqual({ ...legacy, buildings, bag: { hoe_starter: 1, seed_carrot: 2 }, coins: 12, sales: 1, gathered: {}, blueprints_claimed: {}, energy: full });
     } finally { await app.close(); }
   });
 
