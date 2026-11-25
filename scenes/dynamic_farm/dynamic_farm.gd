@@ -564,56 +564,44 @@ func _build_ui() -> void:
 			_focus = _actor.position
 			_overview = false
 			_place_camera())
-	# Top bar in the main farm's UI kit (C-74): the 44 round back of ProfileTopBar / PageHeader (LOCK-22) and a
-	# surface chip with the parcel's name over its status line, at the HUD's place (x 10, y 16 + safe top).
+	# Top bar (C-74; UI v3 since C-105, docs/design/ui-v3-2026-11-24 §4.1 / C-L2): over the scene, in glass (S-2):
+	# a Ø36 glass Back in its 44 hit area, the parcel's name over its status in a glass capsule, and on one's own
+	# parcel its coins (C-59) in the C-H4 glass coin capsule at the right. 12 from the screen's sides, safe top + 8.
 	_header = HBoxContainer.new()
 	_header.name = "TopBar"
 	_header.theme = UiKit.theme()
-	_header.add_theme_constant_override(&"separation", UiTokens.SPACE_WITHIN)
+	_header.add_theme_constant_override(&"separation", UiTokens.SPACE_S3)
 	_header.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	_header.offset_left = UiTokens.SIZE_TODAY_PANEL_X
-	_header.offset_right = -UiTokens.SIZE_TODAY_PANEL_X
-	_header.offset_top = UiTokens.SIZE_HUD_TOP + _safe_top()
+	_header.offset_left = UiTokens.SIZE_SCREEN_EDGE - (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5
+	_header.offset_right = -UiTokens.SIZE_SCREEN_EDGE
+	_header.offset_top = UiTokens.SIZE_SCREEN_SAFE_INSET + _safe_top()
 	_header.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_canvas.add_child(_header)
-	var back := UiProfileTopBar._Round.new(UiProfileTopBar._Round.Glyph.BACK)
+	var back := UiGlassButton.new(null, UiGlassButton.Glyph.BACK)
 	back.name = "Back"
 	back.tooltip_text = "Back"
 	back.pressed.connect(_request_back)
 	_header.add_child(back)
-	var chip := PanelContainer.new()
+	var chip := UiGlassCapsule.new()
 	chip.name = "Place"
 	chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chip.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CHIP,
-		UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT).with_margins(12, 5, 12, 6))
 	_header.add_child(chip)
-	var labels := VBoxContainer.new()
-	labels.add_theme_constant_override(&"separation", 0)
-	labels.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chip.add_child(labels)
-	_title = UiKit.label("Dynamic farm", UiTokens.STYLE_C14_XB)
-	_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_title = chip.label()
+	_title.theme_type_variation = UiTokens.STYLE_TYPE_LABEL_ON_DARK
 	_title.custom_minimum_size.x = 120
-	labels.add_child(_title)
-	_status = UiKit.label("Loading preview…", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
-	_status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	labels.add_child(_status)
-	# One's own parcel: its coins (C-59, apart from the main farm's) in the main HUD's coins capsule, at the right.
-	_coins_capsule = UiHud._capsule()
+	chip.text = "Dynamic farm"
+	chip.detail = "Loading preview…"
+	_status = chip.detail_label()
+	# One's own parcel: its coins (C-59, apart from the main farm's) in the v3 coin capsule, at the right.
+	_coins_capsule = UiGlassCapsule.coins(UiArt.COIN)
 	_coins_capsule.name = "Coins"
 	_coins_capsule.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_coins_capsule.visible = false
-	var coins_row := _coins_capsule.get_child(0) as HBoxContainer
-	_coins = UiKit.label("0", UiTokens.STYLE_C11_XB)
-	_coins.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	coins_row.add_child(_coins)
-	var coin := UiKit.icon(UiHud.ICON_COIN, UiHud._ICON_COIN)
-	coin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	coins_row.add_child(coin)
+	_coins = (_coins_capsule as UiGlassCapsule).label()
+	_coins.text = "0"
 	_header.add_child(_coins_capsule)
-	_controls.top_exclusion_y = UiTokens.SIZE_HUD_TOP + _safe_top() + UiTokens.SIZE_CLOSE + UiTokens.SPACE_PAGE
+	_controls.top_exclusion_y = UiTokens.SIZE_SCREEN_SAFE_INSET + _safe_top() + UiTokens.SIZE_TOUCH_MIN + UiTokens.SPACE_PAGE
 	_hint = UiKit.label("Art preview · Walk and explore", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
 	_hint.theme = UiKit.theme()
 	_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)

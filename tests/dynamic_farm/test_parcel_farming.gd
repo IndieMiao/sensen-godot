@@ -1,6 +1,7 @@
 extends SceneTree
 ## C-34 rules (Q-39) without a scene: the shared numbers, the command rules mirrored from the
 ## C-31 server, the client-only spatial rules and the local save standing in for the server.
+## C-138: the carrot's seven stages and the dry / wet soil blocks (ParcelCropArt).
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -8,6 +9,7 @@ const Data = preload("res://modules/dynamic_farm/farm_data.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const Guide = preload("res://modules/dynamic_farm/parcel_guide.gd")
 const ParcelGather = preload("res://modules/dynamic_farm/parcel_gather.gd")
+const CropArt = preload("res://modules/dynamic_farm/parcel_crop_art.gd")
 const T0 := 1795392000000
 var checks := 0
 var failures := 0
@@ -27,6 +29,8 @@ func _run() -> void:
 	_space()
 	_store()
 	_guide()
+	_crop_stages()
+	_crop_art()
 	print("PARCEL_FARMING checks=%d failures=%d" % [checks, failures])
 	quit(1 if failures else 0)
 
@@ -216,3 +220,53 @@ func _guide() -> void:
 		_check(not Guide.map_text(key).is_empty(), "guide: the map's line for " + key)
 	for key: String in ["build", "till", "sow", "harvest", ""]:
 		_check(Guide.map_text(key).is_empty(), "guide: no map line for '%s' (taught on the parcel)" % key)
+
+## C-138: a sown carrot goes through stages 1..6 (stage 0 is tilled soil with nothing sown). Sowing to root thickening
+## take a fifth of the growing time each; maturity starts exactly when the carrot ripens (Harvest opens).
+func _crop_stages() -> void:
+	var rules := ParcelFarm.rules()
+	var state: Dictionary = ParcelFarm.welcome(rules, ParcelFarm.empty_state(), T0)
+	for command in [{"type": "till", "cell": "10,10"}, {"type": "sow", "cell": "10,10", "crop": "crop_carrot"}]:
+		state = ParcelFarm.apply(rules, state, [command], T0).state
+	var crop: Dictionary = state.crops["10,10"]
+	_check(crop.ripe_at - crop.planted_at == 60000, "stages: the carrot still ripens 60 s after sowing")
+	_check(CropArt.STAGES.size() == 7 and CropArt.MATURE == 6, "stages: seven, the last one mature")
+	var seen: Array = []
+	for second in range(0, 61):
+		var stage := CropArt.stage_of(crop, T0 + second * 1000)
+		if seen.is_empty() or seen.back() != stage: seen.append(stage)
+	_check(seen == [1, 2, 3, 4, 5, 6], "stages: sowing to maturity in order: %s" % [seen])
+	var starts := [0, 12000, 24000, 36000, 48000, 60000]
+	for i in starts.size():
+		_check(CropArt.stage_of(crop, T0 + starts[i]) == i + 1 and (i == 0 or CropArt.stage_of(crop, T0 + starts[i] - 1) == i),
+			"stages: stage %d starts %d s after sowing" % [i + 1, starts[i] / 1000])
+	_check(CropArt.stage_of(crop, T0 + 59999) == 5 and ParcelFarm.apply(rules, state, [{"type": "harvest", "cell": "10,10"}], T0 + 59999).code == "NOT_RIPE",
+		"stages: not mature and not harvestable a moment before ripe")
+	_check(CropArt.stage_of(crop, T0 + 60000) == CropArt.MATURE and ParcelFarm.apply(rules, state, [{"type": "harvest", "cell": "10,10"}], T0 + 60000).ok,
+		"stages: mature exactly when harvestable")
+	_check(CropArt.stage_of(crop, T0 + 86400000) == CropArt.MATURE, "stages: stays mature")
+	_check(CropArt.stage_of(crop, T0 - 5000) == 1, "stages: a clock behind the sowing shows sowing")
+	# A carrot sown before this change: the save has only planted_at / ripe_at, so it lands by how long it has grown.
+	var old := ParcelFarm.normalize(JSON.parse_string(JSON.stringify(state)))
+	_check(old.crops["10,10"] == crop and CropArt.stage_of(old.crops["10,10"], T0 + 40000) == 4, "stages: an existing save reads unchanged, 40 s in -> root shoulders")
+	_check(rules.crops.crop_carrot == {"seed": "seed_carrot", "grow_seconds": 60, "yield": 1} and rules.economy.sell_prices.crop_carrot == 12,
+		"stages: seed, growing time, yield and price unchanged")
+
+## C-138: every tilled cell is one 1×1 soil block, dry or wet, with its carrot stage on it.
+func _crop_art() -> void:
+	var art := CropArt.new(func(cell: Vector2i) -> Vector3: return Vector3(cell.x, 0, -cell.y), 0.8)
+	var crops := {"2,1": {"crop": "crop_carrot", "planted_at": T0, "ripe_at": T0 + 60000},
+		"3,1": {"crop": "crop_carrot", "planted_at": T0 - 60000, "ripe_at": T0}}
+	art.sync({"1,1": CropArt.DRY, "2,1": CropArt.DRY, "3,1": CropArt.DRY}, crops, T0 + 13000)
+	_check(art.counts() == {"soil": {"dry": 3, "wet": 0}, "stages": [1, 0, 1, 0, 0, 0, 1]}, "art: three dry blocks, tilled / emergence / mature: %s" % [art.counts()])
+	art.sync({"1,1": CropArt.WET, "2,1": CropArt.WET, "3,1": CropArt.DRY}, crops, T0 + 13000)
+	_check(art.counts().soil == {"dry": 1, "wet": 2}, "art: wet blocks are drawn as wet")
+	var dry: MultiMeshInstance3D = art._soil[CropArt.DRY]
+	var wet: MultiMeshInstance3D = art._soil[CropArt.WET]
+	_check(dry.multimesh.instance_count == 1 and wet.multimesh.instance_count == 2, "art: one block per tilled cell")
+	var block := dry.multimesh.mesh.get_aabb()
+	_check(block.size.x <= 1.0 and block.size.z <= 1.0 and block.size.x >= 0.9, "art: a block covers one cell and no more: %s" % [block.size])
+	_check(CropArt.SOIL_COLORS.wet.get_luminance() < CropArt.SOIL_COLORS.dry.get_luminance(), "art: wet soil is darker")
+	art.sync({}, {}, T0)
+	_check(art.counts() == {"soil": {"dry": 0, "wet": 0}, "stages": [0, 0, 0, 0, 0, 0, 0]}, "art: nothing tilled, nothing drawn")
+	art.free()

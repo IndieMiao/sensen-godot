@@ -19,6 +19,10 @@ const BUILDINGS_LOAD_TIMEOUT_MS := 45000
 const QUERY_FAILED := "Parcel details could not load. Tap Retry."
 const MAP_FAILED := "Map details could not load. Tap Retry."
 const FINDING := "Finding parcel…"
+const LOADING := "Loading map details…"
+## Below the selectable zoom the parcel layers are not drawn, so they do not load there (C-130 V-362): the map is not
+## stuck loading, it waits for the player to zoom in.
+const ZOOM_IN := "Zoom in to choose a farm."
 const TOO_SMALL := "This parcel is too small to be your main farm. Please choose a larger one." # Q-56
 const MIN_CORE_CELLS := 400 # C-43 default; config min_core_cells overrides (clamped 1–8192).
 # Definite native answers: retrying cannot change them, so they are not failures.
@@ -45,6 +49,7 @@ var _query_failed := false
 var _map_retried := false
 var _reload_left := -1.0
 var _resume_tap := false
+var _map_loading := false # C-94: this map is still loading (not failed); a tap now waits for it like a cold start.
 var _failed_generation := -1 # Map being replaced by the automatic reload; its later signals are the same failure.
 var _buildings_left := -1.0 # Countdown for the DataSF building layer of the current map; -1 when not waiting.
 var _buildings_wait := false # The current DataSF map has not reported its building layer loaded; taps wait for it.
@@ -60,7 +65,7 @@ var _connected := false
 func activate(auto := false) -> void:
 	if not auto: _map_retried = false; _resume_tap = false; _failed_generation = -1
 	_reload_left = -1.0; _buildings_left = -1.0; _buildings_wait = false
-	suspended = false
+	suspended = false; _map_loading = true
 	_epoch += 1
 	var epoch := _epoch
 	var started := Time.get_ticks_msec()
@@ -91,16 +96,18 @@ func activate(auto := false) -> void:
 	manifest = data
 	if generation > 0: bridge.clear_parcel_layers(generation)
 	generation = MapBridge.next_parcel_generation(); style_generation = -1
-	busy = false; message = FINDING if _resume_tap else "Loading map details…"; changed.emit()
+	busy = false; message = FINDING if _resume_tap else _loading_text()
 	if _refetch_buildings: native["refetch_buildings"] = true; _refetch_buildings = false
 	bridge.set_parcel_sources(generation, JSON.stringify(native))
 	if native.building_source == "datasf":
 		_buildings_wait = true; _buildings_left = buildings_load_timeout(); _buildings_started = Time.get_ticks_msec()
+	# C-130: after the sources, so what follows this generation (the starter zone marker) reaches native after them.
+	changed.emit()
 
 func pause() -> void:
 	suspended = true; _epoch += 1; _pending = -1; _retry_left = -1.0; _query_failed = false; map_ready = false; busy = false
 	_reload_left = -1.0; _resume_tap = false; _failed_generation = -1; _buildings_left = -1.0; _buildings_wait = false
-	selection = {}; _options = []; _key = ""
+	_map_loading = false; selection = {}; _options = []; _key = ""
 	if api != null: api.cancel_all()
 	if bridge != null:
 		if generation > 0: bridge.clear_parcel_layers(generation)
@@ -118,11 +125,12 @@ func _native_ready(gen: int, style: int, payload: String) -> void:
 		_buildings_left = -1.0; _buildings_wait = false
 	var was_ready := map_ready
 	map_ready = data.get("source_ready") == true and str(data.get("error", "")).is_empty()
+	_map_loading = not map_ready
 	if map_ready and _resume_tap and not _buildings_wait:
 		# The reloaded map (or its building layer) answers the waiting tap; a reload was that tap's one retry.
 		_resume_tap = false; message = FINDING; changed.emit(); _send_query(); return
 	if _querying(): message = FINDING # Native idle readiness arrives while a tap waits.
-	elif not map_ready: message = "Loading map details…"
+	elif not map_ready: message = _loading_text()
 	# Idle readiness also follows every highlight change: it must not replace the chosen parcel's message (C-43 V-199).
 	elif reset or not was_ready: message = PROMPT
 	changed.emit()
@@ -141,16 +149,22 @@ func _native_error(gen: int, style: int, code: String) -> void:
 	if not retry: _fail(MAP_FAILED); return
 	_map_retried = true; _resume_tap = tap; _retried = _retried or tap; _failed_generation = gen
 	busy = true; _reload_left = retry_delay()
-	message = FINDING if tap else "Loading map details…"; changed.emit()
+	message = FINDING if tap else LOADING; changed.emit()
 
 func camera_changed(zoom := -1.0) -> void:
 	if zoom >= 0.0: _view_zoom = zoom
+	var waiting := _resume_tap
 	_pending = -1; _retry_left = -1.0; _query_failed = false; _resume_tap = false; _options = []
 	if map_ready and not busy:
 		message = PROMPT; changed.emit()
+	elif waiting and not busy: # C-94: a tap waiting for the loading map is cancelled; the map is still loading.
+		message = _loading_text(); changed.emit()
+	elif _map_loading and not busy and message != _loading_text() and message in [LOADING, ZOOM_IN]:
+		message = _loading_text(); changed.emit() # Zoomed across the selectable zoom while the map loads.
 
+## C-94: while the map is still loading ("Loading map details…") the tap waits and is sent once it is ready.
 func tap(point: Vector2, zoom: float) -> void:
-	if suspended or not map_ready or busy: return
+	if suspended or busy or not (map_ready or _map_loading): return
 	_view_zoom = zoom
 	if zoom < float(manifest.native_map.get("minzoom", 16)):
 		message = "Zoom in to choose a farm."; changed.emit(); return
@@ -167,7 +181,11 @@ func retry() -> void:
 
 func _start_query() -> void:
 	message = FINDING; changed.emit()
-	_retried = false; _retry_left = -1.0; _query_failed = false; _map_retried = false
+	_retried = false; _retry_left = -1.0; _query_failed = false
+	# C-94: sent by _native_ready once the loading map (and its DataSF building layer) is ready. The map's own
+	# automatic reload, if already used, is not given back to this tap.
+	if not map_ready: _resume_tap = true; return
+	_map_retried = false
 	if _buildings_wait: _resume_tap = true; return # Sent once the DataSF building layer loads (C-43 V-199).
 	_send_query()
 
@@ -309,7 +327,12 @@ func _record_query(request: int, outcome: String, retry: bool) -> void:
 	# Native outcome code only: no point, parcel, building key or coordinates.
 	print("DYNAMIC_QUERY ", JSON.stringify({"request":request, "outcome":outcome, "attempt":2 if _retried else 1, "retry":retry}))
 
-## The DataSF building layer is drawn, so loads, only from the selectable zoom; below it the countdown waits.
+## While the map loads: the parcel layers load only where drawn, from the selectable zoom (C-130 V-362).
+func _loading_text() -> String:
+	return LOADING if _buildings_drawn() else ZOOM_IN
+
+## The DataSF building layer is drawn, so loads, only from the selectable zoom; below it the countdown waits. The same
+## holds for the parcel layers, whose native load timeout also waits (C-130 V-362).
 func _buildings_drawn() -> bool:
 	return _view_zoom < 0.0 or manifest.is_empty() or _view_zoom >= float(manifest.native_map.get("minzoom", 16))
 
@@ -337,7 +360,7 @@ func _process(delta: float) -> void:
 		_pending = -1; _fail("The map did not respond. Tap again or Retry.")
 
 func _fail(text: String) -> void:
-	busy = false; _resume_tap = false; _reload_left = -1.0; message = text; changed.emit()
+	busy = false; _resume_tap = false; _map_loading = false; _reload_left = -1.0; message = text; changed.emit()
 
 static func _parse(text: String) -> Dictionary:
 	var parser := JSON.new()

@@ -71,10 +71,17 @@ curl localhost:3000/v1/healthz
 启动迁移新增 `parcel_claims` 表（只新增，不改旧表）：主键保证一块地只有一个主人，
 部分唯一索引保证每人一块免费地。首次进入自家地块（`/v1/parcels/mine/enter`）只发一次赠品；
 数值在 `assets/farm/data/dynamic_farm.json`（所有者拍板 Q-39、Q-40）。
+进入时客户端带上这次打开农场用的数据集，旧数据集上的认领会换到新数据集（C-136，所有者拍板 Q-168），见 [docs/plans/C-136.md](../docs/plans/C-136.md)。
 “放弃并重选”只在设置 `DYNAMIC_FARM_RESELECT=1` 的内部测试服可用，正式配置不设，调用返回 403。
 接口、表结构和选型理由见 [docs/plans/C-31.md](../docs/plans/C-31.md)。
 正式服（C-96）只用邀请账号：`ACCOUNT_SIGNUP=closed` 时邮箱注册和 Apple / Google 首登建号都回 403 `SIGNUP_CLOSED`，
 账号由 `tools/invite_accounts.ts` 直接写库。部署包、建库、备份恢复和回滚见 [deploy/dynamicfarm/README.md](deploy/dynamicfarm/README.md)。
+起步区（C-130）：`assets/farm/data/dynamic_farm_starter_zone.json` 开着时，还没有地块的玩家只能认领区内地块
+（按地块编号判定，区外回 403 `OUTSIDE_STARTER_ZONE`；区内核心格不足客户端 `min_core_cells` 的太小地块回 403
+`PARCEL_TOO_SMALL`，C-143）；已有地块的玩家和他们的地块不受影响。
+`GET /v1/parcels/starter-zone?dataset_version=…` 公开返回边界、地图默认落点和区内地块编号。
+`PARCEL_STARTER_ZONE=0/1` 覆盖文件里的开关；扩大范围用 `tools/starter_zone_build.ts` 按新边界重新生成。
+文件不合法时服务端不启动。说明见 [docs/plans/C-130.md](../docs/plans/C-130.md)。
 
 ## 自由选址（SGODOT-37）
 

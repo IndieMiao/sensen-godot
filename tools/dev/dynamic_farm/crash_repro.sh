@@ -13,7 +13,7 @@
 # pids.txt (one line per sample: the app pid; a change means the process died), events.txt and summary.txt.
 set -euo pipefail
 
-port='' serial='' out='' package='com.sensen.dynamicfarm.internal' rounds=10
+port='' serial='' out='' package='com.gensen.mapfarm.internal' rounds=10
 while (($#)); do
   case "$1" in
     --port) port=$2; shift 2 ;;

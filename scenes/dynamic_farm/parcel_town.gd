@@ -1,7 +1,7 @@
 extends Control
-## The market (Jasmine) and the carpenter (Scott) of the dynamic farm (C-59, the C-30 0.4.3 plan). They open from
-## the two fixed entries on the community map (C-30#29 question 1: no shop pins at real places), over the map.
-## Each keeper greets first, as on the main farm (UiDialogueCard, KeeperGreeting); their looks are built from the
+## The market (Jasmine) and the carpenter (Scott) of the dynamic farm (C-59, the C-30 0.4.3 plan). Since C-115 they
+## stand in the Washington Square room (parcel_outpost.gd), which opens this greeting over itself when one is tapped.
+## Each keeper greets first in the UI v3 NPC card (UiNpcCard, C-105; the main farm's KeeperGreeting before); their looks are built from the
 ## existing avatar parts and their portraits drawn from them (P0KeeperPortraits), with no painted art or new model
 ## (C-30#29 question 6).
 ## - Jasmine introduces coins in a line the first time she is met (kept on this device per parcel), then says hello;
@@ -46,12 +46,11 @@ var farm := {}
 var farm_version := -1
 var busy := false
 var stack: ModalStack
-var card: UiDialogueCard
+var card: UiNpcCard
 var counter: Counter
 var toast: ToastLayer
 ## A greeting's keys, by name (tests and the map read them).
 var keys := {}
-var _close: UiCloseButton
 var _switching := false   # the card closes because the counter opens over it
 var _met_path := MET_PATH
 
@@ -116,15 +115,11 @@ func _greet() -> void:
 	var data := npc(who)
 	keys = {}
 	if card == null or not is_instance_valid(card):
-		card = UiDialogueCard.new(portrait(who), "%s · %s" % [data.role, data.name])
-		card.portrait_size = UiDialogueCard.KEEPER_PORTRAIT
-		card.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-		card.offset_left = UiTokens.SIZE_QUICK_BAR_X
-		card.offset_right = -UiTokens.SIZE_QUICK_BAR_X
-		card.offset_bottom = -UiTokens.SPACE_PAGE - 24
-		card.grow_vertical = Control.GROW_DIRECTION_BEGIN
+		card = UiNpcCard.new(portrait(who), "%s · %s" % [data.role, data.name])
+		card.place_centred()
+		card.close_requested.connect(close)
 		stack.open_card(card)
-		_close_above(card)
+		card.play_in(stack.get_node_or_null(^"ScrimCard"))
 		toast.anchor_above(card)
 	for c in card.content.get_children():
 		c.hide()
@@ -221,25 +216,12 @@ func _met() -> Dictionary:
 	var raw = JSON.parse_string(FileAccess.get_file_as_string(_met_path)) if FileAccess.file_exists(_met_path) else null
 	return raw if raw is Dictionary else {}
 
-## A Close 44 sits 8 above the card's top-right corner, as on the main farm's keeper greeting.
-func _close_above(content: Control) -> void:
-	_close = UiCloseButton.new()
-	_close.size = Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE)
-	var follow := func():
-		if is_instance_valid(_close) and is_instance_valid(content):
-			_close.position = content.position + Vector2(content.size.x - UiTokens.SIZE_CLOSE, -8.0 - UiTokens.SIZE_CLOSE)
-	content.item_rect_changed.connect(follow)
-	_close.pressed.connect(close)
-	stack.add_child(_close)
-	follow.call()
-
 ## The counter closing goes back to the greeting; the greeting closing leaves.
 func _on_layer_closed(layer: int, _content: Control) -> void:
 	if layer == ModalStack.Layer.DRAWER:
 		counter = null
 		if is_inside_tree(): _greet_again.call_deferred()
 	elif layer == ModalStack.Layer.CARD:
-		if is_instance_valid(_close): _close.queue_free()
 		card = null
 		if not _switching and not stack.has_drawer(): close()
 

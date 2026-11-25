@@ -332,7 +332,9 @@ packages only; reloads the saved account token through `Net.restore_saved_accoun
 calls `/users/me` and nothing else), `sensen/dynamic_farm/guest_play` (internal test packages only, C-100:
 when no saved account was restored, `Net.dynamic_farm_sign_in()` signs in anonymously with the installation key;
 the server's `PARCEL_GUEST_WRITES` decides whether that guest may claim and farm) and `sensen/dynamic_farm/fake_claims` (+ optional
-`fake_player`, default `fake-a`) for development without the C-31 server. None is
+`fake_player`, default `fake-a`) for development without the C-31 server, and
+`sensen/dynamic_farm/profile_outfit_wait_seconds` (C-135, default 5: how long a profile tap waits for the saved
+outfit's parts before the profile opens all the same; `PARCEL_PROFILE_WAIT` logs `timed_out`). None is
 set in `project.godot`, so release builds show no give-up entry and keep the normal
 `Net` boot. A signed-out player gets a "Sign in" button that opens the existing
 `AccountPanel`; ownership is re-read for the new identity.

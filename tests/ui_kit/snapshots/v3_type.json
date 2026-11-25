@@ -1,0 +1,253 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    481
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "v3 type scale"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "ui-v3 §2.2 · fig 9 · white variants §2.1"
+    },
+    {
+      "type": "VBoxContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        429
+      ],
+      "children": [
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            52,
+            328,
+            39
+          ],
+          "variation": "TypeDisplay",
+          "text": "TypeDisplay · 200/200"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            95,
+            328,
+            29
+          ],
+          "variation": "TypeTitle",
+          "text": "TypeTitle · 200/200"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            128,
+            328,
+            23
+          ],
+          "variation": "TypeHeadline",
+          "text": "TypeHeadline · 200/200"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            155,
+            328,
+            20
+          ],
+          "variation": "TypeBody",
+          "text": "TypeBody · 200/200"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            179,
+            328,
+            20
+          ],
+          "variation": "TypeBodyBold",
+          "text": "TypeBodyBold · 200/200"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            203,
+            328,
+            22
+          ],
+          "variation": "TypeButton",
+          "text": "TypeButton · 200/200"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            229,
+            328,
+            19
+          ],
+          "variation": "TypeLabel",
+          "text": "TypeLabel · 200/200"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            252,
+            328,
+            19
+          ],
+          "variation": "TypeHudNumber",
+          "text": "TypeHudNumber · 200/200"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            275,
+            328,
+            18
+          ],
+          "variation": "TypeCaption",
+          "text": "TypeCaption · 200/200"
+        },
+        {
+          "type": "Label",
+          "rect": [
+            0,
+            297,
+            328,
+            15
+          ],
+          "variation": "TypeMicro",
+          "text": "TypeMicro · 200/200"
+        },
+        {
+          "type": "PanelContainer",
+          "rect": [
+            0,
+            316,
+            328,
+            123
+          ],
+          "children": [
+            {
+              "type": "VBoxContainer",
+              "rect": [
+                8,
+                324,
+                312,
+                107
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    324,
+                    312,
+                    19
+                  ],
+                  "variation": "TypeLabelOnDark",
+                  "text": "TypeLabelOnDark · Bag 1533 x22"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    347,
+                    312,
+                    19
+                  ],
+                  "variation": "TypeHudNumberOnDark",
+                  "text": "TypeHudNumberOnDark · Bag 1533 x22"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    370,
+                    312,
+                    18
+                  ],
+                  "variation": "TypeCaptionOnDark",
+                  "text": "TypeCaptionOnDark · Bag 1533 x22"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    392,
+                    312,
+                    15
+                  ],
+                  "variation": "TypeMicroOnDark",
+                  "text": "TypeMicroOnDark · Bag 1533 x22"
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    8,
+                    411,
+                    312,
+                    20
+                  ],
+                  "variation": "TypeFloat",
+                  "text": "TypeFloat · Bag 1533 x22"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "PanelContainer",
+          "rect": [
+            0,
+            443,
+            328,
+            38
+          ],
+          "children": [
+            {
+              "type": "Label",
+              "rect": [
+                8,
+                451,
+                312,
+                22
+              ],
+              "variation": "TypeButtonOnAction",
+              "text": "TypeButtonOnAction · Give radish"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

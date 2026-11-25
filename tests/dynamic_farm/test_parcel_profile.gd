@@ -155,6 +155,36 @@ func _run() -> void:
 	verify(map._profile == null and not is_instance_valid(host), "‹ on the profile closes it")
 	verify(map._hud.visible and not entry.disabled, "the map's panels come back")
 	verify(TranslationServer.get_locale() == "zh_CN", "the locale is put back")
+	# C-135: a load that never ends (the engine's loading thread stuck) holds the key for profile_wait_seconds at most,
+	# then the profile and Settings open all the same.
+	verify(not ProjectSettings.has_setting(map.PROFILE_WAIT_SETTING) and map.profile_wait_seconds == 5.0, "the wait is 5 s at most by default")
+	for i in 900:
+		if avatar.loader._by_path.is_empty(): break
+		await process_frame
+	var stuck := str(avatar.load_outfit().slots[&"cloth"])
+	var stuck_path: String = avatar.catalog.part(stuck).res_path
+	avatar.loader.set_process(false)   # never polled again: the part stays loading
+	avatar.loader._by_path[stuck_path] = {"waiters": []}
+	var stuck_ids: Array[String] = [stuck]
+	avatar._warming = stuck_ids
+	map.profile_wait_seconds = 0.5
+	verify(avatar.warming(), "stuck: the outfit never finishes loading")
+	var tapped := Time.get_ticks_msec()
+	entry.pressed.emit()
+	verify(map._profile == null and entry.disabled, "a tap holds the key while it loads")
+	while map._profile == null and Time.get_ticks_msec() - tapped < 5000: await process_frame
+	var waited := Time.get_ticks_msec() - tapped
+	verify(map._profile != null and avatar.warming(), "the profile opens though the outfit is still loading")
+	verify(waited >= 500 and waited < 2000, "after the configured wait (%d ms)" % waited)
+	host = map._profile
+	host.top().top_bar.settings_pressed.emit(); await process_frame
+	verify(host.top().get_script() == SettingsPage, "and Settings opens from it")
+	avatar.loader._by_path.erase(stuck_path)
+	var none: Array[String] = []
+	avatar._warming = none
+	host.top().back_pressed.emit(); await process_frame
+	host.top().back_pressed.emit(); await process_frame
+	verify(map._profile == null and not entry.disabled, "it closes as before")
 	map.queue_free(); await process_frame
 	current_scene = null
 	MapUsage.set_enabled(telemetry)

@@ -1,0 +1,335 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    248
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiBagSlot states"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "ui-v3 C-P5 / C-P6 · fig 11"
+    },
+    {
+      "type": "HFlowContainer",
+      "rect": [
+        0,
+        52,
+        328,
+        196
+      ],
+      "children": [
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            52,
+            72,
+            92
+          ],
+          "children": [
+            {
+              "type": "UiBagSlot",
+              "rect": [
+                0,
+                52,
+                72,
+                72
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    75,
+                    100,
+                    1,
+                    24
+                  ],
+                  "variation": "TypeMicro",
+                  "text": ""
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                130,
+                72,
+                14
+              ],
+              "variation": "C9B",
+              "text": "empty"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            84,
+            52,
+            72,
+            92
+          ],
+          "children": [
+            {
+              "type": "UiBagSlot",
+              "rect": [
+                84,
+                52,
+                72,
+                72
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    96,
+                    64,
+                    48,
+                    48
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    134,
+                    100,
+                    26,
+                    24
+                  ],
+                  "variation": "TypeMicro",
+                  "text": "x20"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                84,
+                130,
+                72,
+                14
+              ],
+              "variation": "C9B",
+              "text": "filled"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            168,
+            52,
+            72,
+            92
+          ],
+          "children": [
+            {
+              "type": "UiBagSlot",
+              "rect": [
+                168,
+                52,
+                72,
+                72
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    180,
+                    64,
+                    51,
+                    51
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    218,
+                    100,
+                    26,
+                    24
+                  ],
+                  "variation": "TypeMicro",
+                  "text": "x20"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                168,
+                130,
+                72,
+                14
+              ],
+              "variation": "C9B",
+              "text": "selected"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            252,
+            52,
+            72,
+            92
+          ],
+          "children": [
+            {
+              "type": "UiBagSlot",
+              "rect": [
+                252,
+                52,
+                72,
+                72
+              ],
+              "children": [
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    264,
+                    64,
+                    48,
+                    48
+                  ]
+                },
+                {
+                  "type": "Label",
+                  "rect": [
+                    302,
+                    100,
+                    26,
+                    24
+                  ],
+                  "variation": "TypeMicro",
+                  "text": "x20"
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                252,
+                130,
+                72,
+                14
+              ],
+              "variation": "C9B",
+              "text": "new"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            0,
+            156,
+            72,
+            92
+          ],
+          "children": [
+            {
+              "type": "UiBagSlot",
+              "rect": [
+                0,
+                156,
+                72,
+                72
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    75,
+                    204,
+                    1,
+                    24
+                  ],
+                  "variation": "TypeMicro",
+                  "text": ""
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                0,
+                234,
+                72,
+                14
+              ],
+              "variation": "C9B",
+              "text": "locked"
+            }
+          ]
+        },
+        {
+          "type": "VBoxContainer",
+          "rect": [
+            84,
+            156,
+            72,
+            92
+          ],
+          "children": [
+            {
+              "type": "UiBagSlot",
+              "rect": [
+                84,
+                156,
+                72,
+                72
+              ],
+              "children": [
+                {
+                  "type": "Label",
+                  "rect": [
+                    159,
+                    204,
+                    1,
+                    24
+                  ],
+                  "variation": "TypeMicro",
+                  "text": ""
+                }
+              ]
+            },
+            {
+              "type": "Label",
+              "rect": [
+                84,
+                234,
+                72,
+                14
+              ],
+              "variation": "C9B",
+              "text": "add"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

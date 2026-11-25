@@ -16,7 +16,7 @@ func _init() -> void:
 	var sprout := UiKit.icon(SPROUT, _SPROUT)
 	sprout.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	add_child(sprout)
-	var name_label := UiKit.label(NAME, UiTokens.STYLE_TITLE_XB20, UiTokens.COLOR_PRIMARY)
+	var name_label := UiKit.label(NAME, UiTokens.STYLE_TITLE_XB20, UiTokens.COLOR_PRIMARY_INK)
 	name_label.add_theme_font_size_override(&"font_size", _NAME_SIZE)
 	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(name_label)

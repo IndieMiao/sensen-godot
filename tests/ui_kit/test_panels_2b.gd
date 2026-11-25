@@ -871,7 +871,7 @@ func test_a_plain_state_badge_keeps_its_own_tone() -> void:
 	var ready: UiBadge = _host(UiBadge.new("Ready"))
 	await _settle()
 	assert_object(_fill(ready)).is_equal(UiTokens.COLOR_PRIMARY_TINT)
-	assert_object(_ink(ready, "Ready")).is_equal(UiTokens.COLOR_PRIMARY)
+	assert_object(_ink(ready, "Ready")).is_equal(UiTokens.COLOR_PRIMARY_INK)
 
 func test_notice_row_reads_one_line_with_a_chevron() -> void:
 	var r: UiNoticeRow = _host(UiNoticeRow.new("Bag full · +5 slots at Home Lv3"))

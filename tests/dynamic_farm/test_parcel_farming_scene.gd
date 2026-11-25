@@ -5,14 +5,22 @@ extends SceneTree
 ## faces it and plays the labour clip; the result shows as the clip ends; a cell with nowhere to
 ## stand says so and sends nothing; the stick cancels a walk; the parcel stays covered until the
 ## save is applied. C-33: opening the house placement gives up a press still walking. C-114: Build pops the
-## cottage in with dust round it; reopening shows it still, without dust. Run in the private preview project (README), optionally
+## cottage in with dust round it; reopening shows it still, without dust. C-138: the carrot's stage and the dry soil block
+## are drawn; the development switch draws the soil wet. C-136: a claim made on an older dataset opens on the
+## server save once the enter request names the opened farm's dataset (Q-168), the lost first try included. Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
+const RemoteStore = preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
 const House = preload("res://modules/dynamic_farm/farm_house.gd")
+## Pixels the quick bar's global rect may sit off its rest after M-16's slide back (C-147). Control only refreshes its
+## cached global transform when the position moves by more than is_equal_approx (relative 1e-5, about 0.006 px at
+## y 600), so a tween's last sub-0.006 px step leaves get_global_rect() one frame behind, for good. Far below the
+## 24 px slide (UiMotion.BAR_HIDE_Y) the assertion has to catch.
+const BAR_REST_TOLERANCE_PX := 0.1
 var checks := 0
 var failures := 0
 var raw: Dictionary
@@ -42,6 +50,26 @@ class FlakyStore extends RefCounted:
 		return inner.enter()
 	func send(base_version: int, commands: Array) -> Dictionary: return inner.send(base_version, commands)
 
+## C-136 stand-in for the server's /parcels/mine endpoints holding the player's claim on an older dataset: an enter
+## naming a dataset moves the claim to it (Q-168 rebase; the cell progress is gone, the bag kept); anything else answers
+## the claim as it is. The first `drop` requests are lost like a dropped connection.
+class OldClaimServer extends RefCounted:
+	var block_id: String
+	var dataset: String
+	var farm: Dictionary
+	var drop := 0
+	var enters: Array = [] # Bodies of the enter requests that reached the server, lost ones included.
+	func handle(method: String, url: String, _headers: PackedStringArray, body: String) -> ApiClient.Response:
+		var data = JSON.parse_string(body) if not body.is_empty() else {}
+		if method == "POST" and url.ends_with("/parcels/mine/enter"):
+			enters.append(data)
+			if data is Dictionary and data.get("dataset_version") is String: dataset = data.dataset_version
+		if drop > 0:
+			drop -= 1
+			return ApiClient.Response.new(false, 0, {}, "transport error")
+		return ApiClient.Response.new(true, 200, {"granted": false, "server_time": int(Time.get_unix_time_from_system() * 1000.0),
+			"parcel": {"parcel_id": block_id, "dataset_version": dataset, "farm_version": 5, "farm": farm}})
+
 func _initialize() -> void:
 	_run.call_deferred()
 
@@ -59,6 +87,7 @@ func _run() -> void:
 	await _reopen()
 	await _placement_takes_over()
 	await _house_pops_once()
+	await _older_dataset_claim()
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
 	print("PARCEL_FARMING_SCENE checks=%d failures=%d" % [checks, failures])
@@ -172,6 +201,10 @@ func _first_visit() -> void:
 	_check(_tip(farming) == "", "a tap closes the card")
 	_check(farming._bar.visible and _bar_counts(farming) == {"hoe_starter": 1, "seed_carrot": 3, "blueprint_cottage": 1}, "quick bar shows hoe, seeds and the blueprint")
 	_check(farming._bar.slots[2].icon == load("res://modules/dynamic_farm/parcel_items.gd").icon_of("blueprint_cottage"), "the blueprint has the parcel adapter's placeholder icon (C-59)")
+	_check(farming._bar.slots[0].icon == UiArt.item("row_tool") and farming._bar.slots[1].icon == UiArt.item("seed_carrot"),
+		"the hoe and the seeds show C-86's v3 item art (C-105)")
+	_check(farming._bar.bag_icon == UiArt.SYS_BAG and (scene._coins_capsule as UiGlassCapsule).icon == UiArt.COIN,
+		"the Bag end and the coins capsule show the v3 bag and coin (C-105)")
 	_check(scene._coins_capsule.visible and scene._coins.text == "0", "the top bar shows the parcel's coins, 0 on a new parcel (C-59)")
 	scene._on_farm_changed(farming.farm.merged({"coins": 12}, true))
 	_check(scene._coins.text == "12", "the coins follow the save")
@@ -223,7 +256,7 @@ func _first_visit() -> void:
 	_check(await _key(farming, cell) == ["Till", "Free", UiSceneAction.State.DEFAULT], "a free core cell offers Till")
 	seen = await _press(farming, cell)
 	_check(_beside([cell]) and seen.clips.has("labour_till") and not seen.early, "till: beside the cell, facing it, the till clip")
-	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._soil.counts().get("soil", 0) == 1, "one press tills, soil drawn")
+	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crop_art.counts().soil == {"dry": 1, "wet": 0}, "one press tills, one dry soil block drawn")
 	_check(_tip(farming) == "Press Sow to plant Carrot Seeds in your soil.", "the next step's card comes back after tilling: " + _tip(farming))
 	_check(await _key(farming, cell) == ["Sow", "Carrot", UiSceneAction.State.DEFAULT], "tilled soil offers Sow")
 	seen = await _press(farming, cell)
@@ -231,6 +264,13 @@ func _first_visit() -> void:
 	var crop: Dictionary = farming.farm.crops.get(ParcelFarm.key(cell), {})
 	_check(crop.get("ripe_at", 0) - crop.get("planted_at", 0) == 60000 and farming.farm.bag.seed_carrot == 2, "sown: 60 s to ripen, one seed used")
 	_check(_bar_counts(farming).get("seed_carrot") == 2, "the quick bar's seed count follows at once")
+	_check(farming._crop_art.counts().stages == [0, 1, 0, 0, 0, 0, 0], "C-138: the sown carrot shows its sowing stage at once")
+	_check(not farming.wet_soil_preview and farming._crop_art.counts().soil == {"dry": 1, "wet": 0}, "C-138: no watering yet, the soil is dry")
+	farming.wet_soil_preview = true
+	farming._draw_crops()
+	_check(farming._crop_art.counts().soil == {"dry": 0, "wet": 1}, "C-138: the development switch previews wet soil")
+	farming.wet_soil_preview = false
+	farming._draw_crops()
 	_check(_tip(farming) == "", "no card while the carrot grows")
 	key = await _key(farming, cell)
 	_check(key[0] == "Growing" and key[1] in ["Ready in 1:00", "Ready in 0:59", "Ready in 0:58"] and key[2] == UiSceneAction.State.UNAVAILABLE, "growing counts down")
@@ -266,13 +306,14 @@ func _first_visit() -> void:
 	_check(await _key(farming, cell) == ["Harvest", "Free", UiSceneAction.State.DEFAULT], "ripe after 60 s")
 	await create_timer(farming.get_script().REDRAW_S * 2).timeout
 	_check(_tip(farming) == "Your carrot is ripe. Press Harvest!", "a ripe carrot brings the harvest card: " + _tip(farming))
+	_check(farming._crop_art.counts().stages == [0, 0, 0, 0, 0, 0, 1], "C-138: the ripe carrot is drawn mature")
 	seen = await _press(farming, cell)
 	_check(_beside([cell]) and seen.clips.has("labour_harvest") and not seen.early, "harvest: beside the cell, the harvest clip")
 	_check(farming.farm.bag.get("crop_carrot") == 1 and farming.last_gains == {"crop_carrot": 1}, "harvest goes to the bag")
 	_check("+1 Carrot" in _floats(farming) and _flights(farming) >= 1, "the harvest floats up and flies into the bag")
 	_check(_bar_counts(farming).get("crop_carrot") == 1, "the quick bar shows the carrot")
-	_check(_tip(farming) == "Head back to the map and tap Market to sell your carrot.", "after the first harvest the card sends the carrot to the Market (C-61): " + _tip(farming))
-	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crops.counts().get("C", 0) == 0, "the soil stays tilled, the carrot is gone")
+	_check(_tip(farming) == "Head back to the map and tap Washington Square to sell your carrot.", "after the first harvest the card sends the carrot to the Market (C-61, C-115: at Washington Square): " + _tip(farming))
+	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crop_art.counts().stages == [1, 0, 0, 0, 0, 0, 0], "the soil stays tilled, the carrot is gone")
 	await _press(farming, cell)
 	await _press(farming, cell)
 	_check(farming.farm.crops.has(ParcelFarm.key(cell)), "sow again for the reopen check")
@@ -309,7 +350,7 @@ func _reopen() -> void:
 	names = farming._bar.cells().slice(0, 3).map(func(c): return str(c.get("_name").text).replace("\n", " "))
 	_check(names == ["Starter Hoe", "Carrot Seeds", "Carrot"], "resumed, quick bar names stay English: %s" % [names])
 	_check(farming.farm.cleared.size() == 1 and _obstacle_instances(farming) == farming._core_plan.layout.size() - 1, "the cleared obstacle stays gone")
-	_check(farming._soil.counts().get("soil", 0) == 1, "tilled soil is still drawn")
+	_check(farming._crop_art.counts().soil == {"dry": 1, "wet": 0}, "tilled soil is still drawn")
 	var key: Array
 	for crop_key: String in farming.farm.crops:
 		key = await _key(farming, ParcelFarm.parse_key(crop_key))
@@ -336,7 +377,7 @@ func _full_bag(farming: Node) -> void:
 	_check(screen.encloses(scene._header.get_global_rect()) and scene._coins.text == "1234", "the top bar with 1234 coins stays on screen: %s" % scene._header.get_global_rect())
 	farming.open_bag()
 	await process_frame
-	_check(farming._grid.items.size() == 8, "the Bag lists all 8: %d" % farming._grid.items.size())
+	_check(farming._bag_slots.size() == 8 and farming._slots.get_child_count() == 9, "the Bag lists all 8: %d" % farming._bag_slots.size())
 	farming.close_bag()
 
 ## The guide's card text on screen (C-35), "" when it is hidden.
@@ -345,7 +386,7 @@ func _tip(farming: Node) -> String:
 
 ## Texts of the gain floats on screen.
 func _floats(farming: Node) -> Array:
-	return farming._ui.get_children().filter(func(n): return n is UiFloatText).map(func(n): return n.text)
+	return farming._ui.get_children().filter(func(n): return n is UiGainFloat).map(func(n): return n.text)
 
 func _flights(farming: Node) -> int:
 	return farming._ui.get_children().filter(func(n): return n is UiItemFly).size()
@@ -370,28 +411,38 @@ func _held(farming: Node) -> void:
 	await process_frame
 	farming.held = true
 	await process_frame
-	_check(not farming.bag_open() and not farming._keys.visible and not farming._bar.visible, "held: no key, no quick bar, drawer closed")
+	_check(not farming.bag_open() and not farming._keys.visible and not farming._bar.visible, "held: no key, no quick bar, bag closed")
 	farming.held = false
 	await process_frame
 	_check(farming._keys.visible and farming._bar.visible, "released: key and quick bar back")
 
-## The Bag end opens the compact drawer with the bar docked in it; a cell shows its name; Close and Back close it.
+## The Bag end opens the UI v3 bag panel (C-105): the quick bar slides away (M-16) and comes back where it was; a
+## slot shows its name; ✕, Back and a tap on the dimmed area close it.
 func _bag_drawer(farming: Node) -> void:
-	var home: Node = farming._bar.get_parent()
 	farming._bar.bag_requested.emit()
 	await process_frame
-	_check(farming.bag_open() and farming._bar.get_parent().get_parent() == farming._drawer.body and farming._bar.bag_open, "Bag opens the drawer, the quick bar docked on top")
-	var ids: Array = farming._grid.shown_items().map(func(it): return it.id)
-	_check(ids == ["hoe_starter", "seed_carrot", "blueprint_cottage"] and farming._grid.shown_items()[1].qty == 3, "the drawer lists the bag")
-	farming._grid.select("seed_carrot")
-	_check(farming._picked_name.text == "Carrot Seeds ×3", "a tapped cell shows its name")
-	farming._bar.close_requested.emit()
+	_check(farming.bag_open() and farming._bag.title == "Bag" and farming._bag.hero == UiArt.HERO_BAG, "Bag opens the bag panel, C-86's bag as its hero")
+	var ids: Array = farming._bag_slots.keys()
+	_check(ids == ["hoe_starter", "seed_carrot", "blueprint_cottage"] and farming._bag_slots.seed_carrot.item.qty == 3,
+		"the panel lists the bag: %s" % [ids])
+	_check(farming._slots.get_child_count() == 9 and farming._slots.columns == 3, "three rows of three round slots")
+	farming._bag_slots.seed_carrot.tapped.emit("seed_carrot")
+	_check(farming._picked_name.text == "Carrot Seeds ×3" and farming.bag_selected == "seed_carrot"
+		and farming._bag_slots.seed_carrot.state == UiBagSlot.State.SELECTED, "a tapped slot is selected and named")
+	await create_timer(0.35).timeout
+	_check(not farming._bar.visible, "the quick bar is hidden while the bag is open (M-16)")
+	var panel: UiModalPanel = farming._bag
+	panel.close_button().pressed.emit()
 	await process_frame
-	_check(not farming.bag_open() and farming._bar.get_parent() == home and not farming._bar.bag_open, "Close puts the bar back")
+	_check(not farming.bag_open() and panel.closing, "✕ closes it")
+	await create_timer(0.4).timeout
+	_check(not is_instance_valid(panel), "…and the panel frees itself after its exit")
 	var bar_rect: Rect2 = farming._bar.get_global_rect()
 	var ui_rect: Rect2 = farming._ui.get_global_rect()
-	_check(is_equal_approx(bar_rect.end.y, ui_rect.end.y - UiTokens.SIZE_QUICK_BAR_BOTTOM) and is_equal_approx(bar_rect.position.x, UiTokens.SIZE_QUICK_BAR_X),
-		"…at the bottom, where it was: %s in %s" % [bar_rect, ui_rect])
+	_check(farming._bar.visible and is_equal_approx(farming._bar.modulate.a, 1.0)
+		and absf(bar_rect.end.y - (ui_rect.end.y - UiTokens.SIZE_QUICK_BAR_BOTTOM)) <= BAR_REST_TOLERANCE_PX
+		and absf(bar_rect.position.x - UiTokens.SIZE_QUICK_BAR_X) <= BAR_REST_TOLERANCE_PX,
+		"the quick bar comes back at the bottom, where it was: %s in %s" % [bar_rect, ui_rect])
 	# No long-press drag on this bar (no swap, Pin or Remove, C-74#39); a swipe up still opens the bag.
 	var cell: UiItemCell = farming._bar.cells()[0]
 	cell.gesture.emit({"kind": &"lift", "pos": cell.get_global_rect().get_center()})
@@ -404,21 +455,22 @@ func _bag_drawer(farming: Node) -> void:
 	await process_frame
 	farming._bar.slot_tapped.emit("seed_carrot")
 	await process_frame
-	_check(farming.bag_open() and farming._grid.selected_id == "seed_carrot", "a slot opens the drawer on its item")
-	_check(scene.is_back_navigation_locked() and not farming.bag_open() and not scene._back_sent, "Back closes the drawer first, the farm stays")
+	_check(farming.bag_open() and farming.bag_selected == "seed_carrot", "a slot opens the bag on its item")
+	_check(scene.is_back_navigation_locked() and not farming.bag_open() and not scene._back_sent, "Back closes the bag first, the farm stays")
 	await process_frame
-	# C-111: a tap on the dimmed area closes the drawer. 0.4.2 used the scrim after close_bag() had cleared it: a
+	# C-111: a tap on the dimmed area closes the bag. 0.4.2 used the scrim after close_bag() had cleared it: a
 	# SCRIPT ERROR here, a native crash (SIGSEGV in Control::accept_event) in the release package.
 	farming._bar.bag_requested.emit()
 	await process_frame
-	var scrim: Control = farming._scrim
+	panel = farming._bag
+	var scrim: Control = panel.scrim
 	var release := InputEventMouseButton.new()
 	release.button_index = MOUSE_BUTTON_LEFT
 	release.pressed = false
 	release.position = scrim.get_global_rect().position + Vector2(40, 40)
 	scrim.gui_input.emit(release)
-	_check(not farming.bag_open() and farming._scrim == null and farming._bar.get_parent() == home, "a tap on the dimmed area closes the drawer")
-	await process_frame
+	_check(not farming.bag_open() and farming._bag == null, "a tap on the dimmed area closes the bag")
+	await create_timer(0.4).timeout
 	_check(not is_instance_valid(scrim), "…and frees its scrim")
 
 ## C-33 on a fresh save (the welcome blueprint, no house): Build Cottage while a press is still
@@ -489,6 +541,45 @@ func _house_pops_once() -> void:
 	await process_frame
 	for name in DirAccess.get_files_at(house_dir): DirAccess.remove_absolute(house_dir.path_join(name))
 	DirAccess.remove_absolute(house_dir)
+
+func _older_dataset_claim() -> void:
+	var server := OldClaimServer.new()
+	server.block_id = raw.block_id
+	server.dataset = "sf-dynamic-farm-older"
+	var bag := {"hoe_starter": 1, "seed_carrot": 2, "blueprint_cottage": 1, "blueprint_coop": 1}
+	server.farm = ParcelFarm.empty_state()
+	server.farm.bag = bag; server.farm.welcomed_at = 0; server.farm.coins = 12; server.farm.sales = 1
+	var client := ApiClient.new("https://fake.invalid/v1", server.handle)
+	client.token = "player"
+	# Before C-136 nothing named the dataset: the reply is about the claim's older dataset and is refused.
+	var old: Dictionary = await RemoteStore.new(client, raw.block_id, raw.dataset_version).read()
+	_check(not old.ok and old.code == "OTHER_PARCEL", "a reply on the claim's older dataset is still refused")
+	server.drop = 1
+	var farming := await _open(RemoteStore.new(client, raw.block_id, raw.dataset_version))
+	var deadline := Time.get_ticks_msec() + 30000
+	while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
+	_check(server.enters.size() == 2 and server.enters.all(func(b): return b is Dictionary and b.get("dataset_version") == raw.dataset_version),
+		"each enter, the lost one and its retry, names the opened farm's dataset")
+	_check(farming.loaded() and not farming.unavailable and not farming._cover.visible, "the moved claim opens: no Could not open your farm")
+	_check(farming.farm.get("bag") == bag and farming.farm.get("coins") == 12 and farming.farm.get("house", 0) == null and farming.farm.get("tilled") == [],
+		"the moved save shows the kept bag and coins on fresh cells")
+	scene.queue_free()
+	await process_frame
+	# Retry from the cover goes the same way: both tries lost, then the key's Retry opens it.
+	server.drop = 2
+	server.enters.clear()
+	server.dataset = "sf-dynamic-farm-older"
+	farming = await _open(RemoteStore.new(client, raw.block_id, raw.dataset_version))
+	deadline = Time.get_ticks_msec() + 30000
+	while farming.busy and Time.get_ticks_msec() < deadline: await process_frame
+	_check(farming.unavailable and farming._cover.visible and farming._cover_label.text == "Could not open your farm.", "two lost tries leave the cover up")
+	farming._on_key()
+	deadline = Time.get_ticks_msec() + 30000
+	while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
+	_check(server.enters.size() == 3 and server.enters[2].get("dataset_version") == raw.dataset_version and farming.loaded() and not farming.unavailable,
+		"Retry names the dataset and opens the moved claim")
+	scene.queue_free()
+	await process_frame
 
 func _dust() -> Array:
 	return scene.get_children().filter(func(n): return n is CPUParticles3D)

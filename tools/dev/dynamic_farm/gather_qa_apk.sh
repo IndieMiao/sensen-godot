@@ -10,6 +10,7 @@
 # commit already imported headless, lends its .godot cache so the import only checks changes.
 # GATHER_QA_ABI follows the emulator image; by default it is the host's own architecture
 # (x86_64 on x86_64 hosts such as cardigan-ci, arm64-v8a on Apple silicon such as mac-mini).
+# GATHER_QA_WET_SOIL=1 turns on the development switch that draws tilled soil wet (C-138).
 # On macOS the copied editor is re-signed ad hoc (the copy's signature is otherwise invalid and
 # the system kills it) and templates default to ~/Library/Application Support/Godot.
 # Staging is a disposable copy under $TMPDIR (committed sources at HEAD); nothing in the
@@ -53,10 +54,10 @@ if [[ -n $cache ]]; then
     cp -a "$cache/.godot" "$p/.godot"
     rm -f "$p/.godot/export_credentials.cfg"
 fi
-python3 -I - "$p/project.godot" "$parcel" <<'PY'
+python3 -I - "$p/project.godot" "$parcel" "${GATHER_QA_WET_SOIL:-}" <<'PY'
 import re, sys
 from pathlib import Path
-path, parcel = Path(sys.argv[1]), sys.argv[2]
+path, parcel, wet = Path(sys.argv[1]), sys.argv[2], sys.argv[3] == '1'
 text = path.read_text()
 def one(pattern, repl):
     global text
@@ -65,7 +66,8 @@ def one(pattern, repl):
 one(r'^run/main_scene="[^"]+"$', 'run/main_scene="res://tools/dev/dynamic_farm/own_parcel_qa.tscn"')
 one(r'^\[application\]$', '[application]\nconfig/use_custom_user_dir=true\nconfig/custom_user_dir_name="DynamicFarmGatherQa"')
 one(r'^\[sensen\]$', '[sensen]\nnetwork/online_qa=true\ndynamic_farm/local_farm_save=true\n'
-    f'dynamic_farm/qa_parcel="res://tests/dynamic_farm/fixtures/r4/{parcel}.json"')
+    f'dynamic_farm/qa_parcel="res://tests/dynamic_farm/fixtures/r4/{parcel}.json"'
+    + ('\ndynamic_farm/preview_wet_soil=true' if wet else ''))
 for key in ('network/base_url', 'network/mobile_base_url'):
     one(rf'^{key}="[^"]+"$', f'{key}="http://127.0.0.1:9"')
 path.write_text(text)
