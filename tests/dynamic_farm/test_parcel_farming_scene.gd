@@ -271,7 +271,7 @@ func _first_visit() -> void:
 	_check(farming.farm.bag.get("crop_carrot") == 1 and farming.last_gains == {"crop_carrot": 1}, "harvest goes to the bag")
 	_check("+1 Carrot" in _floats(farming) and _flights(farming) >= 1, "the harvest floats up and flies into the bag")
 	_check(_bar_counts(farming).get("crop_carrot") == 1, "the quick bar shows the carrot")
-	_check(_tip(farming) == "", "the guide is done after the first harvest")
+	_check(_tip(farming) == "Head back to the map and tap Market to sell your carrot.", "after the first harvest the card sends the carrot to the Market (C-61): " + _tip(farming))
 	_check(ParcelFarm.key(cell) in farming.farm.tilled and farming._crops.counts().get("C", 0) == 0, "the soil stays tilled, the carrot is gone")
 	await _press(farming, cell)
 	await _press(farming, cell)
@@ -315,10 +315,29 @@ func _reopen() -> void:
 		key = await _key(farming, ParcelFarm.parse_key(crop_key))
 		_check(farming.farm.crops[crop_key].ripe_at - farming.server_now() <= 40000, "the original ripening time is kept")
 	_check(key.size() == 3 and key[0] == "Growing", "still growing after reopening")
+	await _full_bag(farming)
 	scene.queue_free()
 	await process_frame
 	_check(TranslationServer.get_locale() == "zh_CN", "leaving the parcel leaves the locale unchanged")
 	TranslationServer.set_locale(outside)
+
+## C-61 (C-59#242): seven and more kinds of items with coins stay on screen. The bar shows the first five, the Bag
+## the rest; the coins sit in the top bar, which keeps inside the screen.
+func _full_bag(farming: Node) -> void:
+	var save: Dictionary = farming.farm.duplicate(true)
+	save.coins = 1234
+	save.bag.merge({"stone": 3, "wild_herb": 2, "wood": 4, "blueprint_coop": 1})
+	farming._adopt({"ok": true, "farm": save, "farm_version": farming.farm_version})
+	await process_frame
+	var screen: Rect2 = farming._ui.get_global_rect()
+	var ids: Array = farming.bag_ids()
+	_check(ids.size() == 8 and farming._bar.slots.size() == UiQuickBar.SLOTS, "8 kinds of items: the quick bar shows %d (%s)" % [farming._bar.slots.size(), ids])
+	_check(screen.encloses(farming._bar.get_global_rect()), "the quick bar stays on screen: %s in %s" % [farming._bar.get_global_rect(), screen])
+	_check(screen.encloses(scene._header.get_global_rect()) and scene._coins.text == "1234", "the top bar with 1234 coins stays on screen: %s" % scene._header.get_global_rect())
+	farming.open_bag()
+	await process_frame
+	_check(farming._grid.items.size() == 8, "the Bag lists all 8: %d" % farming._grid.items.size())
+	farming.close_bag()
 
 ## The guide's card text on screen (C-35), "" when it is hidden.
 func _tip(farming: Node) -> String:

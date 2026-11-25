@@ -7,6 +7,7 @@ const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.g
 const Data = preload("res://modules/dynamic_farm/farm_data.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const Guide = preload("res://modules/dynamic_farm/parcel_guide.gd")
+const ParcelGather = preload("res://modules/dynamic_farm/parcel_gather.gd")
 const T0 := 1795392000000
 var checks := 0
 var failures := 0
@@ -159,7 +160,8 @@ func _store() -> void:
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
 
-## C-35: the guide's step follows the save alone: cottage, till, sow, harvest, then nothing.
+## C-35 / C-61: the guide's step follows the save alone: cottage, till, sow, harvest, sell, gather, sell again, the
+## coop blueprint, then nothing.
 func _guide() -> void:
 	var rules := ParcelFarm.rules()
 	_check(Guide.step({}, T0) == "", "guide: nothing before the save is read")
@@ -181,10 +183,36 @@ func _guide() -> void:
 	_check(Guide.step(state, T0 + 59999) == "", "guide: quiet while the carrot grows")
 	_check(Guide.step(state, T0 + 60000) == "harvest", "guide: a ripe carrot -> Harvest")
 	var harvested := ParcelFarm.apply(rules, state, [{"type": "harvest", "cell": "10,10"}], T0 + 60000)
-	_check(harvested.ok and Guide.step(harvested.state, T0 + 60000) == "", "guide: done once a carrot is in the bag")
-	var sold: Dictionary = harvested.state.duplicate(true)
-	sold.bag.erase("crop_carrot")
-	sold.sales = 1
-	_check(Guide.step(sold, T0 + 60000) == "", "guide: stays done after selling it (0.4.3)")
-	for key: String in ["build", "till", "sow", "harvest"]:
+	_check(harvested.ok and Guide.step(harvested.state, T0 + 60000) == "sell", "guide: a carrot in the bag -> sell it at the Market (C-61)")
+	if not harvested.ok: return
+	# C-61 (0.4.3): sell the carrot, gather round the yard, sell what was gathered, take the coop blueprint.
+	state = harvested.state
+	var now := T0 + 60000
+	var object := "p-3139010:%s:wild_pz_rock_08:3,4:0" % ParcelGather.rules().recipe_version
+	var chain := [[{"type": "sell", "item": "crop_carrot", "count": 1}, "gather"],
+		[{"type": "gather", "object": object}, "sell_gathered"],
+		[{"type": "sell", "item": "stone", "count": 1}, "blueprint"],
+		[{"type": "claim_blueprint", "blueprint": "coop"}, ""]]
+	for pair: Array in chain:
+		var result := ParcelFarm.apply(rules, state, [pair[0]], now, "p-3139010")
+		_check(result.ok, "guide: %s applies (%s)" % [pair[0].type, result.get("code", "")])
+		if not result.ok: return
+		state = result.state
+		_check(Guide.step(state, now) == pair[1], "guide: after %s -> '%s' (got '%s')" % [pair[0].type, pair[1], Guide.step(state, now)])
+	var gathered_first: Dictionary = harvested.state.duplicate(true)
+	gathered_first.bag.wild_herb = 1
+	_check(Guide.step(gathered_first, now) == "sell", "guide: gathered before the first sale -> still sell at the Market")
+	var carrots_left: Dictionary = harvested.state.duplicate(true)
+	carrots_left.bag.erase("crop_carrot")
+	carrots_left.sales = 1
+	carrots_left.bag.crop_carrot = 1
+	_check(Guide.step(carrots_left, now) == "gather", "guide: carrots left after the first sale -> gather next")
+	var regrown: Dictionary = carrots_left.duplicate(true)
+	regrown.gathered = {object: now}
+	_check(Guide.step(regrown, now) == "blueprint", "guide: gathered and sold -> the Carpenter")
+	for key: String in ["build", "till", "sow", "harvest", "sell", "gather", "sell_gathered", "blueprint"]:
 		_check(not Guide.text(key).is_empty(), "guide: copy for " + key)
+	for key: String in ["sell", "gather", "sell_gathered", "blueprint"]:
+		_check(not Guide.map_text(key).is_empty(), "guide: the map's line for " + key)
+	for key: String in ["build", "till", "sow", "harvest", ""]:
+		_check(Guide.map_text(key).is_empty(), "guide: no map line for '%s' (taught on the parcel)" % key)
