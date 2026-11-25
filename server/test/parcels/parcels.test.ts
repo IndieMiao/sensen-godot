@@ -319,6 +319,25 @@ for (const [name, enabled, makeStores] of makers) {
       expect((await enterAs(app, await account(app, 'Cy'), R6)).json().code).toBe('NO_PARCEL');
     });
 
+    it('C-113 with r8 registered: an r6 home entered naming r6 (its r6 farm, Q-172) keeps its cells; an r4 home entered naming r8 moves to r8', async () => {
+      const R8 = 'sf-dynamic-farm-20261125-r8';
+      const bob = await account(app, 'Bob');
+      await claim(app, bob, B, R6);
+      await enterAs(app, bob, R6);
+      expect((await command(app, bob, 1, [{ type: 'place_house', x: 9, y: 9 }, { type: 'till', cell: '1,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' }])).statusCode).toBe(200);
+      const r6 = await mine(app, bob);
+      expect(r6).toMatchObject({ dataset_version: R6, farm_version: 2 });
+      const again = await enterAs(app, bob, R6);
+      expect(again.json()).toMatchObject({ granted: false, parcel: { dataset_version: R6, farm_version: 2 } });
+      expect(await mine(app, bob)).toEqual(r6);
+      const ada = await account(app, 'Ada');
+      const before = await r4Farm(app, ada);
+      const moved = await enterAs(app, ada, R8);
+      expect(moved.json()).toMatchObject({ granted: false, parcel: { dataset_version: R8, farm_version: 5 } });
+      expect(moved.json().parcel.farm).toEqual(rebased(before));
+      expect(await mine(app, bob)).toEqual(r6);
+    });
+
     it('a player only reads and writes their own parcel farm', async () => {
       const ada = await account(app, 'Ada'), bob = await account(app, 'Bob');
       await claim(app, ada, A);

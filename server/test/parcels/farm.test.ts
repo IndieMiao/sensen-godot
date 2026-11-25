@@ -28,6 +28,7 @@ describe('dynamic_farm.json', () => {
     expect(rules.till_tool).toBe('hoe_starter');
     expect(communityOf(rules, 'sf-dynamic-farm-20261118-r4')).toBe('sf');
     expect(communityOf(rules, 'sf-dynamic-farm-20261124-r6')).toBe('sf'); // C-43: r6, r5 without its broken building rings (V-167)
+    expect(communityOf(rules, 'sf-dynamic-farm-20261125-r8')).toBe('sf'); // C-113: r8, r6's parcels plus OSM buildings where DataSF has none
     expect(communityOf(rules, 'sf-dynamic-farm-20261124-r5')).toBeNull(); // never shipped
     expect(communityOf(rules, 'nope')).toBeNull();
   });
@@ -307,6 +308,10 @@ describe('rebase onto a newer dataset (C-136, Q-168)', () => {
     expect(isNewerDataset(rules, R6, R6)).toBe(false);
     expect(isNewerDataset(rules, R4, 'sf-dynamic-farm-20261124-r5')).toBe(false); // not registered
     expect(isNewerDataset(rules, 'nope', R6)).toBe(false);
+    const R8 = 'sf-dynamic-farm-20261125-r8'; // C-113
+    expect(isNewerDataset(rules, R6, R8)).toBe(true);
+    expect(isNewerDataset(rules, R4, R8)).toBe(true);
+    expect(isNewerDataset(rules, R8, R6)).toBe(false);
     const two = parseParcelRules({ ...rules, communities: [...rules.communities, { id: 'ny', datasets: ['ny-1', 'ny-2'] }] });
     expect(isNewerDataset(two, R4, 'ny-2')).toBe(false); // another community
     expect(isNewerDataset(two, 'ny-1', 'ny-2')).toBe(true);

@@ -1,5 +1,6 @@
 /**
- * fetch    --out <snapshot> --sources <label,...> [--bbox minLon,minLat,maxLon,maxLat]
+ * fetch    --out <snapshot> --sources <label,...> [--bbox minLon,minLat,maxLon,maxLat] [--extract <local OSM .pbf>]
+ * fetch    --append <existing snapshot> --sources <label,...> [--bbox …] [--extract …]   adds sources to a snapshot
  * build    --snapshot <snapshot> --out <dataset> --dataset-version <v> [--params <json>] [--map-params <json>] [--only p-1,p-2]
  * validate --dataset <dataset> [--core-range current|relaxed]
  * check-tiles --dataset <dataset> [--report <json>] [--properties <json>]
@@ -95,7 +96,8 @@ export async function main(argv: string[]): Promise<number> {
   if (command === 'fetch') {
     const bbox = a.bbox ? a.bbox.split(',').map(Number) : null;
     if (bbox && (bbox.length !== 4 || bbox.some(v => !Number.isFinite(v)))) throw new Error('--bbox needs four numbers');
-    await fetchSnapshot(need(a, 'out'), need(a, 'sources').split(','), bbox);
+    const opts = { extract: a.extract || undefined, append: Boolean(a.append) };
+    await fetchSnapshot(a.append || need(a, 'out'), need(a, 'sources').split(','), bbox, console.log, opts);
     return 0;
   }
   if (command === 'build') {
