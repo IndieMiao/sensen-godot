@@ -181,7 +181,7 @@ class WorkerAPK(unittest.TestCase):
     def test_release_preset_upgrades_the_preview_package_with_the_same_version(self):
         preset, identity = worker_preset(PRESETS, 'dynamic-farm-release')
         self.assertEqual(identity, dict(self.identity, package=farm.PACKAGE))
-        self.assertEqual(identity['package'], 'com.sensen.dynamicfarm.cardigan')
+        self.assertEqual(identity['package'], 'com.gensen.mapfarm')  # The owner's name (C-142#7, Q-171).
         self.assertEqual(worker_preset(preset, 'dynamic-farm-release'), (preset, identity))
         self.assertIn('package/name="Dynamic Farm"', preset)
         self.assertIn('package/signed=false', preset)
@@ -203,6 +203,34 @@ class WorkerAPK(unittest.TestCase):
         for variant in (True, 'android-internal'):  # A bool is an old caller's signature.
             with self.subTest(variant=variant), self.assertRaisesRegex(ValueError, 'unknown package variant'):
                 worker_preset(PRESETS, variant)
+
+    def test_dynamic_packages_show_no_sensen_and_use_the_p0_launcher_icon(self):
+        # C-142 (owner's C-101#91): package, display name, project name, icon and file name carry no "sensen".
+        self.assertEqual((farm.PACKAGE, farm.INTERNAL_PACKAGE), ('com.gensen.mapfarm', 'com.gensen.mapfarm.internal'))
+        for variant in farm.PACKAGES:
+            preset, identity = worker_preset(PRESETS, variant)
+            options = preset.split('[preset.0.options]')[1]
+            with self.subTest(variant=variant):
+                self.assertNotIn('sensen', identity['package'].lower())
+                self.assertNotIn('sensen', farm.NAMES[variant].lower())
+                for key, path in farm.LAUNCHER_ICONS.items():
+                    self.assertIn(f'launcher_icons/{key}="{path}"', options.splitlines())
+                    self.assertTrue((ROOT / path.removeprefix('res://')).is_file(), path)
+                settings = exported_settings(variant)
+                self.assertEqual(settings['application/config/name'], farm.NAMES[variant])
+                name = farm.apk_filename(variant, identity['version_name'], identity['version_code'], 'ab' * 20)
+                self.assertNotIn('sensen', name.lower())
+                self.assertTrue(name.endswith('-abababab-unsigned.apk'), name)
+        # The tracked Android preset itself (Journey) is untouched: no icon, its own name.
+        self.assertIn('launcher_icons/main_192x192=""', self.cfg.splitlines())
+        self.assertEqual(farm.apk_filename('dynamic-farm-release', '0.4.4', '2026112501', '7607d38f' * 5, True),
+                         'mapfarm-0.4.4-2026112501-7607d38f-signed.apk')
+        self.assertEqual(farm.apk_filename('dynamic-farm-internal', '0.4.4', 2026112501, '7607d38f'),
+                         'mapfarm-internal-0.4.4-2026112501-7607d38f-unsigned.apk')
+        for bad in [('android', '0.4.4', '1', 'ab' * 20), ('dynamic-farm', '0.4.4', '1', 'HEAD'),
+                    ('dynamic-farm', '0.4/../x', '1', 'ab' * 20), ('dynamic-farm', '0.4.4', '1x', 'ab' * 20)]:
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                farm.apk_filename(*bad)
 
     def test_readback_checks_each_variants_exported_configuration(self):
         for variant, files in [('android', FILES), ('dynamic-farm', FARM_FILES), ('dynamic-farm-internal', FARM_FILES),
@@ -452,6 +480,9 @@ class WorkerAPK(unittest.TestCase):
         subprocess.run([bt / 'zipalign', '-P', '16', '4', self.apk, aligned], check=True)
         result = inspect(aligned, self.identity, bt)
         self.assertEqual(result['sha256'], hashlib.sha256(aligned.read_bytes()).hexdigest())
+        self.assertNotIn('filename', result)
+        # Only a dynamic farm APK with its source commit gets a delivered file name (C-142).
+        self.assertNotIn('filename', inspect(aligned, self.identity, bt, commit='ab' * 20))
         with self.assertRaisesRegex(ValueError, 'identity differ'):
             inspect(aligned, dict(self.identity, version_code='1'), bt)
         subprocess.run([bt / 'apksigner', 'version'], check=True, stdout=subprocess.DEVNULL)

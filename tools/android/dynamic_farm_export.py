@@ -3,18 +3,31 @@
 `dynamic-farm` is the isolated preview: Journey endpoints are disabled. `dynamic-farm-internal` is the
 internal test package (C-39): Journey points only at an approved isolated test service, and the map's
 internal-only settings (C-32; install-and-play guest sign-in, C-100) are on. `dynamic-farm-release` is the invite-only release package (C-98): the
-preview's package (it upgrades 0.4.1 in place), Journey fixed to the US West dynamic farm production service,
+preview's package, Journey fixed to the US West dynamic farm production service,
 one's own farm and the saved sign-in on, reselect off. None carries an account or credential.
+
+Nothing a player sees carries "sensen" (C-142, the owner's C-101#91): the package names, display names, the
+launcher icon (farm-dev's P0 icon, tools/app_icon/android, owner's C-142#7) and the delivered APK file names.
+The domains, the `[sensen]` setting section and code identifiers are internal and stay.
 """
 import re
 import struct
 import sys
 
-PACKAGE = 'com.sensen.dynamicfarm.cardigan'
-INTERNAL_PACKAGE = 'com.sensen.dynamicfarm.internal'
+# The owner's package name (C-142#7, Q-171). It replaced com.sensen.dynamicfarm.cardigan, so 0.4.x installs are not
+# upgraded in place: testers uninstall the old package once. The internal package keeps its own name so it can sit
+# next to the release package on one phone.
+PACKAGE = 'com.gensen.mapfarm'
+INTERNAL_PACKAGE = 'com.gensen.mapfarm.internal'
 PACKAGES = {'dynamic-farm': PACKAGE, 'dynamic-farm-internal': INTERNAL_PACKAGE, 'dynamic-farm-release': PACKAGE}
 NAMES = {'dynamic-farm': 'Dynamic Farm Preview', 'dynamic-farm-internal': 'Dynamic Farm Internal',
          'dynamic-farm-release': 'Dynamic Farm'}
+# Delivered file names: <prefix>-<version name>-<version code>-<commit 8>-<unsigned|signed>.apk (C-142).
+FILE_PREFIXES = {'dynamic-farm': 'mapfarm-preview', 'dynamic-farm-internal': 'mapfarm-internal',
+                 'dynamic-farm-release': 'mapfarm'}
+# farm-dev's P0 launcher icon (bcefa351, 0.3.4), the same files as the Android P0 / Play presets.
+LAUNCHER_ICONS = {key: f'res://tools/app_icon/android/{key}.png' for key in (
+    'main_192x192', 'adaptive_foreground_432x432', 'adaptive_background_432x432', 'adaptive_monochrome_432x432')}
 MAP_SCENE = 'res://scenes/dynamic_farm/dynamic_farm_map.tscn'
 RAW_FILES = ('modules/dynamic_farm/map/config.json', 'assets/dynamic_farm/499-art-inventory.json',
              'assets/dynamic_farm/499-art-recipe.json', 'assets/dynamic_farm/499-edge-decor-v2.json',
@@ -39,8 +52,8 @@ INTERNAL_SETTINGS = ('dynamic_farm/reselect', 'dynamic_farm/account_restore', 'd
 INVITE_ONLY = 'account/invite_only'
 RELEASE_SETTINGS = ('dynamic_farm/account_restore', 'dynamic_farm/own_farm', INVITE_ONLY)
 URL_KEYS = ('network/base_url', 'network/mobile_base_url')
-# The 0.4.1 preview's user directory. The release package installs over it in place, so it must keep this
-# directory, or the player's local data and saved sign-in would be left behind (C-116).
+# The 0.4.1 preview's user directory, kept by the release package (C-116). Since the package name changed (C-142)
+# nothing is upgraded in place any more, but the name is internal (never shown) and stays as it is.
 PREVIEW_USER_DIR = 'DynamicFarmCardigan'
 USER_DIR_KEYS = ('application/config/use_custom_user_dir', 'application/config/custom_user_dir_name')
 VARIANTS = ('android', *PACKAGES)
@@ -68,15 +81,19 @@ def staged_project(text, target=None, release=False):
     if re.search(r'^(?:network/online_qa|config/(?:use_custom_user_dir|custom_user_dir_name)|dynamic_farm/\w+|'
                  r'account/invite_only)[=.]', text, re.M) or any(OVERRIDDEN.match(line) for line in text.splitlines()):
         raise ValueError('unexpected pre-existing QA overrides')
-    url, user_dir, extra = DISABLED, PREVIEW_USER_DIR, ''
+    url, user_dir, extra, variant = DISABLED, PREVIEW_USER_DIR, '', 'dynamic-farm'
     if release:
-        # Same package and user directory as the preview it replaces; no target can be chosen.
+        # Same package and user directory as the preview; no target can be chosen.
         if target is not None:
             raise ValueError('the release package has a fixed target')
         url, extra = RELEASE_TARGET, ''.join(f'\n{key}=true' for key in RELEASE_SETTINGS)
+        variant = 'dynamic-farm-release'
     elif target is not None:
         url, user_dir = internal_target(target), 'DynamicFarmInternal'
         extra = ''.join(f'\n{key}=true' for key in INTERNAL_SETTINGS)
+        variant = 'dynamic-farm-internal'
+    # The project's own name (SensenAvatar) would otherwise travel in project.binary (C-142).
+    text = replace_one(text, r'^config/name="[^"\n]*"$', f'config/name="{NAMES[variant]}"')
     text = replace_one(text, r'^run/main_scene="[^"]+"$', f'run/main_scene="{MAP_SCENE}"')
     text = replace_one(text, r'^\[application\]$', '[application]\nconfig/use_custom_user_dir=true\n'
                        f'config/custom_user_dir_name="{user_dir}"')
@@ -102,7 +119,21 @@ def staged_preset(header, options, variant):
     header = replace_one(header, r'^include_filter="([^"\n]*)"$', add_files)
     options = replace_one(options, r'^package/unique_name="[^"\n]+"$', f'package/unique_name="{package}"')
     options = replace_one(options, r'^package/name="[^"\n]*"$', f'package/name="{name}"')
+    for key, path in LAUNCHER_ICONS.items():
+        options = replace_one(options, rf'^launcher_icons/{key}="[^"\n]*"$', f'launcher_icons/{key}="{path}"')
     return header, options
+
+
+def apk_filename(variant, version_name, version_code, commit, signed=False):
+    """The delivered file name of a dynamic farm APK; never carries "sensen" (C-142)."""
+    if variant not in FILE_PREFIXES:
+        raise ValueError('unknown package variant')
+    if not re.fullmatch(r'[0-9]+(?:\.[0-9]+)*', str(version_name)) or not re.fullmatch(r'[0-9]+', str(version_code)):
+        raise ValueError('unexpected version')
+    if not re.fullmatch(r'[0-9a-f]{8,40}', commit):
+        raise ValueError('expected a commit SHA')
+    state = 'signed' if signed else 'unsigned'
+    return f'{FILE_PREFIXES[variant]}-{version_name}-{version_code}-{commit[:8]}-{state}.apk'
 
 
 def project_settings(blob):

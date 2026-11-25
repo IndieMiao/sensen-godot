@@ -76,7 +76,8 @@ curl localhost:3000/v1/healthz
 正式服（C-96）只用邀请账号：`ACCOUNT_SIGNUP=closed` 时邮箱注册和 Apple / Google 首登建号都回 403 `SIGNUP_CLOSED`，
 账号由 `tools/invite_accounts.ts` 直接写库。部署包、建库、备份恢复和回滚见 [deploy/dynamicfarm/README.md](deploy/dynamicfarm/README.md)。
 起步区（C-130）：`assets/farm/data/dynamic_farm_starter_zone.json` 开着时，还没有地块的玩家只能认领区内地块
-（按地块编号判定，区外回 403 `OUTSIDE_STARTER_ZONE`）；已有地块的玩家和他们的地块不受影响。
+（按地块编号判定，区外回 403 `OUTSIDE_STARTER_ZONE`；区内核心格不足客户端 `min_core_cells` 的太小地块回 403
+`PARCEL_TOO_SMALL`，C-143）；已有地块的玩家和他们的地块不受影响。
 `GET /v1/parcels/starter-zone?dataset_version=…` 公开返回边界、地图默认落点和区内地块编号。
 `PARCEL_STARTER_ZONE=0/1` 覆盖文件里的开关；扩大范围用 `tools/starter_zone_build.ts` 按新边界重新生成。
 文件不合法时服务端不启动。说明见 [docs/plans/C-130.md](../docs/plans/C-130.md)。
