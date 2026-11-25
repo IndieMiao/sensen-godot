@@ -3,6 +3,8 @@
  * 来源是 assets/farm/data/dynamic_farm_starter_zone.json，由 server/tools/starter_zone_build.ts 按边界从数据集
  * index.geojson 生成：边界（真实街道中线围成的多边形）、地图默认落点，以及地块中心在边界内的地块编号和中心点。
  * 判定只看地块编号是否在清单里（客户端报的中心点改不了结果），区内认领存清单里的中心点。
+ * 区内太小的地块（核心格少于 min_core_cells，与客户端 map/config.json 的 min_core_cells 同一口径）列在 too_small 里，
+ * 不能认领（C-143）；它们仍在区内地块清单里，地图照旧当区内地块显示。
  * 一个社区最多一个起步区；没有起步区的社区不限制。整体开关：文件里的 enabled，可被环境变量
  * PARCEL_STARTER_ZONE=0/1 覆盖。文件不合法时抛错，进程不启动，免得悄悄放开或全拒。
  * 它不在 content_version 的指纹里，改它不影响存档。
@@ -17,6 +19,8 @@ const ID_RE = /^[a-z0-9_-]{1,64}$/;
 /** 一个起步区的地块上限：起步区本来就是一小片，再多说明边界画错了。 */
 export const MAX_ZONE_PARCELS = 5000;
 const MAX_BOUNDARY_POINTS = 512;
+/** 与客户端 selection_controller.gd 对 min_core_cells 的取值范围一致。 */
+const MAX_MIN_CORE_CELLS = 8192;
 
 export type LngLat = [number, number];
 export interface StarterZone {
@@ -32,6 +36,10 @@ export interface StarterZone {
   zoom: number;
   /** 地块编号 → 地块中心 [lng, lat]。 */
   parcels: Map<string, LngLat>;
+  /** 生成 too_small 所用的核心格下限；只是记录，判定看 too_small。 */
+  min_core_cells: number;
+  /** 区内太小、不能认领的地块编号（都在 parcels 里）。 */
+  too_small: Set<string>;
 }
 export interface StarterZones {
   enabled: boolean;
@@ -74,8 +82,17 @@ export function parseStarterZones(raw: unknown): StarterZones {
       if (!PARCEL_ID_RE.test(parcel) || !isPoint(center)) fail(`${id}: 地块 ${parcel} 不对`);
       parcels.set(parcel, [(center as LngLat)[0], (center as LngLat)[1]]);
     }
+    const minCore = z.min_core_cells;
+    if (!Number.isInteger(minCore) || (minCore as number) < 1 || (minCore as number) > MAX_MIN_CORE_CELLS) fail(`${id}: min_core_cells 必须是 1–${MAX_MIN_CORE_CELLS} 的整数`);
+    if (!Array.isArray(z.too_small)) fail(`${id}: too_small 必须是数组`);
+    const tooSmall = new Set<string>();
+    for (const parcel of z.too_small as unknown[]) {
+      if (typeof parcel !== 'string' || !parcels.has(parcel) || tooSmall.has(parcel)) fail(`${id}: too_small 里的 ${String(parcel)} 不对`);
+      tooSmall.add(parcel as string);
+    }
     zones.push({ id: id as string, community_id: community as string, name: (z.name as string).trim(), dataset_version: z.dataset_version as string,
-      boundary: (ring as LngLat[]).map(p => [p[0], p[1]] as LngLat), center: [(z.center as LngLat)[0], (z.center as LngLat)[1]], zoom: z.zoom as number, parcels });
+      boundary: (ring as LngLat[]).map(p => [p[0], p[1]] as LngLat), center: [(z.center as LngLat)[0], (z.center as LngLat)[1]], zoom: z.zoom as number, parcels,
+      min_core_cells: minCore as number, too_small: tooSmall });
   }
   return { enabled: r!.enabled as boolean, zones };
 }
@@ -97,7 +114,7 @@ export function activeZone(zones: StarterZones | undefined, communityId: string)
   return zones.zones.find(z => z.community_id === communityId) ?? null;
 }
 
-/** 给地图的公开描述：边界、落点和区内地块编号（地块编号本来就在公开数据集里）。 */
+/** 给地图的公开描述：边界、落点和区内地块编号（地块编号本来就在公开数据集里）。太小的地块客户端按数据集自己判定，不在这里。 */
 export const zoneView = (z: StarterZone) => ({
   id: z.id, community_id: z.community_id, name: z.name, dataset_version: z.dataset_version,
   boundary: z.boundary, center: z.center, zoom: z.zoom, parcel_ids: [...z.parcels.keys()].sort(),
