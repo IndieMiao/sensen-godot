@@ -1,5 +1,6 @@
 extends SceneTree
-## C-128: the map's Profile entry opens the main farm's profile, Settings and dressing room over the real map scene
+## C-128: the map's Profile entry opens the profile, Settings and dressing room over the real map scene; C-108: the
+## profile and the dressing room in the v3 design (C-85 pages ① and ②). Over the real map scene
 ## (no native map: the map stops after building its panels), with the real AppRouter and Avatar. Headless; the outfit is
 ## saved under a test user directory and the telemetry choice is put back as it was.
 ## Loaded at run time: these use autoloads (Avatar, Localization), which a preload here would compile before.
@@ -31,7 +32,7 @@ func idle(rig: Node) -> void:
 		await process_frame
 
 func _run() -> void:
-	ProfilePage = load("res://scenes/p0/panels/p0_profile_page.gd")
+	ProfilePage = load("res://scenes/dynamic_farm/parcel_profile_page.gd")
 	SettingsPage = load("res://scenes/p0/panels/p0_settings_page.gd")
 	MapUsage = load("res://scenes/map_poc/map_usage.gd")
 	Kind = SettingsPage.get_script_constant_map()["Kind"]
@@ -78,16 +79,28 @@ func _run() -> void:
 	verify(not map._hud.visible, "the map's panels hide under the profile")
 	verify(TranslationServer.get_locale() == "en", "the pages show in English while open")
 	var profile: Control = host.top()
-	verify(profile.get_script() == ProfilePage and profile.is_visible_in_tree(), "the main farm's full-screen profile")
-	verify(profile.name_row.name_label.text == "You", "no account: the name reads You")
+	verify(profile.get_script() == ProfilePage and profile.is_visible_in_tree(), "the v3 full-screen profile (C-108)")
+	verify(profile.name_label.text == "You", "no account: the name reads You")
 	verify(profile.find_children("*", "UiSkillCard", true, false).is_empty(), "no skill cards (no skills here)")
-	verify(profile.find_children("*", "UiFarmCard", true, false).is_empty(), "no farm card")
+	verify(profile.farm_card == null and profile.find_child("SectionMyfarm", true, false) == null, "no home yet: no My farm")
 	verify(profile.find_children("*", "UiNeedTile", true, false).is_empty(), "no collections")
-	verify(profile.preview != null, "the outfit preview and Edit look stay")
-	var p0_profile: Control = ProfilePage.new()
-	verify(p0_profile.blocks == ProfilePage.BLOCKS, "P0's profile keeps all its blocks by default")
-	p0_profile.free()
-	profile.top_bar.settings_pressed.emit()
+	verify(profile.preview != null and profile.edit_look_button != null, "the outfit preview and Edit look stay")
+	# ①-A/D: glass ‹, the Profile tag, a glass gear; the hero 330 high, the paper from 300; Edit look a 32 white pill.
+	var bar: HBoxContainer = profile.top_bar
+	verify(bar.get_child(0) is UiGlassButton and bar.get_child(1) is UiTagPill and (bar.get_child(1) as UiTagPill).text == "Profile"
+		and bar.get_child(bar.get_child_count() - 1) is UiGlassButton, "top bar: glass back, Profile tag, glass gear")
+	verify(is_equal_approx(bar.offset_top, 8.0) and bar.get_child(0).get_global_rect().size == Vector2(44, 44), "the bar 8 down, 44 hit areas")
+	var hero: Control = profile.find_child("Hero", true, false)
+	verify(hero != null and is_equal_approx(hero.size.y, 330.0), "the hero is 330 high")
+	await create_timer(0.4).timeout
+	var paper: Control = profile.find_child("Paper", true, false)
+	verify(is_equal_approx(paper.position.y, 300.0) and is_equal_approx(paper.modulate.a, 1.0), "the paper rose to 300 and faded in")
+	verify(profile.preview.get_parent().scale.is_equal_approx(Vector2.ONE), "the figure eased to ×1")
+	var pill: Control = profile.edit_look_button.get_node("Pill")
+	verify(is_equal_approx(pill.get_global_rect().size.y, 32.0) and is_equal_approx(profile.edit_look_button.get_global_rect().size.y, 44.0)
+		and is_equal_approx(pill.get_global_rect().position.y, 252.0), "Edit look: a 32 pill at 252 in a 44 hit area %s %s" % [pill.get_global_rect(), profile.edit_look_button.get_global_rect()])
+	verify(is_equal_approx(profile.get_global_rect().end.x - profile.edit_look_button.get_global_rect().end.x, 16.0), "16 from the right")
+	profile.settings_pressed.emit()
 	await process_frame
 	var settings: Control = host.top()
 	verify(settings.get_script() == SettingsPage and settings.kind == Kind.SETTINGS and not profile.visible, "the gear opens Settings")
@@ -140,7 +153,13 @@ func _run() -> void:
 	verify(str(avatar.load_outfit().slots[&"cloth"]) == target, "the outfit is saved (it stays after a restart)")
 	var again: Control = host.top()
 	verify(again != profile and host.pages.size() == 1, "the profile opens again")
-	verify(again.find_children("*", "Label", true, false).any(func(l): return l.text == "Look saved"), "with Look saved")
+	var saved_toast = again.toast
+	verify(saved_toast is UiBarToast and saved_toast.text == "Look saved" and saved_toast.kind == UiBarToast.Kind.SUCCESS, "with Look saved, a toast (①-D)")
+	await create_timer(0.3).timeout
+	verify(is_equal_approx(saved_toast.position.y, 84.0) and is_equal_approx(saved_toast.modulate.a, 1.0)
+		and absf(saved_toast.position.x * 2.0 + saved_toast.size.x - again.size.x) <= 1.0, "centred under the top bar at 84 %s %s %s" % [saved_toast.position, saved_toast.size, again.size])
+	await create_timer(2.6).timeout
+	verify(not is_instance_valid(saved_toast), "gone after 2.5 s")
 	verify(not map._hud.visible, "the map's panels stay hidden while the profile is up")
 	room = host.edit_look()
 	await idle(room.rig)
@@ -151,8 +170,21 @@ func _run() -> void:
 	await process_frame
 	verify(host.top().find_children("*", "Label", true, false).all(func(l): return l.text != "Look saved"), "Back from the room: no Look saved")
 	again = host.top()
+	verify(again.toast == null, "no toast either")
 	again.back_pressed.emit(); await process_frame
 	verify(map._profile == null and not is_instance_valid(host), "‹ on the profile closes it")
+	# A home: My farm and its card; the card closes the profile and flies the map home.
+	var went := [false]
+	var home_host: Control = load("res://scenes/dynamic_farm/parcel_profile.gd").open(map, Vector3.ZERO,
+		{"name": "Your Home", "status": "Carrots ready to harvest", "ready": true, "pressed": func(): went[0] = true})
+	await process_frame
+	var with_home: Control = home_host.top()
+	verify(with_home.farm_card != null and with_home.find_child("SectionMyfarm", true, false).text == "My farm", "a home: My farm")
+	verify(with_home.farm_card.find_child("FarmName", true, false).text == "Your Home"
+		and with_home.farm_card.find_child("FarmStatus", true, false).text == "Carrots ready to harvest", "its name and status line")
+	verify(with_home.farm_card.find_child("FarmStatus", true, false).get_theme_color(&"font_color") == UiTokens.COLOR_PRIMARY_INK, "ready: deep green")
+	with_home.farm_pressed.emit(); await process_frame
+	verify(went[0] and not is_instance_valid(home_host), "the card closes the profile and goes home")
 	verify(map._hud.visible and not entry.disabled, "the map's panels come back")
 	verify(TranslationServer.get_locale() == "zh_CN", "the locale is put back")
 	# C-135: a load that never ends (the engine's loading thread stuck) holds the key for profile_wait_seconds at most,
@@ -177,7 +209,7 @@ func _run() -> void:
 	verify(map._profile != null and avatar.warming(), "the profile opens though the outfit is still loading")
 	verify(waited >= 500 and waited < 2000, "after the configured wait (%d ms)" % waited)
 	host = map._profile
-	host.top().top_bar.settings_pressed.emit(); await process_frame
+	host.top().settings_pressed.emit(); await process_frame
 	verify(host.top().get_script() == SettingsPage, "and Settings opens from it")
 	avatar.loader._by_path.erase(stuck_path)
 	var none: Array[String] = []

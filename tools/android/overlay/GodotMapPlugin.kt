@@ -328,7 +328,9 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     fun setCityStyle(enabled: Boolean) {
         runOnUiThread {
             cityStyle = enabled
-
+            // C-145: another map page (city map, map_poc) takes the map: the dynamic farm map's hidden place icons come
+            // back first, so the city palette records and later restores their own visibility.
+            parcelController?.releasePlaceIcons()
             mapView?.mapboxMap?.getStyle { applyCityStyle(it) }
         }
     }
