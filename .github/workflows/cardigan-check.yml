@@ -28,6 +28,29 @@ on:
         description: merge_check or precheck
         required: true
         type: string
+      # Scoped-check protocol (optional). All four are plain strings, not choices, so an
+      # unknown value still dispatches; "Verify candidate" validates them and falls back
+      # to the full check for anything missing, unknown or malformed.
+      merge_tier:
+        description: single, card or batch (default single; batch always runs the full check)
+        required: false
+        type: string
+        default: single
+      scope:
+        description: full, affected or docs_only (default full)
+        required: false
+        type: string
+        default: full
+      affected_paths:
+        description: Space-separated package directories for scope=affected
+        required: false
+        type: string
+        default: ''
+      skip_checks:
+        description: test, e2e or test,e2e for scope=docs_only
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -56,14 +79,54 @@ jobs:
         with:
           ref: ${{ inputs.sha }}
           persist-credentials: false
+      # Also decides the check scope. Inputs arrive only through env and are compared
+      # against fixed patterns; nothing here evaluates them. Only normalized values are
+      # written to the step outputs. Any input that is missing, unknown or not a valid
+      # combination gives scope=full and runs every step. The logic stays in this
+      # trusted workflow file because the checkout is the (untrusted) candidate.
+      # Local cases: tools/ci/test-check-inputs.sh.
       - name: Verify candidate
+        id: verify
         env:
           CANDIDATE_SHA: ${{ inputs.sha }}
           CHECK_KIND: ${{ inputs.kind }}
+          MERGE_TIER: ${{ inputs.merge_tier }}
+          CHECK_SCOPE: ${{ inputs.scope }}
+          AFFECTED_PATHS: ${{ inputs.affected_paths }}
+          SKIP_CHECKS: ${{ inputs.skip_checks }}
+          LC_ALL: C # byte-wise [a-z] in the patterns below
         run: |
           git rev-parse HEAD
           test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
           case "$CHECK_KIND" in merge_check|precheck) ;; *) exit 1 ;; esac
+          tier=single scope=full paths='' skips=''
+          case "$MERGE_TIER" in single|card|batch) tier=$MERGE_TIER ;; esac
+          path='(packages|apps)/[a-z0-9-]+'
+          if [[ "$MERGE_TIER" != "$tier" ]]; then
+            : # Missing or unknown tier: full.
+          elif [[ $tier == batch ]]; then
+            : # A batch always runs the full check.
+          elif [[ "$CHECK_SCOPE" == affected && -z "$SKIP_CHECKS" && ${#AFFECTED_PATHS} -le 4096 &&
+                  "$AFFECTED_PATHS" =~ ^$path(\ $path)*$ ]]; then
+            spaces=${AFFECTED_PATHS//[^ ]/}
+            if (( ${#spaces} < 64 )); then scope=affected paths=$AFFECTED_PATHS; fi
+          elif [[ "$CHECK_SCOPE" == docs_only && -z "$AFFECTED_PATHS" ]]; then
+            case "$SKIP_CHECKS" in test|e2e|test,e2e) scope=docs_only skips=$SKIP_CHECKS ;; esac
+          fi
+          skip_test=false skip_e2e=false
+          case ",$skips," in *,test,*) skip_test=true ;; esac
+          case ",$skips," in *,e2e,*) skip_e2e=true ;; esac
+          # The test step runs the Godot p0 suite, which is not split by workspace
+          # package, so scope=affected still runs it in full; e2e is never narrowed.
+          {
+            echo "merge_tier=$tier"
+            echo "scope=$scope"
+            echo "affected_paths=$paths"
+            echo "skip_test=$skip_test"
+            echo "skip_e2e=$skip_e2e"
+          } >> "$GITHUB_OUTPUT"
+          echo "check scope: tier=$tier scope=$scope skip_test=$skip_test skip_e2e=$skip_e2e affected_paths=${paths:-none}" |
+            tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
         with:
           node-version: 22
@@ -92,6 +155,7 @@ jobs:
           tools/ci/timed.sh autoload-control tools/ci/test-autoload-gate.sh
           tools/ci/timed.sh import tools/run_tests.sh --ci-import
       - name: test
+        if: ${{ steps.verify.outputs.skip_test != 'true' }}
         run: tools/ci/timed.sh p0 tools/run_tests.sh --ci-headless res://tests/p0
       - name: lint
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
@@ -113,5 +177,5 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: tools/ci/timed.sh typecheck pnpm -r typecheck
       - name: e2e
-        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' && steps.verify.outputs.skip_e2e != 'true' }}
         run: tools/ci/timed.sh server-tests pnpm -r test
