@@ -85,7 +85,7 @@ func setup(building: String, footprint: Vector2i, data: Dictionary, walk: RefCou
 
 func move_to(cell: Vector2i) -> void:
 	at = cell
-	reason = Building.reason(_data, at, base, rotation_steps, _taken, _path, _walk_blocked)
+	reason = Building.reason(_data, at, base, rotation_steps, _taken, _path, _walk_blocked, type)
 	_ghost.transform = Building.transform(_walk, at, base, rotation_steps)
 	_bar.reason = reason
 	_paint()

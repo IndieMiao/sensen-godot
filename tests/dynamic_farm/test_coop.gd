@@ -12,6 +12,9 @@ const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Livestock = preload("res://modules/dynamic_farm/farm_livestock.gd")
 const LivestockScene = preload("res://scenes/dynamic_farm/parcel_livestock.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
+const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
+const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
+const Shade = preload("res://modules/dynamic_farm/farm_shade.gd")
 const T0 := 1795406400000
 const BODY := 0.3
 var checks := 0
@@ -32,6 +35,9 @@ func _run() -> void:
 	_saves()
 	_layout()
 	_walls()
+	_keep_clear()
+	for path in OS.get_cmdline_user_args():
+		_keep_clear_parcel(JSON.parse_string(FileAccess.get_file_as_string(path)))
 	await _animals()
 	_items()
 	print("COOP_TESTS checks=%d failures=%d" % [checks, failures])
@@ -132,6 +138,153 @@ func _walls() -> void:
 			and blocked.call(Vector2(7.0, 2.5)), "walls turned %d: the fence stops the player" % turns)
 		_check(blocked.call(Vector2(4.0, 0.75)) and blocked.call(Vector2(2.5, 3.5)), "walls turned %d: the coop and a feeder stop the player" % turns)
 		_check(not blocked.call(Vector2(4.5, 3.2)) and not blocked.call(Vector2(1.5, 4.0)), "walls turned %d: the floor is open" % turns)
+
+## C-154#54 (V-482): the cell outside the entry and the rear hedge row are the coop's to keep. They turn with the
+## model; the coop stands only with them in the core and off buildings and solid obstacles, and no later building
+## covers them, whichever comes first. The reviewer's two cases on the synthetic parcel, then the real walker.
+func _keep_clear() -> void:
+	var data := Data.decode(Fixture.farm())
+	var walk := Walk.new(data)
+	var base := Vector2i(7, 5)
+	var kept := Livestock.keep_clear("coop", base)
+	_check(kept.size() == 8 and kept.filter(func(k): return k.walk).map(func(k): return k.cell) == [Vector2i(5, 5)],
+		"keep clear: the entry's outside cell (walkable) and the 7 rear cells, from the art file")
+	_check(Building.apron("cottage", Vector2i(3, 3), Vector2i(3, 3)).walk.is_empty() and Building.apron_cells("cottage", Vector2i(3, 3), Vector2i(3, 3)).is_empty(),
+		"keep clear: the cottage keeps nothing past its footprint")
+	for turns in 4:
+		var at := Vector2i(4, 4)
+		var frame := Building.transform(walk, at, base, turns)
+		var a := Building.apron("coop", at, base, turns)
+		var same := true
+		var i := 0
+		for k: Dictionary in kept:
+			var want := walk.cell_at(frame * Livestock.model_point(Vector2(k.cell) + Vector2(0.5, 0.5), base, walk.cell_m))
+			var got: Vector2i = a.walk[0] if k.walk else a.art[i]
+			if not k.walk: i += 1
+			same = same and got == want
+		var entry := walk.cell_at(frame * Livestock.model_point(Vector2(5.5, 5.4), base, walk.cell_m))
+		var footprint := Building.cells(at, base, turns)
+		_check(same and a.walk == [entry] and not footprint.has(entry) and a.art.all(func(c): return not footprint.has(c)),
+			"keep clear turned %d: the cells turn with the model, the entry's just past its opening" % turns)
+	var path := Space.protected_path(data)
+	var cottage := Vector2i(3, 3)
+	var none := {}
+	var walk_of := func(farm: Dictionary) -> Dictionary: return walk.reserved.merged(ParcelFarm.building_cells(farm))
+	var coop_ok := func(at: Vector2i, turns: int, farm: Dictionary) -> String:
+		return Building.reason(data, at, base, turns, Building.blocked({}, farm), path, walk_of.call(farm), "coop")
+	var house_ok := func(at: Vector2i, farm: Dictionary) -> String:
+		return Building.reason(data, at, cottage, 0, Building.blocked({}, farm), path, walk_of.call(farm), "cottage")
+	# The reviewer's probe: a coop spot fine alone and a cottage fine alone whose footprint covers the coop's entry
+	# (its rear row); either one standing refuses the other.
+	for which in ["walk", "art"]:
+		var found := 0
+		var exact := true
+		for cell: Dictionary in data.cells:
+			if found >= 6: break
+			if cell.zone != "core": continue
+			var at := Vector2i(cell.x, cell.y)
+			for turns in 4:
+				if coop_ok.call(at, turns, none) != "": continue
+				var target: Vector2i = Building.apron("coop", at, base, turns)[which][0]
+				for dy in 3:
+					for dx in 3:
+						var h := target - Vector2i(dx, dy)
+						if house_ok.call(h, none) != "": continue
+						var c := {"buildings": [{"id": 1, "type": "coop", "x": at.x, "y": at.y, "width": 7, "depth": 5, "rotation": turns}]}
+						var hf := {"buildings": [{"id": 1, "type": "cottage", "x": h.x, "y": h.y, "width": 3, "depth": 3, "rotation": 0}]}
+						exact = exact and coop_ok.call(at, turns, hf) == Building.TAKEN and house_ok.call(h, c) == Building.TAKEN
+						found += 1
+		_check(found > 0 and exact, "keep clear %s: %d coop/cottage pairs over the coop's %s, refused in either order"
+			% [which, found, "entry" if which == "walk" else "rear row"])
+	# A solid obstacle on the entry or the rear row refuses the coop; a weed or a tilled cell does not.
+	var spot = Building.nearest(data, data.spawn, base, {}, path, walk.reserved, 0, "coop")
+	_check(spot != null, "keep clear: the synthetic parcel has room for the coop")
+	if spot == null: return
+	var a0 := Building.apron("coop", spot, base, 0)
+	_check(Building.reason(data, spot, base, 0, {}, path, walk.reserved.merged({a0.walk[0]: true}), "coop") == Building.TAKEN
+		and Building.reason(data, spot, base, 0, {}, path, walk.reserved.merged({a0.art[3]: true}), "coop") == Building.TAKEN
+		and Building.reason(data, spot, base, 0, {a0.walk[0]: true, a0.art[3]: true}, path, walk.reserved, "coop") == "",
+		"keep clear: a solid obstacle there refuses the coop; a weed or a tilled cell does not")
+
+## On a real parcel: every coop spot in all four turns keeps its entry and rear row in the core and off solid
+## obstacles; with the coop standing, every cottage the placement accepts near the entry leaves its floor reachable
+## from spawn by the real walker.
+func _keep_clear_parcel(raw: Dictionary) -> void:
+	var data := Data.decode(raw)
+	if not data.ok: return
+	var walk := Walk.new(data)
+	var planned := Scenery.plan(data, walk)
+	Shade.enforce_budget(planned, data, walk)
+	var layout: Array = planned.core_obstacles.layout
+	var obstacles := {}
+	for item: Dictionary in layout: obstacles[item.cell] = true
+	var path := Space.protected_path(data)
+	var base := Vector2i(7, 5)
+	# The obstacles cleared, as a player does before building; solid ones still standing are judged below.
+	var taken := Building.blocked({}, {})
+	var walk_blocked: Dictionary = walk.reserved.duplicate()
+	var stones := Building.solid(layout, obstacles)
+	var exact := true
+	var spots := 0
+	var reached := true
+	var cottages := 0
+	for turns in 4:
+		var first = null
+		for y in range(-1, data.grid_size.y):
+			for x in range(-1, data.grid_size.x):
+				var at := Vector2i(x, y)
+				var why := Building.reason(data, at, base, turns, taken, path, walk_blocked, "coop")
+				var kept := Building.apron_cells("coop", at, base, turns)
+				var bad := kept.any(func(c): return not data.by_cell.has(c) or data.by_cell[c].zone != "core")
+				if bad: exact = exact and why == Building.OUTSIDE
+				if why == "":
+					spots += 1
+					if first == null: first = at
+				if why == "" and kept.any(func(c): return stones.has(c)):
+					exact = exact and Building.reason(data, at, base, turns, taken, path, walk_blocked.merged(stones), "coop") == Building.TAKEN
+		if first == null: continue
+		var farm := {"buildings": [{"id": 1, "type": "coop", "x": first.x, "y": first.y, "width": 7, "depth": 5, "rotation": turns}]}
+		var entry: Vector2i = Building.apron("coop", first, base, turns).walk[0]
+		var floor_at := Building.transform(walk, first, base, turns) * Livestock.model_point(Vector2(4.5, 3.2), base, walk.cell_m)
+		var tried := 0
+		for dy in range(-3, 2):
+			for dx in range(-3, 2):
+				if tried >= 3: break
+				var h := entry + Vector2i(dx, dy)
+				if Building.reason(data, h, Vector2i(3, 3), 0, Building.blocked({}, farm), path,
+						walk_blocked.merged(ParcelFarm.building_cells(farm)), "cottage") != "": continue
+				tried += 1
+				var trial := Walk.new(data)
+				trial.reserved = walk.reserved
+				trial._proxies_by_cell = walk._proxies_by_cell.duplicate(true)
+				for p in Building.proxies(trial, "coop", first, base, turns): trial.add_prop(p)
+				for p in Building.proxies(trial, "cottage", h, Vector2i(3, 3), 0): trial.add_prop(p)
+				reached = reached and _reaches(trial, floor_at)
+		cottages += tried
+	_check(exact, "%s: every coop spot keeps its entry and rear row in the core, off solid obstacles" % data.block_id)
+	_check(reached, "%s: %d cottages beside the coop's entry leave its floor reachable" % [data.block_id, cottages])
+	print("COOP keep_clear parcel=%s spots=%d cottages=%d" % [data.block_id, spots, cottages])
+
+## Flood fill on a 0.2 m lattice from spawn: the player reaches `target` (within one step).
+func _reaches(walk: RefCounted, target: Vector3) -> bool:
+	var step := 0.2
+	var key := func(p: Vector3) -> Vector2i: return Vector2i(roundi(p.x / step), roundi(p.z / step))
+	var start: Vector3 = walk.point(walk.data.spawn)
+	var goal: Vector2i = key.call(target)
+	var seen := {key.call(start): true}
+	var queue: Array[Vector3] = [start]
+	var i := 0
+	while i < queue.size():
+		var p := queue[i]
+		i += 1
+		if Vector2(key.call(p)).distance_to(Vector2(goal)) <= 1.5: return true
+		for d in [Vector3(step, 0, 0), Vector3(-step, 0, 0), Vector3(0, 0, step), Vector3(0, 0, -step)]:
+			var q: Vector3 = p + d
+			var k: Vector2i = key.call(q)
+			if seen.has(k): continue
+			seen[k] = true
+			if walk.clear_position(q): queue.append(q)
+	return false
 
 func _animals() -> void:
 	var rules := ParcelFarm.rules()

@@ -55,12 +55,12 @@ func _run() -> void:
 	report.turns = []
 	for i in 4:
 		p._bar.secondary_pressed.emit()
-		var spot = Building.nearest(scene._data, p.at + Building.middle(p.base, p.rotation_steps), p.base, p._taken, p._path, p._walk_blocked, p.rotation_steps)
+		var spot = Building.nearest(scene._data, p.at + Building.middle(p.base, p.rotation_steps), p.base, p._taken, p._path, p._walk_blocked, p.rotation_steps, p.type)
 		if spot != null: p.move_to(spot)
 		report.turns.append({"rotation": p.rotation_steps, "at": [p.at.x, p.at.y], "reason": p.reason})
 		await _shot(id + "-2-turn-%d" % p.rotation_steps)
 	for i in build_turns: p._bar.secondary_pressed.emit()
-	var spot = Building.nearest(scene._data, p.at + Building.middle(p.base, p.rotation_steps), p.base, p._taken, p._path, p._walk_blocked, p.rotation_steps)
+	var spot = Building.nearest(scene._data, p.at + Building.middle(p.base, p.rotation_steps), p.base, p._taken, p._path, p._walk_blocked, p.rotation_steps, p.type)
 	if spot != null: p.move_to(spot)
 	report.build_at = {"at": [p.at.x, p.at.y], "rotation": p.rotation_steps, "reason": p.reason}
 	p._bar.confirmed.emit()

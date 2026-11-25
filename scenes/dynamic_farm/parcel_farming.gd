@@ -427,8 +427,8 @@ func _feed_action(near: Dictionary) -> Dictionary:
 	var text := ""
 	match refusal:
 		"NO_FEED": text = "Need 1 %s" % str(_names.get(str(rule.get("feed", "")), ParcelItems.name_of(str(rule.get("feed", "")))))
-		"ANIMALS_FED": text = str(copy.get("fed", "Not hungry"))
-		"GROUND_FULL": text = str(copy.get("full", "Pick up first"))
+		"ANIMALS_FED": text = str(copy.get("fed", "Hens are fed"))
+		"GROUND_FULL": text = str(copy.get("full", "Pick up eggs first"))
 		"NOT_LIVESTOCK": text = "That didn't work."
 	return {"verb": "feed", "refusal": refusal, "refusal_text": text, "feed_item": str(rule.get("feed", "")),
 		"command": {"type": "feed", "building": int(b.id)} if refusal.is_empty() else {}, "feeder": near.point}

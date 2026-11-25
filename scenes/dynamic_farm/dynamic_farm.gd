@@ -262,7 +262,7 @@ func begin_placement() -> void:
 	var taken := Building.blocked(obstacles, _farming.farm)
 	var walk_blocked := _walk_blocked(obstacles)
 	var path: Dictionary = _farming.protected_path()
-	var start = Building.nearest(_data, _walk.cell_at(_actor.position), base, taken, path, walk_blocked)
+	var start = Building.nearest(_data, _walk.cell_at(_actor.position), base, taken, path, walk_blocked, 0, type)
 	_placement = Placement.new()
 	add_child(_placement)
 	_placement.setup(type, base, _data, _walk, _camera, _canvas, taken, path, walk_blocked,

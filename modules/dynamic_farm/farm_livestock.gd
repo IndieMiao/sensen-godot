@@ -67,6 +67,23 @@ static func parts(type: String) -> Array:
 			"model": str(p.get("model", "")), "color": Color.from_string(str(p.get("color", "#9b7a55")), Color(0.6, 0.48, 0.33))})
 	return out
 
+## Cells outside the footprint the type's art needs kept (`keep_clear`, rects [x, z, width, depth] in cells of the
+## unturned frame): [{cell: Vector2i, walk: bool}]. A `walk` one stays walkable (the cell outside the entry); the
+## others hold art drawn past the footprint (the rear hedge). A cell inside the footprint, or a rect wider than a
+## building side, is left out.
+static func keep_clear(type: String, base: Vector2i) -> Array:
+	var out := []
+	for k in building_art(type).get("keep_clear", []):
+		if not k is Dictionary or not k.get("cells") is Array or k.cells.size() != 4: continue
+		var r: Array = k.cells
+		if not r.all(func(v): return (v is int or v is float) and absf(float(v)) <= 16.0 and float(v) == floorf(float(v))): continue
+		var rect := Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3]))
+		for z in range(rect.position.y, rect.end.y):
+			for x in range(rect.position.x, rect.end.x):
+				if not Rect2i(Vector2i.ZERO, base).has_point(Vector2i(x, z)):
+					out.append({"cell": Vector2i(x, z), "walk": bool(k.get("walk", false))})
+	return out
+
 ## The fence's runs along the footprint's edge, openings left out: [{from: Vector2, to: Vector2}] in cells.
 static func fence_runs(type: String, base: Vector2i) -> Array:
 	var fence = building_art(type).get("fence")

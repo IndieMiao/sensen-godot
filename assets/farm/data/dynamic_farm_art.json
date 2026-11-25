@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "_note": "Client art for dynamic_farm.json's buildings, animals and drops (C-154). Positions are in cells (1 U = one tilled cell), in a building's own unturned frame: origin at the footprint's rear-left corner, x to the right, z toward the entry. Paths that do not exist yet draw placeholders.",
+  "_note": "Client art for dynamic_farm.json's buildings, animals and drops (C-154). Positions are in cells (1 U = one tilled cell), in a building's own unturned frame: origin at the footprint's rear-left corner, x to the right, z toward the entry. Paths that do not exist yet draw placeholders. keep_clear: cells outside the footprint, [x, z, width, depth], that other buildings may not cover; walk ones stay walkable to spawn (the cell outside the entry), the others hold art drawn past the footprint (the rear hedge).",
   "buildings": {
     "coop": {
       "name": "Coop",
@@ -8,6 +8,7 @@
       "scene": "res://assets/dynamic_farm/chicken_yard/chicken_yard.tscn",
       "fence": {"height": 0.75, "thickness": 0.125, "openings": [{"side": "front", "from": 5.0, "to": 6.0}]},
       "entry": [5.5, 5.0],
+      "keep_clear": [{"cells": [5, 5, 1, 1], "walk": true}, {"cells": [0, -1, 7, 1]}],
       "parts": [
         {"id": "coop", "model": "res://assets/dynamic_farm/chicken_yard/BD-05A.glb", "center": [4.0, 0.75], "size": [2.0, 1.5], "height": 1.875, "color": "#b5483a"},
         {"id": "ramp", "model": "res://assets/dynamic_farm/chicken_yard/BD-05B.glb", "center": [4.0, 1.6875], "size": [0.5, 0.625], "height": 0.375, "color": "#a87b4f"},
