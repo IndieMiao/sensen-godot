@@ -35,6 +35,7 @@ func _run() -> void:
 	_saves()
 	_layout()
 	_walls()
+	_entry()
 	_keep_clear()
 	for path in OS.get_cmdline_user_args():
 		_keep_clear_parcel(JSON.parse_string(FileAccess.get_file_as_string(path)))
@@ -138,6 +139,92 @@ func _walls() -> void:
 			and blocked.call(Vector2(7.0, 2.5)), "walls turned %d: the fence stops the player" % turns)
 		_check(blocked.call(Vector2(4.0, 0.75)) and blocked.call(Vector2(2.5, 3.5)), "walls turned %d: the coop and a feeder stop the player" % turns)
 		_check(not blocked.call(Vector2(4.5, 3.2)) and not blocked.call(Vector2(1.5, 4.0)), "walls turned %d: the floor is open" % turns)
+
+## C-154#89 (V-495): in all four turns the player's centre passes the entry `entry_clear_m` (0.4 m) wide, and the
+## real walker pushed at a slant from one cell outside the entry, frame by frame at walking speed, gets onto the floor.
+## Aimed up to 0.4 m beside the opening's middle; a stick held steeper than about 67° off straight in slides past
+## even this opening, the walls before C-154#89 (0.1 m) from about 65°. With `entry_clear_m` 0 every 65° walk and
+## every straight push aimed 0.4 m off fails, so the cases do catch a narrow entry.
+const ENTRY_DEGREES := [0.0, 20.0, 35.0, 50.0, 60.0, 65.0]
+const ENTRY_AIMS := [-0.5, -0.25, 0.0, 0.25, 0.5]
+
+func _entry() -> void:
+	var fence: Dictionary = Livestock.building_art("coop").fence
+	var shipped = fence.get("entry_clear_m")
+	_check(shipped != null and is_equal_approx(Livestock.entry_clear_m("coop"), 0.4), "entry: entry_clear_m 0.4 from the art file")
+	var wide := _entry_walks(ENTRY_DEGREES)
+	_check(wide.narrowest >= 0.4 - 0.005, "entry: the player's centre passes %.3f m in the narrowest turn (≥ 0.4)" % wide.narrowest)
+	_check(wide.failed.is_empty(), "entry: %d walks in, four turns, both sides, up to 65°, all get in (failed %s)" % [wide.total, wide.failed])
+	var wide_limit := _entry_limit()
+	fence.entry_clear_m = 0.0
+	var narrow := _entry_walks(ENTRY_DEGREES)
+	var steep: Array = narrow.failed.filter(func(f: String): return f.contains("65°"))
+	var off: Array = narrow.failed.filter(func(f: String): return f.contains(" +0° ") and f.ends_with("0.50"))
+	var narrow_limit := _entry_limit()
+	fence.entry_clear_m = shipped
+	_check(narrow.narrowest < 0.15, "entry control: with entry_clear_m 0 the centre passes only %.3f m" % narrow.narrowest)
+	_check(steep.size() == 4 * 2 * ENTRY_AIMS.size(), "entry control: with entry_clear_m 0 every 65° walk slides past (%d of 40)" % steep.size())
+	_check(off.size() == 4 * 2 * 2, "entry control: with entry_clear_m 0 every straight push aimed 0.4 m off stops at the fence (%d of 16)" % off.size())
+	_check(wide_limit > narrow_limit, "entry: the steepest push that gets in, %d° against %d° before" % [wide_limit, narrow_limit])
+	print("COOP entry clear=%.2f narrowest=%.3f failed=%d/%d steepest=%d°; clear=0 narrowest=%.3f failed=%d/%d steepest=%d°" % [
+		Livestock.entry_clear_m("coop"), wide.narrowest, wide.failed.size(), wide.total, wide_limit, narrow.narrowest,
+		narrow.failed.size(), narrow.total, narrow_limit])
+
+## The steepest whole degree at which every straight-aimed push, in all four turns from both sides, still gets in.
+func _entry_limit() -> int:
+	var limit := 0
+	for degrees in range(40, 86):
+		if not _entry_walks([float(degrees)], [0.0]).failed.is_empty(): break
+		limit = degrees
+	return limit
+
+## The coop's walls in the real walker on the synthetic parcel, each turn: the narrowest width (m) the player's centre
+## passes along the entry's fence line, and which pushes at `degrees` off straight in, aimed `aims` cells beside the
+## opening's middle, fail to reach the floor within six seconds.
+func _entry_walks(degrees_list: Array, aims := ENTRY_AIMS) -> Dictionary:
+	var data := Data.decode(Fixture.farm())
+	var base := Vector2i(7, 5)
+	var at := Vector2i(10, 10)
+	var narrowest := INF
+	var failed := []
+	var total := 0
+	for turns in 4:
+		var walk := Walk.new(data)
+		var frame := Building.transform(walk, at, base, turns)
+		var back := frame.affine_inverse()
+		for proxy in Building.proxies(walk, "coop", at, base, turns): walk.add_prop(proxy)
+		var world := func(local: Vector2) -> Vector3: return frame * Livestock.model_point(local, base, walk.cell_m)
+		var local := func(p: Vector3) -> Vector2: return Livestock.local_point(back * p, base, walk.cell_m)
+		# Across the fence line at the entry: the longest clear stretch of centres.
+		var run := 0.0
+		var best := 0.0
+		var step := 0.0025
+		var x := 4.0
+		while x <= 7.0:
+			run = run + step if walk.clear_position(world.call(Vector2(x, 5.0))) else 0.0
+			best = maxf(best, run)
+			x += step
+		narrowest = minf(narrowest, best * walk.cell_m)
+		# The stick held at a slant toward a point of the opening, at 60 frames a second, from one cell out (the
+		# entry's kept cell row), clear of the fence.
+		for side in [-1.0, 1.0]:
+			for degrees: float in degrees_list:
+				for aim: float in aims:
+					total += 1
+					var a := deg_to_rad(degrees)
+					var heading := Vector2(side * sin(a), -cos(a))
+					var start: Vector2 = Vector2(5.5 + aim, 5.0) - heading / cos(a)
+					walk.position = world.call(start)
+					var direction: Vector3 = (world.call(start + heading) - world.call(start)).normalized()
+					var inside := false
+					for _frame in 360:
+						walk.move(direction * 3.75 / 60.0)
+						var now: Vector2 = local.call(walk.position)
+						if now.y < 4.4 and now.x > 0.5 and now.x < 6.5:
+							inside = true
+							break
+					if not inside: failed.append("t%d %+d° aim %+.2f" % [turns, int(side * degrees), aim])
+	return {"narrowest": narrowest, "failed": failed, "total": total}
 
 ## C-154#54 (V-482): the cell outside the entry and the rear hedge row are the coop's to keep. They turn with the
 ## model; the coop stands only with them in the core and off buildings and solid obstacles, and no later building

@@ -96,7 +96,7 @@ three hens, the feed (one carrot, `energy.costs.feed` 1), the product (an egg `p
 and `ready_at`; `feed` writes one, `pick_up` takes a laid one into the bag once (ids from `drop_seq`, never reused).
 The client's art is `assets/farm/data/dynamic_farm_art.json` (`modules/dynamic_farm/farm_livestock.gd`): the yard's
 scene (SEN-C-155's `chicken_yard.tscn`; a placeholder of the parts and fence until it exists), its parts and fence
-(walls; the front's opening is the entry), the hens' models and clips (SEN-C-156) and the egg's model. The yard's cells
+(walls; the front's opening is the entry, its walls pulled back so the player's centre passes `entry_clear_m`, 0.4 m), the hens' models and clips (SEN-C-156) and the egg's model. The yard's cells
 are never farmed. `scenes/dynamic_farm/parcel_livestock.gd` walks the hens on the open floor (walk, peck, idle; they
 step away from the player; a fed hen pecks at a feeder; a hen walks to her spot before her egg is due) and draws laid
 eggs. Near a feeder the key reads `Feed` · `1 Energy`. An egg within 0.8 m of the player hops into them and flies on

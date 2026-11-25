@@ -6,7 +6,7 @@
       "name": "Coop",
       "copy": {"fed": "Hens are fed", "full": "Pick up eggs first"},
       "scene": "res://assets/dynamic_farm/chicken_yard/chicken_yard.tscn",
-      "fence": {"height": 0.75, "thickness": 0.125, "openings": [{"side": "front", "from": 5.0, "to": 6.0}]},
+      "fence": {"height": 0.75, "thickness": 0.125, "entry_clear_m": 0.4, "openings": [{"side": "front", "from": 5.0, "to": 6.0}]},
       "entry": [5.5, 5.0],
       "keep_clear": [{"cells": [5, 5, 1, 1], "walk": true}, {"cells": [0, -1, 7, 1]}],
       "parts": [

@@ -9,12 +9,15 @@ extends RefCounted
 ## frame: origin at the footprint's rear-left corner, x to the right, z toward the entry (the front, the model's +Z).
 ## FarmBuilding puts a model's pivot on the footprint's middle, so `model_point` shifts by half the footprint.
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
+const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
 const ART_PATH := "res://assets/farm/data/dynamic_farm_art.json"
 ## Placeholder ground sits just above the farm ground so the two never fight.
 const GROUND_LIFT := 0.004
 ## Pickup feel (C-154#19 design) when the file leaves it out.
 const PICKUP_DEFAULTS := {"reach_m": 0.8, "hop_m": 0.25, "flight_s": 0.35, "shrink": 0.6, "chest_m": 0.9}
 const SIDES := ["back", "front", "left", "right"]
+## Width the player's centre has to pass an opening (C-154#89) when the art file's fence leaves `entry_clear_m` out.
+const ENTRY_CLEAR_M := 0.4
 
 static var _art := {}
 
@@ -84,7 +87,8 @@ static func keep_clear(type: String, base: Vector2i) -> Array:
 					out.append({"cell": Vector2i(x, z), "walk": bool(k.get("walk", false))})
 	return out
 
-## The fence's runs along the footprint's edge, openings left out: [{from: Vector2, to: Vector2}] in cells.
+## The fence's runs along the footprint's edge, openings left out: [{from: Vector2, to: Vector2, open_from: bool,
+## open_to: bool}] in cells; `open_*` says that end stops at an opening.
 static func fence_runs(type: String, base: Vector2i) -> Array:
 	var fence = building_art(type).get("fence")
 	if not fence is Dictionary: return []
@@ -104,30 +108,64 @@ static func fence_runs(type: String, base: Vector2i) -> Array:
 		var cuts: Array = gaps[side].duplicate()
 		cuts.sort_custom(func(p: Vector2, q: Vector2): return p.x < q.x)
 		var start := a[along]
+		var after_cut := false
 		for cut: Vector2 in cuts:
-			if cut.x > start: runs.append(_run(a, along, start, cut.x))
-			start = maxf(start, cut.y)
-		if b[along] > start: runs.append(_run(a, along, start, b[along]))
+			if cut.x > start: runs.append(_run(a, along, start, cut.x, after_cut, true))
+			if cut.y >= start:
+				start = cut.y
+				after_cut = true
+		if b[along] > start: runs.append(_run(a, along, start, b[along], after_cut, false))
 	return runs
 
-static func _run(a: Vector2, along: int, from: float, to: float) -> Dictionary:
+static func _run(a: Vector2, along: int, from: float, to: float, open_from: bool, open_to: bool) -> Dictionary:
 	var p := a
 	var q := a
 	p[along] = from
 	q[along] = to
-	return {"from": p, "to": q}
+	return {"from": p, "to": q, "open_from": open_from, "open_to": open_to}
+
+## The fence's `entry_clear_m`: how wide (metres) the player's centre can pass each opening; at least 0.
+static func entry_clear_m(type: String) -> float:
+	var fence = building_art(type).get("fence")
+	var raw = fence.get("entry_clear_m") if fence is Dictionary else null
+	return maxf(0.0, float(raw)) if raw is float or raw is int else ENTRY_CLEAR_M
+
+## How far (cells) a fence run's wall is pulled back from an opening's edge, past the half thickness it already
+## reaches into it, so the player's centre passes the narrowest opening `entry_clear_m` wide; 0 when wide enough. Only
+## the wall the player stops at moves, not the fence's art.
+static func entry_pullback(type: String, cell_m: float) -> float:
+	var fence = building_art(type).get("fence")
+	if not fence is Dictionary: return 0.0
+	var t := float(fence.get("thickness", 0.125))
+	var need := (entry_clear_m(type) + 2.0 * Walk.BODY_RADIUS) / cell_m
+	var pull := 0.0
+	for o in fence.get("openings", []):
+		if o is Dictionary:
+			pull = maxf(pull, (need - (float(o.get("to", 0)) - float(o.get("from", 0)) - t)) * 0.5)
+	return pull
 
 ## Walls the player stops at, as FarmPropProxy profiles in the model's frame: every fence run and every part (a round
-## one as a cylinder). The entry is the fence's opening.
+## one as a cylinder). The entry is the fence's opening; a run's wall stops short of it by `entry_pullback` so the
+## player's centre passes `entry_clear_m` wide (C-154#89).
 static func profiles(type: String, base: Vector2i, cell_m: float) -> Array:
 	var out := []
 	var fence = building_art(type).get("fence")
 	if fence is Dictionary:
 		var t := float(fence.get("thickness", 0.125))
 		var h := float(fence.get("height", 0.75))
+		var pull := entry_pullback(type, cell_m)
 		for run: Dictionary in fence_runs(type, base):
-			var mid: Vector3 = model_point((run.from + run.to) * 0.5, base, cell_m)
-			var span: Vector2 = (run.to - run.from).abs() + Vector2(t, t)
+			var along := 0 if is_equal_approx(run.from.y, run.to.y) else 1
+			var axis := Vector2.ZERO
+			axis[along] = 1.0
+			var length: float = run.to[along] - run.from[along]
+			# Keep at least the fence's thickness of wall at each run.
+			var cut_from := minf(pull if run.open_from else 0.0, length * 0.5)
+			var cut_to := minf(pull if run.open_to else 0.0, length * 0.5)
+			var from: Vector2 = run.from + axis * cut_from
+			var to: Vector2 = run.to - axis * cut_to
+			var mid: Vector3 = model_point((from + to) * 0.5, base, cell_m)
+			var span: Vector2 = (to - from).abs() + Vector2(t, t)
 			out.append({"solid": true, "shape": "box", "center_xz_m": [mid.x, mid.z], "size_xz_m": [span.x * cell_m, span.y * cell_m],
 				"height_m": h * cell_m})
 	for p: Dictionary in parts(type):
