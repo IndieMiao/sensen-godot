@@ -115,13 +115,15 @@ func _init(kind_ := Kind.SETTINGS, title := "Settings", safe_top := 0.0, safe_bo
 ## no sub-page), and at the end, 24 under Legal, the outlined `Sign out` (48, the page's width; "sign_out") and 12
 ## under it the Danger row `Delete account ›` / `Deletes your farm, items and progress` in its own card
 ## ("delete_account").
+## The dynamic farm (C-128) shows only what applies to it there: `show_tests` false leaves out `Test options ›` (P0's test
+## accounts), and a `version` of "" leaves out the Version row (its package's version could not be read).
 const ACCOUNT_ROW := {"apple": "Signed in with Apple", "google": "Signed in with Google", "email": "Signed in with email",
 	"code": "Signed in with a test code"}
 const _END_GAP := 8     # Legal → Sign out: 24 with the column's two 8s
 const _END_SEP := 12    # Sign out → Delete account
 static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home := {}, notifications := "",
 		blocked := BLOCKED_NONE, voice_chat := false, language := "", privacy_url := "", support_code := "",
-		account := "", terms_url := "") -> P0SettingsPage:
+		account := "", terms_url := "", show_tests := true) -> P0SettingsPage:
 	var page := P0SettingsPage.new(Kind.SETTINGS, "Settings", safe_top, safe_bottom)
 	if ACCOUNT_ROW.has(account):
 		var who := UiSettingRow.new(UiSettingRow.Kind.VALUE, str(ACCOUNT_ROW[account]))
@@ -144,7 +146,7 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 		lang.name = "Language"
 		lang.pressed.connect(func(): page.open_pressed.emit("language"))
 		page._group("General", [lang])
-	if not P0Build.store():   # SGODOT-483: no test accounts in the store build (App Review 2.2 / 2.3.1)
+	if show_tests and not P0Build.store():   # SGODOT-483: no test accounts in the store build (App Review 2.2 / 2.3.1)
 		var tests := UiSettingRow.new(UiSettingRow.Kind.LINK, "Test options")
 		tests.name = "TestOptions"
 		tests.pressed.connect(func(): page.open_pressed.emit("test_options"))
@@ -176,9 +178,10 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 	licenses.name = "Licenses"
 	licenses.pressed.connect(func(): page.open_pressed.emit("licenses"))
 	legal.append(licenses)
-	var ver := UiSettingRow.new(UiSettingRow.Kind.VALUE, "Version", "", version)
-	ver.name = "Version"
-	legal.append(ver)
+	if version != "":
+		var ver := UiSettingRow.new(UiSettingRow.Kind.VALUE, "Version", "", version)
+		ver.name = "Version"
+		legal.append(ver)
 	if support_code != "":
 		var code := UiSettingRow.new(UiSettingRow.Kind.LINK, "Support code", "Tap to copy", support_code, "", false)
 		code.name = "SupportCode"

@@ -119,3 +119,41 @@ func test_sync_loads_deliver_without_a_threaded_request() -> void:
 	assert_int(finished.size()).is_equal(1)
 	assert_int(finished[0][0]).is_equal(rid)
 	assert_object(finished[0][2]).is_not_null()
+
+## C-133: `loading` is true from a threaded request until the part is delivered or has failed.
+func test_loading_until_delivered() -> void:
+	assert_bool(loader.loading("fx_cloth_a")).is_false()
+	loader.request_part("fx_cloth_a")
+	assert_bool(loader.loading("fx_cloth_a")).is_true()
+	await _pump()
+	assert_int(finished.size()).is_equal(1)
+	assert_bool(loader.loading("fx_cloth_a")).is_false()
+	loader.request_part("fx_cloth_a")   # a cache hit never loads
+	assert_bool(loader.loading("fx_cloth_a")).is_false()
+	loader.request_part("nope")
+	assert_bool(loader.loading("nope")).is_false()
+
+## C-133: the Avatar service warms the saved outfit into the cache without a rig; nothing is saved, the cached parts
+## are not asked for again, and `warming` turns false once they have loaded.
+func test_avatar_warms_the_saved_outfit() -> void:
+	var keep_dir: String = Avatar.store.base_dir
+	var keep_user: String = Avatar.user_id
+	Avatar.store.base_dir = "user://test_warm_outfit"
+	Avatar.user_id = "c133"
+	Avatar.cache.clear()
+	var outfit := Avatar.load_outfit()
+	var asked := Avatar.warm_saved_outfit()
+	var expected: Array[String] = []
+	for id in outfit.slots.values():
+		if not str(id).is_empty() and not expected.has(str(id)): expected.append(str(id))
+	assert_array(asked).contains_exactly_in_any_order(expected)
+	assert_bool(Avatar.warming()).is_true()
+	for i in 900:
+		if not Avatar.warming(): break
+		await get_tree().process_frame
+	assert_bool(Avatar.warming()).is_false()
+	for id in expected: assert_object(Avatar.cache.get_part(id)).is_not_null()
+	assert_array(Avatar.warm_saved_outfit()).is_empty()
+	assert_bool(DirAccess.dir_exists_absolute("user://test_warm_outfit")).is_false()
+	Avatar.store.base_dir = keep_dir
+	Avatar.user_id = keep_user
