@@ -36,7 +36,8 @@ const PICK_FIRST := "Tap a building to choose your first home."
 const PICK_HOME := "Tap your green parcel, then Enter my farm."
 ## A Market / Carpenter entry while its town loads (C-61, C-59#135: a cold start's first open took ~10 s).
 const TOWN_LOADING := "Loading…"
-const TOWN_NAMES := {"market": "Market", "carpenter": "Carpenter"}## Camera zoom when the map moves to the player's home (C-110); the parcel and its address labels show from 18.
+const TOWN_NAMES := {"market": "Market", "carpenter": "Carpenter"}
+## Camera zoom when the map moves to the player's home (C-110); the parcel and its address labels show from 18.
 const HOME_ZOOM := 18.0
 const MY_HOME := "My home"
 ## The locate key: farm-dev's MapLocateButton (scenes/p0/p0_map.gd _style_locate, LOCK-24) as it is, in its place
@@ -268,6 +269,23 @@ func _button(text: String, action: Callable) -> Button:
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL; button.pressed.connect(action)
 	return button
 
+## A disabled panel button that reads another text for a while (Loading…) keeps the width its `usual` text gives it,
+## with no side margins and the text centred; `text == usual` puts it back. A longer text widened the top panel past
+## the screen and cut off the buttons on the right (C-123, C-61#195).
+func _text_in_place(button: Button, text: String, usual: String) -> void:
+	if button.text == text: return
+	if text == usual:
+		button.text = usual
+		button.remove_theme_stylebox_override("disabled"); button.clip_text = false; button.custom_minimum_size.x = 0
+		return
+	if button.text == usual:
+		button.custom_minimum_size.x = button.get_combined_minimum_size().x
+		button.clip_text = true
+		var style := button.get_theme_stylebox("disabled").duplicate() as StyleBox
+		style.content_margin_left = 0; style.content_margin_right = 0
+		button.add_theme_stylebox_override("disabled", style)
+	button.text = text
+
 func _render() -> void:
 	_render_account()
 	if _selector == null or _suspended or _leaving: return
@@ -304,7 +322,8 @@ func _render() -> void:
 	_reselect.visible = state == "mine" and _claims.reselect; _reselect.disabled = not idle
 	var town_ready: bool = _claims.has_home() and not _opening and not _claims.busy and _town == null and _town_loading.is_empty()
 	_market.disabled = not town_ready; _carpenter.disabled = not town_ready
-	_town_entry(_market, "market"); _town_entry(_carpenter, "carpenter")
+	_text_in_place(_market, TOWN_LOADING if _town_loading == "market" else TOWN_NAMES.market, TOWN_NAMES.market)
+	_text_in_place(_carpenter, TOWN_LOADING if _town_loading == "carpenter" else TOWN_NAMES.carpenter, TOWN_NAMES.carpenter)
 	_home.visible = _claims.has_home()
 	_home.disabled = _selector.manifest.is_empty() or _opening or _town != null
 	_locate.disabled = _home.disabled
@@ -313,25 +332,6 @@ func _render() -> void:
 		_prepare_town()
 		_read_farm()
 	if _selector._options.is_empty(): _choices.hide()
-
-## A Market / Carpenter entry reads its name, or Loading… while its town loads. Loading… keeps the width the name gives
-## the entry and drops the side margins (the text stays centred) to fit in it: wider than "Market", it widened the top
-## panel past the screen and cut off the buttons on the right (C-123, C-61#195). The entry is disabled while it loads.
-func _town_entry(entry: Button, who: String) -> void:
-	var loading := _town_loading == who
-	if loading == (entry.text == TOWN_LOADING): return
-	if loading:
-		entry.custom_minimum_size.x = entry.get_combined_minimum_size().x
-		entry.clip_text = true
-		var style := entry.get_theme_stylebox("disabled").duplicate() as StyleBox
-		style.content_margin_left = 0; style.content_margin_right = 0
-		entry.add_theme_stylebox_override("disabled", style)
-		entry.text = TOWN_LOADING
-	else:
-		entry.text = TOWN_NAMES[who]
-		entry.remove_theme_stylebox_override("disabled")
-		entry.clip_text = false
-		entry.custom_minimum_size.x = 0
 
 ## First framing after the map loads: the player's home if they have one, else the dataset's area. It waits while the
 ## saved account and the home are still being read, and never moves a camera the player has already moved. A home
