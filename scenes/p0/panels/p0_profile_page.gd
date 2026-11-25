@@ -38,8 +38,12 @@ const _LOOK_GAP := 2.0          # top bar → outfit area
 const _FIGURE := Vector2(120, 196)
 const _CONTENT_GAP := 8.0       # Profile content column
 const _SKILL_GAP := 8.0
+## The blocks under the name, as above. A world with no data for one leaves it out, as P0 leaves out PROFILE-1's: the
+## dynamic farm (C-128) has none of them, so its profile is the top bar, the look and the name.
+const BLOCKS := ["skills", "farm", "collections", "voice"]
 
 var view := {}
+var blocks: Array = BLOCKS
 var safe_top := 0.0
 var top_bar: UiProfileTopBar
 var preview: BagCharacterPreview
@@ -55,8 +59,9 @@ var look_saved := false
 var title_pending := {}
 var name_row: _NameRow
 
-func _init(view_: Dictionary = {}, safe_top_ := 0.0, look_saved_ := false, title_pending_ := {}) -> void:
+func _init(view_: Dictionary = {}, safe_top_ := 0.0, look_saved_ := false, title_pending_ := {}, blocks_: Array = BLOCKS) -> void:
 	view = view_
+	blocks = blocks_
 	safe_top = safe_top_
 	look_saved = look_saved_
 	title_pending = title_pending_
@@ -121,29 +126,32 @@ func refresh(view_: Dictionary) -> void:
 	if str(d.home_line) != "": id.add_child(UiKit.label(str(d.home_line), UiTokens.STYLE_C10_B, UiTokens.COLOR_SECONDARY))
 	if look_saved: id.add_child(UiKit.label("Look saved", UiTokens.STYLE_C10_B, UiTokens.COLOR_PRIMARY))   # KEEP-P0-2
 	col.add_child(id)
-	var skills := HBoxContainer.new()
-	skills.add_theme_constant_override(&"separation", int(_SKILL_GAP))
-	for s in d.skills:
-		var card := UiSkillCard.new(Localization.ctx(str(s.name), "skill"), int(s.level), float(s.progress), P0Logic.icon(str(s.icon)))
-		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var key: String = s.key
-		card.pressed.connect(func(): skill_pressed.emit(key))
-		skills.add_child(card)
-	col.add_child(skills)
-	var farm := UiFarmCard.new(str(d.farm.name), str(d.farm.level_line), str(d.farm.status), load("res://assets/p0/art/homestead-thumb.jpg"))
-	farm.chevron = true   # it opens HOME-1: no card that looks tappable and does nothing (int11, 不知火舞 on 225)
-	farm.pressed.connect(func(): farm_pressed.emit())
-	col.add_child(farm)
-	col.add_child(UiKit.label("Collections", UiTokens.STYLE_C11_XB))
-	var tiles := []
-	for c in d.collections:
-		var tile := UiNeedTile.new(str(c.name), int(c.have), int(c.need), UiNeedTile.Size.M, P0Logic.icon(str(c.icon)), true)
-		var key := str(c.get("key", ""))
-		if bool(c.get("badge", false)): tile.add_corner(P0FishDex.badge_icon(), _CORNER_BADGE, _CORNER_AT)   # the whole Fish-dex (283 PROFILE-1-DEX)
-		tile.pressed.connect(func(): collection_pressed.emit(key))
-		tiles.append(tile)
-	col.add_child(UiNeedTile.group(tiles))
-	if voice_profile_shown(OS.get_name()): col.add_child(_voice_row())
+	if "skills" in blocks:
+		var skills := HBoxContainer.new()
+		skills.add_theme_constant_override(&"separation", int(_SKILL_GAP))
+		for s in d.skills:
+			var card := UiSkillCard.new(Localization.ctx(str(s.name), "skill"), int(s.level), float(s.progress), P0Logic.icon(str(s.icon)))
+			card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			var key: String = s.key
+			card.pressed.connect(func(): skill_pressed.emit(key))
+			skills.add_child(card)
+		col.add_child(skills)
+	if "farm" in blocks:
+		var farm := UiFarmCard.new(str(d.farm.name), str(d.farm.level_line), str(d.farm.status), load("res://assets/p0/art/homestead-thumb.jpg"))
+		farm.chevron = true   # it opens HOME-1: no card that looks tappable and does nothing (int11, 不知火舞 on 225)
+		farm.pressed.connect(func(): farm_pressed.emit())
+		col.add_child(farm)
+	if "collections" in blocks:
+		col.add_child(UiKit.label("Collections", UiTokens.STYLE_C11_XB))
+		var tiles := []
+		for c in d.collections:
+			var tile := UiNeedTile.new(str(c.name), int(c.have), int(c.need), UiNeedTile.Size.M, P0Logic.icon(str(c.icon)), true)
+			var key := str(c.get("key", ""))
+			if bool(c.get("badge", false)): tile.add_corner(P0FishDex.badge_icon(), _CORNER_BADGE, _CORNER_AT)   # the whole Fish-dex (283 PROFILE-1-DEX)
+			tile.pressed.connect(func(): collection_pressed.emit(key))
+			tiles.append(tile)
+		col.add_child(UiNeedTile.group(tiles))
+	if "voice" in blocks and voice_profile_shown(OS.get_name()): col.add_child(_voice_row())
 
 ## q(281) ③ (SGODOT-390): no Voice Profile on an iPhone (the card is not there at all); Android keeps it (the user) — but
 ## for the store build (SGODOT-483, Google Play: an AI reading of a recording sent abroad), which has none either.

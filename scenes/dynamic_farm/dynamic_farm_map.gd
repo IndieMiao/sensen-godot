@@ -11,6 +11,8 @@ extends Control
 ## The guide (C-35, C-61) says on the bottom card where the next step is, from the home's parcel save (ParcelGuide).
 ## C-112: farm-dev's camera feel (geo_native_camera.gd) and its round locate key, over the bottom card at the right;
 ## My home, San Francisco and the locate key fly there. Only buildings are coloured (ParcelMapController.kt).
+## C-128 (0.4.4): a round profile key at the left, level with the locate key, opens the main farm's profile over the
+## map, and from it Settings and the dressing room (parcel_profile.gd).
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
@@ -23,6 +25,7 @@ const CONFIG := "res://modules/dynamic_farm/map/config.json"
 const HOST := "res://scenes/dynamic_farm/dynamic_farm_host.tscn"
 const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
 const TOWN := "res://scenes/dynamic_farm/parcel_town.gd"
+const PROFILE := "res://scenes/dynamic_farm/parcel_profile.gd"
 const LocalFarmStore := preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const RemoteFarmStore := preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
 const ParcelFarm := preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -44,6 +47,8 @@ const MY_HOME := "My home"
 ## over the bottom card. It flies back to the player's home, or to the dataset's area without one.
 const LOCATE_ICON := "res://assets/p0/icons/locate.svg"
 const LOCATE_GAP := 12.0
+## The profile key (C-128): the same round key at the left, with the account glyph; it opens the profile.
+const PROFILE_ICON := "res://assets/ui/icons/lucide/user-round.svg"
 const CHECKING := "Checking your account…"
 const SIGNED_IN := "Signed in as %s"
 const SIGNED_IN_NO_NAME := "Signed in"
@@ -76,6 +81,9 @@ var _bottom: Control
 var _market: Button
 var _carpenter: Button
 var _town: Control
+var _profile_button: Button
+## The profile and the pages opened from it, over the map (parcel_profile.gd), else null.
+var _profile: Control
 ## The town that is loading after a tap on Market / Carpenter (C-61: the tap shows Loading… at once), else "".
 var _town_loading := ""
 ## The home's parcel save as last read or seen (the guide's line) and the parcel it belongs to; read again after
@@ -228,13 +236,17 @@ func _build_ui() -> void:
 	for item in [["© Mapbox", "https://www.mapbox.com/about/maps/"], ["© OpenStreetMap", "https://www.openstreetmap.org/copyright"]]:
 		var credit := _button(item[0], ExternalLink.open.bind(item[1])); credit.flat = true; credits.add_child(credit)
 	bottom.add_child(_label("Parcels: DataSF · PDDL / CC0", 10))
-	_locate = _locate_key(); _hud.add_child(_locate)
+	_locate = _round_key(LOCATE_ICON); _locate.name = "MapLocate"; _locate.disabled = true
+	_locate.pressed.connect(_locate_player); _hud.add_child(_locate)
+	_profile_button = _round_key(PROFILE_ICON, UiTokens.COLOR_TEXT); _profile_button.name = "MapProfile"
+	_profile_button.pressed.connect(_open_profile); _hud.add_child(_profile_button)
 	_bottom.item_rect_changed.connect(_place_locate); _hud.resized.connect(_place_locate)
 	_render_account()
 
-## farm-dev's round locate key, styled as P0 styles it (Close round, floating shadow, the locate glyph).
-func _locate_key() -> Button:
-	var b := Button.new(); b.name = "MapLocate"; b.focus_mode = Control.FOCUS_NONE
+## farm-dev's round locate key, styled as P0 styles it (Close round, floating shadow, the glyph as drawn). `tint`
+## colours a white glyph (lucide's) the text colour the locate glyph is drawn in.
+func _round_key(glyph: String, tint := Color.WHITE) -> Button:
+	var b := Button.new(); b.focus_mode = Control.FOCUS_NONE
 	b.theme = UiKit.theme(); b.theme_type_variation = UiTokens.BUTTON_CLOSE_ROUND
 	for state in [&"normal", &"hover", &"focus", &"disabled", &"pressed", &"hover_pressed"]:
 		var sb := b.get_theme_stylebox(state).duplicate() as StyleBoxFlat
@@ -243,16 +255,16 @@ func _locate_key() -> Button:
 			sb.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
 			sb.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
 			b.add_theme_stylebox_override(state, sb)
-		b.add_theme_color_override(StringName("icon_%s_color" % state), Color.WHITE)
-	b.icon = load(LOCATE_ICON); b.expand_icon = true; b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.add_theme_color_override(StringName("icon_%s_color" % state), tint)
+	b.icon = load(glyph); b.expand_icon = true; b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	b.add_theme_constant_override(&"icon_max_width", 22)
 	b.custom_minimum_size = Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE); b.size = b.custom_minimum_size
-	b.disabled = true; b.pressed.connect(_locate_player)
 	return b
 
 func _place_locate() -> void:
 	if _locate == null or _bottom == null: return
 	_locate.position = Vector2(_hud.size.x - _locate.size.x - LOCATE_GAP, _bottom.position.y - _locate.size.y - LOCATE_GAP)
+	_profile_button.position = Vector2(LOCATE_GAP, _locate.position.y)
 
 func _panel(bottom: bool) -> VBoxContainer:
 	var panel := PanelContainer.new(); _hud.add_child(panel)
@@ -359,6 +371,7 @@ func _locate_player() -> void:
 ## Development builds on the in-memory claim stand-in have no account and hide it.
 func _render_account() -> void:
 	if _account_line == null: return
+	_profile_button.disabled = _opening or _profile != null or (_selector != null and _selector.busy)
 	var net := get_node_or_null("/root/Net")
 	var shown := net != null and not _fake_claims()
 	_account_line.visible = shown
@@ -551,6 +564,21 @@ func _town_closed(town: Control, parcel: String) -> void:
 	if _suspended or _leaving: return
 	_hud.show(); _render()
 
+## The profile over the map (C-128), as the town is: the map's panels hide and its camera holds still until it closes.
+func _open_profile() -> void:
+	if _profile != null or _opening or _leaving or _suspended: return
+	var view := Vector3.ZERO
+	if _camera != null: view = Vector3(float(_camera.center[1]), float(_camera.center[0]), float(_camera.zoom))
+	_profile = load(PROFILE).open(self, view)
+	_profile.closed.connect(_profile_closed)
+	_hud.hide()
+	if _camera != null: _camera.input_enabled = false
+
+func _profile_closed() -> void:
+	_profile = null
+	if _suspended or _leaving: return
+	_hud.show(); _render()
+
 ## The same save the parcel scene uses: the server, or the device stand-in with the development setting.
 func _farm_store(block_id: String, dataset: String) -> RefCounted:
 	if bool(ProjectSettings.get_setting(LOCAL_SAVE_SETTING, false)): return LocalFarmStore.new(block_id)
@@ -614,7 +642,8 @@ func _suspend_map(committing_preview: bool) -> void:
 
 func resume() -> void:
 	if _leaving: return
-	_suspended = false; process_mode = Node.PROCESS_MODE_INHERIT; _hud.show()
+	_suspended = false; process_mode = Node.PROCESS_MODE_INHERIT
+	_hud.visible = _profile == null # Back from the dressing room: the profile is still over the map.
 	_farm_fresh = false # Back from the parcel: its save has moved on.
 	_presentation_epoch += 1
 	if _bridge != null:
@@ -664,6 +693,9 @@ func _quit_preview() -> void:
 	get_tree().quit()
 
 func is_back_navigation_locked() -> bool:
+	if is_instance_valid(_profile):
+		_profile.back()
+		return true
 	if is_instance_valid(_town):
 		if not _town.stack.back(): _town.close()
 		return true
