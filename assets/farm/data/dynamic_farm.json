@@ -19,6 +19,13 @@
       "width": 3,
       "depth": 3,
       "max": 1
+    },
+    "well": {
+      "model": "well",
+      "blueprint": "blueprint_well",
+      "width": 1,
+      "depth": 1,
+      "max": 1
     }
   },
   "crops": {
@@ -45,7 +52,19 @@
     "costs": {
       "clear_obstacle": 2,
       "till": 2,
-      "gather": 2
+      "gather": 2,
+      "draw_water": 2
+    }
+  },
+  "watering": {
+    "well": "well",
+    "pail": "pail",
+    "pail_uses": 3
+  },
+  "grants": {
+    "watering": {
+      "blueprint_well": 1,
+      "pail": 1
     }
   },
   "economy": {

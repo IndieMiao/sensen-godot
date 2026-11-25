@@ -1,0 +1,2486 @@
+{
+ "_note": "C-151: the same watering cases for server/test/parcels/farm.test.ts and tests/dynamic_farm/test_parcel_farming.gd; parcel p-3512001. Regenerate only from the server rules.",
+ "parcel_id": "p-3512001",
+ "cases": [
+  {
+   "name": "sowing leaves the crop dry: not watered, never ripe",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 178,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "sow",
+     "cell": "5,1",
+     "crop": "crop_carrot"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": true,
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "5,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795464000000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "pail_water": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 1,
+     "pail": 1
+    },
+    "energy": {
+     "value": 175,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "drawing at the well fills the pail to 3 for 2 Energy",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 178,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "draw_water",
+     "building": 2
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": true,
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "pail_water": 3,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "watering a sown cell uses one and starts it growing now",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 3,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "water",
+     "cell": "1,1"
+    }
+   ],
+   "now": 1795464005000,
+   "expect": {
+    "ok": true,
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 1795464065000,
+      "watered_at": 1795464005000
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "pail_water": 2,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "three cells empty the pail",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 178,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "draw_water",
+     "building": 2
+    },
+    {
+     "type": "water",
+     "cell": "1,1"
+    },
+    {
+     "type": "water",
+     "cell": "2,1"
+    },
+    {
+     "type": "water",
+     "cell": "3,1"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": true,
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 1795464060000,
+      "watered_at": 1795464000000
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 1795464060000,
+      "watered_at": 1795464000000
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 1795464060000,
+      "watered_at": 1795464000000
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "pail_water": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "a fourth cell with the pail empty is refused",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 1795464060000,
+      "watered_at": 1795464000000
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 1795464060000,
+      "watered_at": 1795464000000
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 1795464060000,
+      "watered_at": 1795464000000
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "water",
+     "cell": "4,1"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "PAIL_EMPTY",
+    "detail": {}
+   }
+  },
+  {
+   "name": "an empty pail is refused in the same batch too",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 178,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "draw_water",
+     "building": 2
+    },
+    {
+     "type": "water",
+     "cell": "1,1"
+    },
+    {
+     "type": "water",
+     "cell": "2,1"
+    },
+    {
+     "type": "water",
+     "cell": "3,1"
+    },
+    {
+     "type": "water",
+     "cell": "4,1"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 4,
+    "code": "PAIL_EMPTY",
+    "detail": {}
+   }
+  },
+  {
+   "name": "a part-full pail is filled up to 3",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 1795464060000,
+      "watered_at": 1795464000000
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 2,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "draw_water",
+     "building": 2
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": true,
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 1795464060000,
+      "watered_at": 1795464000000
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "pail_water": 3,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "energy": {
+     "value": 174,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "a full pail is not drawn again",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 3,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "draw_water",
+     "building": 2
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "PAIL_FULL",
+    "detail": {
+     "water": 3
+    }
+   }
+  },
+  {
+   "name": "the same cell twice is refused",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 1795464060000,
+      "watered_at": 1795464000000
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 2,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "water",
+     "cell": "1,1"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "ALREADY_WATERED",
+    "detail": {}
+   }
+  },
+  {
+   "name": "tilled but not sown: nothing to water",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 3,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "water",
+     "cell": "5,1"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NO_CROP",
+    "detail": {}
+   }
+  },
+  {
+   "name": "not tilled: nothing to water",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 3,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "water",
+     "cell": "9,9"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NO_CROP",
+    "detail": {}
+   }
+  },
+  {
+   "name": "the cottage is not a well",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 178,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "draw_water",
+     "building": 1
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NO_WELL",
+    "detail": {
+     "building": 1
+    }
+   }
+  },
+  {
+   "name": "a building that is not there is not a well",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 178,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "draw_water",
+     "building": 7
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NO_WELL",
+    "detail": {
+     "building": 7
+    }
+   }
+  },
+  {
+   "name": "short of 2 Energy the well gives nothing",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 1,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "draw_water",
+     "building": 2
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NO_ENERGY",
+    "detail": {
+     "need": 2,
+     "have": 1,
+     "next_in": 180000
+    }
+   }
+  },
+  {
+   "name": "no pail: no watering",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 3,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "water",
+     "cell": "1,1"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NO_PAIL",
+    "detail": {
+     "item": "pail"
+    }
+   }
+  },
+  {
+   "name": "no pail: no drawing",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "draw_water",
+     "building": 2
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NO_PAIL",
+    "detail": {
+     "item": "pail"
+    }
+   }
+  },
+  {
+   "name": "a dry crop is never harvested",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 178,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "harvest",
+     "cell": "1,1"
+    }
+   ],
+   "now": 1795550400000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NOT_WATERED",
+    "detail": {}
+   }
+  },
+  {
+   "name": "a watered crop is ripe a minute after watering",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 1795464060000,
+      "watered_at": 1795464000000
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 2,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "harvest",
+     "cell": "1,1"
+    }
+   ],
+   "now": 1795464060000,
+   "expect": {
+    "ok": true,
+    "crops": {
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "pail_water": 2,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1,
+     "crop_carrot": 1
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "a watered crop is not ripe a moment before",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 1795464060000,
+      "watered_at": 1795464000000
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 2,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "harvest",
+     "cell": "1,1"
+    }
+   ],
+   "now": 1795464059999,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NOT_RIPE",
+    "detail": {
+     "ripe_at": 1795464060000
+    }
+   }
+  },
+  {
+   "name": "a crop sown before watering (no watered_at) is ripe on its own time",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463880000,
+      "ripe_at": 1795463940000
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 178,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "harvest",
+     "cell": "1,1"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": true,
+    "crops": {
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "pail_water": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1,
+     "crop_carrot": 1
+    },
+    "energy": {
+     "value": 178,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "a crop sown before watering cannot be watered again",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795463940000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795463940000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795463940000
+    },
+    "cleared": [],
+    "tilled": [
+     "1,1",
+     "2,1",
+     "3,1",
+     "4,1",
+     "5,1"
+    ],
+    "crops": {
+     "1,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463880000,
+      "ripe_at": 1795463940000
+     },
+     "2,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "3,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     },
+     "4,1": {
+      "crop": "crop_carrot",
+      "planted_at": 1795463940000,
+      "ripe_at": 8640000000000000,
+      "watered_at": null
+     }
+    },
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1794772800000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 3,
+    "grants": {
+     "watering": 1794772800000
+    },
+    "energy": {
+     "value": 176,
+     "at": 1795463940000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "water",
+     "cell": "1,1"
+    }
+   ],
+   "now": 1795464000000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "ALREADY_WATERED",
+    "detail": {}
+   }
+  }
+ ]
+}

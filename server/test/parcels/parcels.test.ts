@@ -18,7 +18,7 @@ import { loadParcelRules } from '../../src/parcels/rules.js';
 import { MemoryParcelStore, type ParcelStore } from '../../src/parcels/store.js';
 import { PgParcelStore } from '../../src/parcels/pg_store.js';
 import { parcelReselectFromEnv } from '../../src/parcels/routes.js';
-import { emptyFarm } from '../../src/parcels/farm.js';
+import { emptyFarm, NEVER } from '../../src/parcels/farm.js';
 import type { StarterZones } from '../../src/parcels/starter_zone.js';
 
 const DSN = process.env.TEST_DATABASE_URL;
@@ -54,10 +54,10 @@ const makers: [string, boolean, (now: () => number) => Stores][] = [
 
 const bearer = (token: string) => ({ authorization: `Bearer ${token}` });
 let clock = T0;
-const appFor = (stores: Stores, opts: { reselect?: boolean; guestWrites?: boolean; starterZones?: StarterZones } = {}) => buildApp({
+const appFor = (stores: Stores, opts: { reselect?: boolean; guestWrites?: boolean; starterZones?: StarterZones; rules?: typeof rules } = {}) => buildApp({
   store: stores.store, content, contentVersion: CV, blueprintDir: path.join(ROOT, 'assets', 'blueprints'),
   regionsFile: REGIONS, pepper: 'test-pepper', now: () => clock, realtimeEnabled: false, guestWrites: opts.guestWrites,
-  parcels: { store: stores.parcels, rules, reselect: opts.reselect ?? false, starterZones: opts.starterZones },
+  parcels: { store: stores.parcels, rules: opts.rules ?? rules, reselect: opts.reselect ?? false, starterZones: opts.starterZones },
 });
 /** C-130 起步区：A、B 在区内（清单里的中心点与客户端报的不同，认领应存清单里的），FAR 在区外。
  * C-143：SMALL 在区内但太小（too_small），不能认领。 */
@@ -95,12 +95,15 @@ const R6 = 'sf-dynamic-farm-20261124-r6';
 /** C-136：带上这次打开农场用的数据集进入（新客户端）。 */
 const enterAs = (app: FastifyInstance, token: string, dataset_version: unknown) =>
   app.inject({ method: 'POST', url: '/v1/parcels/mine/enter', headers: bearer(token), payload: { dataset_version } });
-/** r4 上认领、进入，盖房、清障碍、开垦三格、种两颗（一颗熟一颗没熟）、卖一次、领鸡舍蓝图、采一棵树；返回此时的地块。 */
+/** C-151：井放在这里（建筑 2，小屋之后），打水并浇 cells。 */
+const WELL = { type: 'place_building', building: 'well', x: 20, y: 20, rotation: 0 };
+const wet = (well: number, ...cells: string[]) => [{ type: 'draw_water', building: well }, ...cells.map(cell => ({ type: 'water', cell }))];
+/** r4 上认领、进入，盖房和井、清障碍、开垦三格、种两颗（一颗熟一颗没熟）、卖一次、领鸡舍蓝图、采一棵树；返回此时的地块。 */
 async function r4Farm(app: FastifyInstance, token: string, parcel = A) {
   await claim(app, token, parcel);
   await enter(app, token);
-  await command(app, token, 1, [{ type: 'place_house', x: 9, y: 9 }, { type: 'clear_obstacle', cell: '3,3' }, { type: 'till', cell: '1,1' },
-    { type: 'till', cell: '2,1' }, { type: 'till', cell: '3,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' }]);
+  await command(app, token, 1, [{ type: 'place_house', x: 9, y: 9 }, WELL, { type: 'clear_obstacle', cell: '3,3' }, { type: 'till', cell: '1,1' },
+    { type: 'till', cell: '2,1' }, { type: 'till', cell: '3,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' }, ...wet(2, '1,1')]);
   clock = T0 + 60_000;
   await command(app, token, 2, [{ type: 'harvest', cell: '1,1' }, { type: 'sell', item: 'crop_carrot', count: 1 }, { type: 'claim_blueprint', blueprint: 'coop' },
     { type: 'sow', cell: '1,1', crop: 'crop_carrot' }, { type: 'gather', object: `${parcel.parcel_id}:outer-groves-v2:wild_pz_tree_20:41,7:0` }]);
@@ -108,22 +111,26 @@ async function r4Farm(app: FastifyInstance, token: string, parcel = A) {
   const res = await command(app, token, 3, [{ type: 'sow', cell: '2,1', crop: 'crop_carrot' }]);
   expect(res.statusCode).toBe(200);
   const farm = res.json().parcel;
-  expect(farm).toMatchObject({ dataset_version: DATASET, farm_version: 4, farm: { coins: 12, sales: 1, bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1 } } });
+  expect(farm).toMatchObject({ dataset_version: DATASET, farm_version: 4, farm: { coins: 12, sales: 1, bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1, pail: 1 } } });
   expect(Object.keys(farm.farm.crops)).toEqual(['1,1', '2,1']);
   return farm;
 }
-/** 换到 r6 之后应有的样子：格子上的清空，每棵作物退一颗种子、房子退住宅蓝图，其余不动。 */
+/** 换到 r6 之后应有的样子：格子上的清空，每棵作物退一颗种子、每栋建筑退它的蓝图（小屋、井），其余（水桶和桶里的水）不动。 */
 const rebased = (before: { farm: Record<string, unknown> }) => ({ ...before.farm, buildings: [], house: null, cleared: [], tilled: [], crops: {}, gathered: {},
-  bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1, seed_carrot: 2, blueprint_cottage: 1 } });
+  bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1, pail: 1, seed_carrot: 2, blueprint_cottage: 1, blueprint_well: 1 } });
 const GIFT = { hoe_starter: 1, seed_carrot: 3, blueprint_cottage: 1 };
+/** C-151 的一次性补发：井的蓝图和水桶。 */
+const WATERING = { blueprint_well: 1, pail: 1 };
+/** 首次进入后的背包：赠品加补发。 */
+const FIRST_BAG = { ...GIFT, ...WATERING };
 const command = (app: FastifyInstance, token: string, base_version: number, commands: object[]) =>
   app.inject({ method: 'POST', url: '/v1/parcels/mine/commands', headers: bearer(token), payload: { base_version, commands } });
-/** 认领、进入、种两颗萝卜并在 60 秒后收获；返回此时的 farm_version，时钟停在 T0 + 60 s。 */
+/** 认领、进入、种两颗萝卜、盖井浇水并在 60 秒后收获；返回此时的 farm_version，时钟停在 T0 + 60 s。 */
 async function withCarrots(app: FastifyInstance, token: string, parcel: { parcel_id: string; center: number[] }): Promise<number> {
   await claim(app, token, parcel);
   await enter(app, token);
   expect((await command(app, token, 1, [{ type: 'till', cell: '1,1' }, { type: 'till', cell: '2,1' },
-    { type: 'sow', cell: '1,1', crop: 'crop_carrot' }, { type: 'sow', cell: '2,1', crop: 'crop_carrot' }])).statusCode).toBe(200);
+    { type: 'sow', cell: '1,1', crop: 'crop_carrot' }, { type: 'sow', cell: '2,1', crop: 'crop_carrot' }, WELL, ...wet(1, '1,1', '2,1')])).statusCode).toBe(200);
   clock = T0 + 60_000;
   const res = await command(app, token, 2, [{ type: 'harvest', cell: '1,1' }, { type: 'harvest', cell: '2,1' }]);
   expect(res.json().parcel.farm.bag.crop_carrot).toBe(2);
@@ -239,18 +246,19 @@ for (const [name, enabled, makeStores] of makers) {
       expect((await mine(app, ada)).farm.bag).toEqual({});
       const first = await enter(app, ada);
       expect(first.statusCode).toBe(200);
-      expect(first.json()).toMatchObject({ granted: true, parcel: { farm_version: 1, farm: { bag: GIFT, welcomed_at: T0 } } });
+      // C-151: the well blueprint and the pail come with it, in the same write, and gift names all of it.
+      expect(first.json()).toMatchObject({ granted: true, gift: FIRST_BAG, parcel: { farm_version: 1, farm: { bag: FIRST_BAG, welcomed_at: T0, grants: { watering: T0 } } } });
       clock = T0 + 1000;
       const again = await enter(app, ada);
-      expect(again.json()).toMatchObject({ granted: false, parcel: { farm_version: 1, farm: { bag: GIFT, welcomed_at: T0 } } });
+      expect(again.json()).toMatchObject({ granted: false, gift: {}, parcel: { farm_version: 1, farm: { bag: FIRST_BAG, welcomed_at: T0 } } });
       // A lost response retried many times at once still grants nothing more.
       const retries = await Promise.all(Array.from({ length: 5 }, () => enter(app, ada)));
       expect(retries.map(r => r.json().granted)).toEqual(Array(5).fill(false));
       // Spending the gift and entering again does not refill it.
-      await command(app, ada, 1, [{ type: 'place_house', x: 9, y: 9 }, { type: 'till', cell: '1,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' }]);
-      expect((await enter(app, ada)).json()).toMatchObject({ granted: false, parcel: { farm_version: 2, farm: { bag: { hoe_starter: 1, seed_carrot: 2 } } } });
+      await command(app, ada, 1, [{ type: 'place_house', x: 9, y: 9 }, WELL, { type: 'till', cell: '1,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' }]);
+      expect((await enter(app, ada)).json()).toMatchObject({ granted: false, gift: {}, parcel: { farm_version: 2, farm: { bag: { hoe_starter: 1, seed_carrot: 2, pail: 1 } } } });
       // Re-claiming the same parcel (a retry) does not reset the farm either.
-      expect((await claim(app, ada, A)).json().parcel.farm.bag).toEqual({ hoe_starter: 1, seed_carrot: 2 });
+      expect((await claim(app, ada, A)).json().parcel.farm.bag).toEqual({ hoe_starter: 1, seed_carrot: 2, pail: 1 });
     });
 
     it('simultaneous first entries grant the gift exactly once', async () => {
@@ -258,7 +266,26 @@ for (const [name, enabled, makeStores] of makers) {
       await claim(app, ada, A);
       const results = await Promise.all(Array.from({ length: 6 }, () => enter(app, ada)));
       expect(results.filter(r => r.json().granted)).toHaveLength(1);
-      expect(await mine(app, ada)).toMatchObject({ farm_version: 1, farm: { bag: GIFT } });
+      expect(results.filter(r => Object.keys(r.json().gift).length)).toHaveLength(1);
+      expect(await mine(app, ada)).toMatchObject({ farm_version: 1, farm: { bag: FIRST_BAG } });
+    });
+
+    it('C-151 a farm from before watering gets the well blueprint and the pail on its next entry, once, even entered many times at once', async () => {
+      // The same stores served first by a server whose rules have no grants yet (0.4.4), then by the 0.4.5 one.
+      const old = await appFor(stores, { rules: { ...rules, grants: {} } });
+      const ada = await account(old, 'Ada');
+      await claim(old, ada, A);
+      expect((await enter(old, ada)).json()).toMatchObject({ granted: true, gift: GIFT, parcel: { farm_version: 1, farm: { bag: GIFT, grants: {} } } });
+      await command(old, ada, 1, [{ type: 'place_house', x: 9, y: 9 }, { type: 'till', cell: '1,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' }]);
+      await old.close();
+      clock = T0 + 86_400_000;
+      const results = await Promise.all(Array.from({ length: 5 }, () => enter(app, ada)));
+      expect(results.map(r => r.json().granted)).toEqual(Array(5).fill(false));
+      expect(results.filter(r => Object.keys(r.json().gift).length).map(r => r.json().gift)).toEqual([WATERING]);
+      expect(await mine(app, ada)).toMatchObject({ farm_version: 3, farm: { bag: { hoe_starter: 1, seed_carrot: 2, ...WATERING }, grants: { watering: clock } } });
+      // Spent (the well built) and entered again: nothing more.
+      await command(app, ada, 3, [WELL]);
+      expect((await enter(app, ada)).json()).toMatchObject({ gift: {}, parcel: { farm_version: 4, farm: { bag: { hoe_starter: 1, seed_carrot: 2, pail: 1 } } } });
     });
 
     it('C-136 an r4 claim entered by an r6 client moves to r6 once: cells cleared, crops back as seeds, house back as its blueprint', async () => {
@@ -279,7 +306,7 @@ for (const [name, enabled, makeStores] of makers) {
       expect((await enterAs(app, ada, DATASET)).json().parcel).toMatchObject({ dataset_version: R6, farm_version: 5 });
       // The owner and the map still see the same parcel; play goes on on the new cells.
       expect((await owners(app, ada, `ids=${A.parcel_id}`)).json().parcels[0].owner).toBe('mine');
-      expect((await command(app, ada, 5, [{ type: 'place_house', x: 2, y: 2 }, { type: 'till', cell: '9,9' }, { type: 'sow', cell: '9,9', crop: 'crop_carrot' }])).statusCode).toBe(200);
+      expect((await command(app, ada, 5, [{ type: 'place_house', x: 2, y: 2 }, { ...WELL, x: 6, y: 2 }, { type: 'till', cell: '9,9' }, { type: 'sow', cell: '9,9', crop: 'crop_carrot' }])).statusCode).toBe(200);
       // A command based on the version before the move is refused, not applied to the new cells.
       expect((await command(app, ada, 4, [{ type: 'till', cell: '4,4' }])).statusCode).toBe(409);
     });
@@ -298,7 +325,7 @@ for (const [name, enabled, makeStores] of makers) {
       // An r6 claim entered by the r6 client is an ordinary entry; an r6 claim is not moved back by an r4 client.
       const bob = await account(app, 'Bob');
       await claim(app, bob, B, R6);
-      expect((await enterAs(app, bob, R6)).json()).toMatchObject({ granted: true, parcel: { dataset_version: R6, farm_version: 1, farm: { bag: GIFT } } });
+      expect((await enterAs(app, bob, R6)).json()).toMatchObject({ granted: true, parcel: { dataset_version: R6, farm_version: 1, farm: { bag: FIRST_BAG } } });
       expect((await enterAs(app, bob, DATASET)).json()).toMatchObject({ granted: false, parcel: { dataset_version: R6, farm_version: 1 } });
     });
 
@@ -307,7 +334,7 @@ for (const [name, enabled, makeStores] of makers) {
       await claim(app, ada, A);
       const results = await Promise.all(Array.from({ length: 4 }, () => enterAs(app, ada, R6)));
       expect(results.filter(r => r.json().granted)).toHaveLength(1);
-      expect(await mine(app, ada)).toMatchObject({ dataset_version: R6, farm_version: 1, farm: { bag: GIFT, welcomed_at: T0, house: null, tilled: [] } });
+      expect(await mine(app, ada)).toMatchObject({ dataset_version: R6, farm_version: 1, farm: { bag: FIRST_BAG, welcomed_at: T0, house: null, tilled: [] } });
     });
 
     it('C-136 only one\'s own claim moves; another player\'s parcel and farm are untouched', async () => {
@@ -373,27 +400,41 @@ for (const [name, enabled, makeStores] of makers) {
         { type: 'till', cell: '2,2' }, { type: 'sow', cell: '2,2', crop: 'crop_carrot' }]);
       expect(res.statusCode).toBe(200);
       expect(res.json().parcel.farm_version).toBe(3);
-      const refused = await command(app, ada, 3, [{ type: 'harvest', cell: '2,2' }]);
+      // C-151: sown dry, it does not grow until watered.
+      expect(res.json().parcel.farm.crops['2,2']).toEqual({ crop: 'crop_carrot', planted_at: T0, ripe_at: NEVER, watered_at: null });
+      clock = T0 + 3600_000;
+      const dry = await command(app, ada, 3, [{ type: 'harvest', cell: '2,2' }]);
+      expect(dry.statusCode).toBe(422);
+      expect(dry.json()).toMatchObject({ code: 'NOT_WATERED', index: 0, parcel: { farm_version: 3 } });
+      const W = clock;
+      expect((await command(app, ada, 3, [WELL, ...wet(2, '2,2')])).statusCode).toBe(200);
+      const refused = await command(app, ada, 4, [{ type: 'harvest', cell: '2,2' }]);
       expect(refused.statusCode).toBe(422);
-      expect(refused.json()).toMatchObject({ code: 'NOT_RIPE', index: 0, detail: { ripe_at: T0 + 60_000 }, parcel: { farm_version: 3 } });
-      clock = T0 + 59_999;
-      expect((await command(app, ada, 3, [{ type: 'harvest', cell: '2,2' }])).json().code).toBe('NOT_RIPE');
-      clock = T0 + 60_000;
-      const harvested = await command(app, ada, 3, [{ type: 'harvest', cell: '2,2' }]);
+      expect(refused.json()).toMatchObject({ code: 'NOT_RIPE', index: 0, detail: { ripe_at: W + 60_000 }, parcel: { farm_version: 4 } });
+      clock = W + 59_999;
+      expect((await command(app, ada, 4, [{ type: 'harvest', cell: '2,2' }])).json().code).toBe('NOT_RIPE');
+      clock = W + 60_000;
+      const harvested = await command(app, ada, 4, [{ type: 'harvest', cell: '2,2' }]);
       expect(harvested.statusCode).toBe(200);
-      expect(await mine(app, ada)).toMatchObject({ farm_version: 4, farm: {
-        buildings: [{ id: 1, type: 'cottage', model: 'cottage', x: 10, y: 4, width: 3, depth: 3, rotation: 1, built_at: T0 }],
+      expect(await mine(app, ada)).toMatchObject({ farm_version: 5, farm: {
+        buildings: [{ id: 1, type: 'cottage', model: 'cottage', x: 10, y: 4, width: 3, depth: 3, rotation: 1, built_at: T0 },
+          { id: 2, type: 'well', model: 'well', x: 20, y: 20, width: 1, depth: 1, rotation: 0, built_at: W }],
         house: { model: 'cottage', x: 10, y: 4, width: 3, depth: 3, rotation: 1, built_at: T0 },
-        cleared: ['2,2'], tilled: ['1,1', '2,2'], crops: {}, bag: { hoe_starter: 1, seed_carrot: 2, crop_carrot: 1 },
+        cleared: ['2,2'], tilled: ['1,1', '2,2'], crops: {}, bag: { hoe_starter: 1, seed_carrot: 2, crop_carrot: 1, pail: 1 }, pail_water: 2,
       } });
-      expect((await command(app, ada, 4, [{ type: 'teleport' }])).statusCode).toBe(400);
+      expect((await command(app, ada, 5, [{ type: 'teleport' }])).statusCode).toBe(400);
       // C-150 place_building: the shape is checked (400), an unknown type or a second cottage is refused (422) and changes nothing.
-      expect((await command(app, ada, 4, [{ type: 'place_building', building: 'cottage', x: 1, y: 1, rotation: 4 }])).statusCode).toBe(400);
-      expect((await command(app, ada, 4, [{ type: 'place_building', x: 1, y: 1 }])).statusCode).toBe(400);
-      expect((await command(app, ada, 4, [{ type: 'place_building', building: 'barn', x: 20, y: 20 }])).json())
-        .toMatchObject({ code: 'UNKNOWN_BUILDING', index: 0, detail: { building: 'barn' }, parcel: { farm_version: 4 } });
-      expect((await command(app, ada, 4, [{ type: 'place_building', building: 'cottage', x: 20, y: 20 }])).json())
-        .toMatchObject({ code: 'BUILDING_LIMIT', detail: { building: 'cottage', max: 1 }, parcel: { farm_version: 4 } });
+      expect((await command(app, ada, 5, [{ type: 'place_building', building: 'cottage', x: 1, y: 1, rotation: 4 }])).statusCode).toBe(400);
+      expect((await command(app, ada, 5, [{ type: 'place_building', x: 1, y: 1 }])).statusCode).toBe(400);
+      expect((await command(app, ada, 5, [{ type: 'place_building', building: 'barn', x: 30, y: 30 }])).json())
+        .toMatchObject({ code: 'UNKNOWN_BUILDING', index: 0, detail: { building: 'barn' }, parcel: { farm_version: 5 } });
+      expect((await command(app, ada, 5, [{ type: 'place_building', building: 'cottage', x: 30, y: 30 }])).json())
+        .toMatchObject({ code: 'BUILDING_LIMIT', detail: { building: 'cottage', max: 1 }, parcel: { farm_version: 5 } });
+      // C-151 draw_water and water: the shape is checked (400); the server's own refusals keep the save.
+      expect((await command(app, ada, 5, [{ type: 'draw_water', building: 'well' }])).statusCode).toBe(400);
+      expect((await command(app, ada, 5, [{ type: 'water', cell: 'x' }])).statusCode).toBe(400);
+      expect((await command(app, ada, 5, [{ type: 'water', cell: '1,1' }])).json()).toMatchObject({ code: 'NO_CROP', parcel: { farm_version: 5 } });
+      expect((await command(app, ada, 5, [{ type: 'draw_water', building: 1 }])).json()).toMatchObject({ code: 'NO_WELL', detail: { building: 1 }, parcel: { farm_version: 5 } });
       expect((await command(app, await account(app, 'Bob'), 0, [{ type: 'till', cell: '1,1' }])).json().code).toBe('NO_PARCEL');
     });
 
@@ -690,7 +731,7 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
     await claim(app, ada, A);
     await enter(app, ada);
     await command(app, ada, 1, [{ type: 'place_house', x: 6, y: 6 }, { type: 'clear_obstacle', cell: '1,2' }, { type: 'till', cell: '1,2' },
-      { type: 'sow', cell: '1,2', crop: 'crop_carrot' }]);
+      { type: 'sow', cell: '1,2', crop: 'crop_carrot' }, WELL, ...wet(2, '1,2')]);
     const saved = await mine(app, ada);
     await app.close();
     await before.end();
@@ -703,10 +744,10 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
     try {
       const read = await mine(restarted, ada);
       expect(read).toEqual(saved);
-      expect(read.farm).toMatchObject({ house: { x: 6, y: 6 }, cleared: ['1,2'], tilled: ['1,2'],
-        crops: { '1,2': { crop: 'crop_carrot', planted_at: T0, ripe_at: T0 + 60_000 } }, bag: { hoe_starter: 1, seed_carrot: 2 }, welcomed_at: T0 });
-      // Reopening after the restart does not give the first-entry gift again.
-      expect((await enter(restarted, ada)).json()).toMatchObject({ granted: false, parcel: { farm_version: read.farm_version, farm: { bag: { hoe_starter: 1, seed_carrot: 2 } } } });
+      expect(read.farm).toMatchObject({ house: { x: 6, y: 6 }, cleared: ['1,2'], tilled: ['1,2'], pail_water: 2, grants: { watering: T0 },
+        crops: { '1,2': { crop: 'crop_carrot', planted_at: T0, ripe_at: T0 + 60_000, watered_at: T0 } }, bag: { hoe_starter: 1, seed_carrot: 2, pail: 1 }, welcomed_at: T0 });
+      // Reopening after the restart does not give the first-entry gift or the watering grant again.
+      expect((await enter(restarted, ada)).json()).toMatchObject({ granted: false, gift: {}, parcel: { farm_version: read.farm_version, farm: { bag: { hoe_starter: 1, seed_carrot: 2, pail: 1 } } } });
       const harvested = await command(restarted, ada, read.farm_version, [{ type: 'harvest', cell: '1,2' }]);
       expect(harvested.json().parcel.farm.bag.crop_carrot).toBe(1);
     } finally { await restarted.close(); await after.end(); }
@@ -763,14 +804,18 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
       const buildings = [{ id: 1, type: 'cottage', ...legacy.house }];
       // C-148: a save from before Energy also reads at full Energy, nothing else changes.
       const full = { value: 200, at: clock, rested_on: null };
-      expect((await mine(app, ada)).farm).toEqual({ ...legacy, buildings, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, energy: full });
-      // Re-entering an old save still gives no gift and does not rewrite it.
-      expect((await enter(app, ada)).json()).toMatchObject({ granted: false, parcel: { farm_version: 4 } });
-      expect((await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state).toEqual(legacy);
-      const sold = await command(app, ada, 4, [{ type: 'sell', item: 'crop_carrot', count: 1 }]);
+      // C-151: and as an empty pail, no one-off grant given yet.
+      expect((await mine(app, ada)).farm).toEqual({ ...legacy, buildings, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, pail_water: 0, grants: {}, energy: full });
+      // Re-entering an old save gives no first-entry gift; it gets the watering grant (C-151) once, which writes the new fields.
+      expect((await enter(app, ada)).json()).toMatchObject({ granted: false, gift: WATERING, parcel: { farm_version: 5 } });
+      const bag = { hoe_starter: 1, seed_carrot: 2, crop_carrot: 1, ...WATERING };
+      const entered = { ...legacy, buildings, bag, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, pail_water: 0, grants: { watering: clock } };
+      expect((await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state).toEqual(entered);
+      expect((await enter(app, ada)).json()).toMatchObject({ granted: false, gift: {}, parcel: { farm_version: 5 } });
+      const sold = await command(app, ada, 5, [{ type: 'sell', item: 'crop_carrot', count: 1 }]);
       expect(sold.statusCode).toBe(200);
       const stored = (await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state;
-      expect(stored).toEqual({ ...legacy, buildings, bag: { hoe_starter: 1, seed_carrot: 2 }, coins: 12, sales: 1, gathered: {}, blueprints_claimed: {}, energy: full });
+      expect(stored).toEqual({ ...entered, bag: { hoe_starter: 1, seed_carrot: 2, ...WATERING }, coins: 12, sales: 1, energy: full });
     } finally { await app.close(); }
   });
 

@@ -1,6 +1,7 @@
 /**
  * 动态农场（C-31）的可调数值：社区与数据集、首次进入自家地块的赠品、各类建筑的占地与蓝图（C-150）、作物成熟时间；
- * 以及地块经济（C-58）：出售价格、外围采集与刷新时间、领蓝图条件；体力（C-148，照搬 P0）：上限、恢复、休息和各动作的价。
+ * 以及地块经济（C-58）：出售价格、外围采集与刷新时间、领蓝图条件；体力（C-148，照搬 P0）：上限、恢复、休息和各动作的价；
+ * 浇水（C-151）：哪类建筑是井、水桶和一桶浇几格，以及进农场时各发一次的补发（井的蓝图和水桶）。
  * 默认值按所有者拍板 Q-39（C-34#14）与 Q-40（C-33#14），经济按 C-30#29 第 3–5 题（C-30#30 写入的推荐）。
  * 来源是 assets/farm/data/dynamic_farm.json；它不在 content_version 的指纹里，改它不影响旧农场存档。
  */
@@ -20,6 +21,11 @@ export interface GatherSource { item: string; amount: number; max_objects: numbe
  * 转 90°/270° 时宽深互换。客户端按同一个类型编号取模型和碰撞（modules/dynamic_farm/farm_building.gd）。
  */
 export interface BuildingRule { model: string; blueprint: string; width: number; depth: number; max: number }
+/**
+ * 浇水（C-151，所有者 SEN-C-137#6、#15）：在 well 类建筑旁打水，水桶（背包里的 pail）装满 pail_uses 次，每浇一格用一次。
+ * 打一桶水的体力在 energy.costs.draw_water，浇水不花体力。
+ */
+export interface WateringRules { well: string; pail: string; pail_uses: number }
 /** 一次性领取的蓝图：卖成功过至少 min_sales 次后可领，只发一次。 */
 export interface BlueprintRule { item: string; amount: number; min_sales: number }
 export interface EconomyRules {
@@ -49,6 +55,13 @@ export interface ParcelRules {
   crops: Record<string, CropRule>;
   /** C-148 体力：上限、恢复、新手期、休息、玩家日和各动作的价（见 energy.ts）。 */
   energy: EnergyRules;
+  /** C-151 浇水。 */
+  watering: WateringRules;
+  /**
+   * C-151 一次性补发：编号 → 物品和个数。每个农场进入自家地块时，没发过的各发一次（新玩家随首次进入的赠品一起拿到，
+   * 老玩家下次进入时拿到），发过的记在存档 grants 里，不再发。
+   */
+  grants: Record<string, Record<string, number>>;
   economy: EconomyRules;
 }
 
@@ -90,6 +103,14 @@ export function parseParcelRules(raw: unknown): ParcelRules {
     if (!isId(id) || !isId(c?.seed) || !count(c.grow_seconds, 1, 30 * 24 * 3600) || !count(c.yield, 1, 99) || !count(c.energy, 0, 1000))
       fail(`crops.${id} 不对`);
   parseEnergyRules(r.energy, fail);
+  const w = r.watering;
+  if (!w || !isId(w.well) || !isId(w.pail) || !count(w.pail_uses, 1, 99)) fail('watering 不对');
+  if (!Object.hasOwn(r.buildings, w.well)) fail(`watering.well ${w.well} 不在 buildings 里`);
+  if (!r.grants || typeof r.grants !== 'object' || Array.isArray(r.grants)) fail('grants 缺失');
+  for (const [id, items] of Object.entries(r.grants)) {
+    if (!isId(id) || !items || typeof items !== 'object' || Array.isArray(items) || !Object.keys(items).length) fail(`grants.${id} 不对`);
+    for (const [item, n] of Object.entries(items)) if (!isId(item) || !count(n, 1, 999)) fail(`grants.${id}.${item} 不对`);
+  }
   parseEconomy(r.economy, fail);
   return r;
 }
