@@ -231,13 +231,14 @@ func _build_ui() -> void:
 	bottom.add_child(_label("Parcels: DataSF · PDDL / CC0", 10))
 	_locate = _round_key(LOCATE_ICON); _locate.name = "MapLocate"; _locate.disabled = true
 	_locate.pressed.connect(_locate_player); _hud.add_child(_locate)
-	_profile_button = _round_key(PROFILE_ICON); _profile_button.name = "MapProfile"
+	_profile_button = _round_key(PROFILE_ICON, UiTokens.COLOR_TEXT); _profile_button.name = "MapProfile"
 	_profile_button.pressed.connect(_open_profile); _hud.add_child(_profile_button)
 	_bottom.item_rect_changed.connect(_place_locate); _hud.resized.connect(_place_locate)
 	_render_account()
 
-## farm-dev's round locate key, styled as P0 styles it (Close round, floating shadow, a white glyph).
-func _round_key(glyph: String) -> Button:
+## farm-dev's round locate key, styled as P0 styles it (Close round, floating shadow, the glyph as drawn). `tint`
+## colours a white glyph (lucide's) the text colour the locate glyph is drawn in.
+func _round_key(glyph: String, tint := Color.WHITE) -> Button:
 	var b := Button.new(); b.focus_mode = Control.FOCUS_NONE
 	b.theme = UiKit.theme(); b.theme_type_variation = UiTokens.BUTTON_CLOSE_ROUND
 	for state in [&"normal", &"hover", &"focus", &"disabled", &"pressed", &"hover_pressed"]:
@@ -247,7 +248,7 @@ func _round_key(glyph: String) -> Button:
 			sb.shadow_size = UiTokens.SIZE_SHADOW_FLOAT_RADIUS
 			sb.shadow_offset = Vector2(0, UiTokens.SIZE_SHADOW_FLOAT_OFFSET_Y)
 			b.add_theme_stylebox_override(state, sb)
-		b.add_theme_color_override(StringName("icon_%s_color" % state), Color.WHITE)
+		b.add_theme_color_override(StringName("icon_%s_color" % state), tint)
 	b.icon = load(glyph); b.expand_icon = true; b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	b.add_theme_constant_override(&"icon_max_width", 22)
 	b.custom_minimum_size = Vector2(UiTokens.SIZE_CLOSE, UiTokens.SIZE_CLOSE); b.size = b.custom_minimum_size

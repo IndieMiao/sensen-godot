@@ -148,8 +148,11 @@ static func version_line() -> String:
 	if context == null: return ""
 	var info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0)
 	if info == null: return ""
+	# versionName is a field, not a method: read through reflection. `call`, not `.get()`, which is Godot's own
+	# Object.get and never reaches Java.
+	var field = info.getClass().getField("versionName")
+	var name = field.call("get", info) if field != null else null
 	var code = info.getLongVersionCode()
-	var name = info.get("versionName")
 	if code == null or name == null: return ""
 	return P0Legal.version_line({"version": int(code), "name": str(name)})
 
