@@ -479,10 +479,11 @@ func energy_view() -> Dictionary:
 func _refresh_energy() -> void:
 	if energy_chip == null: return
 	var e := energy_now()
-	energy_chip.visible = not e.is_empty() and not held
+	energy_chip.visible = not e.is_empty()
 	if e.is_empty(): return
-	var hud := P0Logic.hud_state(energy_view(), {"next_cost": key_cost if key_short else 0, "unread": 0})
-	energy_chip.show_energy(int(hud.energy), int(hud.energy_max), str(hud.regen), int(hud.next_cost))
+	# The HUD's third line as P0Logic.hud_state words it: `+1 in 2:41`, or `Full`.
+	var regen := "Full" if e.next_in == null else "+1 in " + P0Logic.duration(float(e.next_in))
+	energy_chip.show_energy(int(e.value), int(e.max), regen, key_cost if key_short else 0)
 
 ## P0's Energy card (LOCK-09) for an action short of Energy: facts, the RECOVER tiles that only guide, and the one
 ## button `Free to do now` that closes it. Only Rest is on the parcel today; away from a cottage it reads `At home`.
