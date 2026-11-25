@@ -47,6 +47,11 @@ func request_part(part_id: String) -> int:
 	set_process(true)
 	return rid
 
+## Whether `part_id`'s resource is still loading on a thread (it is neither delivered nor failed yet).
+func loading(part_id: String) -> bool:
+	var meta = catalog.part(part_id) if catalog else null
+	return meta != null and _by_path.has(meta.res_path)
+
 func cancel(request_id: int) -> void:
 	_cancelled[request_id] = true
 

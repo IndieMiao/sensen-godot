@@ -48,16 +48,33 @@ func _run() -> void:
 	var map: Control = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
 	root.add_child(map)
 	current_scene = map
+	# C-133: the map has no player of its own; the saved outfit's parts start loading as it opens.
+	var outfit: Array[String] = []
+	for id in avatar.load_outfit().slots.values():
+		if not str(id).is_empty(): outfit.append(str(id))
+	verify(not outfit.is_empty() and outfit.all(func(id): return avatar.loader.loading(id) or avatar.cache.get_part(id) != null),
+		"the map starts loading the saved outfit as it opens")
 	await process_frame
 	var entry: Button = map.find_child("MapProfile", true, false)
 	var locate: Button = map.find_child("MapLocate", true, false)
 	verify(entry != null and entry.is_visible_in_tree() and not entry.disabled, "the map has a profile key")
 	verify(entry.theme_type_variation == locate.theme_type_variation and entry.size == locate.size, "the same round key as locate")
 	verify(is_equal_approx(entry.position.y, locate.position.y) and entry.position.x < locate.position.x, "at the left, level with locate")
+	# A tap while the outfit still loads (a cold start's first seconds): the key holds, the profile opens with its figure.
+	avatar.cache.clear()
+	verify(not avatar.warm_saved_outfit().is_empty() and avatar.warming(), "cold again: the outfit is loading")
 	entry.pressed.emit()
-	await process_frame
+	verify(map._profile == null and entry.disabled, "a tap while it loads holds the key; no profile without its figure yet")
+	entry.pressed.emit()
+	for i in 900:
+		if map._profile != null: break
+		await process_frame
+	verify(not avatar.warming() and outfit.all(func(id): return avatar.cache.get_part(id) != null), "once it has loaded")
 	var host: Control = map._profile
-	verify(host != null and host.get_parent() == map, "Profile opens the profile over the map")
+	verify(host != null and host.get_parent() == map and host.pages.size() == 1, "Profile opens the profile over the map, once")
+	var figure: Node = host.top().preview.rig
+	await process_frame
+	verify(figure != null and figure.visible and not figure.is_busy(), "the figure shows on the profile's first frame")
 	verify(not map._hud.visible, "the map's panels hide under the profile")
 	verify(TranslationServer.get_locale() == "en", "the pages show in English while open")
 	var profile: Control = host.top()
