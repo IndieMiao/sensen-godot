@@ -29,9 +29,9 @@ const STAGE_PARTS := [
 	[["seeds", Vector3.ONE, 0.04]],
 	[["C", Vector3(0.20, 0.16, 0.20), 0.08]],
 	[["C", Vector3(0.45, 0.40, 0.45), 0.20]],
-	[["C", Vector3(0.60, 0.62, 0.60), 0.31], ["C_detail", Vector3(0.34, 0.45, 0.34), 0.01]],
-	[["C", Vector3(0.72, 0.78, 0.72), 0.39], ["C_detail", Vector3(0.48, 0.65, 0.48), 0.03]],
-	[["C", Vector3(0.84, 0.94, 0.84), 0.47], ["C_detail", Vector3(0.62, 0.85, 0.62), 0.06]],
+	[["C", Vector3(0.60, 0.62, 0.60), 0.31], ["C_detail", Vector3(0.42, 0.50, 0.42), 0.03]],
+	[["C", Vector3(0.72, 0.78, 0.72), 0.39], ["C_detail", Vector3(0.56, 0.70, 0.56), 0.06]],
+	[["C", Vector3(0.84, 0.94, 0.84), 0.47], ["C_detail", Vector3(0.70, 0.90, 0.70), 0.09]],
 ]
 ## Seeds sit at even intervals on the soil's middle three ridges (PlantMesh soil ridges are 0.17 apart).
 const SEED_ROWS := [-0.17, 0.0, 0.17]

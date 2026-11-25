@@ -65,8 +65,6 @@ func _run() -> void:
 	await _open(store)
 	farming = scene._farming
 	var middle: Vector2i = row[3]
-	scene._walk.position = scene._walk.point(middle + Vector2i(0, -2))
-	scene._actor.position = scene._walk.position
 	scene._focus = scene._walk.point(middle)
 	scene._place_camera()
 	farming._draw_crops()
@@ -97,7 +95,8 @@ func _shot(name: String) -> void:
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(out.path_join(name + ".png"))
 
-## `count` free core cells in a row (x increasing), off the path, obstacles and house, nearest the arrival first.
+## `count` free core cells in a row (x increasing), off the path, obstacles and house, nearest the arrival first. The
+## player standing at the arrival hides about three cells behind it on screen, so the row keeps out of that.
 func _row(farming, count: int) -> Array:
 	var data: Dictionary = scene._data
 	var house := ParcelFarm.house_cells(farming.farm)
@@ -110,7 +109,9 @@ func _row(farming, count: int) -> Array:
 	for cell: Dictionary in data.cells:
 		var row: Array = []
 		for i in count: row.append(Vector2i(cell.x + i, cell.y))
-		if not row.all(free): continue
+		var hidden: bool = cell.y >= data.spawn.y and cell.y <= data.spawn.y + 3 \
+			and data.spawn.x >= cell.x - 1 and data.spawn.x <= cell.x + count
+		if hidden or not row.all(free): continue
 		var d: float = (row[count / 2] - data.spawn).length()
 		if d < best_d:
 			best_d = d
