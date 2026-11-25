@@ -105,7 +105,7 @@ func set_marks(index: int, badge: int, dot: bool) -> void:
 func _recolor() -> void:
 	for i in _tabs.size():
 		var on := i == selected
-		var ink := UiTokens.COLOR_PRIMARY if on else UiTokens.COLOR_SECONDARY
+		var ink := UiTokens.COLOR_PRIMARY_INK if on else UiTokens.COLOR_SECONDARY
 		for l in _tabs[i].get_child(0).get_children():
 			if not (l is Label): continue   # the badge and the dot keep their own colours
 			(l as Label).add_theme_color_override(&"font_color", ink)

@@ -298,6 +298,23 @@ func _button(text: String, action: Callable) -> Button:
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL; button.pressed.connect(action)
 	return button
 
+## A disabled panel button that reads another text for a while (Loading…) keeps the width its `usual` text gives it,
+## with no side margins and the text centred; `text == usual` puts it back. A longer text widened the top panel past
+## the screen and cut off the buttons on the right (C-123, C-61#195).
+func _text_in_place(button: Button, text: String, usual: String) -> void:
+	if button.text == text: return
+	if text == usual:
+		button.text = usual
+		button.remove_theme_stylebox_override("disabled"); button.clip_text = false; button.custom_minimum_size.x = 0
+		return
+	if button.text == usual:
+		button.custom_minimum_size.x = button.get_combined_minimum_size().x
+		button.clip_text = true
+		var style := button.get_theme_stylebox("disabled").duplicate() as StyleBox
+		style.content_margin_left = 0; style.content_margin_right = 0
+		button.add_theme_stylebox_override("disabled", style)
+	button.text = text
+
 func _render() -> void:
 	_render_account()
 	if _selector == null or _suspended or _leaving: return
@@ -334,8 +351,8 @@ func _render() -> void:
 	_reselect.visible = state == "mine" and _claims.can_give_up(); _reselect.disabled = not idle
 	var town_ready: bool = _claims.has_home() and not _opening and not _claims.busy and _town == null and _town_loading.is_empty()
 	_market.disabled = not town_ready; _carpenter.disabled = not town_ready
-	_market.text = TOWN_LOADING if _town_loading == "market" else TOWN_NAMES.market
-	_carpenter.text = TOWN_LOADING if _town_loading == "carpenter" else TOWN_NAMES.carpenter
+	_text_in_place(_market, TOWN_LOADING if _town_loading == "market" else TOWN_NAMES.market, TOWN_NAMES.market)
+	_text_in_place(_carpenter, TOWN_LOADING if _town_loading == "carpenter" else TOWN_NAMES.carpenter, TOWN_NAMES.carpenter)
 	_home.visible = _claims.has_home()
 	_home.disabled = _selector.manifest.is_empty() or _opening or _town != null
 	_locate.disabled = _home.disabled

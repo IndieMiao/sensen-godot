@@ -61,7 +61,7 @@ func _init(pinned_ := true) -> void:
 	_button = UiCommandButton.new("", UiCommandButton.Kind.SECONDARY)
 	_button.activated.connect(func(): toggled.emit())
 	v.add_child(_button)
-	_verb = UiKit.label("", UiTokens.STYLE_BUTTON_XB15, UiTokens.COLOR_PRIMARY)
+	_verb = UiKit.label("", UiTokens.STYLE_BUTTON_XB15, UiTokens.COLOR_PRIMARY_INK)
 	_verb.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_verb.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_verb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

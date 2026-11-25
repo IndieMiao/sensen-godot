@@ -294,9 +294,25 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	ProjectSettings.set_setting(LOCAL_SAVE, true) # the town reads the device save, not a server
 	page._render(); await process_frame
 	check(not page._carpenter.disabled and page._carpenter.text == "Carpenter", "with a home, Carpenter can be tapped")
+	var row_width: float = page._places.get_combined_minimum_size().x
+	var named: Array = [page._carpenter.get_combined_minimum_size().x, page._carpenter.clip_text, page._carpenter.has_theme_stylebox_override("disabled")]
 	page._carpenter.pressed.emit()
 	check(page._carpenter.text == page.TOWN_LOADING and page._carpenter.disabled and page._market.disabled and page._town == null,
 		"a tap shows Loading… on the entry at once, before the town loads")
+	check(page._places.get_combined_minimum_size().x == row_width and page._carpenter.get_combined_minimum_size().x == named[0],
+		"Loading… keeps the width of the entry's name, so the top panel stays as wide as before (C-123)")
+	var loading_font: Font = page._carpenter.get_theme_font("font")
+	var loading_text: float = loading_font.get_string_size(page.TOWN_LOADING, HORIZONTAL_ALIGNMENT_LEFT, -1, page._carpenter.get_theme_font_size("font_size")).x
+	check(loading_text <= named[0] - page._carpenter.get_theme_stylebox("disabled").get_minimum_size().x,
+		"Loading… fits in the width of the entry's name (%.0f in %.0f)" % [loading_text, named[0]])
+	var market_named: float = page._market.get_combined_minimum_size().x
+	page._town_loading = "market"; page._render()
+	check(page._market.text == page.TOWN_LOADING and page._market.get_combined_minimum_size().x == market_named
+		and page._places.get_combined_minimum_size().x == row_width and loading_text <= market_named,
+		"Market's Loading… keeps the width of \"Market\" too and fits in it (%.0f in %.0f)" % [loading_text, market_named])
+	page._town_loading = "carpenter"; page._render()
+	check(page._market.text == "Market" and not page._market.clip_text and not page._market.has_theme_stylebox_override("disabled")
+		and page._market.get_combined_minimum_size().x == market_named, "an entry that stops loading is its name again")
 	page._market.pressed.emit()
 	check(page._market.text == "Market", "the other entry waits meanwhile")
 	await process_frame
@@ -317,6 +333,8 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	page._town.close(); await process_frame
 	check(page._town == null and page._hud.visible and page._carpenter.text == "Carpenter" and not page._carpenter.disabled,
 		"closing the town brings the map's entries back")
+	check([page._carpenter.get_combined_minimum_size().x, page._carpenter.clip_text, page._carpenter.has_theme_stylebox_override("disabled")] == named
+		and page._places.get_combined_minimum_size().x == row_width, "back on the map the top panel's row is laid out as before")
 	check(page._farm_parcel == home and not seen.is_empty() and page.home_farm == seen, "the map keeps the save the town read for its line")
 	ProjectSettings.set_setting(LOCAL_SAVE, null)
 	page.home_farm = {}; page._farm_parcel = ""

@@ -1,0 +1,410 @@
+{
+  "type": "VBoxContainer",
+  "rect": [
+    0,
+    0,
+    328,
+    522
+  ],
+  "children": [
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        0,
+        328,
+        22
+      ],
+      "variation": "RowTitleXB15",
+      "text": "UiModalPanel · bag"
+    },
+    {
+      "type": "Label",
+      "rect": [
+        0,
+        28,
+        328,
+        18
+      ],
+      "variation": "CaptionR12",
+      "text": "ui-v3 C-P1–C-P4 · fig 4"
+    },
+    {
+      "type": "Control",
+      "rect": [
+        0,
+        52,
+        328,
+        470
+      ],
+      "children": [
+        {
+          "type": "UiModalPanel",
+          "rect": [
+            0,
+            52,
+            328,
+            470
+          ],
+          "children": [
+            {
+              "type": "ColorRect",
+              "rect": [
+                0,
+                52,
+                328,
+                470
+              ]
+            },
+            {
+              "type": "Control",
+              "rect": [
+                20,
+                71,
+                288,
+                394
+              ],
+              "children": [
+                {
+                  "type": "PanelContainer",
+                  "rect": [
+                    20,
+                    71,
+                    288,
+                    394
+                  ],
+                  "variation": "ModalPanel",
+                  "children": [
+                    {
+                      "type": "VBoxContainer",
+                      "rect": [
+                        20,
+                        71,
+                        288,
+                        394
+                      ],
+                      "children": [
+                        {
+                          "type": "PanelContainer",
+                          "rect": [
+                            20,
+                            71,
+                            288,
+                            40
+                          ],
+                          "variation": "PanelHeader"
+                        },
+                        {
+                          "type": "MarginContainer",
+                          "rect": [
+                            20,
+                            111,
+                            288,
+                            354
+                          ],
+                          "children": [
+                            {
+                              "type": "VBoxContainer",
+                              "rect": [
+                                40,
+                                139,
+                                248,
+                                302
+                              ],
+                              "children": [
+                                {
+                                  "type": "GridContainer",
+                                  "rect": [
+                                    40,
+                                    139,
+                                    248,
+                                    272
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "UiBagSlot",
+                                      "rect": [
+                                        40,
+                                        139,
+                                        72,
+                                        72
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            52,
+                                            151,
+                                            48,
+                                            48
+                                          ]
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            99,
+                                            187,
+                                            17,
+                                            24
+                                          ],
+                                          "variation": "TypeMicro",
+                                          "text": "x3"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "UiBagSlot",
+                                      "rect": [
+                                        128,
+                                        139,
+                                        72,
+                                        72
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "TextureRect",
+                                          "rect": [
+                                            140,
+                                            151,
+                                            51,
+                                            51
+                                          ]
+                                        },
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            178,
+                                            187,
+                                            26,
+                                            24
+                                          ],
+                                          "variation": "TypeMicro",
+                                          "text": "x20"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "UiBagSlot",
+                                      "rect": [
+                                        216,
+                                        139,
+                                        72,
+                                        72
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            291,
+                                            187,
+                                            1,
+                                            24
+                                          ],
+                                          "variation": "TypeMicro",
+                                          "text": ""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "UiBagSlot",
+                                      "rect": [
+                                        40,
+                                        239,
+                                        72,
+                                        72
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            115,
+                                            287,
+                                            1,
+                                            24
+                                          ],
+                                          "variation": "TypeMicro",
+                                          "text": ""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "UiBagSlot",
+                                      "rect": [
+                                        128,
+                                        239,
+                                        72,
+                                        72
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            203,
+                                            287,
+                                            1,
+                                            24
+                                          ],
+                                          "variation": "TypeMicro",
+                                          "text": ""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "UiBagSlot",
+                                      "rect": [
+                                        216,
+                                        239,
+                                        72,
+                                        72
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            291,
+                                            287,
+                                            1,
+                                            24
+                                          ],
+                                          "variation": "TypeMicro",
+                                          "text": ""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "UiBagSlot",
+                                      "rect": [
+                                        40,
+                                        339,
+                                        72,
+                                        72
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            115,
+                                            387,
+                                            1,
+                                            24
+                                          ],
+                                          "variation": "TypeMicro",
+                                          "text": ""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "UiBagSlot",
+                                      "rect": [
+                                        128,
+                                        339,
+                                        72,
+                                        72
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            203,
+                                            387,
+                                            1,
+                                            24
+                                          ],
+                                          "variation": "TypeMicro",
+                                          "text": ""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "UiBagSlot",
+                                      "rect": [
+                                        216,
+                                        339,
+                                        72,
+                                        72
+                                      ],
+                                      "children": [
+                                        {
+                                          "type": "Label",
+                                          "rect": [
+                                            291,
+                                            387,
+                                            1,
+                                            24
+                                          ],
+                                          "variation": "TypeMicro",
+                                          "text": ""
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Label",
+                                  "rect": [
+                                    40,
+                                    423,
+                                    248,
+                                    18
+                                  ],
+                                  "variation": "TypeCaption",
+                                  "text": "Carrot ×20"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "TextureRect",
+                  "rect": [
+                    32,
+                    39,
+                    80,
+                    80
+                  ]
+                },
+                {
+                  "type": "UiTagPill",
+                  "rect": [
+                    112,
+                    77,
+                    48,
+                    28
+                  ],
+                  "variation": "TagPill",
+                  "children": [
+                    {
+                      "type": "Label",
+                      "rect": [
+                        124,
+                        81,
+                        24,
+                        19
+                      ],
+                      "variation": "TypeLabelOnDark",
+                      "text": "Bag"
+                    }
+                  ]
+                },
+                {
+                  "type": "Button",
+                  "rect": [
+                    267,
+                    69,
+                    44,
+                    44
+                  ],
+                  "text": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

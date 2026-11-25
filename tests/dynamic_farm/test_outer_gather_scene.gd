@@ -183,7 +183,7 @@ func _first_visit() -> Dictionary:
 		_check(int(farming.farm.bag.get(ITEMS[kind][0], 0)) == had + 1, "one %s in the bag" % ITEMS[kind][0])
 		_check(farming.last_gains == {ITEMS[kind][0]: 1} and ("+1 " + ITEMS[kind][1]) in _floats(farming),
 			"the gain floats up and flies into the bag (%s)" % kind)
-		_check(ITEMS[kind][0] in farming._grid_items(farming.bag_ids()).map(func(it): return it.id),
+		_check(ITEMS[kind][0] in farming.bag_ids(),
 			"%s shows in the bag" % ITEMS[kind][0])
 		var id: String = farming.gatherables[index].id
 		_check(farming.farm.gathered.has(id), "%s is recorded" % id)
@@ -249,4 +249,4 @@ func _grown_back(picked: Dictionary) -> void:
 
 ## The texts of the gain floats on screen (C-74).
 func _floats(farming: Node) -> Array:
-	return farming._ui.get_children().filter(func(n): return n is UiFloatText).map(func(n): return n.text)
+	return farming._ui.get_children().filter(func(n): return n is UiGainFloat).map(func(n): return n.text)
