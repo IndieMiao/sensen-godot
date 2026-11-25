@@ -91,6 +91,30 @@ const mine = async (app: FastifyInstance, token: string) =>
   (await app.inject({ method: 'GET', url: '/v1/parcels/mine', headers: bearer(token) })).json().parcel;
 const enter = (app: FastifyInstance, token: string) =>
   app.inject({ method: 'POST', url: '/v1/parcels/mine/enter', headers: bearer(token) });
+const R6 = 'sf-dynamic-farm-20261124-r6';
+/** C-136：带上这次打开农场用的数据集进入（新客户端）。 */
+const enterAs = (app: FastifyInstance, token: string, dataset_version: unknown) =>
+  app.inject({ method: 'POST', url: '/v1/parcels/mine/enter', headers: bearer(token), payload: { dataset_version } });
+/** r4 上认领、进入，盖房、清障碍、开垦三格、种两颗（一颗熟一颗没熟）、卖一次、领鸡舍蓝图、采一棵树；返回此时的地块。 */
+async function r4Farm(app: FastifyInstance, token: string, parcel = A) {
+  await claim(app, token, parcel);
+  await enter(app, token);
+  await command(app, token, 1, [{ type: 'place_house', x: 9, y: 9 }, { type: 'clear_obstacle', cell: '3,3' }, { type: 'till', cell: '1,1' },
+    { type: 'till', cell: '2,1' }, { type: 'till', cell: '3,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' }]);
+  clock = T0 + 60_000;
+  await command(app, token, 2, [{ type: 'harvest', cell: '1,1' }, { type: 'sell', item: 'crop_carrot', count: 1 }, { type: 'claim_blueprint', blueprint: 'coop' },
+    { type: 'sow', cell: '1,1', crop: 'crop_carrot' }, { type: 'gather', object: `${parcel.parcel_id}:outer-groves-v2:wild_pz_tree_20:41,7:0` }]);
+  clock = T0 + 90_000;
+  const res = await command(app, token, 3, [{ type: 'sow', cell: '2,1', crop: 'crop_carrot' }]);
+  expect(res.statusCode).toBe(200);
+  const farm = res.json().parcel;
+  expect(farm).toMatchObject({ dataset_version: DATASET, farm_version: 4, farm: { coins: 12, sales: 1, bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1 } } });
+  expect(Object.keys(farm.farm.crops)).toEqual(['1,1', '2,1']);
+  return farm;
+}
+/** 换到 r6 之后应有的样子：格子上的清空，每棵作物退一颗种子、房子退住宅蓝图，其余不动。 */
+const rebased = (before: { farm: Record<string, unknown> }) => ({ ...before.farm, house: null, cleared: [], tilled: [], crops: {}, gathered: {},
+  bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1, seed_carrot: 2, blueprint_cottage: 1 } });
 const GIFT = { hoe_starter: 1, seed_carrot: 3, blueprint_cottage: 1 };
 const command = (app: FastifyInstance, token: string, base_version: number, commands: object[]) =>
   app.inject({ method: 'POST', url: '/v1/parcels/mine/commands', headers: bearer(token), payload: { base_version, commands } });
@@ -235,6 +259,64 @@ for (const [name, enabled, makeStores] of makers) {
       const results = await Promise.all(Array.from({ length: 6 }, () => enter(app, ada)));
       expect(results.filter(r => r.json().granted)).toHaveLength(1);
       expect(await mine(app, ada)).toMatchObject({ farm_version: 1, farm: { bag: GIFT } });
+    });
+
+    it('C-136 an r4 claim entered by an r6 client moves to r6 once: cells cleared, crops back as seeds, house back as its blueprint', async () => {
+      const ada = await account(app, 'Ada');
+      const before = await r4Farm(app, ada);
+      clock = T0 + 100_000;
+      const res = await enterAs(app, ada, R6);
+      expect(res.statusCode).toBe(200);
+      expect(res.json()).toMatchObject({ granted: false, parcel: { parcel_id: A.parcel_id, community_id: 'sf', dataset_version: R6, farm_version: 5,
+        center: A.center, claimed_at: T0 } });
+      expect(res.json().parcel.farm).toEqual(rebased(before));
+      expect(await mine(app, ada)).toEqual(res.json().parcel);
+      // Retries, many at once, and the old client: nothing moves again and nothing more is given back.
+      const again = await Promise.all([...Array.from({ length: 5 }, () => enterAs(app, ada, R6)), enter(app, ada)]);
+      expect(again.map(r => [r.statusCode, r.json().parcel.farm_version, r.json().parcel.dataset_version])).toEqual(Array(6).fill([200, 5, R6]));
+      expect((await mine(app, ada)).farm).toEqual(rebased(before));
+      // Never back to r4: the claim stays on r6.
+      expect((await enterAs(app, ada, DATASET)).json().parcel).toMatchObject({ dataset_version: R6, farm_version: 5 });
+      // The owner and the map still see the same parcel; play goes on on the new cells.
+      expect((await owners(app, ada, `ids=${A.parcel_id}`)).json().parcels[0].owner).toBe('mine');
+      expect((await command(app, ada, 5, [{ type: 'place_house', x: 2, y: 2 }, { type: 'till', cell: '9,9' }, { type: 'sow', cell: '9,9', crop: 'crop_carrot' }])).statusCode).toBe(200);
+      // A command based on the version before the move is refused, not applied to the new cells.
+      expect((await command(app, ada, 4, [{ type: 'till', cell: '4,4' }])).statusCode).toBe(409);
+    });
+
+    it('C-136 without the field, with an unknown, older or same dataset the claim and its farm stay as they are', async () => {
+      const ada = await account(app, 'Ada');
+      const before = await r4Farm(app, ada);
+      for (const res of [await enter(app, ada), await enterAs(app, ada, undefined), await enterAs(app, ada, 'sf-dynamic-farm-20261124-r5'),
+        await enterAs(app, ada, 'ny-dynamic-farm-1'), await enterAs(app, ada, DATASET)]) {
+        expect(res.statusCode).toBe(200);
+        expect(res.json()).toMatchObject({ granted: false, parcel: { dataset_version: DATASET, farm_version: 4 } });
+      }
+      expect(await mine(app, ada)).toEqual(before);
+      for (const bad of [6, null, ['x'], 'x'.repeat(129)]) expect((await enterAs(app, ada, bad)).json().code).toBe('SCHEMA');
+      expect(await mine(app, ada)).toEqual(before);
+      // An r6 claim entered by the r6 client is an ordinary entry; an r6 claim is not moved back by an r4 client.
+      const bob = await account(app, 'Bob');
+      await claim(app, bob, B, R6);
+      expect((await enterAs(app, bob, R6)).json()).toMatchObject({ granted: true, parcel: { dataset_version: R6, farm_version: 1, farm: { bag: GIFT } } });
+      expect((await enterAs(app, bob, DATASET)).json()).toMatchObject({ granted: false, parcel: { dataset_version: R6, farm_version: 1 } });
+    });
+
+    it('C-136 a never-entered r4 claim moves to r6 and gets the first-entry gift in the same write', async () => {
+      const ada = await account(app, 'Ada');
+      await claim(app, ada, A);
+      const results = await Promise.all(Array.from({ length: 4 }, () => enterAs(app, ada, R6)));
+      expect(results.filter(r => r.json().granted)).toHaveLength(1);
+      expect(await mine(app, ada)).toMatchObject({ dataset_version: R6, farm_version: 1, farm: { bag: GIFT, welcomed_at: T0, house: null, tilled: [] } });
+    });
+
+    it('C-136 only one\'s own claim moves; another player\'s parcel and farm are untouched', async () => {
+      const ada = await account(app, 'Ada'), bob = await account(app, 'Bob');
+      const bobs = await r4Farm(app, bob, B);
+      await claim(app, ada, A);
+      await enterAs(app, ada, R6);
+      expect(await mine(app, bob)).toEqual(bobs);
+      expect((await enterAs(app, await account(app, 'Cy'), R6)).json().code).toBe('NO_PARCEL');
     });
 
     it('a player only reads and writes their own parcel farm', async () => {
@@ -638,6 +720,19 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
       const stored = (await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state;
       expect(stored).toEqual({ ...legacy, bag: { hoe_starter: 1, seed_carrot: 2 }, coins: 12, sales: 1, gathered: {}, blueprints_claimed: {} });
     } finally { await app.close(); }
+  });
+
+  it('C-136 two server processes entering one r4 claim with r6 at once: it moves once and gives back once', async () => {
+    const other = new pg.Pool({ connectionString: DSN, max: 20 });
+    const one = await appFor(pgStores(pool!)), two = await appFor(pgStores(other));
+    try {
+      const ada = await account(one, 'Ada');
+      const before = await r4Farm(one, ada);
+      const results = await Promise.all(Array.from({ length: 10 }, (_, i) => enterAs(i % 2 ? two : one, ada, R6)));
+      expect(results.map(r => r.statusCode)).toEqual(Array(10).fill(200));
+      const row = await pool!.query('SELECT dataset_version, farm_version, farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id]);
+      expect(row.rows[0]).toEqual({ dataset_version: R6, farm_version: 5, farm_state: rebased(before) });
+    } finally { await one.close(); await two.close(); await other.end(); }
   });
 
   it('deleting the account frees the parcel', async () => {

@@ -71,6 +71,7 @@ curl localhost:3000/v1/healthz
 启动迁移新增 `parcel_claims` 表（只新增，不改旧表）：主键保证一块地只有一个主人，
 部分唯一索引保证每人一块免费地。首次进入自家地块（`/v1/parcels/mine/enter`）只发一次赠品；
 数值在 `assets/farm/data/dynamic_farm.json`（所有者拍板 Q-39、Q-40）。
+进入时客户端带上这次打开农场用的数据集，旧数据集上的认领会换到新数据集（C-136，所有者拍板 Q-168），见 [docs/plans/C-136.md](../docs/plans/C-136.md)。
 “放弃并重选”只在设置 `DYNAMIC_FARM_RESELECT=1` 的内部测试服可用，正式配置不设，调用返回 403。
 接口、表结构和选型理由见 [docs/plans/C-31.md](../docs/plans/C-31.md)。
 正式服（C-96）只用邀请账号：`ACCOUNT_SIGNUP=closed` 时邮箱注册和 Apple / Google 首登建号都回 403 `SIGNUP_CLOSED`，
