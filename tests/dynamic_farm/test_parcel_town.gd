@@ -219,7 +219,8 @@ func _upgrade() -> void:
 	await process_frame
 	var sheet = town.upgrade_sheet
 	_check(sheet != null and town.stack.drawer() == sheet and sheet.title.text == "Farm Lv1 → Lv2", "the sheet opens over the greeting: Farm Lv1 → Lv2")
-	_check(sheet.button.reason == "" and sheet.footer.text == "Upgrading is free of Energy", "enough: Upgrade can go; no Energy")
+	_check(sheet.button.reason == "" and not sheet.find_children("*", "Label", true, false).any(func(l): return "free of Energy" in l.text),
+		"enough: Upgrade can go; no footer line under it (C-152#29)")
 	var asked := [false]
 	sheet.upgrade_requested.connect(func(): asked[0] = true)
 	sheet.button.activated.emit()
@@ -230,7 +231,7 @@ func _upgrade() -> void:
 	_check(sheet.title.text == "Farm Lv2 → Lv3" and sheet.button.reason == "", "the sheet moves on to Lv3")
 	await town.upgrade()
 	_check(town.farm.level == 3 and town.farm.bag == {"blueprint_well": 1} and town.farm.coins == 0, "Lv3: its price taken, a well blueprint given")
-	_check(town.toast.current_text() == "Farm Lv3 · Received Well Blueprint ×1", "the toast names the blueprint")
+	_check(town.toast.current_text() == "Farm Lv3 · +1 Well Blueprint", "the toast names the blueprint (C-152#29)")
 	_check(sheet.title.text == "Farm Lv3 → Lv4" and sheet.button.reason == "Need 14 more Timber", "short for Lv4: the gap on the key")
 	var refused: Dictionary = await town.upgrade()
 	_check(not refused.ok and refused.code == "NOT_ENOUGH" and store.read().farm.level == 3, "the store refuses a short upgrade, still Lv3")

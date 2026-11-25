@@ -3,7 +3,7 @@ extends UiDrawer
 ## kit pieces for the parcel's own save; the P0 sheet is not touched. Top to bottom: `Farm Lv1 → Lv2` · Needs (NEED-TILEs:
 ## each material the next level takes, then Coins) · What changes (Max Energy, and Wells on a level that adds one) · the
 ## Upgrade key with the first gap on it (LOCK-10: `Need 2 more Timber`, materials before coins as the server refuses) ·
-## `Upgrading is free of Energy` · Close. At the top level: `Farm Lv5`, `Highest level for now`, no key.
+## Close. At the top level: `Farm Lv5`, `Highest level for now`, no key.
 ## Numbers are the rules' (`farm_levels`, `energy.per_level`, assets/farm/data/dynamic_farm.json); the key only reports
 ## (`upgrade_requested`), the town sends `upgrade_farm`.
 
@@ -14,11 +14,10 @@ const ParcelItems = preload("res://modules/dynamic_farm/parcel_items.gd")
 const HEIGHT := 440.0
 const TOP_HEIGHT := 200.0
 const WELL := "well"
-## Player-visible copy, drafted after P0's HOME-1 (`Home Lv1 → Lv2`, `Needs`, `What changes`, `Upgrade`,
-## `Upgrading is free of Energy`, `Highest level for now`) for PM to finalise (C-45).
+## Player-visible copy after P0's HOME-1, as PM finalised it on SEN-C-152#29 (C-45): no footer line under the key.
 const COPY := {"title": "Farm Lv%d → Lv%d", "top": "Farm Lv%d", "top_line": "Highest level for now", "needs": "Needs",
 	"changes": "What changes", "energy": "Max Energy %d", "wells": "Wells %d", "now": "now %d", "upgrade": "Upgrade",
-	"short": "Need %d more %s", "coins": "Need %d more coins", "footer": "Upgrading is free of Energy", "close": "Close"}
+	"short": "Need %d more %s", "coins": "Need %d more coins", "close": "Close"}
 
 var farm := {}
 var title: Label
@@ -26,7 +25,6 @@ var subtitle: Label
 var needs: VBoxContainer
 var changes: VBoxContainer
 var button: UiCommandButton
-var footer: Label
 var _tiles: HFlowContainer
 var _rows: VBoxContainer
 
@@ -66,9 +64,6 @@ func _init(farm_: Dictionary) -> void:
 	button.activated.connect(func(): upgrade_requested.emit())
 	body.add_child(button)
 	_gap(body, 6.0)
-	footer = UiKit.label(COPY.footer, UiTokens.STYLE_C11_B, UiTokens.COLOR_SECONDARY)
-	footer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	body.add_child(footer)
 	var close := UiDismissButton.new(COPY.close)
 	close.name = "Close"
 	close.pressed.connect(func(): close_requested.emit())
@@ -115,7 +110,6 @@ func refresh(farm_: Dictionary) -> void:
 	needs.visible = not bool(m.top)
 	changes.visible = not bool(m.top)
 	button.visible = not bool(m.top)
-	footer.visible = not bool(m.top)
 	height = TOP_HEIGHT if bool(m.top) else HEIGHT
 	for c in _tiles.get_children():
 		_tiles.remove_child(c)

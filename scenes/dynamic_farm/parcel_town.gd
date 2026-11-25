@@ -40,10 +40,10 @@ const LINES := {
 	"scott_done": "Hope the coop plans come in handy.",
 	"scott_none": "Come back later.",
 	"unreachable": "Could not reach your farm.",
-	# C-152, drafted for PM to finalise (C-45): the greeting's key and the toast after an upgrade.
+	# C-152, as PM finalised them on SEN-C-152#29 (C-45): the greeting's key and the toast after an upgrade.
 	"upgrade_key": "Upgrade Farm",
 	"upgraded": "Farm Lv%d",
-	"upgraded_gift": "Farm Lv%d · Received %s ×%d",
+	"upgraded_gift": "Farm Lv%d · +%d %s",
 }
 const MET_PATH := "user://dynamic_farm_local/town.json"
 
@@ -212,7 +212,7 @@ func upgrade() -> Dictionary:
 		if gift.is_empty(): toast.show_toast(LINES.upgraded % level, ToastLayer.Severity.SUCCESS)
 		else:
 			var item: String = gift.keys()[0]
-			toast.show_toast(LINES.upgraded_gift % [level, ParcelItems.name_of(item), int(gift[item])], ToastLayer.Severity.SUCCESS)
+			toast.show_toast(LINES.upgraded_gift % [level, int(gift[item]), ParcelItems.name_of(item)], ToastLayer.Severity.SUCCESS)
 	return result
 
 func sell(item: String, count: int) -> Dictionary:
