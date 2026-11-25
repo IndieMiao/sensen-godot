@@ -249,6 +249,75 @@ func burst_errors() -> void:
 	check(native.sources.size() == boots and controller.message == Controller.MAP_FAILED, "reported map failure stays until the player retries")
 	controller.retry(); for i in 4: await process_frame
 	ready_signal()
+## C-94: a tap while the map is still loading ("Loading map details…", e.g. right after Retry) waits instead of being dropped.
+func loading_map_tap() -> void:
+	await controller.activate()
+	check(not controller.map_ready and not controller.busy and controller.message == "Loading map details…", "the map is loading its details")
+	var sent := native.queries.size()
+	controller.tap(Vector2(.35, .65), 17.5)
+	check(native.queries.size() == sent and controller.message == "Finding parcel…", "a tap while the map loads waits with the finding hint instead of being ignored")
+	native.parcel_ready.emit(controller.generation, 1, '{"source_ready":false,"error":""}')
+	check(native.queries.size() == sent and controller.message == "Finding parcel…", "a not-yet-ready report keeps the tap waiting")
+	ready_signal()
+	check(native.queries.size() == sent + 1 and native.queries.back()[1] == controller.generation and native.queries.back()[2] == Vector2(.35, .65), "the waiting tap is sent once, at its point, when the map is ready")
+	answer("", [Fixture.metadata()])
+	check(controller.selection.get("block_id") == "p-A" and controller.message == "Ready to preview this farm.", "the tap made while loading selects without a second tap")
+	ready_signal(controller.style_generation)
+	check(native.queries.size() == sent + 1 and controller.message == "Ready to preview this farm.", "later readiness does not send the tap again")
+	# Retry after a map failure (C-83's case): the first tap during the reload's loading selects.
+	controller.tap(Vector2(.3, .7), 18); map_error(); await reload(); map_error()
+	check(controller.message == Controller.MAP_FAILED and not controller.busy, "the map failed")
+	sent = native.queries.size()
+	controller.tap(Vector2(.3, .7), 18)
+	check(native.queries.size() == sent and controller.message == Controller.MAP_FAILED, "a failed map still ignores taps until Retry")
+	controller.retry(); for i in 4: await process_frame
+	check(controller.message == "Loading map details…", "Retry loads the map again")
+	controller.tap(Vector2(.45, .55), 17.5); ready_signal()
+	check(native.queries.size() == sent + 1 and native.queries.back()[2] == Vector2(.45, .55), "the first tap after Retry is sent when the map is ready")
+	answer("loading"); controller._process(controller.retry_delay() + .01)
+	check(native.queries.size() == sent + 2, "it keeps its one quiet re-query")
+	answer("", [Fixture.metadata("p-B")])
+	check(controller.selection.get("block_id") == "p-B", "the first tap after Retry selects")
+	# Below the selectable zoom the tap is not queued.
+	await controller.activate(); sent = native.queries.size()
+	controller.tap(Vector2(.3, .7), 15)
+	check(controller.message == "Zoom in to choose a farm.", "a tap below the selectable zoom while loading asks to zoom in")
+	ready_signal()
+	check(native.queries.size() == sent and controller.message == Controller.PROMPT, "and sends nothing when the map is ready")
+	# A camera move cancels the waiting tap: its point is no longer where the player tapped.
+	await controller.activate(); sent = native.queries.size()
+	controller.tap(Vector2(.3, .7), 18); controller.camera_changed(18.0)
+	check(controller.message == "Loading map details…", "a camera move cancels the waiting tap and shows the loading state again")
+	ready_signal()
+	check(native.queries.size() == sent and controller.message == Controller.PROMPT, "the cancelled tap is not sent")
+	# Pause cancels it too.
+	await controller.activate(); sent = native.queries.size()
+	controller.tap(Vector2(.3, .7), 18); controller.pause(); await controller.activate(); ready_signal()
+	check(native.queries.size() == sent and controller.message == Controller.PROMPT, "pause cancels a tap waiting for the map")
+	# A map error while the tap waits reloads once and keeps the tap.
+	await controller.activate(); sent = native.queries.size()
+	controller.tap(Vector2(.3, .7), 18); map_error()
+	check(controller.busy and controller.message == "Finding parcel…", "a map error while the tap waits reloads and keeps the finding hint")
+	await reload(); ready_signal()
+	check(native.queries.size() == sent + 1 and native.queries.back()[1] == controller.generation, "the reloaded map answers the waiting tap")
+	answer("", [Fixture.metadata()])
+	check(controller.selection.get("block_id") == "p-A", "and it selects")
+	# A tap waiting on the automatic reload's load does not get a second automatic reload.
+	await controller.activate(); map_error(); await reload()
+	controller.tap(Vector2(.3, .7), 18); map_error()
+	check(controller.message == Controller.MAP_FAILED and not controller.busy, "the map's one automatic reload is not given back to a tap made during it")
+	controller.retry()
+	for i in 4: await process_frame
+	ready_signal()
+	# DataSF: the tap made while loading also waits for the building layer.
+	controller.config.building_source = "datasf"; controller.config.buildings_url = "https://demo.invalid/buildings.geojson"
+	await controller.activate(); sent = native.queries.size()
+	controller.tap(Vector2(.2, .8), 17.5); ready_signal()
+	check(native.queries.size() == sent and controller.message == "Finding parcel…", "with DataSF the tap made while loading waits for the building layer too")
+	native.parcel_ready.emit(controller.generation, controller.style_generation, '{"source_ready":true,"buildings_source_ready":true,"error":""}')
+	check(native.queries.size() == sent + 1 and native.queries.back()[2] == Vector2(.2, .8), "and is sent once the building layer loads")
+	controller.config.building_source = "mapbox"; controller.config.erase("buildings_url")
+	await controller.activate(); ready_signal()
 func _run() -> void:
 	api = Api.new(); api.transport = transport; root.add_child(api)
 	native = Native.new(); controller = Controller.new(); controller.api = api; controller.bridge = native
@@ -310,6 +379,7 @@ func _run() -> void:
 	await first_tap_retry()
 	await map_error_retry()
 	await buildings_layer_timeout()
+	await loading_map_tap()
 	check(paths.all(func(path: String): return path == "/client-manifest.json" or path.begins_with("/farms/")), "preview never requests claims or account/gameplay endpoints")
 	controller.queue_free(); await process_frame
 	api.queue_free(); await process_frame
