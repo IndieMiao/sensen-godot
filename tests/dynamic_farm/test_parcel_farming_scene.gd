@@ -172,6 +172,10 @@ func _first_visit() -> void:
 	_check(_tip(farming) == "", "a tap closes the card")
 	_check(farming._bar.visible and _bar_counts(farming) == {"hoe_starter": 1, "seed_carrot": 3, "blueprint_cottage": 1}, "quick bar shows hoe, seeds and the blueprint")
 	_check(farming._bar.slots[2].icon == load("res://modules/dynamic_farm/parcel_items.gd").icon_of("blueprint_cottage"), "the blueprint has the parcel adapter's placeholder icon (C-59)")
+	_check(farming._bar.slots[0].icon == UiArt.item("row_tool") and farming._bar.slots[1].icon == UiArt.item("seed_carrot"),
+		"the hoe and the seeds show C-86's v3 item art (C-105)")
+	_check(farming._bar.bag_icon == UiArt.SYS_BAG and (scene._coins_capsule as UiGlassCapsule).icon == UiArt.COIN,
+		"the Bag end and the coins capsule show the v3 bag and coin (C-105)")
 	_check(scene._coins_capsule.visible and scene._coins.text == "0", "the top bar shows the parcel's coins, 0 on a new parcel (C-59)")
 	scene._on_farm_changed(farming.farm.merged({"coins": 12}, true))
 	_check(scene._coins.text == "12", "the coins follow the save")
@@ -380,7 +384,7 @@ func _held(farming: Node) -> void:
 func _bag_drawer(farming: Node) -> void:
 	farming._bar.bag_requested.emit()
 	await process_frame
-	_check(farming.bag_open() and farming._bag.title == "Bag" and farming._bag.hero != null, "Bag opens the bag panel")
+	_check(farming.bag_open() and farming._bag.title == "Bag" and farming._bag.hero == UiArt.HERO_BAG, "Bag opens the bag panel, C-86's bag as its hero")
 	var ids: Array = farming._bag_slots.keys()
 	_check(ids == ["hoe_starter", "seed_carrot", "blueprint_cottage"] and farming._bag_slots.seed_carrot.item.qty == 3,
 		"the panel lists the bag: %s" % [ids])

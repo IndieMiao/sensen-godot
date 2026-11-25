@@ -594,7 +594,7 @@ func _build_ui() -> void:
 	chip.detail = "Loading preview…"
 	_status = chip.detail_label()
 	# One's own parcel: its coins (C-59, apart from the main farm's) in the v3 coin capsule, at the right.
-	_coins_capsule = UiGlassCapsule.coins(UiHud.ICON_COIN)
+	_coins_capsule = UiGlassCapsule.coins(UiArt.COIN)
 	_coins_capsule.name = "Coins"
 	_coins_capsule.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_coins_capsule.visible = false

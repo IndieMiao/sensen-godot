@@ -58,6 +58,8 @@ var bag_open := false: set = set_bag_open
 var capacity_warning := false: set = set_capacity_warning
 ## Spaces without a quick bar (kitchen, counters, the map): only the Bag end stays (plan §10.3.5, MAP-1).
 var bag_only := false: set = set_bag_only
+## The end's Bag icon (the dynamic farm gives C-86's glass-button bag, UiArt.SYS_BAG; P0 keeps its glyph).
+var bag_icon: Texture2D = BAG_GLYPH: set = set_bag_icon
 ## Vibrate on lift; off in tests and the gallery.
 var haptics := true
 ## Docked as the bag drawer's top row (SGODOT-225): the drop zones open under the bar instead of over it (q(61)).
@@ -125,6 +127,7 @@ func set_collapsed(v: bool) -> void: collapsed = v; _refresh()
 func set_bag_open(v: bool) -> void: bag_open = v; _refresh()
 func set_capacity_warning(v: bool) -> void: capacity_warning = v; _refresh()
 func set_bag_only(v: bool) -> void: bag_only = v; _refresh()
+func set_bag_icon(v: Texture2D) -> void: bag_icon = v; _refresh()
 
 func cells() -> Array[UiItemCell]: return _cells
 func end_button() -> Button: return _end
@@ -216,7 +219,7 @@ func _refresh() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE if collapsed or bag_only else Control.MOUSE_FILTER_STOP
 	# Collapsed or bag-only: the end stays at the right (BAR-1-2); the handle sits centred when collapsed.
 	_row.alignment = BoxContainer.ALIGNMENT_END if collapsed or bag_only else BoxContainer.ALIGNMENT_BEGIN
-	_end_icon.texture = CLOSE_GLYPH if bag_open else BAG_GLYPH
+	_end_icon.texture = CLOSE_GLYPH if bag_open else bag_icon
 	_end_icon.self_modulate = UiTokens.COLOR_TEXT_ON_DARK if bag_open else Color.WHITE
 	_glass.visible = not collapsed and not bag_only
 	_end_label.text = "Close" if bag_open else "Bag"

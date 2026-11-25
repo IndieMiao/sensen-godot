@@ -1,0 +1,55 @@
+{
+ "source": "Sensenjoy Image API",
+ "base_url": "https://sub.sensenjoy.cn/v1",
+ "endpoint": "/images/edits",
+ "model": "gpt-image-2",
+ "size": "1536x1024",
+ "size_note": "size 为请求尺寸，实际像素见 outputs[].actual_size",
+ "quality": "high",
+ "n": 1,
+ "background": "transparent",
+ "prompt_file": "prompt.txt",
+ "prompt_sha256": "06a0f9374aa36778cce861ebebf5b6b86d3120c57f19480b9c36b156525ae0cc",
+ "references": [
+  {
+   "file": "attachment-947.png",
+   "sha256": "172f8ca4abba43cf71dec6e7ef9ad8d7dd2d5a086dec36b412aec3b3f906d1dd",
+   "bytes": 581662
+  },
+  {
+   "file": "attachment-949.png",
+   "sha256": "293a52f41c4a480f3d605b5522491969639c2a0101600c06af92c3811ea7e744",
+   "bytes": 520090
+  }
+ ],
+ "outputs": [
+  {
+   "file": "image-1.png",
+   "sha256": "ac099e522b9e08afa3e77f82a670ba35c4335f78bc42c0faece9f39b21465555",
+   "bytes": 1804030,
+   "actual_size": [
+    1536,
+    1024
+   ],
+   "revised_prompt": null
+  }
+ ],
+ "usage": {
+  "input_tokens": 3423,
+  "input_tokens_details": {
+   "image_tokens": 3072,
+   "text_tokens": 351
+  },
+  "output_tokens": 1372,
+  "output_tokens_details": {
+   "image_tokens": 1372,
+   "text_tokens": 0
+  },
+  "total_tokens": 4795
+ },
+ "created_at": "2026-11-25T01:25:47.475173+00:00",
+ "generated_by": "host imagegen.py (SEN-H-66)",
+ "label": "I2",
+ "remark": null,
+ "secrets": "host only; key not stored here"
+}

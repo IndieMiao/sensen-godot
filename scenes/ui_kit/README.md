@@ -30,6 +30,7 @@ Type: `STYLE_TYPE_*` (§2.2) and white `*_ON_DARK` / `*_ON_ACTION` variants; whi
 
 | Class | Spec | Notes |
 |---|---|---|
+| `UiArt` (`modules/ui/kit`) | C-86 / C-I1–C-I4 | the 70 v3 art pieces in `assets/ui/v3` (items, heroes, system and coloured icons; Q-155) |
 | `UiMotion` (`modules/ui/kit`) | §5 | M-01 press, M-04 / M-05 panel in / out, M-10 float, M-16 quick bar; tokens only, runs while paused, `reduced` switch |
 | `UiGlassCapsule` | C-H4 | glass pill: coins (24 high, Ø18 coin right) or a title over a status |
 | `UiGlassButton` | C-R1 / C-R2 | Ø36 glass disc in 44, white icon or drawn ‹, optional notify dot |
@@ -40,7 +41,8 @@ Type: `STYLE_TYPE_*` (§2.2) and white `*_ON_DARK` / `*_ON_ACTION` variants; whi
 | `UiGainFloat` | C-W5, M-10 | icon + outlined white line over the scene |
 
 `UiCommandButton.bar` is the C-N6 CTA bar; command buttons play M-01. Quick slots and the quick bar are glass (C-Q1 /
-C-Q2) with their LOCK-04 / 05 structure (five slots, names, Bag end, pins) unchanged.
+C-Q2) with their LOCK-04 / 05 structure (five slots, names, Bag end, pins) unchanged; `UiQuickBar.bag_icon` sets the
+Bag end's icon (default P0's glyph; the dynamic farm gives `UiArt.SYS_BAG`).
 
 ## Rules for kit components
 

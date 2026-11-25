@@ -38,11 +38,10 @@ const TOO_FAR := "too_far"
 ## How long one press's labour clip plays; the command's result is shown when it ends.
 const LABOUR_S := 1.2
 const UNREACHABLE := "Can't reach it"
-## The bag panel (UI v3 C-P5): three columns of round slots, at least three rows; the hero is the existing bag icon
-## until C-86's art.
+## The bag panel (UI v3 C-P5): three columns of round slots, at least three rows; the hero is C-86's bag (UiArt).
 const BAG_COLUMNS := 3
 const BAG_MIN_SLOTS := 9
-const BAG_HERO := preload("res://assets/p0/icons/bag.svg")
+const BAG_HERO := UiArt.HERO_BAG
 ## Floats start this far above what they rise from (the caller puts them 40 above the object).
 const FLOAT_ABOVE := 40.0
 ## The action key's bottom sits this far above the quick bar (P0Ui._KEY_ABOVE_BAR, BAR-1).
@@ -515,7 +514,7 @@ func _draw_bag() -> void:
 		slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": int(farm.bag[id])})
 	_bar.slots = slots
 	if _bag == null: _bar.visible = not farm.is_empty() and not held
-	_keys.tool_icon = P0Logic.icon("hoe") if int(farm.get("bag", {}).get(str(rules.get("till_tool", "")), 0)) > 0 else null
+	_keys.tool_icon = item_icon(str(rules.get("till_tool", ""))) if int(farm.get("bag", {}).get(str(rules.get("till_tool", "")), 0)) > 0 else null
 	if _bag != null: _draw_bag_slots(ids)
 
 ## The bag panel's slots follow the save: one per item in the bag's order, then empty ones to fill the rows.
@@ -702,6 +701,7 @@ func _build_ui(canvas: CanvasLayer) -> void:
 	_ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	canvas.add_child(_ui)
 	_bar = UiQuickBar.new()
+	_bar.bag_icon = UiArt.SYS_BAG
 	_bar.name = "QuickBar"
 	_bar.haptics = OS.has_feature("mobile")
 	_bar.visible = false

@@ -1,0 +1,1946 @@
+{
+ "card": "SEN-C-86",
+ "author": "顾恺之·森 (UI/UX 设计师)",
+ "date": "2026-11-25",
+ "spec": "SEN-C-84 README §6 (C-I1~C-I8), tokens v3; layouts SEN-C-85 D-201",
+ "provider": "Sensenjoy OpenAI-compatible API (host-side, SEN-H-66)",
+ "base_url": "https://sub.sensenjoy.cn/v1",
+ "secrets": "host only; no key stored",
+ "style_reference": {
+  "attachment": "attachment-947",
+  "file": "ref-style.png",
+  "sha256": "172f8ca4abba43cf71dec6e7ef9ad8d7dd2d5a086dec36b412aec3b3f906d1dd",
+  "source": "concept frame SEN-C-82 attachment-582 + SEN-C-84 fig-10/fig-04 crops"
+ },
+ "layout_references": {
+  "I1": "attachment-948",
+  "I2": "attachment-949",
+  "I3": "attachment-950"
+ },
+ "processing": {
+  "script": "tools/slice.py (Pillow only)",
+  "alpha": "a<=8 -> 0; a>=246 -> 255; linear between. Soft pixels (8<a<222) RGB pulled 65% toward #34 2A 22 and alpha x0.6 so contact shadows read as shadows on dark glass. Soft pixels kept only within ~28px of a solid body (a>200), 8px feather, removing the generator haze clouds.",
+  "slicing": "connected components on 4x-reduced mask; component assigned to grid cell by centroid; components without a solid core dropped; crop to bbox; pad to square so longer side = fill x canvas (items 0.8, heroes 0.92, system/color 0.9); Lanczos resize to export sizes."
+ },
+ "sheets": [
+  {
+   "batch": "I1",
+   "sheet_attachment": "attachment-952",
+   "prompt_attachment": "attachment-953",
+   "provenance_attachment": "attachment-954",
+   "sheet_sha256": "eed46de973f1192697d2f50d351f546c5d1ac6546229fb25f8fd8700684eee84",
+   "requested_size": "1536x1024",
+   "actual_size": [
+    1536,
+    1024
+   ],
+   "model": "gpt-image-2",
+   "quality": "high",
+   "background": "transparent",
+   "endpoint": "/images/edits",
+   "references": [
+    "attachment-947",
+    "attachment-948"
+   ],
+   "prompt_file": "prompts/I1.txt",
+   "prompt_sha256": "89869101a852f6e9ee64142b2edab898f277d92bd5182d5c157c5ef99c9c5517",
+   "created_at": "2026-11-25T01:17:10.494163+00:00"
+  },
+  {
+   "batch": "I2",
+   "sheet_attachment": "attachment-964",
+   "prompt_attachment": "attachment-965",
+   "provenance_attachment": "attachment-966",
+   "sheet_sha256": "ac099e522b9e08afa3e77f82a670ba35c4335f78bc42c0faece9f39b21465555",
+   "requested_size": "1536x1024",
+   "actual_size": [
+    1536,
+    1024
+   ],
+   "model": "gpt-image-2",
+   "quality": "high",
+   "background": "transparent",
+   "endpoint": "/images/edits",
+   "references": [
+    "attachment-947",
+    "attachment-949"
+   ],
+   "prompt_file": "prompts/I2.txt",
+   "prompt_sha256": "06a0f9374aa36778cce861ebebf5b6b86d3120c57f19480b9c36b156525ae0cc",
+   "created_at": "2026-11-25T01:25:47.475173+00:00"
+  },
+  {
+   "batch": "I3",
+   "sheet_attachment": "attachment-970",
+   "prompt_attachment": "attachment-971",
+   "provenance_attachment": "attachment-972",
+   "sheet_sha256": "bc86035bc519f3c8c86c318427685a656ff9e7e3274a72d858da10536a7218ea",
+   "requested_size": "1536x1024",
+   "actual_size": [
+    1536,
+    1024
+   ],
+   "model": "gpt-image-2",
+   "quality": "high",
+   "background": "transparent",
+   "endpoint": "/images/edits",
+   "references": [
+    "attachment-947",
+    "attachment-950"
+   ],
+   "prompt_file": "prompts/I3.txt",
+   "prompt_sha256": "d926d5b0492228022640999ef3a3239c1413b801564d9664a2612278b25d4dfb",
+   "created_at": "2026-11-25T01:25:47.484694+00:00"
+  },
+  {
+   "batch": "I4",
+   "sheet_attachment": "attachment-967",
+   "prompt_attachment": "attachment-968",
+   "provenance_attachment": "attachment-969",
+   "sheet_sha256": "5ea755e377dda2d12a8b8b39250ea3db521702cefeb78d29acbe9cb7c7cd50a2",
+   "requested_size": "1536x1024",
+   "actual_size": [
+    1536,
+    1024
+   ],
+   "model": "gpt-image-2",
+   "quality": "high",
+   "background": "transparent",
+   "endpoint": "/images/edits",
+   "references": [
+    "attachment-947"
+   ],
+   "prompt_file": "prompts/I4.txt",
+   "prompt_sha256": "f8ecfe171f09b5177134dc21730a07e999be9685b57c317931c5d888299e3198",
+   "created_at": "2026-11-25T01:25:47.499341+00:00"
+  },
+  {
+   "batch": "I5",
+   "sheet_attachment": "attachment-973",
+   "prompt_attachment": "attachment-974",
+   "provenance_attachment": "attachment-975",
+   "sheet_sha256": "48f3fe29aae49e70bdadbd87eccceb9bb74db3d90816b083b9dd2cd1ed950cac",
+   "requested_size": "1536x1024",
+   "actual_size": [
+    1536,
+    1024
+   ],
+   "model": "gpt-image-2",
+   "quality": "high",
+   "background": "transparent",
+   "endpoint": "/images/edits",
+   "references": [
+    "attachment-947"
+   ],
+   "prompt_file": "prompts/I5.txt",
+   "prompt_sha256": "79f9e5e23fcaf279c99606d4a346d53a7a6d79634b872ec4858085cd86992468",
+   "created_at": "2026-11-25T01:27:38.013543+00:00"
+  },
+  {
+   "batch": "I6",
+   "sheet_attachment": "attachment-976",
+   "prompt_attachment": "attachment-977",
+   "provenance_attachment": "attachment-978",
+   "sheet_sha256": "8a0ac941a2a1a42382d6bf65dcdb4864cc5e04625ea9fdd25a6f6f0049cf8195",
+   "requested_size": "1536x1024",
+   "actual_size": [
+    1536,
+    1024
+   ],
+   "model": "gpt-image-2",
+   "quality": "high",
+   "background": "transparent",
+   "endpoint": "/images/edits",
+   "references": [
+    "attachment-947"
+   ],
+   "prompt_file": "prompts/I6.txt",
+   "prompt_sha256": "6db137ca1bc25250c85eeb3ce9f45118b58557165d1fe7c205affa38f75483ba",
+   "created_at": "2026-11-25T01:27:38.018069+00:00"
+  },
+  {
+   "batch": "I7",
+   "sheet_attachment": "attachment-979",
+   "prompt_attachment": "attachment-980",
+   "provenance_attachment": "attachment-981",
+   "sheet_sha256": "b6a424a5448cab128eca3a48c2c85043ea590b242d5439fbcab0620d2b182b62",
+   "requested_size": "1536x1024",
+   "actual_size": [
+    1536,
+    1024
+   ],
+   "model": "gpt-image-2",
+   "quality": "high",
+   "background": "transparent",
+   "endpoint": "/images/edits",
+   "references": [
+    "attachment-947"
+   ],
+   "prompt_file": "prompts/I7.txt",
+   "prompt_sha256": "b1818e0ca376a4ec5994708a65aa875a8e5a5edce41887893adb7438123d83e8",
+   "created_at": "2026-11-25T01:27:38.005765+00:00"
+  },
+  {
+   "batch": "H1",
+   "sheet_attachment": "attachment-955",
+   "prompt_attachment": "attachment-956",
+   "provenance_attachment": "attachment-957",
+   "sheet_sha256": "6e6a956759cea8474fbea683fe4fba67af0e1022a18bb945aa082cbaf7223272",
+   "requested_size": "1024x1024",
+   "actual_size": [
+    1536,
+    1024
+   ],
+   "model": "gpt-image-2",
+   "quality": "high",
+   "background": "transparent",
+   "endpoint": "/images/edits",
+   "references": [
+    "attachment-947"
+   ],
+   "prompt_file": "prompts/H1.txt",
+   "prompt_sha256": "df074fb605c3e30ae8ee53ac196358a46596061b750f72ed5ff3ceedd6612cb6",
+   "created_at": "2026-11-25T01:19:44.916745+00:00"
+  },
+  {
+   "batch": "H2",
+   "sheet_attachment": "attachment-989",
+   "prompt_attachment": "attachment-990",
+   "provenance_attachment": "attachment-991",
+   "sheet_sha256": "3cfac3e40154745349d0ede7ea0dce9a402574e4659cd297fe57b6992c7e6918",
+   "requested_size": "1024x1024",
+   "actual_size": [
+    1536,
+    1024
+   ],
+   "model": "gpt-image-2",
+   "quality": "high",
+   "background": "transparent",
+   "endpoint": "/images/edits",
+   "references": [
+    "attachment-947"
+   ],
+   "prompt_file": "prompts/H2.txt",
+   "prompt_sha256": "0c4003cd6056545ef41b7724226f5c973cc354d2389dc14ca51da40edb4c2fbf",
+   "created_at": "2026-11-25T01:29:26.473876+00:00"
+  },
+  {
+   "batch": "S1",
+   "sheet_attachment": "attachment-958",
+   "prompt_attachment": "attachment-959",
+   "provenance_attachment": "attachment-960",
+   "sheet_sha256": "d75433b3ed5d0d78f9a71d763be03a0f84753d633ab4858a29f2338a43b45457",
+   "requested_size": "1536x1024",
+   "actual_size": [
+    1774,
+    887
+   ],
+   "model": "gpt-image-2",
+   "quality": "high",
+   "background": "transparent",
+   "endpoint": "/images/edits",
+   "references": [
+    "attachment-947"
+   ],
+   "prompt_file": "prompts/S1.txt",
+   "prompt_sha256": "c279712cb245874db8a8654ac0e3bc5dc0a05c09dee5e2fd51e3f7b7b465a18b",
+   "created_at": "2026-11-25T01:21:27.162465+00:00"
+  },
+  {
+   "batch": "C1",
+   "sheet_attachment": "attachment-986",
+   "prompt_attachment": "attachment-987",
+   "provenance_attachment": "attachment-988",
+   "sheet_sha256": "2e3091a6bbbd820d4a8e3d31f9cb91956f07d8cf2ca013a098fe9f790d654482",
+   "requested_size": "1536x1024",
+   "actual_size": [
+    1448,
+    1086
+   ],
+   "model": "gpt-image-2",
+   "quality": "high",
+   "background": "transparent",
+   "endpoint": "/images/edits",
+   "references": [
+    "attachment-947"
+   ],
+   "prompt_file": "prompts/C1.txt",
+   "prompt_sha256": "27c21b7ed4417dcdf2338c3722a0a659eeeb7a22b79b61fa15510109b1daafec",
+   "created_at": "2026-11-25T01:29:26.473319+00:00"
+  }
+ ],
+ "assets": [
+  {
+   "name": "icon_item_radish",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I1",
+   "cell": 0,
+   "src_bbox": [
+    131,
+    80,
+    397,
+    450
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_radish.png",
+     "sha256": "2981a104758609062f0f934260599d591d2c001e5a5bd1e1f1f91092c2f358e5"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_radish.png",
+     "sha256": "2eb66e05d1e3caab4bc1a05c89e67a84baa29d839f74c94ab1d924d344b89abb"
+    }
+   },
+   "item_id": "R",
+   "item_name": "Radish",
+   "replaces": "res://assets/ui/farm/crops/radish.png"
+  },
+  {
+   "name": "icon_item_lettuce",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I1",
+   "cell": 1,
+   "src_bbox": [
+    579,
+    107,
+    944,
+    436
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_lettuce.png",
+     "sha256": "398cabddd68729a52c062fb4d5eef81b196704efb70b75eb489048b2832e4eca"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_lettuce.png",
+     "sha256": "a149b69f8812bf788a2c5a481b0a8faf2ef83825fc54777f6cbb999c27d283fb"
+    }
+   },
+   "item_id": "L",
+   "item_name": "Lettuce",
+   "replaces": "res://assets/ui/farm/crops/lettuce.png"
+  },
+  {
+   "name": "icon_item_carrot",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I1",
+   "cell": 2,
+   "src_bbox": [
+    1135,
+    71,
+    1421,
+    459
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_carrot.png",
+     "sha256": "5ca7ec86f6a6f928e5f1d2e0b597b8218b97c7594aa6582a1500834b1391d073"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_carrot.png",
+     "sha256": "8069fa562548df55a4264af693500bd97a08da1620510714d733aab79d575863"
+    }
+   },
+   "item_id": "C",
+   "item_name": "Carrot",
+   "replaces": "res://assets/ui/farm/crops/carrot.png"
+  },
+  {
+   "name": "icon_item_chamomile",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I1",
+   "cell": 3,
+   "src_bbox": [
+    97,
+    562,
+    425,
+    943
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_chamomile.png",
+     "sha256": "c2cf479c20c9c72ead0a868c71906e887cf37ab813f017331ed482ddebd45643"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_chamomile.png",
+     "sha256": "cb1567de6b5861e4e393865ec567a045e4dd9026f81d40cb2291b852629c4830"
+    }
+   },
+   "item_id": "H",
+   "item_name": "Chamomile",
+   "replaces": "res://assets/ui/farm/crops/chamomile.png"
+  },
+  {
+   "name": "icon_item_orchard_fruit",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I1",
+   "cell": 4,
+   "src_bbox": [
+    573,
+    599,
+    941,
+    931
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_orchard_fruit.png",
+     "sha256": "f742a055cd0f1de1510b482b5b5ca653bd5400cae7a8f7722712a849facbd766"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_orchard_fruit.png",
+     "sha256": "23568d464f4c1bd347f4fe29226b25a6c4ae60a6ebaa1241d1618e864fe5a668"
+    }
+   },
+   "item_id": "T",
+   "item_name": "Orchard fruit",
+   "replaces": "res://assets/ui/farm/crops/chamomile.png"
+  },
+  {
+   "name": "icon_item_seed_fruit_tree",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I1",
+   "cell": 5,
+   "src_bbox": [
+    1120,
+    549,
+    1425,
+    954
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_seed_fruit_tree.png",
+     "sha256": "073deeedf2116d514a5aca4d3dddb967764465bedd5c85bd97f77ff9edaef4af"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_seed_fruit_tree.png",
+     "sha256": "9684f8b74752e313f8cc40365223eba5771cbb5672dcaa77f9164a6cfec38d9e"
+    }
+   },
+   "item_id": "seed_T",
+   "item_name": "Fruit tree sapling",
+   "replaces": "res://assets/ui/farm/seeds/chamomile.png"
+  },
+  {
+   "name": "icon_item_seed_radish",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I2",
+   "cell": 0,
+   "src_bbox": [
+    102,
+    86,
+    428,
+    464
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_seed_radish.png",
+     "sha256": "1e0675ac4f69325b53165bfdfec630c476c19850bf3d4401f1a54ac52b703bc3"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_seed_radish.png",
+     "sha256": "554e6ba0bf0db46cf47b7ba818e0d1267aa5a1e011eb05ca3b4de5c0462ebf12"
+    }
+   },
+   "item_id": "seed_R",
+   "item_name": "Radish seeds",
+   "replaces": "res://assets/ui/farm/seeds/radish.png"
+  },
+  {
+   "name": "icon_item_seed_lettuce",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I2",
+   "cell": 1,
+   "src_bbox": [
+    613,
+    86,
+    939,
+    464
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_seed_lettuce.png",
+     "sha256": "c8b99666f6361ed5f4cc37c16dbfbb7892e119db99ccf9148efef0c6aaeeaa2f"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_seed_lettuce.png",
+     "sha256": "05a6586331b122a07102714d77a1649ae79677eb4679b22abbcfc5c82b034f7b"
+    }
+   },
+   "item_id": "seed_L",
+   "item_name": "Lettuce seeds",
+   "replaces": "res://assets/ui/farm/seeds/lettuce.png"
+  },
+  {
+   "name": "icon_item_seed_carrot",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I2",
+   "cell": 2,
+   "src_bbox": [
+    1122,
+    86,
+    1450,
+    465
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_seed_carrot.png",
+     "sha256": "cd212419e4cb54dc122f0126294c90d75592161bf1dc38bf4f8a73f0840e0240"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_seed_carrot.png",
+     "sha256": "63ed96a71fc2b18fe81bc1ef9398ff3e97c10e70403fd5107cb035397218252f"
+    }
+   },
+   "item_id": "seed_C",
+   "item_name": "Carrot seeds",
+   "replaces": "res://assets/ui/farm/seeds/carrot.png"
+  },
+  {
+   "name": "icon_item_seed_chamomile",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I2",
+   "cell": 3,
+   "src_bbox": [
+    104,
+    574,
+    430,
+    957
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_seed_chamomile.png",
+     "sha256": "c57e36fafd0860419c6b2018e6170807d2aeca772f8c0591f2f2d2d8181846ca"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_seed_chamomile.png",
+     "sha256": "d52aa883e8ef9310546897a333806a7c659ad159199d31972f22072e6b946e54"
+    }
+   },
+   "item_id": "seed_H",
+   "item_name": "Chamomile seeds",
+   "replaces": "res://assets/ui/farm/seeds/chamomile.png"
+  },
+  {
+   "name": "icon_item_wood",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I2",
+   "cell": 4,
+   "src_bbox": [
+    570,
+    616,
+    973,
+    950
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_wood.png",
+     "sha256": "2b37f30b8f926a4463aba8137b496789402401f65938893c30814871ca67ca5c"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_wood.png",
+     "sha256": "05337f4e574d4b2bafd04ceb181ff267a58f61ca71064a65b5aa8b5f17919447"
+    }
+   },
+   "item_id": "wood",
+   "item_name": "Timber",
+   "replaces": "res://assets/ui/farm/items/wood.png"
+  },
+  {
+   "name": "icon_item_stone",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I2",
+   "cell": 5,
+   "src_bbox": [
+    1084,
+    634,
+    1481,
+    935
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_stone.png",
+     "sha256": "d86a7fa39ea55cdea8e7af1b47a7839f96c86c1c63d107160113de5b804e91ed"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_stone.png",
+     "sha256": "6abcc1f8905b277e8d4c7e71ce91281f1b2a2541751c40862e23f18fc8358bd6"
+    }
+   },
+   "item_id": "stone",
+   "item_name": "Stone",
+   "replaces": "res://assets/ui/farm/items/stone.png"
+  },
+  {
+   "name": "icon_item_fiber",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I3",
+   "cell": 0,
+   "src_bbox": [
+    140,
+    58,
+    373,
+    452
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_fiber.png",
+     "sha256": "f18ab33f0a37b2a2582a017ea337e6004d162e0e442b980be20c6870f8ded883"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_fiber.png",
+     "sha256": "439dcbae4d478c2e40cdbc9743412b3d5d7d8c28527bbf7443e2b68d66ada8e1"
+    }
+   },
+   "item_id": "fiber",
+   "item_name": "Reeds",
+   "replaces": "res://assets/ui/farm/items/fiber.png"
+  },
+  {
+   "name": "icon_item_copper_ore",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I3",
+   "cell": 1,
+   "src_bbox": [
+    566,
+    110,
+    946,
+    431
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_copper_ore.png",
+     "sha256": "f643042c049086048dda3691df654c0c24eac39faa9a4540ebc92d9e52deda08"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_copper_ore.png",
+     "sha256": "ccedff3550eb83ab4ecd20682c8f73a137d947fb7d1d3abe721c4e26e11c002c"
+    }
+   },
+   "item_id": "copper_ore",
+   "item_name": "Copper ore",
+   "replaces": "res://assets/ui/farm/items/copper_ore.png"
+  },
+  {
+   "name": "icon_item_rock_salt",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I3",
+   "cell": 2,
+   "src_bbox": [
+    1075,
+    130,
+    1457,
+    421
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_rock_salt.png",
+     "sha256": "d65eab8edcd470d891f7c6836b3a4dbc4dca6ed117f5f513561d5160cf76e313"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_rock_salt.png",
+     "sha256": "43b4b42aaea34bb1ffec06e0a93529e511da249e127425238574bd2afa3690eb"
+    }
+   },
+   "item_id": "rock_salt",
+   "item_name": "Rock salt",
+   "replaces": "res://assets/ui/farm/items/rock_salt.png"
+  },
+  {
+   "name": "icon_item_salad",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I3",
+   "cell": 3,
+   "src_bbox": [
+    53,
+    587,
+    442,
+    935
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_salad.png",
+     "sha256": "516cf48a15156116e969ce38306fff641c60dc1233a919098b196073b8fc4229"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_salad.png",
+     "sha256": "3dae6723a98a3f68e9ed7a3f8dd0ab9ce65e8ed21e4fa82bbaa3d5d890754d85"
+    }
+   },
+   "item_id": "salad",
+   "item_name": "Vegetable salad",
+   "replaces": "res://assets/ui/farm/dishes/salad.png"
+  },
+  {
+   "name": "icon_item_tea",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I3",
+   "cell": 4,
+   "src_bbox": [
+    553,
+    576,
+    949,
+    944
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_tea.png",
+     "sha256": "21dad748f3edc9a470bfbcd067a2d4603441ab7dad332c184da5123b03bb4787"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_tea.png",
+     "sha256": "e49bbc7347c534d764d9aad92bd981a8ffe516ce8a296c41459e484d192c4a60"
+    }
+   },
+   "item_id": "tea",
+   "item_name": "Chamomile tea",
+   "replaces": "res://assets/ui/farm/dishes/tea.png"
+  },
+  {
+   "name": "icon_item_vegetable_soup",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I3",
+   "cell": 5,
+   "src_bbox": [
+    1096,
+    578,
+    1467,
+    936
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_vegetable_soup.png",
+     "sha256": "fa2a05bdbd5badf512cff46c9a0fb0bb411083dc8f9d402ae34c22c3edcbc5c9"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_vegetable_soup.png",
+     "sha256": "dc917b991467bcdd2eb4aec2759d5940a4a25bf3e1cb957923fe06dd59270576"
+    }
+   },
+   "item_id": "vegetable_soup",
+   "item_name": "Rock-salt vegetable soup",
+   "replaces": "res://assets/ui/farm/dishes/vegetable_soup.png"
+  },
+  {
+   "name": "icon_item_bench",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I4",
+   "cell": 0,
+   "src_bbox": [
+    67,
+    106,
+    469,
+    471
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_bench.png",
+     "sha256": "ab371cd48abe97d4a2f914cce1056aa77773a5092720899a7b0d19b757491fee"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_bench.png",
+     "sha256": "df53197cf8787dd5437209668ba589f76a4b3345a0e6c67a1d4d51ae57ced225"
+    }
+   },
+   "item_id": "bench",
+   "item_name": "Garden bench",
+   "replaces": "res://assets/ui/farm/items/bench.png"
+  },
+  {
+   "name": "icon_item_planter",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I4",
+   "cell": 1,
+   "src_bbox": [
+    574,
+    89,
+    961,
+    472
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_planter.png",
+     "sha256": "0565806342faf534a17231f090474dd2b9c4e716a1b8535bd3d313c9f4d8b80b"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_planter.png",
+     "sha256": "dacd245b50e9f2bfac9f9a2949b2e299105ebb1648fbaf10ea21e634235ef6a5"
+    }
+   },
+   "item_id": "planter",
+   "item_name": "Flower planter",
+   "replaces": "res://assets/ui/farm/items/planter.png"
+  },
+  {
+   "name": "icon_item_lantern",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I4",
+   "cell": 2,
+   "src_bbox": [
+    1171,
+    60,
+    1394,
+    487
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_lantern.png",
+     "sha256": "073c6d8b808eb621accf24e8e798fcbd5fdd1a102b534c50ad5a8f3e5325d1ff"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_lantern.png",
+     "sha256": "fdec4abdbd579353b33cf494342910e5efe18ec9ea19f7ee9ba32b7bb6b949f2"
+    }
+   },
+   "item_id": "lantern",
+   "item_name": "Garden lantern",
+   "replaces": "res://assets/ui/farm/items/lantern.png"
+  },
+  {
+   "name": "icon_item_fountain",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I4",
+   "cell": 3,
+   "src_bbox": [
+    59,
+    574,
+    469,
+    961
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_fountain.png",
+     "sha256": "585f17252b67a55305e005e4c0bcef83fb1a51f1abf6c3d99a6e3f9f5ffab3bb"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_fountain.png",
+     "sha256": "94779ef5c28119544caecb93ad17448b4fbfee88bc67c04774c7a31283201b9d"
+    }
+   },
+   "item_id": "fountain",
+   "item_name": "Small fountain",
+   "replaces": "res://assets/ui/farm/items/fountain.png"
+  },
+  {
+   "name": "icon_item_sign",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I4",
+   "cell": 4,
+   "src_bbox": [
+    582,
+    565,
+    935,
+    953
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_sign.png",
+     "sha256": "9ae7d1a4294f707f15e7674c55455ec4a11e2e63f0e2d508909d43dd96c361cb"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_sign.png",
+     "sha256": "c47734be0c17e42c3cf929c25e2aa0f5c070c9cd61f7a22390165bfade56c930"
+    }
+   },
+   "item_id": "sign",
+   "item_name": "Garden sign",
+   "replaces": "res://assets/ui/farm/items/sign.png"
+  },
+  {
+   "name": "icon_item_crate",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I4",
+   "cell": 5,
+   "src_bbox": [
+    1073,
+    580,
+    1485,
+    950
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_crate.png",
+     "sha256": "d31673a11d927e4c1368e749c9b76874b473be912250ebe2cc52ef13a65f0d98"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_crate.png",
+     "sha256": "303ba0468a7d1de921c136ccfa99db9017b2dd9030331772c43b044402d99b28"
+    }
+   },
+   "item_id": "crate",
+   "item_name": "Copper-bound crate",
+   "replaces": "res://assets/ui/farm/items/crate.png"
+  },
+  {
+   "name": "icon_item_fish_crucian",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I5",
+   "cell": 0,
+   "src_bbox": [
+    70,
+    125,
+    473,
+    418
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_fish_crucian.png",
+     "sha256": "531babc36f51c36b425d6c4e12f97687e3ae84881361a754b8c60a6e22238718"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_fish_crucian.png",
+     "sha256": "77903b2c72d6eee65818c9fad56d0f51a795786c2cc378cfd218ec8128a17329"
+    }
+   },
+   "item_id": "fish_crucian",
+   "item_name": "Pond crucian",
+   "replaces": "res://assets/ui/farm/items/fish_crucian.svg"
+  },
+  {
+   "name": "icon_item_fish_perch",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I5",
+   "cell": 1,
+   "src_bbox": [
+    557,
+    126,
+    982,
+    417
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_fish_perch.png",
+     "sha256": "8f5752add5e324dd85b12180ca4af6801a54792b8f255a7640999daa359d8912"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_fish_perch.png",
+     "sha256": "d885ac7484416921959eb51719b8df1b679a9578ee5a65dff1307a93c7f880f5"
+    }
+   },
+   "item_id": "fish_perch",
+   "item_name": "River perch",
+   "replaces": "res://assets/ui/farm/items/fish_perch.svg"
+  },
+  {
+   "name": "icon_item_fish_koi",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I5",
+   "cell": 2,
+   "src_bbox": [
+    1054,
+    132,
+    1485,
+    416
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_fish_koi.png",
+     "sha256": "b72bf99827da9fe872dd4a38f062ce8242ce4c2f8e670cd0160c6d51ccc92f45"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_fish_koi.png",
+     "sha256": "f8fbceed2367ea26fc1dbb9c87073ca877edcab17b8b11a7c6a527be4f88e584"
+    }
+   },
+   "item_id": "fish_koi",
+   "item_name": "Golden koi",
+   "replaces": "res://assets/ui/farm/items/fish_koi.svg"
+  },
+  {
+   "name": "icon_item_fish_sturgeon",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I5",
+   "cell": 3,
+   "src_bbox": [
+    39,
+    647,
+    493,
+    876
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_fish_sturgeon.png",
+     "sha256": "f25af30f562da29eb895e020f7ba6743cf3c4887e1f809dd8aaa8bbd0faab7a2"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_fish_sturgeon.png",
+     "sha256": "b72ef5ef484d8298af4e05d50a8495c87ca2bf94c140ef3065175e43020db969"
+    }
+   },
+   "item_id": "fish_sturgeon",
+   "item_name": "Silver sturgeon",
+   "replaces": "res://assets/ui/farm/items/fish_sturgeon.svg"
+  },
+  {
+   "name": "icon_item_starter_fishing_rod",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I5",
+   "cell": 4,
+   "src_bbox": [
+    571,
+    558,
+    979,
+    934
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_starter_fishing_rod.png",
+     "sha256": "b9af0b03a7c7d4825114a3ad7055be3d4a36ae03cb60004640b6ecc256b9d27f"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_starter_fishing_rod.png",
+     "sha256": "98c163e3fe066faa374803c763503ff3d89f473d2b3c8b3c9e383681ebd5388b"
+    }
+   },
+   "item_id": "starter_fishing_rod",
+   "item_name": "Starter fishing rod",
+   "replaces": "res://assets/ui/farm/items/starter_fishing_rod.svg"
+  },
+  {
+   "name": "icon_item_trail_boots",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I5",
+   "cell": 5,
+   "src_bbox": [
+    1071,
+    599,
+    1501,
+    933
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_trail_boots.png",
+     "sha256": "49a4a70c166a06165a693beaf4ee25141097e9daba607f330dbe611fd13069e7"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_trail_boots.png",
+     "sha256": "a63c6833b62d9e35a1b2f0f5126d5409d64f9db6be4169bb843ac92b9777dc0e"
+    }
+   },
+   "item_id": "trail_boots",
+   "item_name": "Trail boots",
+   "replaces": "res://assets/ui/farm/items/trail_boots.png"
+  },
+  {
+   "name": "icon_item_rusty_sword",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I6",
+   "cell": 0,
+   "src_bbox": [
+    127,
+    68,
+    446,
+    454
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_rusty_sword.png",
+     "sha256": "b20775ac7f3f324e15841d3ebc06052df7ce9fd91920a58ddb5debbe8bb206a4"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_rusty_sword.png",
+     "sha256": "a3ad7a9639237851463fc35466d559b351800608a7a529cf478854b7f660dd73"
+    }
+   },
+   "item_id": "rusty_sword",
+   "item_name": "Old shortsword",
+   "replaces": "res://assets/ui/farm/items/rusty_sword.png"
+  },
+  {
+   "name": "icon_item_copper_sword",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I6",
+   "cell": 1,
+   "src_bbox": [
+    594,
+    44,
+    972,
+    452
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_copper_sword.png",
+     "sha256": "93d734b16fde76790cbc7fb5084ec8c66888022be22c78bd19a57b88fdbc505e"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_copper_sword.png",
+     "sha256": "88ab3cc85c578708aead3fc5318d57a592bf2ffd091a213f0336d7f310208ede"
+    }
+   },
+   "item_id": "copper_sword",
+   "item_name": "Copper sword",
+   "replaces": "res://assets/ui/farm/items/copper_sword.png"
+  },
+  {
+   "name": "icon_item_copper_knife",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I6",
+   "cell": 2,
+   "src_bbox": [
+    1124,
+    104,
+    1413,
+    432
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_copper_knife.png",
+     "sha256": "e20208f3639260a6d528e35aaecfd1de72ab9db38273dcd69e1fe6ecf3cbf1d7"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_copper_knife.png",
+     "sha256": "902aa9ed8be5110586227a1c4b8b173e7dc0410158a7e95087c497b43a36877a"
+    }
+   },
+   "item_id": "copper_knife",
+   "item_name": "Copper knife",
+   "replaces": "res://assets/ui/icons/lucide/sword.svg"
+  },
+  {
+   "name": "icon_item_copper_axe",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I6",
+   "cell": 3,
+   "src_bbox": [
+    81,
+    551,
+    441,
+    947
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_copper_axe.png",
+     "sha256": "019e3c959fb953c591180964a3ee314e38d29f9a3f15ff72888946e1140d1fc7"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_copper_axe.png",
+     "sha256": "7e4981a57e6e3254ccaf149b8e1f836ae225cd19111ade9ba786335e3788b122"
+    }
+   },
+   "item_id": "copper_axe",
+   "item_name": "Copper axe",
+   "replaces": "res://assets/ui/icons/lucide/axe.svg"
+  },
+  {
+   "name": "icon_item_copper_pickaxe",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I6",
+   "cell": 4,
+   "src_bbox": [
+    573,
+    560,
+    940,
+    950
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_copper_pickaxe.png",
+     "sha256": "75333750f1d02027b1982f908ffdf6b686fca6bc1c9b94a06020401b471b652d"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_copper_pickaxe.png",
+     "sha256": "76ac4b6b18caea4aebb137a5f086614a83120ac39a5b08198d827ee1ea62fc63"
+    }
+   },
+   "item_id": "copper_pickaxe",
+   "item_name": "Copper pickaxe",
+   "replaces": "res://assets/ui/farm/items/copper_pickaxe.png"
+  },
+  {
+   "name": "icon_item_hand_tools",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I6",
+   "cell": 5,
+   "src_bbox": [
+    1051,
+    572,
+    1464,
+    946
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_hand_tools.png",
+     "sha256": "11417d4b775f6ac484790905417899290147795b19a59651ec57c37ecdb83fb1"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_hand_tools.png",
+     "sha256": "f72d0158fe44f4c18ff1efd388cc79012a6738ca1a52f718938ba7c4663913c0"
+    }
+   },
+   "item_id": "hand_tools",
+   "item_name": "Hand tools",
+   "replaces": "res://assets/ui/farm/items/hand_tools.png"
+  },
+  {
+   "name": "icon_item_row_tool",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I7",
+   "cell": 0,
+   "src_bbox": [
+    106,
+    82,
+    475,
+    482
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_row_tool.png",
+     "sha256": "5848f1df92fb45e95e7e8340ccbd5c342dc4b6d4a3ff41cbf79953eb9b836f91"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_row_tool.png",
+     "sha256": "d4a59e94adb487a77caa7cf66f17b10a01f1df343201f475c591489251adc1db"
+    }
+   },
+   "item_id": "row_tool",
+   "item_name": "Row tool",
+   "replaces": "res://assets/ui/farm/items/row_tool.png"
+  },
+  {
+   "name": "icon_item_foraging_gloves",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I7",
+   "cell": 1,
+   "src_bbox": [
+    575,
+    71,
+    944,
+    470
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_foraging_gloves.png",
+     "sha256": "a3ae52b41ca181bf7d2f6bb96fe4384f15681197f5be2a6a6bd11897fb0143c0"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_foraging_gloves.png",
+     "sha256": "cf8936ec8b64552f11f05c51e289be86f64228b150f22c482b0f8f66e76e31fc"
+    }
+   },
+   "item_id": "foraging_gloves",
+   "item_name": "Foraging gloves",
+   "replaces": "res://assets/ui/farm/items/foraging_gloves.png"
+  },
+  {
+   "name": "icon_item_artisan_apron",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I7",
+   "cell": 2,
+   "src_bbox": [
+    1057,
+    58,
+    1445,
+    487
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_artisan_apron.png",
+     "sha256": "498b81e28af19a5e46c387aeea313c53a410e99382a101b38a1081f6efeb04dd"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_artisan_apron.png",
+     "sha256": "a49a94519547cd8c0dc23b117fbbf4baf7d2498f018f4ebf3a0408950eca97b9"
+    }
+   },
+   "item_id": "artisan_apron",
+   "item_name": "Artisan apron",
+   "replaces": "res://assets/ui/farm/items/artisan_apron.png"
+  },
+  {
+   "name": "icon_item_copper_ring",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I7",
+   "cell": 3,
+   "src_bbox": [
+    93,
+    600,
+    426,
+    964
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_copper_ring.png",
+     "sha256": "6f354855b0a2acf28f2f048e705b6488c2ad3934f13e356ce619b9bc011ff048"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_copper_ring.png",
+     "sha256": "9c700f7e1fb69693f002597aecb3c0fe2bf1bad32fb2840bb7c36dc91fcc9851"
+    }
+   },
+   "item_id": "copper_ring",
+   "item_name": "Copper ring",
+   "replaces": "res://assets/ui/icons/lucide/circle.svg"
+  },
+  {
+   "name": "icon_item_wooden_ring",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I7",
+   "cell": 4,
+   "src_bbox": [
+    577,
+    604,
+    929,
+    966
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_wooden_ring.png",
+     "sha256": "afb15a8c0a07ddfd169f3a4b76181b87bb099c9199d9766aa368c618823ad459"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_wooden_ring.png",
+     "sha256": "1edb8ea44ec1b82d06a2fb9c1acf7619ddb0b6ecdec372d94562d373f21fc7bc"
+    }
+   },
+   "item_id": "wooden_ring",
+   "item_name": "Wooden ring",
+   "replaces": "res://assets/ui/icons/lucide/circle.svg"
+  },
+  {
+   "name": "icon_item_copper_necklace",
+   "type": "item",
+   "spec": "物品图标 C-I1",
+   "batch": "I7",
+   "cell": 5,
+   "src_bbox": [
+    1099,
+    558,
+    1447,
+    980
+   ],
+   "files": {
+    "256": {
+     "path": "assets/items/256/icon_item_copper_necklace.png",
+     "sha256": "2ef82fc3ac4c9f8eeb5e1687b75ea72fc454da4ef5107507a4198d5804cdad7c"
+    },
+    "128": {
+     "path": "assets/items/128/icon_item_copper_necklace.png",
+     "sha256": "0eaa7a4495e03efa21eab3117df6302ef6d2128d946c843795beffa229f4ce36"
+    }
+   },
+   "item_id": "copper_necklace",
+   "item_name": "Copper necklace",
+   "replaces": "res://assets/ui/icons/lucide/gem.svg"
+  },
+  {
+   "name": "hero_bag",
+   "type": "hero",
+   "spec": "头图物件 C-I2",
+   "batch": "H1",
+   "cell": 0,
+   "src_bbox": [
+    117,
+    31,
+    725,
+    492
+   ],
+   "files": {
+    "256": {
+     "path": "assets/hero/256/hero_bag.png",
+     "sha256": "b7cf6fd173569866744dac0704f99cc5dc303455514a1c90c8c2b7ddf2f549bf"
+    }
+   }
+  },
+  {
+   "name": "hero_market",
+   "type": "hero",
+   "spec": "头图物件 C-I2",
+   "batch": "H1",
+   "cell": 1,
+   "src_bbox": [
+    869,
+    57,
+    1405,
+    495
+   ],
+   "files": {
+    "256": {
+     "path": "assets/hero/256/hero_market.png",
+     "sha256": "81fdf7cf3e1c348b32efccae6fe77648e30bc14e08cc1eb99de224947cb103c3"
+    }
+   }
+  },
+  {
+   "name": "hero_dressing",
+   "type": "hero",
+   "spec": "头图物件 C-I2",
+   "batch": "H1",
+   "cell": 2,
+   "src_bbox": [
+    164,
+    534,
+    663,
+    991
+   ],
+   "files": {
+    "256": {
+     "path": "assets/hero/256/hero_dressing.png",
+     "sha256": "09a6c676777245a03a1ce8037a0f885a9bdfac2fd0229e509ee47362c4584ac5"
+    }
+   }
+  },
+  {
+   "name": "hero_signin",
+   "type": "hero",
+   "spec": "头图物件 C-I2",
+   "batch": "H1",
+   "cell": 3,
+   "src_bbox": [
+    896,
+    541,
+    1352,
+    995
+   ],
+   "files": {
+    "256": {
+     "path": "assets/hero/256/hero_signin.png",
+     "sha256": "5750566c30683576ea29a835448b44d6268ec0a1a8da620ca84ee00808bff61a"
+    }
+   }
+  },
+  {
+   "name": "hero_parcel",
+   "type": "hero",
+   "spec": "头图物件 C-I2",
+   "batch": "H2",
+   "cell": 0,
+   "src_bbox": [
+    201,
+    40,
+    626,
+    489
+   ],
+   "files": {
+    "256": {
+     "path": "assets/hero/256/hero_parcel.png",
+     "sha256": "6f341f913ea5d6d8ae6a2293a105bce5fb02febee24c0762849306566a012d7c"
+    }
+   }
+  },
+  {
+   "name": "hero_home",
+   "type": "hero",
+   "spec": "头图物件 C-I2",
+   "batch": "H2",
+   "cell": 1,
+   "src_bbox": [
+    869,
+    7,
+    1428,
+    500
+   ],
+   "files": {
+    "256": {
+     "path": "assets/hero/256/hero_home.png",
+     "sha256": "2af1eaf13d63adc1925e718bc70a46ae4308b5078bfe07239e39ff721d8abcd2"
+    }
+   }
+  },
+  {
+   "name": "hero_titles",
+   "type": "hero",
+   "spec": "头图物件 C-I2",
+   "batch": "H2",
+   "cell": 2,
+   "src_bbox": [
+    233,
+    547,
+    568,
+    974
+   ],
+   "files": {
+    "256": {
+     "path": "assets/hero/256/hero_titles.png",
+     "sha256": "362c2c9a1faf7f2322b282b1a724ac7cc583d6136dbd1eb7c92349fe1418985e"
+    }
+   }
+  },
+  {
+   "name": "hero_reward",
+   "type": "hero",
+   "spec": "头图物件 C-I2",
+   "batch": "H2",
+   "cell": 3,
+   "src_bbox": [
+    908,
+    526,
+    1364,
+    986
+   ],
+   "files": {
+    "256": {
+     "path": "assets/hero/256/hero_reward.png",
+     "sha256": "e23279d783bfb2bab062c3839cf3f7dc9a59a0554a30f5b629f0f0bc23d318ea"
+    }
+   }
+  },
+  {
+   "name": "icon_sys_tasks",
+   "type": "system",
+   "spec": "系统图标 C-I3",
+   "batch": "S1",
+   "cell": 0,
+   "src_bbox": [
+    67,
+    49,
+    402,
+    427
+   ],
+   "files": {
+    "96": {
+     "path": "assets/sys/96/icon_sys_tasks.png",
+     "sha256": "007742b03e80cf7253ee5718fbdeb02722253457bba9709096da806b36bf47c2"
+    }
+   }
+  },
+  {
+   "name": "icon_sys_bag",
+   "type": "system",
+   "spec": "系统图标 C-I3",
+   "batch": "S1",
+   "cell": 1,
+   "src_bbox": [
+    497,
+    57,
+    842,
+    420
+   ],
+   "files": {
+    "96": {
+     "path": "assets/sys/96/icon_sys_bag.png",
+     "sha256": "12c495519d8bce4ff7e17d99b370ecd169998b24952a16230128e7f17d804dc2"
+    }
+   }
+  },
+  {
+   "name": "icon_sys_phone",
+   "type": "system",
+   "spec": "系统图标 C-I3",
+   "batch": "S1",
+   "cell": 2,
+   "src_bbox": [
+    982,
+    49,
+    1230,
+    424
+   ],
+   "files": {
+    "96": {
+     "path": "assets/sys/96/icon_sys_phone.png",
+     "sha256": "daef81d0418a9c1658917603304c52b11ba33ba119971e53b45c3813e2d99e34"
+    }
+   }
+  },
+  {
+   "name": "icon_sys_map",
+   "type": "system",
+   "spec": "系统图标 C-I3",
+   "batch": "S1",
+   "cell": 3,
+   "src_bbox": [
+    1376,
+    74,
+    1697,
+    439
+   ],
+   "files": {
+    "96": {
+     "path": "assets/sys/96/icon_sys_map.png",
+     "sha256": "d95e4eefe875ad7fb5aa3e7e34fe55abcb547dd5c9a2c3328d94fde87876edf3"
+    }
+   }
+  },
+  {
+   "name": "icon_sys_settings",
+   "type": "system",
+   "spec": "系统图标 C-I3",
+   "batch": "S1",
+   "cell": 4,
+   "src_bbox": [
+    69,
+    504,
+    382,
+    838
+   ],
+   "files": {
+    "96": {
+     "path": "assets/sys/96/icon_sys_settings.png",
+     "sha256": "619f1a706f1eda14ab1cc6b92f2b80ac62c915704f4b39ffe57c6fde9ed73d05"
+    }
+   }
+  },
+  {
+   "name": "icon_sys_exit",
+   "type": "system",
+   "spec": "系统图标 C-I3",
+   "batch": "S1",
+   "cell": 5,
+   "src_bbox": [
+    518,
+    514,
+    840,
+    843
+   ],
+   "files": {
+    "96": {
+     "path": "assets/sys/96/icon_sys_exit.png",
+     "sha256": "c5e511deee11a5e0c5c0fafa4faa0c54d1008fb54f230ab58d72f279996685d6"
+    }
+   }
+  },
+  {
+   "name": "icon_sys_locate",
+   "type": "system",
+   "spec": "系统图标 C-I3",
+   "batch": "S1",
+   "cell": 6,
+   "src_bbox": [
+    931,
+    491,
+    1275,
+    843
+   ],
+   "files": {
+    "96": {
+     "path": "assets/sys/96/icon_sys_locate.png",
+     "sha256": "c11d4a55274dbebd6d9a772dbde9140970553376e5fa13431d730c35b4d8a297"
+    }
+   }
+  },
+  {
+   "name": "icon_sys_home",
+   "type": "system",
+   "spec": "系统图标 C-I3",
+   "batch": "S1",
+   "cell": 7,
+   "src_bbox": [
+    1370,
+    505,
+    1716,
+    824
+   ],
+   "files": {
+    "96": {
+     "path": "assets/sys/96/icon_sys_home.png",
+     "sha256": "b5112bf9d3e30ea0c9fbd9848f45c09bb97da67d28a9e3fa05e321825cbf179c"
+    }
+   }
+  },
+  {
+   "name": "icon_tab_tasks",
+   "type": "color",
+   "spec": "页签/分类/技能/货币 C-I4",
+   "batch": "C1",
+   "cell": 0,
+   "src_bbox": [
+    84,
+    73,
+    318,
+    336
+   ],
+   "files": {
+    "96": {
+     "path": "assets/color/96/icon_tab_tasks.png",
+     "sha256": "b7b94c9af34a15fafa6a9bc45b302ffa9fc73af0e80283ea72cf2a953110697e"
+    },
+    "128": {
+     "path": "assets/color/128/icon_tab_tasks.png",
+     "sha256": "3ec12b40d7849de05aaf296bba95ff2e63aae685f99d89b3ab8579c017d49451"
+    }
+   }
+  },
+  {
+   "name": "icon_tab_inbox",
+   "type": "color",
+   "spec": "页签/分类/技能/货币 C-I4",
+   "batch": "C1",
+   "cell": 1,
+   "src_bbox": [
+    418,
+    73,
+    668,
+    336
+   ],
+   "files": {
+    "96": {
+     "path": "assets/color/96/icon_tab_inbox.png",
+     "sha256": "57a5f20de3d305e13f563e9ece0f922878a7c997c94d8c842b8e4d5387230978"
+    },
+    "128": {
+     "path": "assets/color/128/icon_tab_inbox.png",
+     "sha256": "39b5f4b5114da381687a3b4eb8a963f7c9b090dceb1a16939332c4748ba61fd3"
+    }
+   }
+  },
+  {
+   "name": "icon_tab_collection",
+   "type": "color",
+   "spec": "页签/分类/技能/货币 C-I4",
+   "batch": "C1",
+   "cell": 2,
+   "src_bbox": [
+    756,
+    98,
+    1052,
+    312
+   ],
+   "files": {
+    "96": {
+     "path": "assets/color/96/icon_tab_collection.png",
+     "sha256": "a74ef6d8dd12c63f392c097e093070e80a15a4e7f0053888d06bac0c03cd9e30"
+    },
+    "128": {
+     "path": "assets/color/128/icon_tab_collection.png",
+     "sha256": "548e7a63739e262186ca5dfa21d5842213322d8edf33ae8433c4e5d20c4d797a"
+    }
+   }
+  },
+  {
+   "name": "icon_dress_hair",
+   "type": "color",
+   "spec": "页签/分类/技能/货币 C-I4",
+   "batch": "C1",
+   "cell": 3,
+   "src_bbox": [
+    1117,
+    74,
+    1378,
+    332
+   ],
+   "files": {
+    "96": {
+     "path": "assets/color/96/icon_dress_hair.png",
+     "sha256": "0d31124b7ce0a0fb6a4d83fe612674b7c7ae13df524f9d066d72a6eb6740d2d3"
+    },
+    "128": {
+     "path": "assets/color/128/icon_dress_hair.png",
+     "sha256": "4f1ebc5fb9b53c252b82198971504cc5f0ecfb2efb9ea5e1840482aca626f073"
+    }
+   }
+  },
+  {
+   "name": "icon_dress_cloth",
+   "type": "color",
+   "spec": "页签/分类/技能/货币 C-I4",
+   "batch": "C1",
+   "cell": 4,
+   "src_bbox": [
+    55,
+    425,
+    333,
+    660
+   ],
+   "files": {
+    "96": {
+     "path": "assets/color/96/icon_dress_cloth.png",
+     "sha256": "7db66a1a987aa0b65d33eab882e78daf6b3785a5a0f3b5cb8e6d0736dd8013ec"
+    },
+    "128": {
+     "path": "assets/color/128/icon_dress_cloth.png",
+     "sha256": "d2e6a8d64e2888fa99e8b0c8d7c6430a93134d943c61919aab0667dd07a75a90"
+    }
+   }
+  },
+  {
+   "name": "icon_dress_shoes",
+   "type": "color",
+   "spec": "页签/分类/技能/货币 C-I4",
+   "batch": "C1",
+   "cell": 5,
+   "src_bbox": [
+    399,
+    428,
+    687,
+    655
+   ],
+   "files": {
+    "96": {
+     "path": "assets/color/96/icon_dress_shoes.png",
+     "sha256": "b3ba0c4bd1326c1de5b16ee50574b493d50e9de7f9f6deb5cd67a86dbbf403f1"
+    },
+    "128": {
+     "path": "assets/color/128/icon_dress_shoes.png",
+     "sha256": "d6a5654714cb271f64486c2c1b2fcf5a09cae4d670aabfd57d6d4017b949fa5b"
+    }
+   }
+  },
+  {
+   "name": "icon_dress_bag",
+   "type": "color",
+   "spec": "页签/分类/技能/货币 C-I4",
+   "batch": "C1",
+   "cell": 6,
+   "src_bbox": [
+    754,
+    430,
+    1052,
+    657
+   ],
+   "files": {
+    "96": {
+     "path": "assets/color/96/icon_dress_bag.png",
+     "sha256": "fcaf2845d1bd5c399774e80030f9f4dd41770c1be90522dc2e1be568e930473c"
+    },
+    "128": {
+     "path": "assets/color/128/icon_dress_bag.png",
+     "sha256": "8e07fee975ecb8946d58960316149cb32f87153e0d251b76398ed87d91f64c99"
+    }
+   }
+  },
+  {
+   "name": "icon_dress_glasses",
+   "type": "color",
+   "spec": "页签/分类/技能/货币 C-I4",
+   "batch": "C1",
+   "cell": 7,
+   "src_bbox": [
+    1093,
+    467,
+    1420,
+    613
+   ],
+   "files": {
+    "96": {
+     "path": "assets/color/96/icon_dress_glasses.png",
+     "sha256": "62053f6f7fc04e90ba955edf4dc5c6f2ddc27024790fd9cf8e6900098d0a13b2"
+    },
+    "128": {
+     "path": "assets/color/128/icon_dress_glasses.png",
+     "sha256": "18cffd36cd7bffc0471484bd43274bffb82608e8ea240ffe2bd2bf60c0971868"
+    }
+   }
+  },
+  {
+   "name": "icon_skill_farming",
+   "type": "color",
+   "spec": "页签/分类/技能/货币 C-I4",
+   "batch": "C1",
+   "cell": 8,
+   "src_bbox": [
+    65,
+    772,
+    319,
+    1030
+   ],
+   "files": {
+    "96": {
+     "path": "assets/color/96/icon_skill_farming.png",
+     "sha256": "9550244a50618cad2fffa105a56401290872d1620f1ec43fd0f86162cb5e2b28"
+    },
+    "128": {
+     "path": "assets/color/128/icon_skill_farming.png",
+     "sha256": "e4d74d66abc54ce67026fa6d868667ed1c493641ddca24ec29e143692c02c7f4"
+    }
+   }
+  },
+  {
+   "name": "icon_skill_fishing",
+   "type": "color",
+   "spec": "页签/分类/技能/货币 C-I4",
+   "batch": "C1",
+   "cell": 9,
+   "src_bbox": [
+    414,
+    729,
+    639,
+    1040
+   ],
+   "files": {
+    "96": {
+     "path": "assets/color/96/icon_skill_fishing.png",
+     "sha256": "c01e58497a38ffa152f992d626c63575cac240a5e0f72bcd2ed8656bdd03d53e"
+    },
+    "128": {
+     "path": "assets/color/128/icon_skill_fishing.png",
+     "sha256": "4684d3ba3bff8e3b74cb24f74a980643f58477de0be8576c1c1ad54dad61610b"
+    }
+   }
+  },
+  {
+   "name": "icon_skill_cooking",
+   "type": "color",
+   "spec": "页签/分类/技能/货币 C-I4",
+   "batch": "C1",
+   "cell": 10,
+   "src_bbox": [
+    730,
+    742,
+    1036,
+    1031
+   ],
+   "files": {
+    "96": {
+     "path": "assets/color/96/icon_skill_cooking.png",
+     "sha256": "3cab474495cb2a92036f60230015eae9ef0e55f8b2e3b7ae8c6e45dab8823a85"
+    },
+    "128": {
+     "path": "assets/color/128/icon_skill_cooking.png",
+     "sha256": "a953bd005d4fc5a4b1b0b03447b84b0170f3f619d207f945e423eb3209f9e0a1"
+    }
+   }
+  },
+  {
+   "name": "icon_currency_coin",
+   "type": "color",
+   "spec": "页签/分类/技能/货币 C-I4",
+   "batch": "C1",
+   "cell": 11,
+   "src_bbox": [
+    1122,
+    761,
+    1389,
+    1031
+   ],
+   "files": {
+    "96": {
+     "path": "assets/color/96/icon_currency_coin.png",
+     "sha256": "dd4c4f9a03c6994f28506a73467fae4cf135299437366c51f691ec495543d696"
+    },
+    "128": {
+     "path": "assets/color/128/icon_currency_coin.png",
+     "sha256": "0123c95a60997ce242b3eb9db361a74623203748ae6d07a6116c42833c47977c"
+    }
+   }
+  }
+ ]
+}
