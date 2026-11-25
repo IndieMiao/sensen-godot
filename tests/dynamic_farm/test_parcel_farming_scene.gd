@@ -807,7 +807,7 @@ func _watering_loop() -> void:
 	var built: Dictionary = scene._buildings.get(int(well.id), {})
 	var well_cell := Building.at_of(well)
 	var middle := Building.center(scene._walk, well_cell, Vector2i.ONE)
-	_check(built.get("node") is Node3D and built.node.get_child_count() == 1 and built.get("proxy") != null and not scene._walk.clear_position(middle),
+	_check(built.get("node") is Node3D and built.node.get_child_count() == 1 and not built.get("proxies", []).is_empty() and not scene._walk.clear_position(middle),
 		"the well's model stands and its ring stops the player")
 	_check(not cells.any(func(at): return at == well_cell), "the well keeps off the carrots")
 	_check(await _key(farming, cells[0]) == ["Water", "Pail empty", UiSceneAction.State.UNAVAILABLE], "an empty pail cannot water")
