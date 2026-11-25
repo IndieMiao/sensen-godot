@@ -17,7 +17,9 @@ the open-ground fallback: a hit on a parcel without a building selects nothing,
 draws no rectangular parcel outline and keeps the "Tap a building" prompt.
 C-112 (C-103#18) draws no parcel colour or outline and no dark building frames at
 all: only buildings are filled (own green, someone else's red, claimable yellow when
-selected), and Mapbox's own place icons are hidden. The map camera takes farm-dev's
+selected), and Mapbox's own place icons are hidden. C-145 keeps them hidden while
+the map is paused (3D room, dressing room), so the way back shows none; only
+closing the map or another page's city style brings them back. The map camera takes farm-dev's
 inertia, double tap, two-finger tilt and flights (`test_map_camera.gd`); details in
 `docs/plans/C-112.md`.
 

@@ -243,6 +243,10 @@ func _entries() -> void:
 		_check(not map.find_children("*", "Button", true, false).any(func(b): return b.text in ["Market", "Carpenter"]),
 			"no Market or Carpenter button on the map with own_farm=%s" % own)
 		_check(map._entry != null and not map._entry.visible, "the Washington Square pin waits for the map (own_farm=%s)" % own)
+		# C-145 (C-115#62): the pin shows "Washington Square" whole, wider than a pin's usual 96 px name; same copy.
+		var whole := UiMapDestination.label_size_for(map._entry.SHORT, false, 4096.0)
+		_check(map._entry.pin.text == "Washington Square" and whole.x > UiMapDestination.SHORT_MAX_W and whole.x <= map._entry.NAME_MAX_W
+			and map._entry.pin.label_size() == whole, "the Washington Square pin's name is not cut (own_farm=%s)" % own)
 		map._open_town()
 		_check(not map._opening and map.find_children("*", "ParcelTown", true, false).is_empty(), "nothing opens without a home")
 		map.queue_free()
