@@ -51,7 +51,7 @@ func controller(server: RefCounted, token: String, native: Native) -> Node:
 	return c
 
 func _run() -> void:
-	_town_load_on_free()
+	await _town_load_on_free()
 	await _server_contract()
 	await _first_home_flow()
 	await _map_card()
@@ -251,6 +251,7 @@ func _map_card() -> void:
 	check(not guest.signed_out and guest.mine_known and guest.status(ids[1]) == "none" and page._claim.visible, "after signing in the card re-reads ownership and offers the claim")
 	page.queue_free(); selector.queue_free(); guest.queue_free()
 	await process_frame
+	await _orphan_loads_taken()
 	check(ResourceLoader.load_threaded_get_status("res://scenes/dynamic_farm/parcel_town.gd") == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
 		"with the map gone no load of the town is left running")
 
@@ -311,18 +312,38 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	page.home_farm = {}; page._farm_parcel = ""
 	page._render()
 
-## C-61: a map freed while the town's script still loads on a thread takes that load, so a quitting Godot has none
-## left running (the merge check's run of this file passed, then hit its time limit on exit).
+## C-125 (C-61, Q-139): a map freed while the town's script still loads on a thread does not wait for it there (Back
+## from a map pushed over another page held the main thread until the town had loaded): AppRouter takes the load once
+## it is done, so none is left running for a quitting Godot either.
 func _town_load_on_free() -> void:
+	var router: Node = root.get_node("AppRouter")
 	var page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
 	root.add_child(page)
 	var town: String = page.TOWN
 	page._prepare_town()
 	check(page._town_prepared and ResourceLoader.load_threaded_get_status(town) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
 		"the town's script loads on a thread before any tap")
+	var freeing := Time.get_ticks_usec()
+	page.free()
+	print("TOWN_LOAD_ON_FREE ", JSON.stringify({"free_ms": (Time.get_ticks_usec() - freeing) / 1000.0,
+		"still_loading": ResourceLoader.load_threaded_get_status(town) == ResourceLoader.THREAD_LOAD_IN_PROGRESS}))
+	check(router._orphan_loads == [town], "a map freed meanwhile hands that load to AppRouter instead of waiting for it")
+	await _orphan_loads_taken()
+	check(ResourceLoader.load_threaded_get_status(town) == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
+		"AppRouter takes it once done, leaving no load of it running")
+	page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
+	root.add_child(page)
+	page._prepare_town()
+	page._town_router = null
 	page.free()
 	check(ResourceLoader.load_threaded_get_status(town) == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE,
-		"a map freed meanwhile leaves no load of it running")
+		"without AppRouter a freed map still takes the load itself")
+
+## Frames until AppRouter has taken every load a freed map left it (at most 60 s, far above the town's ~1.3 s compile).
+func _orphan_loads_taken() -> void:
+	var router: Node = root.get_node("AppRouter")
+	var deadline := Time.get_ticks_msec() + 60000
+	while not router._orphan_loads.is_empty() and Time.get_ticks_msec() < deadline: await process_frame
 
 ## Parcel ids the fake neighbour does not own.
 func _free_ids(server: RefCounted, count: int) -> Array:
