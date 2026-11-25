@@ -5,7 +5,7 @@ extends UiPhone
 ##               through and grey, the current one ringed in the action colour. Tapping the current row closes the
 ##               phone and shows that step's tip again (`task_pressed`); nothing else is new and no row gives a reward.
 ##   Inbox       Parcels · N / Updates (P0Inbox's rows and words over a P0-style view: `{inbox, bag}`); the parcel
-##               save has no inbox, so the dynamic farm passes none and the page reads `No parcels` / `No updates yet`.
+##               save has no inbox, so the dynamic farm passes none and the page reads `No parcels` / `No updates`.
 ##   Collection  2-column category cards (icon, name, bar, `9/20`); a card opens its 4-column grid, got ones in colour
 ##               and the rest as silhouettes, ‹ back. Categories the package has no data for are not shown; with none
 ##               the page reads `Nothing collected yet` (the dynamic farm has no fish, dishes, cities or postcards).
@@ -20,7 +20,7 @@ const COLLECTION_TAB := 2
 const TITLES := ["Tasks", "Inbox", "Collection"]
 const NO_TASKS := "No tasks"
 const NO_PARCELS := "No parcels"
-const NO_UPDATES := "No updates yet"
+const NO_UPDATES := "No updates"
 const NOTHING_COLLECTED := "Nothing collected yet"
 ## Collection cards: 2 columns, 6 apart; the detail grid 4 columns.
 const CARD_COLUMNS := 2

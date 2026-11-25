@@ -12,11 +12,11 @@ const TOWN := "TOWN"
 ## In the guide's order. Titles of the design's rows (C-85 ⑧-B); the two gathering rows follow C-61's steps.
 const TASKS := [
 	{"key": "build", "group": GET_STARTED, "title": "Build Cottage"},
-	{"key": "till", "group": GET_STARTED, "title": "Till a spot in your yard"},
+	{"key": "till", "group": GET_STARTED, "title": "Till your yard"},
 	{"key": "sow", "group": GET_STARTED, "title": "Sow Carrot Seeds"},
 	{"key": "harvest", "group": GET_STARTED, "title": "Harvest a carrot"},
 	{"key": "sell", "group": TOWN, "title": "Sell to Jasmine"},
-	{"key": "gather", "group": TOWN, "title": "Gather round your yard"},
+	{"key": "gather", "group": TOWN, "title": "Gather in your yard"},
 	{"key": "sell_gathered", "group": TOWN, "title": "Sell what you gathered"},
 	{"key": "blueprint", "group": TOWN, "title": "Take Scott's blueprint"},
 ]

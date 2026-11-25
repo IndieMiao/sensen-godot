@@ -111,7 +111,7 @@ func _kit() -> void:
 	drop.more_pressed.connect(func(): more[0] += 1)
 	var folded := [0]
 	drop.folded.connect(func(): folded[0] += 1)
-	drop.open([{"title": "Build Cottage", "state": UiTaskRow.State.DONE}, {"title": "Till a spot in your yard", "state": UiTaskRow.State.CURRENT},
+	drop.open([{"title": "Build Cottage", "state": UiTaskRow.State.DONE}, {"title": "Till your yard", "state": UiTaskRow.State.CURRENT},
 		{"title": "Sow Carrot Seeds", "state": UiTaskRow.State.TODO}, {"title": "Harvest a carrot", "state": UiTaskRow.State.TODO}], true)
 	await process_frame
 	_check(drop.rows.size() == 3 and drop.more != null and drop.more.title == "More…", "three rows then More…")
@@ -119,7 +119,7 @@ func _kit() -> void:
 		"rows let touches through to the scene")
 	_check(drop.rows[0].look == UiTaskRow.Look.GLASS and drop.rows[0].pill().get_theme_stylebox(&"panel").bg_color == UiTokens.COLOR_GLASS_FILL_STRONG,
 		"glass rows")
-	_check(drop.rows[0].size.x < drop.rows[1].size.x, "a glass pill hugs its text")
+	_check(drop.rows[0].size.x < drop.rows[2].size.x, "a glass pill hugs its text")
 	drop.more.pressed.emit()
 	await create_timer(0.3).timeout
 	_check(more[0] == 1 and not drop.showing and not drop.visible and folded[0] == 1, "More… asks for the phone and folds")
@@ -195,7 +195,7 @@ func _pages() -> void:
 	_check("No parcels" in _texts(phone.page), "no inbox: No parcels")
 	(_find(phone.page, "Part1") as Button).pressed.emit()
 	await process_frame
-	_check("No updates yet" in _texts(phone.page), "Updates: No updates yet")
+	_check("No updates" in _texts(phone.page), "Updates: No updates")
 	(_find(phone.page, "Part0") as Button).pressed.emit()
 	await process_frame
 	# Inbox with P0's rows (a P0-style view).
@@ -302,7 +302,7 @@ func _scene() -> void:
 	_check(drop.rows[0].state == UiTaskRow.State.DONE, "the finished row turns done in place")
 	_check(button.badge == false, "a step finished in view counts as seen")
 	await create_timer(UiTaskDropDown.DONE_STAY_S + 0.6).timeout
-	_check(drop.showing and drop.rows[1].title == "Till a spot in your yard" and drop.rows[1].state == UiTaskRow.State.CURRENT,
+	_check(drop.showing and drop.rows[1].title == "Till your yard" and drop.rows[1].state == UiTaskRow.State.CURRENT,
 		"a second later the rows show Till as current")
 	# More… opens the phone on Tasks.
 	drop.more.pressed.emit()
