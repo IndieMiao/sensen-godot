@@ -65,6 +65,21 @@ func test_sync_loads_open_without_a_threaded_request_and_still_fail_with_the_car
 	AppRouter.sync_loads = keep
 	DirAccess.remove_absolute(path)
 
+## C-125: a threaded load whose requester went away is taken once done, without the main thread waiting for it.
+func test_an_adopted_threaded_load_is_taken_once_done() -> void:
+	var path := OS.get_user_data_dir().path_join("router_adopted_probe.tscn")
+	FileAccess.open(path, FileAccess.WRITE).store_string('[gd_scene format=3]\n\n[node name="X" type="Node"]\n')
+	ResourceLoader.load_threaded_request(path, "PackedScene")
+	AppRouter.adopt_threaded_load(path)
+	assert_bool(AppRouter.is_processing()).is_true()
+	for i in 600:
+		if AppRouter._orphan_loads.is_empty(): break
+		await get_tree().process_frame
+	assert_array(AppRouter._orphan_loads).is_empty()
+	assert_int(ResourceLoader.load_threaded_get_status(path)).is_equal(ResourceLoader.THREAD_LOAD_INVALID_RESOURCE)
+	assert_bool(AppRouter.is_processing()).is_false()
+	DirAccess.remove_absolute(path)
+
 func after_test() -> void:
 	while AppRouter.instance_depth() > 0:
 		AppRouter.pop_instance()
