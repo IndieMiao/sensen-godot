@@ -317,9 +317,25 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	ProjectSettings.set_setting(LOCAL_SAVE, true) # the town reads the device save, not a server
 	page._render(); await process_frame
 	check(not page._carpenter.disabled and page._carpenter.text == "Carpenter", "with a home, Carpenter can be tapped")
+	var named: Array = [page._carpenter.get_combined_minimum_size().x, page._carpenter.clip_text, page._carpenter.get_theme_stylebox("disabled")]
+	var market_look: StyleBox = page._market.get_theme_stylebox("disabled")
 	page._carpenter.pressed.emit()
 	check(page._carpenter.text == page.TOWN_LOADING and page._carpenter.disabled and page._market.disabled and page._town == null,
 		"a tap shows Loading… on the entry at once, before the town loads")
+	check(page._carpenter.get_combined_minimum_size().x == named[0],
+		"Loading… keeps the width of the entry's name, so the right-aligned pill stays on screen (C-123)")
+	var loading_font: Font = page._carpenter.get_theme_font("font")
+	var loading_text: float = loading_font.get_string_size(page.TOWN_LOADING, HORIZONTAL_ALIGNMENT_LEFT, -1, page._carpenter.get_theme_font_size("font_size")).x
+	check(loading_text <= named[0] - page._carpenter.get_theme_stylebox("disabled").get_minimum_size().x,
+		"Loading… fits in the width of the entry's name (%.0f in %.0f)" % [loading_text, named[0]])
+	var market_named: float = page._market.get_combined_minimum_size().x
+	page._town_loading = "market"; page._render()
+	check(page._market.text == page.TOWN_LOADING and page._market.get_combined_minimum_size().x == market_named
+		and loading_text <= market_named,
+		"Market's Loading… keeps the width of \"Market\" too and fits in it (%.0f in %.0f)" % [loading_text, market_named])
+	page._town_loading = "carpenter"; page._render()
+	check(page._market.text == "Market" and not page._market.clip_text and page._market.get_theme_stylebox("disabled") == market_look
+		and page._market.get_combined_minimum_size().x == market_named, "an entry that stops loading is its name again, in its own glass look")
 	page._market.pressed.emit()
 	check(page._market.text == "Market", "the other entry waits meanwhile")
 	await process_frame
@@ -340,6 +356,11 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	page._town.close(); await process_frame
 	check(page._town == null and page._hud.visible and page._carpenter.text == "Carpenter" and not page._carpenter.disabled,
 		"closing the town brings the map's entries back")
+	check([page._carpenter.get_combined_minimum_size().x, page._carpenter.clip_text, page._carpenter.get_theme_stylebox("disabled")] == named,
+		"back on the map the pill has its width and glass look as before")
+	await process_frame
+	check(page._carpenter.get_rect().end.x <= page._hud.size.x and page._market.get_rect().end.x <= page._hud.size.x,
+		"Market and Carpenter stay inside the screen's right edge")
 	check(page._farm_parcel == home and not seen.is_empty() and page.home_farm == seen, "the map keeps the save the town read for its line")
 	ProjectSettings.set_setting(LOCAL_SAVE, null)
 	page.home_farm = {}; page._farm_parcel = ""

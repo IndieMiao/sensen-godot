@@ -440,6 +440,29 @@ func _place_locate() -> void:
 		y -= key.size.y + UiTokens.SPACE_S2
 		key.position = Vector2(right - key.size.x - (0.0 if key is UiGlassButton else nudge), y)
 
+## A disabled side button that reads another text for a while (Loading…) keeps the width its `usual` text gives it,
+## with no side margins and the text centred; `text == usual` puts it back, with the button's own disabled look.
+## A longer text first widened the top panel past the screen (C-123, C-61#195); on the v3 map the glass pills are
+## placed by their right edge only when the side keys show or hide, so a wider pill would run off the right edge.
+func _text_in_place(button: Button, text: String, usual: String) -> void:
+	if button.text == text: return
+	if text == usual:
+		button.text = usual
+		var own: Variant = button.get_meta(&"usual_disabled", null)
+		if own is StyleBox: button.add_theme_stylebox_override("disabled", own)
+		else: button.remove_theme_stylebox_override("disabled")
+		button.remove_meta(&"usual_disabled"); button.clip_text = false; button.custom_minimum_size.x = 0
+		return
+	if button.text == usual:
+		button.custom_minimum_size.x = button.get_combined_minimum_size().x
+		button.clip_text = true
+		if button.has_theme_stylebox_override("disabled"):
+			button.set_meta(&"usual_disabled", button.get_theme_stylebox("disabled"))
+		var style := button.get_theme_stylebox("disabled").duplicate() as StyleBox
+		style.content_margin_left = 0; style.content_margin_right = 0
+		button.add_theme_stylebox_override("disabled", style)
+	button.text = text
+
 func _render() -> void:
 	_render_account()
 	if _selector == null or _suspended or _leaving: return
@@ -463,8 +486,8 @@ func _render() -> void:
 	_reselect.visible = state == "mine" and _claims.can_give_up(); _reselect.disabled = not idle
 	var town_ready: bool = _claims.has_home() and not _opening and not _claims.busy and _town == null and _town_loading.is_empty()
 	_market.disabled = not town_ready; _carpenter.disabled = not town_ready
-	_market.text = TOWN_LOADING if _town_loading == "market" else TOWN_NAMES.market
-	_carpenter.text = TOWN_LOADING if _town_loading == "carpenter" else TOWN_NAMES.carpenter
+	_text_in_place(_market, TOWN_LOADING if _town_loading == "market" else TOWN_NAMES.market, TOWN_NAMES.market)
+	_text_in_place(_carpenter, TOWN_LOADING if _town_loading == "carpenter" else TOWN_NAMES.carpenter, TOWN_NAMES.carpenter)
 	_market.visible = _own_farm_entry(); _carpenter.visible = _own_farm_entry()
 	_home.visible = _claims.has_home()
 	_home.disabled = _selector.manifest.is_empty() or _opening or _town != null
