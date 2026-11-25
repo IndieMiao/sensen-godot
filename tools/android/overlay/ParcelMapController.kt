@@ -49,6 +49,7 @@ internal class ParcelMapController(
     private val hiddenPlaces = linkedMapOf<String, Value>() // Place icon layer -> its visibility before we hid it.
     private var fadedBuildings: Value? = null // Mapbox's building fill-opacity before the DataSF buildings went over it.
     private var zone: StarterZoneMarker? = null // C-130: this generation's starter zone marker, drawn by installZone().
+    private val sourceTimeout = ParcelSourceTimeout() // C-130 (V-362): counts only while the parcel layers are drawn.
     private val map get() = view.mapboxMap
 
     companion object {
@@ -80,6 +81,8 @@ internal class ParcelMapController(
         val PLACE_ICON_LAYERS = listOf("poi-label", "transit-label", "airport-label", "natural-point-label")
         /** A tap right after a pan waits this long for map idle before answering "loading". */
         const val IDLE_WAIT_MS = 4000L
+        /** The parcel source not loaded this long while its layers are drawn (camera at or above the selectable zoom). */
+        const val SOURCE_TIMEOUT_MS = 20000L
     }
     private class WaitingQuery(val requestId: Long, val generation: Long, val x: Double, val y: Double, val ticket: ParcelTicket, val revision: Long)
     init {
@@ -92,7 +95,10 @@ internal class ParcelMapController(
                 install()
             }
         }
-        subscriptions += map.subscribeCameraChanged { cameraRevision++; mapIdle = false; settle.cameraChanged() }
+        subscriptions += map.subscribeCameraChanged {
+            cameraRevision++; mapIdle = false; settle.cameraChanged()
+            if (!closed && state.active && !state.ready) watchSourceTimeout()
+        }
         subscriptions += map.subscribeMapIdle {
             if (!closed) { mapIdle = true; if (state.active) emitReady(); resumeWaiting() }
         }
@@ -202,9 +208,21 @@ internal class ParcelMapController(
         hidePlaceIcons(style)
         installZone(style)
         emitReady() // source_ready gates picking on parcel data; hidden building layers must not block z17 selection.
+        sourceTimeout.reset(); watchSourceTimeout()
+    }
+    /**
+     * C-130 (V-362): the parcel source loads only where a layer draws it, from the selectable zoom ([ParcelSourceConfig.minZoom]).
+     * Entering the map below it (the starter zone's landing view) loads nothing, so its load timeout counts only while
+     * the camera is at or above that zoom; zooming out again before it loads stops the count, zooming in starts it anew.
+     */
+    private fun watchSourceTimeout() {
+        val cfg = config ?: return
+        if (closed || !map.isValid()) return
+        val turn = state.epoch
+        val token = sourceTimeout.update(state.active && !state.ready, map.cameraState.zoom >= cfg.minZoom) ?: return
         handler.postDelayed({
-            if (!closed && state.accepts(turn) && !state.ready) error(state.generation, turn, "source_timeout")
-        }, 20000)
+            if (!closed && sourceTimeout.fires(token) && state.accepts(turn) && !state.ready) error(state.generation, turn, "source_timeout")
+        }, SOURCE_TIMEOUT_MS)
     }
     /** C-118: reuse the loaded or still-loading building source; fetch again only for a new URL, a failure or a new style.
      *  C-124: [refetch] also replaces a copy still loading. Returns the copy's source id, null if Mapbox refused it. */
@@ -448,7 +466,7 @@ internal class ParcelMapController(
         }
         removeZone(style)
         restorePlaceIcons(style); restoreMapboxBuildings(style)
-        sources.clear(); loaded.clear(); buildingSelection.clear(); settle.reset(emptySet())
+        sources.clear(); loaded.clear(); buildingSelection.clear(); settle.reset(emptySet()); sourceTimeout.reset()
     }
     fun close() {
         if (closed) return

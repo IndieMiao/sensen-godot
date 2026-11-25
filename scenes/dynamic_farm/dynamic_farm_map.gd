@@ -324,6 +324,7 @@ func _render() -> void:
 	_message.text = _selector.message
 	_retry.disabled = _selector.busy or _opening
 	var id := str(_selector.selection.get("block_id", ""))
+	if _selector.generation > 0: _claims.show_zone(_selector.generation) # Before the parcel layers load (C-130 V-362).
 	if _selector.map_ready and _selector.generation > 0:
 		_claims.attach(_selector.generation, id)
 		if _area_generation != _selector.generation:

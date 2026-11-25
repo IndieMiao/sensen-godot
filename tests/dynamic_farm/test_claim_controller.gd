@@ -659,6 +659,10 @@ func _starter_zone() -> void:
 	var count := native.zones.size()
 	c.attach(4, ids[0]); await process_frame
 	check(native.zones.size() == count, "the zone is not resent for the same generation")
+	c.show_zone(4)
+	check(native.zones.size() == count, "nor by the marker's own entry")
+	c.show_zone(6)
+	check(native.zones.size() == count + 1 and native.zones.back()[0] == 6 and native.zones.back()[1] == native.zones[count - 1][1], "its own entry sends it for a generation whose parcel layers are not ready yet")
 	c.attach(5, ids[0]); await process_frame
 	check(native.zones.back()[0] == 5, "a new generation gets the zone again")
 	await c.claim({"block_id": ids[2], "center": [-122.45, 37.73]})
@@ -681,9 +685,14 @@ func _starter_zone() -> void:
 	page._camera.user_moved.connect(func(): page._player_moved = true)
 	page._area_generation = selector.generation
 	var other := FakeServer.new(); other.zone = _zone([ids[0], ids[1]])
-	page._claims = controller(other, "fake-b", Native.new()); page._claims.changed.connect(page._render)
+	var page_native := Native.new()
+	page._claims = controller(other, "fake-b", page_native); page._claims.changed.connect(page._render)
 	page._camera.frame_center(-122.50, 37.80, 15.0)
+	selector.map_ready = false # C-130 V-362: below the selectable zoom the parcel layers do not load.
 	await page._claims.start(); await process_frame
+	check(not page_native.zones.is_empty() and page_native.zones.back()[0] == selector.generation and not page_native.zones.back()[1].is_empty(), "the starter zone marker is drawn before the parcel layers are ready")
+	check(page_native.batches.is_empty(), "parcel colours still wait for the parcel layers")
+	selector.map_ready = true
 	var near := func(point: Array, zoom: float) -> bool:
 		return absf(page._camera.center[0] - point[0]) < 1e-6 and absf(page._camera.center[1] - point[1]) < 1e-6 and is_equal_approx(page._camera.zoom, zoom)
 	check(page._framed and near.call(ZONE_CENTER, 17.0), "without a home the map opens on the starter zone")

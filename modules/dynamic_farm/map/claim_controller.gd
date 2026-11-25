@@ -206,9 +206,14 @@ func _sync() -> void:
 	bridge.set_parcel_claims(_generation, JSON.stringify(names))
 	# Yellow means claimable: a selected parcel that is already owned shows its own colour instead.
 	if status(_selected) in ["mine", "other"]: bridge.set_parcel_building_highlight(_generation, "")
-	if _zone_pushed != _generation:
-		_zone_pushed = _generation
-		bridge.set_starter_zone(_generation, zone_payload(zone))
+	show_zone(_generation)
+
+## The starter zone marker for this map generation, once. It does not wait for the parcel layers (attach), which load
+## only from the selectable zoom: the map is entered below it at the starter zone's landing view (C-130 V-362).
+func show_zone(generation: int) -> void:
+	if bridge == null or generation <= 0 or _zone_pushed == generation: return
+	_zone_pushed = generation
+	bridge.set_starter_zone(generation, zone_payload(zone))
 
 ## Native starter zone layer: the boundary ring and its style; "" clears it.
 static func zone_payload(z: Dictionary) -> String:
