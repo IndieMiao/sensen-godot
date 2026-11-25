@@ -92,7 +92,7 @@ static func ready_at(gather: Dictionary, state: Dictionary, id: String, now: int
 
 ## The server's `gather` command on `state` (changed in place on success): {code, detail}, code "" when
 ## gathered. `parcel_id` is the owner's parcel (the server reads it from the locked row); `in_core` says
-## the cell is under the house, tilled, sown or a cleared obstacle (the core cells the server knows).
+## the cell is under a building, tilled, sown or a cleared obstacle (the core cells the server knows).
 static func take(gather: Dictionary, state: Dictionary, object: String, parcel_id: String, in_core: bool, now: int) -> Dictionary:
 	var o = parse_id(object)
 	if o == null or gather.is_empty(): return {"code": "UNKNOWN_OBJECT", "detail": {}}

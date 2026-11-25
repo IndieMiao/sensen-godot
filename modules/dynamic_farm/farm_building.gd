@@ -1,0 +1,149 @@
+extends RefCounted
+## Buildings on the owner's parcel (C-150; the first house Q-40, C-33#14). A type's footprint, blueprint and limit
+## are the rules' `buildings` (assets/farm/data/dynamic_farm.json, shared with the server); its model and wall
+## profile are KINDS below. A building stands the moment it is placed. Every footprint cell must be core, clear of
+## the parcel's uncleared obstacles, other buildings, tilled cells and crops, and off the protected path that tilling
+## also keeps clear (ParcelFarming.protected_path(), C-34, one rule for both per Q-44); and no remaining walk cell
+## may lose its way to spawn. Outside the core (the ring round it and the entry path) nothing can be placed.
+## `at` is the footprint's lowest-x, lowest-y cell, as the save stores it; `base` the footprint unturned (width along
+## x, depth along y); `rotation` quarter turns 0–3 (所有者 SEN-C-134#22 第 3 题: 0, 90, 180, 270°), a quarter or
+## three-quarter turn swapping width and depth. The server checks only buildings, tilled cells and crops (C-31).
+const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
+const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
+## Per type: `asset` (FarmArt model, its pivot on the footprint's middle, +Z the front), `name` (the Build key says
+## "Build <name>") and `profile` (the walls the player stops at, a FarmPropProxy profile in the model's frame).
+## The cottage (house_cottage.glb, 3×3): walls and plinth below the eaves, measured from its cross-sections at
+## 0.15–1.1 m (x ±0.875, z −0.84…0.885; the low step, the side woodpile and the bench stay walkable, under the body
+## only). The eaves are overhead; the whole model stays within the 3×3 footprint (2.4 m).
+const KINDS := {
+	"cottage": {"asset": "house_cottage", "name": "Cottage",
+		"profile": {"solid": true, "shape": "box", "center_xz_m": [0.0, 0.0225], "size_xz_m": [1.75, 1.725], "height_m": 1.1}},
+}
+const HOME := ParcelFarm.HOME_BUILDING
+const OUTSIDE := "Outside your yard"
+const TAKEN := "Space taken"
+const PATH := "Keep the path clear"
+const AROUND := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
+
+## The client art of a type: {asset, name, profile}, or {} for a type this client has no art for.
+static func kind(type: String) -> Dictionary:
+	return KINDS.get(type, {})
+
+## The unturned footprint of a rules entry or a saved building (width × depth).
+static func base_of(entry: Dictionary) -> Vector2i:
+	return Vector2i(int(entry.width), int(entry.depth))
+
+static func size(base: Vector2i, rotation := 0) -> Vector2i:
+	return ParcelFarm.turned(base, rotation)
+
+static func cells(at: Vector2i, base: Vector2i, rotation := 0) -> Array[Vector2i]:
+	return ParcelFarm.footprint(at, base, rotation)
+
+## Cells nothing may cover: uncleared core obstacles (ParcelFarming.obstacle_cells(), every role, weeds too),
+## the save's buildings, tilled cells and crops.
+static func blocked(obstacles: Dictionary, farm: Dictionary) -> Dictionary:
+	var out := obstacles.duplicate()
+	out.merge(ParcelFarm.building_cells(farm))
+	for key in farm.get("tilled", []): out[_cell(str(key))] = true
+	for key in (farm.get("crops", {}) as Dictionary): out[_cell(str(key))] = true
+	return out
+
+## The cells of `layout` (core obstacle plan) still standing in `obstacles` that also block walking (stones,
+## bushes, saplings).
+static func solid(layout: Array, obstacles: Dictionary) -> Dictionary:
+	var out := {}
+	for item: Dictionary in layout:
+		if bool(item.solid) and obstacles.has(item.cell): out[item.cell] = true
+	return out
+
+## "" when the building may stand at `at`, else the reason shown on the main key.
+## `path`: the protected path; `walk_blocked`: cells walking cannot use besides the footprint (solid obstacles,
+## other buildings, reserved extension cells).
+static func reason(data: Dictionary, at: Vector2i, base: Vector2i, rotation: int, taken: Dictionary, path: Dictionary,
+		walk_blocked: Dictionary) -> String:
+	var footprint := cells(at, base, rotation)
+	for cell in footprint:
+		if not data.by_cell.has(cell) or data.by_cell[cell].zone != "core": return OUTSIDE
+	for cell in footprint:
+		if taken.has(cell): return TAKEN
+	for cell in footprint:
+		if path.has(cell): return PATH
+	return "" if keeps_open(data, footprint, walk_blocked) else PATH
+
+## Every walk cell outside the footprint and `walk_blocked` still reaches spawn.
+static func keeps_open(data: Dictionary, footprint: Array[Vector2i], walk_blocked: Dictionary) -> bool:
+	var closed := walk_blocked.duplicate()
+	for cell in footprint: closed[cell] = true
+	if closed.has(data.spawn): return false
+	var open := 0
+	for cell: Vector2i in data.by_cell:
+		if not closed.has(cell): open += 1
+	var queue: Array[Vector2i] = [data.spawn]
+	var seen := {data.spawn: true}
+	var index := 0
+	while index < queue.size():
+		var cell := queue[index]
+		index += 1
+		for offset: Vector2i in AROUND:
+			var next: Vector2i = cell + offset
+			if data.by_cell.has(next) and not closed.has(next) and not seen.has(next):
+				seen[next] = true
+				queue.append(next)
+	return seen.size() == open
+
+## The valid spot whose footprint centre is nearest `near` (a cell), or null.
+static func nearest(data: Dictionary, near: Vector2i, base: Vector2i, taken: Dictionary, path: Dictionary,
+		walk_blocked: Dictionary, rotation := 0) -> Variant:
+	var offset := middle(base, rotation)
+	var candidates: Array[Vector2i] = []
+	for cell: Dictionary in data.cells:
+		if cell.zone == "core": candidates.append(Vector2i(cell.x, cell.y) - offset)
+	candidates.sort_custom(func(a: Vector2i, b: Vector2i):
+		var da := (a - near + offset).length_squared()
+		var db := (b - near + offset).length_squared()
+		return da < db or (da == db and (a.y < b.y or (a.y == b.y and a.x < b.x))))
+	for at in candidates:
+		if reason(data, at, base, rotation, taken, path, walk_blocked) == "": return at
+	return null
+
+## The footprint's middle cell, from its lowest cell (the finger holds a building there).
+static func middle(base: Vector2i, rotation := 0) -> Vector2i:
+	var s := size(base, rotation)
+	return Vector2i(s.x / 2, s.y / 2)
+
+## Where a footprint turned to `rotation` starts so that it keeps the middle of the one at `at` turned `was`: a turn
+## spins a building in place (an odd-sized one exactly; an even side keeps within half a cell).
+static func turned_at(at: Vector2i, base: Vector2i, was: int, rotation: int) -> Vector2i:
+	return at + middle(base, was) - middle(base, rotation)
+
+## The footprint's middle on the ground, in scene space.
+static func center(walk: RefCounted, at: Vector2i, base: Vector2i, rotation := 0) -> Vector3:
+	var s := size(base, rotation)
+	return (walk.point(at) + walk.point(at + s - Vector2i.ONE)) * 0.5
+
+## Where the build's dust puffs (C-114): the footprint's four corners and four edge middles, on the ground.
+static func rim(walk: RefCounted, at: Vector2i, base: Vector2i, rotation := 0) -> Array[Vector3]:
+	var half := Vector2(size(base, rotation)) * float(walk.cell_m) * 0.5
+	var mid := center(walk, at, base, rotation)
+	var out: Array[Vector3] = []
+	for dz in [-1, 0, 1]:
+		for dx in [-1, 0, 1]:
+			if dx != 0 or dz != 0: out.append(mid + Vector3(dx * half.x, 0, dz * half.y))
+	return out
+
+## The model's transform: its own pivot on the footprint's middle, +Z (the front) toward the camera, a quarter turn
+## per rotation step.
+static func transform(walk: RefCounted, at: Vector2i, base: Vector2i, rotation := 0) -> Transform3D:
+	return Transform3D(Basis(Vector3.UP, rotation * PI * 0.5), center(walk, at, base, rotation))
+
+## The type's walls at that spot, or null for a type without a profile here.
+static func proxy(walk: RefCounted, type: String, at: Vector2i, base: Vector2i, rotation := 0) -> Proxy:
+	var profile = kind(type).get("profile")
+	return Proxy.new(profile, transform(walk, at, base, rotation), 1.0) if profile is Dictionary else null
+
+static func at_of(building: Dictionary) -> Vector2i:
+	return Vector2i(int(building.get("x", 0)), int(building.get("y", 0)))
+
+static func _cell(key: String) -> Vector2i:
+	var parts := key.split(",")
+	return Vector2i(int(parts[0]), int(parts[1])) if parts.size() == 2 else Vector2i(-1, -1)

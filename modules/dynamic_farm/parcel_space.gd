@@ -1,7 +1,7 @@
 extends RefCounted
 ## Where the owner may farm inside their own parcel (Q-39, C-34#14). The server holds no
 ## parcel geometry (C-31), so these spatial rules are the client's: tilling only on free
-## core cells, never under the house, on the protected path or outside the core.
+## core cells, never under a building (C-150; the refusal still reads "House here"), on the protected path or outside the core.
 ##
 ## Schema 4 marks every core cell "no solid decor", so the protected path inside the core
 ## is derived here: the shortest walk from the entry to the spawn, widened by
@@ -56,7 +56,7 @@ static func _mark_core(data: Dictionary, into: Dictionary, center: Vector2i, rad
 ## Why an empty cell cannot be tilled, or "" when it can (the hoe is checked separately).
 static func till_refusal(data: Dictionary, path: Dictionary, state: Dictionary, cell: Vector2i) -> String:
 	if not Data.permits(data, cell, "till"): return OUTSIDE
-	if ParcelFarm.house_cells(state).has(cell): return HOUSE
+	if ParcelFarm.building_cells(state).has(cell): return HOUSE
 	if path.has(cell): return PATH
 	return ""
 

@@ -17,7 +17,7 @@ const RemoteStore = preload("res://modules/dynamic_farm/parcel_farm_remote_store
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
-const House = preload("res://modules/dynamic_farm/farm_house.gd")
+const Building = preload("res://modules/dynamic_farm/farm_building.gd")
 ## Pixels the quick bar's global rect may sit off its rest after M-16's slide back (C-147). Control only refreshes its
 ## cached global transform when the position moves by more than is_equal_approx (relative 1e-5, about 0.006 px at
 ## y 600), so a tween's last sub-0.006 px step leaves get_global_rect() one frame behind, for good. Far below the
@@ -89,6 +89,7 @@ func _run() -> void:
 	await _reopen()
 	await _placement_takes_over()
 	await _house_pops_once()
+	await _placement_turns()
 	await _older_dataset_claim()
 	await _release_named_on_enter()
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
@@ -168,10 +169,11 @@ func _obstacle_instances(farming: Node) -> int:
 	return count
 
 func _first_visit() -> void:
-	# Stand-in for C-33: a cottage already placed in the save before the first entry.
+	# Stand-in for C-33: a cottage already placed in a save from before C-150 (only `house`, no `buildings`).
 	var data: Dictionary = scene_data()
 	var house_at := _free_block(data)
 	var seeded := ParcelFarm.empty_state()
+	seeded.erase("buildings")
 	seeded.house = {"model": "cottage", "x": house_at.x, "y": house_at.y, "width": 3, "depth": 3, "rotation": 0, "built_at": 0}
 	DirAccess.make_dir_recursive_absolute(dir)
 	var file := FileAccess.open(dir.path_join(raw.block_id.validate_filename() + ".json"), FileAccess.WRITE)
@@ -287,7 +289,7 @@ func _first_visit() -> void:
 	_check(await _key(farming, _outside_cell(data)) == ["Till", "Not farmland", UiSceneAction.State.UNAVAILABLE], "outside the core refuses")
 	_check(await _key(farming, data.spawn) == ["Till", "On the path", UiSceneAction.State.UNAVAILABLE], "the protected path refuses")
 	var under_house := house_at
-	for at: Vector2i in ParcelFarm.house_cells(farming.farm):
+	for at: Vector2i in ParcelFarm.building_cells(farming.farm):
 		if not farming._obstacles.has(at): under_house = at
 	_check(await _key(farming, under_house) == ["Till", "House here", UiSceneAction.State.UNAVAILABLE], "the house refuses")
 	version = farming.farm_version
@@ -503,7 +505,7 @@ func _placement_takes_over() -> void:
 	_check(_tip(farming) == "", "no card while the house is being placed")
 	_check(scene._walk.position == at and farming.farm_version == version and farming.farm.tilled.is_empty(),
 		"the player holds still and nothing was sent")
-	scene.end_house_placement()
+	scene.end_placement()
 	scene.queue_free()
 	await process_frame
 	for name in DirAccess.get_files_at(house_dir): DirAccess.remove_absolute(house_dir.path_join(name))
@@ -518,15 +520,15 @@ func _house_pops_once() -> void:
 	scene._build.activated.emit()
 	await process_frame
 	scene._placement._bar.confirmed.emit()
-	var built = scene.house_state()
-	var house: Node3D = scene._house
+	var built = scene.buildings_state()[0] if scene.buildings_state().size() == 1 else null
+	var house: Node3D = scene._buildings.get(1, {}).get("node")
 	_check(built is Dictionary and house != null and house.scale.x < 0.1, "Build starts the cottage small")
 	var dust: Array = _dust()
 	_check(dust.size() == 9, "Build puffs dust at the middle and round the footprint (%d)" % dust.size())
 	_check(dust.all(func(d): return d.scale_amount_min >= 0.2 and d.emitting),
 		"the puffs are sized for the cottage and emitting")
 	if built is Dictionary:
-		var rim := House.rim(scene._walk, House.at_of(built), int(built.rotation))
+		var rim := Building.rim(scene._walk, Building.at_of(built), Building.base_of(built), int(built.rotation))
 		var far := 0.0
 		for p: Vector3 in rim:
 			var near := INF
@@ -540,14 +542,58 @@ func _house_pops_once() -> void:
 	scene.queue_free()
 	await process_frame
 	await _open(LocalStore.new(raw.block_id, house_dir))
-	_check(scene._house != null and scene._house.scale == Vector3.ONE, "reopening shows the cottage at full size")
+	var reopened: Node3D = scene._buildings.get(1, {}).get("node")
+	_check(reopened != null and reopened.scale == Vector3.ONE, "reopening shows the cottage at full size")
 	_check(_dust().is_empty(), "reopening puffs no dust")
 	await create_timer(0.1).timeout
-	_check(scene._house.scale == Vector3.ONE and _dust().is_empty(), "nothing pops after reopening")
+	_check(reopened.scale == Vector3.ONE and _dust().is_empty(), "nothing pops after reopening")
 	scene.queue_free()
 	await process_frame
 	for name in DirAccess.get_files_at(house_dir): DirAccess.remove_absolute(house_dir.path_join(name))
 	DirAccess.remove_absolute(house_dir)
+
+## C-150: the placement bar is Cancel · Rotate · Build; each Rotate turns the preview a quarter about its middle
+## (0, 90, 180, 270°, then 0 again) and Build sends place_building with that turn. The cottage stands turned, keeps
+## it after reopening, and the player still stops at its walls.
+func _placement_turns() -> void:
+	var turn_dir := dir + "_turn"
+	await _open(LocalStore.new(raw.block_id, turn_dir))
+	_check(scene._build.label == "Build Cottage", "the Build key names the cottage")
+	scene._build.activated.emit()
+	await process_frame
+	var p = scene._placement
+	_check(p._bar.secondary == "Rotate" and p._bar.confirm == "Build" and p._bar.cancel == "Cancel", "the bar: Cancel · Rotate · Build")
+	_check(p.type == "cottage" and p.base == Vector2i(3, 3), "the cottage's footprint from the rules")
+	var start: Vector2i = p.at
+	var turns: Array = []
+	var still := true
+	for i in 4:
+		p._bar.secondary_pressed.emit()
+		turns.append(p.rotation_steps)
+		var facing: Vector3 = p._ghost.transform.basis.z
+		still = still and p.at == start and facing.is_equal_approx(Vector3.BACK.rotated(Vector3.UP, p.rotation_steps * PI * 0.5))
+	_check(turns == [1, 2, 3, 0] and still, "Rotate turns the preview a quarter in place each press (%s)" % [turns])
+	p._bar.secondary_pressed.emit()
+	p._bar.secondary_pressed.emit()
+	var reason: String = p.reason
+	p._bar.confirmed.emit()
+	for _i in 3: await process_frame
+	var built: Array = scene.buildings_state()
+	_check(reason == "" and built.size() == 1 and int(built[0].rotation) == 2 and Building.at_of(built[0]) == start and built[0].type == "cottage",
+		"Build places the cottage turned half way round: %s" % [built])
+	_check(not scene._build.visible and scene._placement == null, "one cottage: the Build key goes")
+	scene.queue_free()
+	await process_frame
+	await _open(LocalStore.new(raw.block_id, turn_dir))
+	var node: Node3D = scene._buildings.get(1, {}).get("node")
+	var middle := Building.center(scene._walk, start, Vector2i(3, 3), 2)
+	_check(node != null and node.transform.basis.z.is_equal_approx(Vector3.FORWARD) and node.position.is_equal_approx(middle),
+		"reopened, the cottage stands where and as it was turned")
+	_check(not scene._walk.clear_position(middle) and scene._buildings[1].proxy != null, "its walls still stop the player")
+	scene.queue_free()
+	await process_frame
+	for name in DirAccess.get_files_at(turn_dir): DirAccess.remove_absolute(turn_dir.path_join(name))
+	DirAccess.remove_absolute(turn_dir)
 
 func _older_dataset_claim() -> void:
 	var server := OldClaimServer.new()
@@ -639,7 +685,7 @@ func _free_block(data: Dictionary) -> Vector2i:
 	return Vector2i(-1, -1)
 
 func _free_cell(data: Dictionary, farming: Node, except: Array = []) -> Vector2i:
-	var house := ParcelFarm.house_cells(farming.farm)
+	var house := ParcelFarm.building_cells(farming.farm)
 	var obstacles: Dictionary = farming.obstacle_cells()
 	for cell: Dictionary in data.cells:
 		var at := Vector2i(cell.x, cell.y)
