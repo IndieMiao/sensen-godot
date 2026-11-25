@@ -490,7 +490,7 @@ func _refresh_energy() -> void:
 ## Its guide `Show home` (q(30) before a bench) turns the camera to the cottage.
 func open_energy_card(need: int, verb: String) -> void:
 	close_energy()
-	var facts := P0Logic.energy_card(energy_view(), need, verb, farm.get("house") is Dictionary)
+	var facts := P0Logic.energy_card(energy_view(), need, verb, ParcelFarm.has_home(farm))
 	for t: Dictionary in facts.tiles:
 		t.icon = P0Logic.icon(str(t.icon))
 		if t.go == "bench":

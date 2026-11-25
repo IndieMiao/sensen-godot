@@ -489,7 +489,6 @@ class _SkillRing extends Control:
 			var p := get_child(0) as Control
 			p.position = (Vector2(UiTokens.SIZE_SKILL_RING, size.y) - p.size) * 0.5
 
-## Energy bar: green fill (amber when Low, none at 0); Bonus draws the over-cap part in light green.
 ## The priest's buffs (q(300) ⑨): `buffs` [{icon, remaining "18:20", progress 0..1}], left to right; display only.
 ## Laid out by hand: the pills are wider than the circles and set the slots, the circles' centres 40 apart.
 class _BuffRings extends Control:

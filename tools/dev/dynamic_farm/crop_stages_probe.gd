@@ -100,7 +100,7 @@ func _shot(name: String) -> void:
 ## arrival hides about three cells behind it.
 func _row(farming, count: int) -> Array:
 	var data: Dictionary = scene._data
-	var house := ParcelFarm.house_cells(farming.farm)
+	var house := ParcelFarm.building_cells(farming.farm)
 	var obstacles: Dictionary = farming.obstacle_cells()
 	var spawn: Vector2i = data.spawn
 	var aim := Vector2(spawn + Vector2i(0, 4))

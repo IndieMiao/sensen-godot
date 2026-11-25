@@ -1,7 +1,7 @@
 extends RefCounted
 ## Where the owner may farm inside their own parcel (Q-39, C-34#14). The server holds no
 ## parcel geometry (C-31), so these spatial rules are the client's: tilling only on free
-## core cells, never under the house, on the protected path or outside the core.
+## core cells, never under a building (C-150; the refusal still reads "House here"), on the protected path or outside the core.
 ##
 ## Schema 4 marks every core cell "no solid decor", so the protected path inside the core
 ## is derived here: the shortest walk from the entry to the spawn, widened by
@@ -59,7 +59,7 @@ static func _mark_core(data: Dictionary, into: Dictionary, center: Vector2i, rad
 ## Why an empty cell cannot be tilled, or "" when it can (the hoe is checked separately).
 static func till_refusal(data: Dictionary, path: Dictionary, state: Dictionary, cell: Vector2i) -> String:
 	if not Data.permits(data, cell, "till"): return OUTSIDE
-	if ParcelFarm.house_cells(state).has(cell): return HOUSE
+	if ParcelFarm.building_cells(state).has(cell): return HOUSE
 	if path.has(cell): return PATH
 	return ""
 
@@ -92,15 +92,16 @@ static func action(rules: Dictionary, data: Dictionary, path: Dictionary, obstac
 	return {"verb": "till", "refusal": refusal,
 		"command": {"type": "till", "cell": key} if refusal.is_empty() else {}}
 
-## The cottage's cells along its door (C-148: Rest is at the door). The model's +Z, the door, turns a quarter per
-## rotation step (FarmHouse.transform): rotation 0 faces −y on the grid, 1 +x, 2 +y, 3 −x. {} without a cottage.
+## The cottage's cells along its door (C-148: Rest is at the door). The cottage is the first of the save's buildings
+## of type ParcelFarm.HOME_BUILDING (C-150). The model's +Z, the door, turns a quarter per rotation step
+## (FarmBuilding.transform): rotation 0 faces −y on the grid, 1 +x, 2 +y, 3 −x. {} without a cottage.
 static func door_row(state: Dictionary) -> Dictionary:
 	var row := {}
-	var house = state.get("house")
-	if not house is Dictionary: return row
-	var turn := int(house.rotation) % 4
-	var cells := ParcelFarm.house_cells(state)
-	var at := Vector2i(int(house.x), int(house.y))
+	var home := ParcelFarm.home_building(state)
+	if home.is_empty(): return row
+	var turn := int(home.rotation) % 4
+	var cells := ParcelFarm.building_footprint(home)
+	var at := Vector2i(int(home.x), int(home.y))
 	var last := at
 	for cell: Vector2i in cells: last = Vector2i(maxi(last.x, cell.x), maxi(last.y, cell.y))
 	for cell: Vector2i in cells:

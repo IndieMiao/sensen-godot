@@ -23,7 +23,8 @@ describe('dynamic_farm.json', () => {
     // Q-39: 1 hoe and 3 carrot seeds on first entry, carrots ripe 60 s after sowing by server time.
     // Q-40: 1 first-house blueprint on first entry; the approved 3×3 cottage (C-30#12) is built as soon as it is placed.
     expect(rules.welcome_gift).toEqual({ hoe_starter: 1, seed_carrot: 3, blueprint_cottage: 1 });
-    expect(rules.house).toEqual({ model: 'cottage', blueprint: 'blueprint_cottage', width: 3, depth: 3 });
+    // C-150: the cottage is the one building type so far, at most one per parcel, as Q-40's single first house.
+    expect(rules.buildings).toEqual({ cottage: { model: 'cottage', blueprint: 'blueprint_cottage', width: 3, depth: 3, max: 1 } });
     // C-148: sowing a carrot costs 3 Energy, P0's carrot (assets/p0/p0_content.json crops.crop_carrot.energy).
     expect(rules.crops).toEqual({ crop_carrot: { seed: 'seed_carrot', grow_seconds: 60, yield: 1, energy: 3 } });
     expect(rules.till_tool).toBe('hoe_starter');
@@ -38,7 +39,12 @@ describe('dynamic_farm.json', () => {
     expect(() => parseParcelRules({ ...rules, version: 2 })).toThrow();
     expect(() => parseParcelRules({ ...rules, crops: { crop_carrot: { seed: 'seed_carrot', grow_seconds: 0, yield: 1 } } })).toThrow();
     expect(() => parseParcelRules({ ...rules, communities: [{ id: 'a', datasets: ['d'] }, { id: 'b', datasets: ['d'] }] })).toThrow();
-    expect(() => parseParcelRules({ ...rules, house: { model: 'cottage', width: 3, depth: 3 } })).toThrow();
+    expect(() => parseParcelRules({ ...rules, buildings: { cottage: { model: 'cottage', width: 3, depth: 3, max: 1 } } })).toThrow();
+    expect(() => parseParcelRules({ ...rules, buildings: { cottage: { ...rules.buildings.cottage, max: 0 } } })).toThrow();
+    expect(() => parseParcelRules({ ...rules, buildings: { cottage: { ...rules.buildings.cottage, width: 17 } } })).toThrow();
+    // The cottage must stay: old saves' house and old clients' place_house are cottages.
+    expect(() => parseParcelRules({ ...rules, buildings: { well: { ...rules.buildings.cottage, model: 'well' } } })).toThrow();
+    expect(() => parseParcelRules({ ...rules, buildings: undefined })).toThrow();
     expect(() => parseParcelRules({ ...rules, till_tool: undefined })).toThrow();
     expect(() => parseParcelRules({ ...rules, welcome_gift: undefined })).toThrow();
   });
@@ -194,7 +200,7 @@ describe('parcel economy (C-58)', () => {
   it('an old C-31 save without economy fields reads as 0 coins, nothing sold, gathered or claimed; existing fields untouched', () => {
     const legacy = { v: 1, house: null, cleared: ['2,2'], tilled: ['1,1'], crops: {}, bag: { hoe_starter: 1, crop_carrot: 1 }, welcomed_at: T0 } as unknown as ParcelFarmState;
     const frozen = structuredClone(legacy);
-    expect(withEconomy(legacy)).toEqual({ ...frozen, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} });
+    expect(withEconomy(legacy)).toEqual({ ...frozen, buildings: [], coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} });
     expect(legacy).toEqual(frozen);
     expect(withEconomy({ ...legacy, coins: 30, sales: 2 } as ParcelFarmState)).toMatchObject({ coins: 30, sales: 2 });
     // And it can sell straight away.
@@ -332,7 +338,7 @@ describe('rebase onto a newer dataset (C-136, Q-168)', () => {
     expect(s.bag.seed_carrot).toBeUndefined();
     const before = structuredClone(s);
     const moved = rebaseFarm(rules, s);
-    expect(moved).toEqual({ ...before, house: null, cleared: [], tilled: [], crops: {}, gathered: {},
+    expect(moved).toEqual({ ...before, buildings: [], house: null, cleared: [], tilled: [], crops: {}, gathered: {},
       bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1, seed_carrot: 2, blueprint_cottage: 1 } });
     expect(s).toEqual(before); // the input is untouched
     // The cottage goes back up on the new cells with the returned blueprint.
@@ -346,6 +352,136 @@ describe('rebase onto a newer dataset (C-136, Q-168)', () => {
     expect(rebaseFarm(rules, odd).bag).toEqual(welcomed().bag);
     // A C-31 era save without the economy fields comes out with them.
     const legacy = { v: 1, house: null, cleared: ['1,2'], tilled: [], crops: {}, bag: { hoe_starter: 1 }, welcomed_at: T0 } as unknown as ParcelFarmState;
-    expect(rebaseFarm(rules, legacy)).toEqual({ ...legacy, cleared: [], coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} });
+    expect(rebaseFarm(rules, legacy)).toEqual({ ...legacy, buildings: [], cleared: [], coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} });
+  });
+});
+
+/**
+ * C-150（0.4.5）：多栋建筑、按类型配置、四个朝向（所有者 SEN-C-134#22 第 3 题）。发布的规则只有小屋；
+ * 这里在规则副本里加两种测试用类型（不是新建筑）：1×1、最多 3 口的 well，4×2、最多 1 栋的 coop。
+ */
+describe('buildings (C-150)', () => {
+  const multi = parseParcelRules({ ...structuredClone(rules), buildings: { ...rules.buildings,
+    well: { model: 'well', blueprint: 'blueprint_well', width: 1, depth: 1, max: 3 },
+    coop: { model: 'coop', blueprint: 'blueprint_coop', width: 4, depth: 2, max: 1 } } });
+  const stocked = (): ParcelFarmState => {
+    const s = welcomed();
+    s.bag = { ...s.bag, blueprint_well: 5, blueprint_coop: 2 };
+    return s;
+  };
+  const place = (building: string, x: number, y: number, rotation = 0): FarmCommand => ({ type: 'place_building', building, x, y, rotation });
+  const go = (state: ParcelFarmState, commands: FarmCommand[], now = T0) => {
+    const out = applyFarmCommands(multi, state, commands, now);
+    if (!out.ok) throw new Error(`${out.code} @${out.index}`);
+    return out.state;
+  };
+  const tryIt = (state: ParcelFarmState, commands: FarmCommand[]) => applyFarmCommands(multi, state, commands, T0);
+
+  it('parses place_building: a type, a cell and a rotation of 0–3 quarter turns (default 0)', () => {
+    expect(parseFarmCommands([{ type: 'place_building', building: 'well', x: 3, y: 4 }]))
+      .toEqual([{ type: 'place_building', building: 'well', x: 3, y: 4, rotation: 0 }]);
+    expect(parseFarmCommands([{ type: 'place_building', building: 'well', x: 3, y: 4, rotation: 3 }])).toMatchObject([{ rotation: 3 }]);
+    for (const bad of [{ building: 'well', x: 3, y: 4, rotation: 4 }, { building: 'well', x: 3, y: 4, rotation: 1.5 }, { x: 3, y: 4 },
+      { building: 7, x: 3, y: 4 }, { building: 'w'.repeat(65), x: 3, y: 4 }, { building: 'well', x: -1, y: 4 }, { building: 'well', x: 3, y: 1024 }])
+      expect(parseFarmCommands([{ type: 'place_building', ...bad }])).toBeNull();
+  });
+
+  it('saves several buildings with their own type, spot, rotation and footprint; ids count up; house mirrors the cottage', () => {
+    const s = go(stocked(), [place('well', 2, 2), place('cottage', 10, 10, 2), place('coop', 20, 5, 1), place('well', 4, 2, 3)]);
+    expect(s.buildings).toEqual([
+      { id: 1, type: 'well', model: 'well', x: 2, y: 2, width: 1, depth: 1, rotation: 0, built_at: T0 },
+      { id: 2, type: 'cottage', model: 'cottage', x: 10, y: 10, width: 3, depth: 3, rotation: 2, built_at: T0 },
+      { id: 3, type: 'coop', model: 'coop', x: 20, y: 5, width: 4, depth: 2, rotation: 1, built_at: T0 },
+      { id: 4, type: 'well', model: 'well', x: 4, y: 2, width: 1, depth: 1, rotation: 3, built_at: T0 },
+    ]);
+    expect(s.house).toEqual({ model: 'cottage', x: 10, y: 10, width: 3, depth: 3, rotation: 2, built_at: T0 });
+    expect(s.bag).toMatchObject({ blueprint_well: 3, blueprint_coop: 1 });
+    expect(s.bag.blueprint_cottage).toBeUndefined();
+    // A server round trip (JSON) keeps them all.
+    expect(withEconomy(JSON.parse(JSON.stringify(s)))).toEqual(s);
+  });
+
+  it('refuses a building on another one, naming the shared cells; the rotated footprint counts', () => {
+    const s = go(stocked(), [place('cottage', 10, 10)]); // cells 10–12 × 10–12
+    expect(tryIt(s, [place('well', 12, 12)])).toEqual({ ok: false, index: 0, code: 'BUILDING_OVERLAP', detail: { cells: ['12,12'] } });
+    // The coop unturned is 4 wide, 2 deep: at 6,9 it covers x 6–9, y 9–10 and stops short of the cottage.
+    const beside = go(s, [place('coop', 6, 9)]);
+    expect(beside.buildings).toHaveLength(2);
+    // Turned a quarter it is 2 wide, 4 deep: at 9,7 it covers x 9–10, y 7–10 and reaches into the cottage's corner.
+    expect(tryIt(s, [place('coop', 9, 7, 1)])).toEqual({ ok: false, index: 0, code: 'BUILDING_OVERLAP', detail: { cells: ['10,10'] } });
+    expect(tryIt(s, [place('coop', 9, 7, 3)])).toMatchObject({ ok: false, code: 'BUILDING_OVERLAP' });
+    // Unturned (or turned half) the same spot covers x 9–12, y 7–8, clear of it.
+    expect(go(s, [place('coop', 9, 7, 0)]).buildings).toHaveLength(2);
+    expect(go(s, [place('coop', 9, 7, 2)]).buildings).toHaveLength(2);
+    // Two buildings in one batch may not overlap each other either; the refused batch changes nothing.
+    const before = structuredClone(s);
+    expect(tryIt(s, [place('well', 1, 1), place('well', 1, 1)])).toMatchObject({ ok: false, index: 1, code: 'BUILDING_OVERLAP', detail: { cells: ['1,1'] } });
+    expect(s).toEqual(before);
+  });
+
+  it('refuses a building on tilled ground or crops, the rotated footprint as well; tilling and gathering stay off every building', () => {
+    const s = go(stocked(), [{ type: 'till', cell: '5,8' }, { type: 'till', cell: '7,4' }, { type: 'sow', cell: '7,4', crop: 'crop_carrot' }]);
+    // Turned, the coop at 5,5 covers x 5–6, y 5–8: the tilled cell 5,8 is under it.
+    expect(tryIt(s, [place('coop', 5, 5, 1)])).toEqual({ ok: false, index: 0, code: 'CELL_OCCUPIED', detail: { cells: ['5,8'] } });
+    // Unturned it covers x 5–8, y 5–6: clear.
+    expect(go(s, [place('coop', 5, 5)]).buildings).toHaveLength(1);
+    // Unturned at 4,3 it covers x 4–7, y 3–4: the sown cell 7,4 (tilled too) is under it.
+    expect(tryIt(s, [place('coop', 4, 3)])).toEqual({ ok: false, index: 0, code: 'CELL_OCCUPIED', detail: { cells: ['7,4'] } });
+    const built = go(s, [place('coop', 5, 5), place('well', 12, 12)]);
+    for (const cell of ['8,6', '12,12'])
+      expect(tryIt(built, [{ type: 'till', cell }])).toEqual({ ok: false, index: 0, code: 'CELL_OCCUPIED', detail: { cells: [cell] } });
+    const tree = 'p-3512001:outer-groves-v2:wild_pz_tree_20:12,12:0';
+    expect(applyFarmCommands(multi, built, [{ type: 'gather', object: tree }], T0, { parcel_id: 'p-3512001' })).toMatchObject({ ok: false, code: 'NOT_OUTER' });
+  });
+
+  it('checks the type, its limit, the blueprint and the bounds', () => {
+    const s = stocked();
+    expect(tryIt(s, [place('barn', 1, 1)])).toEqual({ ok: false, index: 0, code: 'UNKNOWN_BUILDING', detail: { building: 'barn' } });
+    expect(tryIt(s, [place('constructor', 1, 1)])).toMatchObject({ code: 'UNKNOWN_BUILDING' }); // not an inherited key
+    const wells = go(s, [place('well', 1, 1), place('well', 3, 1), place('well', 5, 1)]);
+    expect(tryIt(wells, [place('well', 7, 1)])).toEqual({ ok: false, index: 0, code: 'BUILDING_LIMIT', detail: { building: 'well', max: 3 } });
+    expect(tryIt({ ...s, bag: { blueprint_well: 1 } }, [place('coop', 1, 1)])).toEqual({ ok: false, index: 0, code: 'NO_BLUEPRINT', detail: { item: 'blueprint_coop' } });
+    // A 4×2 coop at x 1020 reaches x 1023, the last cell; at 1021 it would leave the grid; turned it is only 2 wide.
+    expect(go(s, [place('coop', 1020, 0)]).buildings).toHaveLength(1);
+    expect(tryIt(s, [place('coop', 1021, 0)])).toMatchObject({ code: 'OUT_OF_BOUNDS' });
+    expect(go(s, [place('coop', 1021, 0, 1)]).buildings).toHaveLength(1);
+    expect(tryIt(s, [place('coop', 0, 1021, 1)])).toMatchObject({ code: 'OUT_OF_BOUNDS' });
+  });
+
+  it('place_house (0.4.4 and older clients) is the cottage: one only, HOUSE_PLACED for a second either way', () => {
+    const viaOld = go(stocked(), [{ type: 'place_house', x: 9, y: 9, rotation: 1 }]);
+    expect(viaOld.buildings).toEqual([{ id: 1, type: 'cottage', model: 'cottage', x: 9, y: 9, width: 3, depth: 3, rotation: 1, built_at: T0 }]);
+    expect(tryIt({ ...viaOld, bag: { ...viaOld.bag, blueprint_cottage: 1 } }, [place('cottage', 20, 20)]))
+      .toEqual({ ok: false, index: 0, code: 'BUILDING_LIMIT', detail: { building: 'cottage', max: 1 } });
+    const viaNew = go(stocked(), [place('well', 1, 1), place('cottage', 9, 9)]);
+    expect(tryIt({ ...viaNew, bag: { ...viaNew.bag, blueprint_cottage: 1 } }, [{ type: 'place_house', x: 20, y: 20 }])).toMatchObject({ code: 'HOUSE_PLACED' });
+    // An old client's house lands beside the new buildings under the same overlap rule.
+    expect(tryIt(go(stocked(), [place('well', 10, 10)]), [{ type: 'place_house', x: 9, y: 9 }])).toMatchObject({ code: 'BUILDING_OVERLAP', detail: { cells: ['10,10'] } });
+  });
+
+  it('an old save with one house reads it as cottage 1 where it stood and facing as it did, still solid to tilling and new buildings', () => {
+    for (const rotation of [0, 1, 2, 3]) {
+      const house = { model: 'cottage', x: 6, y: 6, width: 3, depth: 3, rotation, built_at: T0 - 5 };
+      const legacy = { v: 1, house, cleared: [], tilled: ['1,1'], crops: {}, bag: { hoe_starter: 1, blueprint_well: 1 }, welcomed_at: T0 } as unknown as ParcelFarmState;
+      const frozen = structuredClone(legacy);
+      const read = withEconomy(legacy);
+      expect(read.buildings).toEqual([{ id: 1, type: 'cottage', ...house }]);
+      expect(read.house).toEqual(house);
+      expect(legacy).toEqual(frozen);
+      expect(tryIt(legacy, [{ type: 'till', cell: '8,8' }])).toMatchObject({ code: 'CELL_OCCUPIED' });
+      expect(tryIt(legacy, [place('well', 7, 7)])).toMatchObject({ code: 'BUILDING_OVERLAP', detail: { cells: ['7,7'] } });
+      const more = go(legacy, [place('well', 9, 6)]);
+      expect(more.buildings.map(b => [b.id, b.type])).toEqual([[1, 'cottage'], [2, 'well']]);
+      expect(more.house).toEqual(house);
+      expect(tryIt(legacy, [{ type: 'place_house', x: 20, y: 20 }])).toMatchObject({ code: 'HOUSE_PLACED' });
+    }
+  });
+
+  it('a rebase gives back one blueprint per building of a known type', () => {
+    const s = go(stocked(), [place('cottage', 9, 9), place('well', 1, 1), place('well', 3, 1), place('coop', 20, 20, 1)]);
+    const moved = rebaseFarm(multi, { ...s, buildings: [...s.buildings, { ...s.buildings[1], id: 9, type: 'gone' }] });
+    expect(moved.buildings).toEqual([]);
+    expect(moved.house).toBeNull();
+    expect(moved.bag).toMatchObject({ blueprint_cottage: 1, blueprint_well: 5, blueprint_coop: 2 });
   });
 });

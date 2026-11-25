@@ -27,6 +27,7 @@ func _check(ok: bool, label: String) -> void:
 func _run() -> void:
 	_rules()
 	_commands()
+	_buildings()
 	_space()
 	_store()
 	_guide()
@@ -76,7 +77,9 @@ func _commands() -> void:
 	_check(ripe.ok and ripe.state.bag.crop_carrot == 1 and "10,10" in ripe.state.tilled and ripe.state.crops.is_empty(), "harvest puts the carrot in the bag, soil stays tilled")
 	var batch := ParcelFarm.apply(rules, state, [{"type": "till", "cell": "12,10"}, {"type": "harvest", "cell": "10,10"}], T0)
 	_check(not batch.ok and batch.index == 1 and "12,10" not in state.tilled, "a failed batch changes nothing")
+	# A save from before C-150: only the one house, no `buildings`.
 	var housed := state.duplicate(true)
+	housed.erase("buildings")
 	housed.house = {"model": "cottage", "x": 20, "y": 8, "width": 3, "depth": 3, "rotation": 0, "built_at": T0}
 	_check(ParcelFarm.apply(rules, housed, [{"type": "till", "cell": "22,10"}], T0).code == "CELL_OCCUPIED", "no tilling under the house")
 	_check(ParcelFarm.apply(rules, housed, [{"type": "till", "cell": "23,10"}], T0).ok, "next to the house is fine")
@@ -92,8 +95,85 @@ func _commands() -> void:
 	_check(ParcelFarm.apply(rules, state, [{"type": "place_house", "x": 1.5, "y": 0}], T0).code == "SCHEMA", "whole coordinates only")
 	_check(ParcelFarm.parse_key("01,2") == null and ParcelFarm.parse_key("1, 2") == null and ParcelFarm.parse_key("3,4") == Vector2i(3, 4), "canonical cell keys only")
 	var round_trip := ParcelFarm.normalize(JSON.parse_string(JSON.stringify(housed)))
-	_check(round_trip == housed, "a JSON round trip keeps the farm")
+	var read := housed.duplicate(true)
+	read.buildings = [{"model": "cottage", "x": 20, "y": 8, "width": 3, "depth": 3, "rotation": 0, "built_at": T0, "id": 1, "type": "cottage"}]
+	_check(round_trip == read, "a JSON round trip keeps the farm, the old house read as cottage 1")
+	_check(ParcelFarm.normalize(JSON.parse_string(JSON.stringify(placed))) == placed, "a JSON round trip keeps the buildings")
 	_check(ParcelFarm.normalize({"v": 2}).is_empty(), "other versions are refused")
+
+## C-150: several buildings by type, four turns, the same refusals as the server (farm.test.ts 'buildings (C-150)').
+## The shipped rules have only the cottage; a copy adds two test-only types (not new buildings): a 1×1 well, at
+## most 3, and a 4×2 coop, at most 1.
+func _buildings() -> void:
+	var rules := ParcelFarm.rules()
+	_check(rules.buildings == {"cottage": {"model": "cottage", "blueprint": "blueprint_cottage", "width": 3, "depth": 3, "max": 1}},
+		"buildings: the cottage only, one per parcel")
+	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH))
+	raw.buildings["well"] = {"model": "well", "blueprint": "blueprint_well", "width": 1, "depth": 1, "max": 3}
+	raw.buildings["coop"] = {"model": "coop", "blueprint": "blueprint_coop", "width": 4, "depth": 2, "max": 1}
+	var multi := ParcelFarm.parse_rules(raw)
+	_check(multi.buildings.coop.width == 4 and multi.buildings.well.max == 3, "buildings: per-type rules parse")
+	var no_home: Dictionary = raw.duplicate(true)
+	no_home.buildings.erase("cottage")
+	var wide: Dictionary = raw.duplicate(true)
+	wide.buildings.coop.width = 17
+	_check(ParcelFarm.parse_rules(no_home).is_empty() and ParcelFarm.parse_rules(wide).is_empty(), "buildings: the cottage must stay; sides 1–16")
+	var start := ParcelFarm.welcome(multi, ParcelFarm.empty_state(), T0) as Dictionary
+	start.bag.blueprint_well = 5
+	start.bag.blueprint_coop = 2
+	var place := func(type: String, x: int, y: int, turns := 0) -> Dictionary:
+		return {"type": "place_building", "building": type, "x": x, "y": y, "rotation": turns}
+	var all := ParcelFarm.apply(multi, start, [place.call("well", 2, 2), place.call("cottage", 10, 10, 2), place.call("coop", 20, 5, 1),
+		place.call("well", 4, 2, 3)], T0)
+	_check(all.ok and all.state.buildings.map(func(b): return [b.id, b.type, b.x, b.y, b.rotation]) == \
+		[[1, "well", 2, 2, 0], [2, "cottage", 10, 10, 2], [3, "coop", 20, 5, 1], [4, "well", 4, 2, 3]], "buildings: each with its type, spot and turn")
+	_check(all.state.house == {"model": "cottage", "x": 10, "y": 10, "width": 3, "depth": 3, "rotation": 2, "built_at": T0},
+		"buildings: house mirrors the cottage")
+	_check(ParcelFarm.building_cells(all.state).has(Vector2i(21, 8)) and not ParcelFarm.building_cells(all.state).has(Vector2i(22, 5)),
+		"buildings: the turned coop covers x 20–21, y 5–8")
+	var cottage: Dictionary = ParcelFarm.apply(multi, start, [place.call("cottage", 10, 10)], T0).state
+	var overlap := ParcelFarm.apply(multi, cottage, [place.call("well", 12, 12)], T0)
+	_check(overlap.code == "BUILDING_OVERLAP" and overlap.detail.cells == ["12,12"], "buildings: not on another building")
+	var turned := ParcelFarm.apply(multi, cottage, [place.call("coop", 9, 7, 1)], T0)
+	_check(turned.code == "BUILDING_OVERLAP" and turned.detail.cells == ["10,10"], "buildings: the turned footprint counts")
+	_check(ParcelFarm.apply(multi, cottage, [place.call("coop", 9, 7, 0)], T0).ok and ParcelFarm.apply(multi, cottage, [place.call("coop", 9, 7, 2)], T0).ok,
+		"buildings: unturned the same spot is clear")
+	var tilled: Dictionary = ParcelFarm.apply(multi, start, [{"type": "till", "cell": "5,8"}], T0).state
+	var on_soil := ParcelFarm.apply(multi, tilled, [place.call("coop", 5, 5, 1)], T0)
+	_check(on_soil.code == "CELL_OCCUPIED" and on_soil.detail.cells == ["5,8"] and ParcelFarm.apply(multi, tilled, [place.call("coop", 5, 5)], T0).ok,
+		"buildings: not on tilled soil, turned or not")
+	var coop: Dictionary = ParcelFarm.apply(multi, start, [place.call("coop", 5, 5)], T0).state
+	_check(ParcelFarm.apply(multi, coop, [{"type": "till", "cell": "8,6"}], T0).code == "CELL_OCCUPIED", "buildings: no tilling under any building")
+	var wells: Dictionary = ParcelFarm.apply(multi, start, [place.call("well", 1, 1), place.call("well", 3, 1), place.call("well", 5, 1)], T0).state
+	var limit := ParcelFarm.apply(multi, wells, [place.call("well", 7, 1)], T0)
+	_check(limit.code == "BUILDING_LIMIT" and limit.detail == {"building": "well", "max": 3}, "buildings: each type's limit")
+	_check(ParcelFarm.apply(multi, start, [place.call("barn", 1, 1)], T0).code == "UNKNOWN_BUILDING", "buildings: unknown types refused")
+	_check(ParcelFarm.apply(multi, start, [place.call("coop", 1021, 0)], T0).code == "OUT_OF_BOUNDS" and ParcelFarm.apply(multi, start, [place.call("coop", 1021, 0, 1)], T0).ok,
+		"buildings: the turned footprint stays on the grid")
+	_check(ParcelFarm.apply(multi, start, [place.call("well", 1, 1, 4)], T0).code == "SCHEMA" and ParcelFarm.apply(multi, start, [{"type": "place_building", "x": 1, "y": 1}], T0).code == "SCHEMA",
+		"buildings: a turn of 0–3 and a type")
+	var batch := ParcelFarm.apply(multi, start, [place.call("well", 1, 1), place.call("well", 1, 1)], T0)
+	_check(batch.index == 1 and batch.code == "BUILDING_OVERLAP" and start.buildings.is_empty(), "buildings: a refused batch changes nothing")
+	var old := ParcelFarm.apply(multi, start, [{"type": "place_house", "x": 9, "y": 9, "rotation": 1}], T0)
+	_check(old.ok and old.state.buildings == [{"id": 1, "type": "cottage", "model": "cottage", "x": 9, "y": 9, "width": 3, "depth": 3, "rotation": 1, "built_at": T0}],
+		"buildings: place_house is the cottage")
+	var again: Dictionary = old.state.duplicate(true)
+	again.bag.blueprint_cottage = 1
+	_check(ParcelFarm.apply(multi, again, [place.call("cottage", 20, 20)], T0).code == "BUILDING_LIMIT"
+		and ParcelFarm.apply(multi, again, [{"type": "place_house", "x": 20, "y": 20}], T0).code == "HOUSE_PLACED", "buildings: one cottage either way")
+	# Saves from before C-150, the house turned any way: cottage 1 where it stood and facing as it did.
+	for turns in 4:
+		var house := {"model": "cottage", "x": 6, "y": 6, "width": 3, "depth": 3, "rotation": turns, "built_at": T0 - 5}
+		var legacy := {"v": 1, "house": house, "cleared": [], "tilled": [], "crops": {}, "bag": {"blueprint_well": 1}, "welcomed_at": T0}
+		var read := ParcelFarm.normalize(JSON.parse_string(JSON.stringify(legacy)))
+		var home := house.duplicate()
+		home.id = 1
+		home.type = "cottage"
+		_check(read.buildings == [home] and read.house == house, "buildings: an old house (turn %d) reads unchanged" % turns)
+		_check(ParcelFarm.apply(multi, legacy, [place.call("well", 7, 7)], T0).code == "BUILDING_OVERLAP"
+			and ParcelFarm.apply(multi, legacy, [place.call("well", 9, 6)], T0).ok, "buildings: an old house still takes its cells (turn %d)" % turns)
+	_check(ParcelFarm.normalize({"v": 1, "buildings": [{"x": 1, "y": 1, "width": 1, "depth": 1, "rotation": 0}], "cleared": [], "tilled": [], "crops": {}, "bag": {}}).is_empty(),
+		"buildings: an entry without id and type is refused")
 
 func _space() -> void:
 	var rules := ParcelFarm.rules()
@@ -107,7 +187,7 @@ func _space() -> void:
 	for y in range(4, 15): through = through and (path.has(Vector2i(23, y)) or path.has(Vector2i(24, y)) or path.has(Vector2i(25, y)))
 	_check(through and path.size() < 60, "a narrow path from the core edge to the spawn")
 	var state := ParcelFarm.welcome(rules, ParcelFarm.empty_state(), T0) as Dictionary
-	state.house = {"model": "cottage", "x": 8, "y": 6, "width": 3, "depth": 3, "rotation": 0, "built_at": T0}
+	state.buildings = [{"id": 1, "type": "cottage", "model": "cottage", "x": 8, "y": 6, "width": 3, "depth": 3, "rotation": 0, "built_at": T0}]
 	var free_cell := Vector2i(36, 18)
 	_check(not path.has(free_cell) and Space.till_refusal(data, path, state, free_cell) == "", "a free core cell may be tilled")
 	_check(Space.till_refusal(data, path, state, Vector2i(1, 10)) == Space.OUTSIDE, "the walk-only outer ring refuses")
@@ -332,13 +412,28 @@ func _energy_space() -> void:
 	var path := Space.protected_path(data)
 	var state := ParcelFarm.welcome(rules, ParcelFarm.empty_state(), T0) as Dictionary
 	_check(Space.door_row(state).is_empty() and Space.door_cell(state) == null, "rest: no cottage, no door")
-	state.house = {"model": "cottage", "x": 8, "y": 6, "width": 3, "depth": 3, "rotation": 0, "built_at": T0}
+	# C-150: the cottage is found in the building list, whatever else stands there and whatever `house` says.
+	var cottage := {"model": "cottage", "x": 8, "y": 6, "width": 3, "depth": 3, "rotation": 0, "built_at": T0}
+	var other := {"id": 1, "type": "shed", "model": "shed", "x": 2, "y": 2, "width": 2, "depth": 2, "rotation": 0, "built_at": T0}
+	state.buildings = [other, cottage.merged({"id": 2, "type": "cottage"})]
+	state.house = null
+	_check(ParcelFarm.has_home(state) and ParcelFarm.home_building(state).id == 2, "rest: the cottage is building 2 of the list")
 	_check(Space.door_row(state).keys().size() == 3 and Space.door_row(state).has(Vector2i(9, 6)) and Space.door_cell(state) == Vector2i(9, 6),
 		"rest: rotation 0 opens to −y, the door in the middle")
 	var turned := state.duplicate(true)
 	for turn in [[1, Vector2i(10, 7)], [2, Vector2i(9, 8)], [3, Vector2i(8, 7)]]:
-		turned.house.rotation = turn[0]
+		turned.buildings[1].rotation = turn[0]
 		_check(Space.door_cell(turned) == turn[1], "rest: rotation %d's door at %s" % [turn[0], turn[1]])
+	var no_cottage := state.duplicate(true)
+	no_cottage.buildings = [other]
+	no_cottage.house = cottage
+	_check(not ParcelFarm.has_home(no_cottage) and Space.door_cell(no_cottage) == null, "rest: buildings without a cottage, no door")
+	_check(ParcelFarm.apply(rules, no_cottage.merged({"energy": {"value": 50, "at": T0, "rested_on": null}}, true), [{"type": "rest"}], T0).code
+		== "NO_HOUSE", "rest: the client refuses it without a cottage in the list, as the server")
+	var old_save := state.duplicate(true)
+	old_save.erase("buildings")
+	old_save.house = cottage
+	_check(ParcelFarm.has_home(old_save) and Space.door_cell(old_save) == Vector2i(9, 6), "rest: an old house-only save reads its cottage")
 	state.energy = {"value": 50, "at": T0, "rested_on": null}
 	var rest := Space.action(rules, data, path, {}, state, Vector2i(8, 6), T0)
 	_check(rest.verb == "rest" and rest.refusal == "" and rest.command == {"type": "rest"} and rest.gain == 60, "rest: the door row offers Rest +60")

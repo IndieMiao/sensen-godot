@@ -101,6 +101,7 @@ describe('C-148 not enough Energy: the server refuses and the save does not chan
     }
     // Free actions still work at 0.
     expect(applyFarmCommands(rules, withEnergy(s, 0), [{ type: 'place_house', x: 10, y: 10 }], T0, ctx).ok).toBe(true);
+    expect(applyFarmCommands(rules, withEnergy(s, 0), [{ type: 'place_building', building: 'cottage', x: 10, y: 10, rotation: 0 }], T0, ctx).ok).toBe(true);
   });
 
   it('a batch that runs out half way is refused whole', () => {
@@ -176,6 +177,18 @@ describe('C-148 Rest at the cottage: +60 once a player day', () => {
     // Near the top it gives only what fits, and a full pool cannot rest (the day's rest is kept).
     expect(run(housed(180), [{ type: 'rest' }]).energy).toEqual({ value: 200, at: T0, rested_on: '2026-11-23' });
     expect(applyFarmCommands(rules, housed(200), [{ type: 'rest' }], T0, ctx)).toMatchObject({ ok: false, code: 'ENERGY_FULL' });
+  });
+
+  it('finds the cottage in the building list (C-150), placed either way or carried over from an old house-only save', () => {
+    const built = withEnergy(run(veteran(), [{ type: 'place_building', building: 'cottage', x: 10, y: 10, rotation: 1 }]), 50);
+    expect(run(built, [{ type: 'rest' }]).energy).toEqual({ value: 110, at: T0, rested_on: '2026-11-23' });
+    // A save from before C-150: only house, no buildings. It reads as building 1, a cottage, so Rest works.
+    const old = housed(50) as Partial<ParcelFarmState> & ParcelFarmState;
+    delete (old as Partial<ParcelFarmState>).buildings;
+    expect(run(old, [{ type: 'rest' }]).energy).toEqual({ value: 110, at: T0, rested_on: '2026-11-23' });
+    // The building list decides, not the old house mirror: buildings without a cottage cannot rest.
+    const stale = { ...withEnergy(veteran(), 50), buildings: [], house: housed(50).house };
+    expect(applyFarmCommands(rules, stale, [{ type: 'rest' }], T0, ctx)).toMatchObject({ ok: false, code: 'NO_HOUSE' });
   });
 
   it('the player day turns at 04:00 San Francisco time (12:00 UTC); the next day rests again', () => {
