@@ -256,16 +256,18 @@ func _on_farm_changed(farm: Dictionary) -> void:
 func buildings_state() -> Array:
 	return ParcelFarm.buildings_of(_farming.farm) if _farming != null else []
 
-## The first type of the rules' `buildings` whose blueprint is in the bag, still under its limit and with art here;
-## "" when there is none. Only the cottage exists so far, so this is Build Cottage while its blueprint waits.
+## The first type of the rules' `buildings` whose blueprint is in the bag, still under its limit at the farm's level
+## (C-152: wells 2 from Lv3, 3 from Lv5) and with art here; "" when there is none.
 func build_choice() -> String:
 	if _farming == null: return ""
 	var bag: Dictionary = _farming.farm.get("bag", {})
-	var types: Dictionary = ParcelFarm.rules().get("buildings", {})
+	var rules := ParcelFarm.rules()
+	var types: Dictionary = rules.get("buildings", {})
 	var built := buildings_state()
+	var level := ParcelFarm.farm_level(_farming.farm)
 	for type: String in types:
 		if int(bag.get(types[type].blueprint, 0)) <= 0 or Building.kind(type).is_empty(): continue
-		if built.filter(func(b): return b.type == type).size() < int(types[type].max): return type
+		if built.filter(func(b): return b.type == type).size() < ParcelFarm.building_max(rules, type, level): return type
 	return ""
 
 func _refresh_build() -> void:

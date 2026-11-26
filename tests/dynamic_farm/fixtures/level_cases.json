@@ -1,0 +1,1699 @@
+{
+ "_note": "C-152: the same farm level cases for server/test/parcels/farm.test.ts and tests/dynamic_farm/test_parcel_farming.gd; parcel p-3512001. Regenerate only from the server rules.",
+ "parcel_id": "p-3512001",
+ "cases": [
+  {
+   "name": "Lv1 -> Lv2 with exactly 40 coins, 6 Timber and 4 Stone: all taken, no Energy spent",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1,
+     "wood": 6,
+     "stone": 4
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 40,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 1,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": true,
+    "level": 2,
+    "coins": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "buildings": [
+     "cottage"
+    ],
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "Lv2 -> Lv3 gives a well blueprint; leftovers stay",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1,
+     "wood": 13,
+     "stone": 8,
+     "wild_herb": 2
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 60,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 2,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": true,
+    "level": 3,
+    "coins": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 2,
+     "pail": 1,
+     "wood": 3,
+     "wild_herb": 2
+    },
+    "buildings": [
+     "cottage"
+    ],
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "Lv3 -> Lv4",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1,
+     "wood": 14,
+     "stone": 12
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 70,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 3,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": true,
+    "level": 4,
+    "coins": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "buildings": [
+     "cottage"
+    ],
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "Lv4 -> Lv5 gives another well blueprint",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1,
+     "wood": 20,
+     "stone": 16
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 80,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 4,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": true,
+    "level": 5,
+    "coins": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 2,
+     "pail": 1
+    },
+    "buildings": [
+     "cottage"
+    ],
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "Lv5 is the top: refused",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1,
+     "wood": 99,
+     "stone": 99
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 999,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 5,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "MAX_LEVEL",
+    "detail": {
+     "level": 5
+    }
+   }
+  },
+  {
+   "name": "no Timber: refused, naming Timber",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 40,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 1,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NOT_ENOUGH",
+    "detail": {
+     "item": "wood",
+     "have": 0,
+     "need": 6
+    }
+   }
+  },
+  {
+   "name": "a Stone short: refused, naming Stone",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1,
+     "wood": 6,
+     "stone": 3
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 40,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 1,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NOT_ENOUGH",
+    "detail": {
+     "item": "stone",
+     "have": 3,
+     "need": 4
+    }
+   }
+  },
+  {
+   "name": "Timber and coins both short: Timber is named first",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1,
+     "wood": 5,
+     "stone": 4
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 10,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 1,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NOT_ENOUGH",
+    "detail": {
+     "item": "wood",
+     "have": 5,
+     "need": 6
+    }
+   }
+  },
+  {
+   "name": "a coin short: refused, naming the coins",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1,
+     "wood": 6,
+     "stone": 4
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 39,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 1,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NOT_ENOUGH_COINS",
+    "detail": {
+     "coins": 39,
+     "need": 40
+    }
+   }
+  },
+  {
+   "name": "two upgrades on Lv2 money only: the second is refused and the batch is undone",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1,
+     "wood": 6,
+     "stone": 4
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 40,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 1,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    },
+    {
+     "type": "upgrade_farm"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": false,
+    "index": 1,
+    "code": "NOT_ENOUGH",
+    "detail": {
+     "item": "wood",
+     "have": 0,
+     "need": 10
+    }
+   }
+  },
+  {
+   "name": "an old save without a level upgrades from Lv1",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1,
+     "wood": 6,
+     "stone": 4
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 40,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": true,
+    "level": 2,
+    "coins": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "buildings": [
+     "cottage"
+    ],
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "Lv2: a second well is refused at one",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 2,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "place_building",
+     "building": "well",
+     "x": 40,
+     "y": 30,
+     "rotation": 0
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "BUILDING_LIMIT",
+    "detail": {
+     "building": "well",
+     "max": 1
+    }
+   }
+  },
+  {
+   "name": "Lv3: a second well stands",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 3,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "place_building",
+     "building": "well",
+     "x": 40,
+     "y": 30,
+     "rotation": 0
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": true,
+    "level": 3,
+    "coins": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "pail": 1
+    },
+    "buildings": [
+     "cottage",
+     "well",
+     "well"
+    ],
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "Lv3: a third well is refused at two",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795665600000
+     },
+     {
+      "id": 3,
+      "type": "well",
+      "model": "well",
+      "x": 32,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 3,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "place_building",
+     "building": "well",
+     "x": 40,
+     "y": 30,
+     "rotation": 0
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "BUILDING_LIMIT",
+    "detail": {
+     "building": "well",
+     "max": 2
+    }
+   }
+  },
+  {
+   "name": "Lv4: a third well is still refused at two",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795665600000
+     },
+     {
+      "id": 3,
+      "type": "well",
+      "model": "well",
+      "x": 32,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 4,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "place_building",
+     "building": "well",
+     "x": 40,
+     "y": 30,
+     "rotation": 0
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "BUILDING_LIMIT",
+    "detail": {
+     "building": "well",
+     "max": 2
+    }
+   }
+  },
+  {
+   "name": "Lv5: a third well stands",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795665600000
+     },
+     {
+      "id": 3,
+      "type": "well",
+      "model": "well",
+      "x": 32,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 2,
+     "pail": 1
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 5,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "place_building",
+     "building": "well",
+     "x": 40,
+     "y": 30,
+     "rotation": 0
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": true,
+    "level": 5,
+    "coins": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "buildings": [
+     "cottage",
+     "well",
+     "well",
+     "well"
+    ],
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "upgrade to Lv3 and build the second well with its blueprint in one batch",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     },
+     {
+      "id": 2,
+      "type": "well",
+      "model": "well",
+      "x": 30,
+      "y": 30,
+      "width": 1,
+      "depth": 1,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1,
+     "wood": 10,
+     "stone": 8
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 60,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 2,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    },
+    {
+     "type": "place_building",
+     "building": "well",
+     "x": 40,
+     "y": 30,
+     "rotation": 0
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": true,
+    "level": 3,
+    "coins": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "buildings": [
+     "cottage",
+     "well",
+     "well"
+    ],
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "Lv2 at 200 Energy is below its 210 top: it keeps coming back",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 2,
+    "energy": {
+     "value": 200,
+     "at": 1795665440000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "clear_obstacle",
+     "cell": "9,9"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": true,
+    "level": 2,
+    "coins": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "buildings": [
+     "cottage"
+    ],
+    "energy": {
+     "value": 199,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "Lv1 at 200 Energy is full: nothing comes back",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 1,
+    "energy": {
+     "value": 200,
+     "at": 1795665440000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "clear_obstacle",
+     "cell": "9,9"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": true,
+    "level": 1,
+    "coins": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "buildings": [
+     "cottage"
+    ],
+    "energy": {
+     "value": 198,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "full at Lv1, upgraded: 200 of 210, counting from the upgrade",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1,
+     "wood": 6,
+     "stone": 4
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 40,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 1,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    }
+   ],
+   "now": 1795665660000,
+   "expect": {
+    "ok": true,
+    "level": 2,
+    "coins": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "buildings": [
+     "cottage"
+    ],
+    "energy": {
+     "value": 200,
+     "at": 1795665660000,
+     "rested_on": null
+    }
+   }
+  },
+  {
+   "name": "rest at Lv5 fills up to 240",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 0,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 5,
+    "energy": {
+     "value": 190,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "rest"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": true,
+    "level": 5,
+    "coins": 0,
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1
+    },
+    "buildings": [
+     "cottage"
+    ],
+    "energy": {
+     "value": 240,
+     "at": 1795665600000,
+     "rested_on": "2026-11-25"
+    }
+   }
+  }
+ ]
+}

@@ -67,6 +67,52 @@
       "pail": 1
     }
   },
+  "farm_levels": [
+    {
+      "level": 2,
+      "coins": 40,
+      "items": {
+        "wood": 6,
+        "stone": 4
+      }
+    },
+    {
+      "level": 3,
+      "coins": 60,
+      "items": {
+        "wood": 10,
+        "stone": 8
+      },
+      "buildings": {
+        "well": 2
+      },
+      "gift": {
+        "blueprint_well": 1
+      }
+    },
+    {
+      "level": 4,
+      "coins": 70,
+      "items": {
+        "wood": 14,
+        "stone": 12
+      }
+    },
+    {
+      "level": 5,
+      "coins": 80,
+      "items": {
+        "wood": 20,
+        "stone": 16
+      },
+      "buildings": {
+        "well": 3
+      },
+      "gift": {
+        "blueprint_well": 1
+      }
+    }
+  ],
   "economy": {
     "sell_prices": {
       "crop_carrot": 12,
