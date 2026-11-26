@@ -1,6 +1,6 @@
 /**
  * 地块体力（C-148，所有者 C-137#15 第 3 题“照搬p0”）：照 P0 的 server/src/p0/rules.ts 结算。
- * 上限 max_base（农场每级 +per_level，等级在 C-152 做，这里按 1 级）；每 regen_ms 回 1 点，按服务端时间算，下线也回，
+ * 上限 max_base（农场每级 +per_level，等级见 C-152 的 farm.level）；每 regen_ms 回 1 点，按服务端时间算，下线也回，
  * 满了不再回、计时停在结算时刻，所以满条后花掉 1 点，下一个 +1 从花的时刻起算（§3.1.1）；新手期（首次进入自家地块后
  * blessing.days 天）恢复快 regen_mult 倍。休息：有小屋、每个玩家日一次，回 rest_amount（不超过上限）。
  * 玩家日按 day.utc_offset_hours 的当地时间、day.rollover_hour 点换日（P0 §3.1.1 的 04:00）。
@@ -15,13 +15,13 @@ import type { ParcelRules } from './rules.js';
 export interface EnergyState { value: number; at: number; rested_on: string | null }
 export interface EnergyRules {
   max_base: number;
-  /** 农场每升一级加的上限（C-152 接等级；本卡按 1 级）。 */
+  /** 农场每升一级加的上限（C-152：1 级 200，每级 +10）。 */
   per_level: number;
   regen_ms: number;
   rest_amount: number;
   blessing: { days: number; regen_mult: number };
   day: { utc_offset_hours: number; rollover_hour: number };
-  /** 不按作物计价的动作的体力价；播种按 crops.<作物>.energy。不在表里的动作不花体力（收获、出售、领蓝图、放房子、休息、浇水、拾取掉落物）。 */
+  /** 不按作物计价的动作的体力价；播种按 crops.<作物>.energy。不在表里的动作不花体力（收获、出售、领蓝图、放房子、休息、浇水、拾取掉落物、升级）。 */
   costs: Record<string, number>;
 }
 
@@ -29,8 +29,8 @@ export interface EnergyRules {
 export const PRICED_COMMANDS = ['clear_obstacle', 'till', 'gather', 'draw_water', 'feed'] as const;
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-/** 农场等级（C-152 之前一律 1 级）。 */
-export const farmLevel = (_s: ParcelFarmState): number => 1;
+/** 农场等级（C-152）；C-152 以前的存档没有 level，按 1 级。 */
+export const farmLevel = (s: ParcelFarmState): number => Number.isInteger(s.level) && s.level >= 1 ? s.level : 1;
 
 export function maxEnergy(rules: ParcelRules, s: ParcelFarmState): number {
   return rules.energy.max_base + rules.energy.per_level * (farmLevel(s) - 1);

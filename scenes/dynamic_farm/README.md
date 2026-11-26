@@ -56,6 +56,18 @@ library), for their own lengths; the pail is put away when they end. The guide a
 for water while a dry carrot waits. Shared cases: `tests/dynamic_farm/fixtures/watering_cases.json` (server and client).
 Notes: `docs/plans/C-151.md`.
 
+## Farm levels (C-152, 0.4.5)
+
+As P0's Homestead levels, Lv1 to Lv5 for now (`farm_levels` in `assets/farm/data/dynamic_farm.json`; the costs are the
+author's defaults on SEN-C-152#14 for the owner to confirm). Scott's greeting has `Upgrade Farm`, which opens the upgrade
+sheet (`parcel_upgrade.gd`, P0's HOME-1 in the kit: NEED-TILEs for Timber, Stone and Coins, What changes, the first gap on
+the Upgrade key per LOCK-10); Upgrade sends `upgrade_farm`. The server takes the next level's coins and materials (no
+Energy) or refuses the whole batch (`NOT_ENOUGH` naming the first short material, then `NOT_ENOUGH_COINS`; `MAX_LEVEL`
+at the top). Each level adds `energy.per_level` (10) to Max Energy; wells are 1 at Lv1, 2 from Lv3 and 3 from Lv5 (a
+level's `buildings`), and Lv3 and Lv5 put one Well Blueprint in the bag (`gift`), which `Build Well` uses. Tilled cells
+have no cap (owner SEN-C-137#10). The save's `level` is absent on older saves (Lv1) and kept across dataset moves.
+Shared cases: `tests/dynamic_farm/fixtures/level_cases.json` (server and client). Notes: `docs/plans/C-152.md`.
+
 ## Market and carpenter (C-59)
 
 Jasmine and Scott (`parcel_town.gd`) first opened over the map from two fixed entries, `Market` and `Carpenter`; since C-115 they stand in the Washington Square room (below). Both read and write that home's parcel save through the same store as the parcel scene: `read()` (`GET /parcels/mine`, no welcome gift) and `send()`. Jasmine introduces coins once per parcel on this device (`user://dynamic_farm_local/town.json`), then her `Sell` counter (`parcel_counter.gd`, built from the main counter's kit pieces; the main `P0CounterDrawer` is untouched) sells with the C-58 `sell` command at the rules' prices. Scott gives one Coop Blueprint with `claim_blueprint` once the parcel has sold something. Their looks are existing avatar parts, drawn by `P0KeeperPortraits.register_look`. The parcel's coins show in its top bar (C-74). Details and the copy draft: `docs/plans/C-59.md`; tests: `tests/dynamic_farm/test_parcel_town.gd`; review pictures: `tools/dev/dynamic_farm/town_shots.gd`.

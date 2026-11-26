@@ -13,6 +13,8 @@
 # GATHER_QA_WET_SOIL=1 turns on the development switch that draws tilled soil wet (C-138).
 # GATHER_QA_ENTRY=trade (C-149) makes the main scene tools/dev/dynamic_farm/trade_loop_qa.tscn instead, package
 # com.sensen.dynamicfarm.tradeqa: a stand-in for the map opening the Washington Square room and the parcel on one save.
+# GATHER_QA_ENTRY=level (C-152): tools/dev/dynamic_farm/level_loop_qa.tscn, package com.sensen.dynamicfarm.levelqa: the same
+# stand-in, its save starting with Lv2's price and Lv3's one Timber short, for Scott's farm upgrade.
 # On macOS the copied editor is re-signed ad hoc (the copy's signature is otherwise invalid and
 # the system kills it) and templates default to ~/Library/Application Support/Godot.
 # Staging is a disposable copy under $TMPDIR (committed sources at HEAD); nothing in the
@@ -32,7 +34,8 @@ abi=${GATHER_QA_ABI:-$host_abi}
 case ${GATHER_QA_ENTRY:-parcel} in
 parcel) entry=own_parcel_qa qa_id=gatherqa qa_ver=gather-qa qa_name='Gather QA' qa_dir=DynamicFarmGatherQa ;;
 trade) entry=trade_loop_qa qa_id=tradeqa qa_ver=trade-qa qa_name='Trade QA' qa_dir=DynamicFarmTradeQa ;;
-*) fail 'GATHER_QA_ENTRY must be parcel or trade' ;;
+level) entry=level_loop_qa qa_id=levelqa qa_ver=level-qa qa_name='Level QA' qa_dir=DynamicFarmLevelQa ;;
+*) fail 'GATHER_QA_ENTRY must be parcel, trade or level' ;;
 esac
 case $abi in
 x86_64) x86_64=true arm64=false ;;

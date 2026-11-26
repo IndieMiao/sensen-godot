@@ -5,7 +5,8 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONTENT_DIR } from '../../src/domain/content.js';
 import { applyFarmCommands, emptyFarm, grant, MAX_BATCH, MAX_BUY_COUNT, MAX_COINS, MAX_SELL_COUNT, NEVER, parseCell, parseFarmCommands, rebaseFarm,
   welcome, withEconomy, type FarmCommand, type ParcelFarmState } from '../../src/parcels/farm.js';
-import { communityOf, isNewerDataset, loadParcelRules, parseParcelRules } from '../../src/parcels/rules.js';
+import { maxEnergy } from '../../src/parcels/energy.js';
+import { buildingMax, communityOf, isNewerDataset, loadParcelRules, nextFarmLevel, parseParcelRules } from '../../src/parcels/rules.js';
 
 const rules = loadParcelRules(DEFAULT_CONTENT_DIR);
 const T0 = Date.UTC(2026, 10, 23, 4);
@@ -226,7 +227,7 @@ describe('parcel economy (C-58)', () => {
     const legacy = { v: 1, house: null, cleared: ['2,2'], tilled: ['1,1'], crops: {}, bag: { hoe_starter: 1, crop_carrot: 1 }, welcomed_at: T0 } as unknown as ParcelFarmState;
     const frozen = structuredClone(legacy);
     expect(withEconomy(legacy)).toEqual({ ...frozen, buildings: [], coins: 0, sales: 0, gathered: {}, blueprints_claimed: {},
-      drops: [], drop_seq: 0, pail_water: 0, grants: {} });
+      drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1 });
     expect(legacy).toEqual(frozen);
     expect(withEconomy({ ...legacy, coins: 30, sales: 2 } as ParcelFarmState)).toMatchObject({ coins: 30, sales: 2 });
     // And it can sell straight away.
@@ -459,7 +460,7 @@ describe('rebase onto a newer dataset (C-136, Q-168)', () => {
     // A C-31 era save without the economy fields comes out with them.
     const legacy = { v: 1, house: null, cleared: ['1,2'], tilled: [], crops: {}, bag: { hoe_starter: 1 }, welcomed_at: T0 } as unknown as ParcelFarmState;
     expect(rebaseFarm(rules, legacy, T0)).toEqual({ ...legacy, buildings: [], cleared: [], coins: 0, sales: 0, gathered: {}, blueprints_claimed: {},
-      drops: [], drop_seq: 0, pail_water: 0, grants: {} });
+      drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1 });
   });
 });
 
@@ -468,7 +469,7 @@ describe('rebase onto a newer dataset (C-136, Q-168)', () => {
  * 这里在规则副本里加两种测试用类型（不是新建筑）：1×1、最多 3 口的 well，4×2、最多 1 栋的 coop。
  */
 describe('buildings (C-150)', () => {
-  const multi = parseParcelRules({ ...structuredClone(rules), buildings: { ...rules.buildings,
+  const multi = parseParcelRules({ ...structuredClone(rules), farm_levels: [], buildings: { ...rules.buildings,
     well: { model: 'well', blueprint: 'blueprint_well', width: 1, depth: 1, max: 3 },
     coop: { model: 'coop', blueprint: 'blueprint_coop', width: 4, depth: 2, max: 1 } } });
   const stocked = (): ParcelFarmState => {
@@ -745,7 +746,7 @@ describe('coop, feeding and drops (C-154)', () => {
       bag: { blueprint_coop: 1 }, welcomed_at: T0, coins: 12, sales: 1, gathered: {}, blueprints_claimed: { coop: T0 } } as unknown as ParcelFarmState;
     const frozen = structuredClone(old);
     const read = withEconomy(old);
-    expect(read).toEqual({ ...frozen, drops: [], drop_seq: 0, pail_water: 0, grants: {} });
+    expect(read).toEqual({ ...frozen, drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1 });
     expect(old).toEqual(frozen);
     // Its blueprint builds the coop; Scott does not give a second one.
     expect(run(old, [coopAt(20, 20)]).buildings.map(b => b.type)).toEqual(['cottage', 'coop']);
@@ -942,5 +943,128 @@ describe('watering (C-151)', () => {
     expect(bad({ grants: { watering: {} } })).toThrow();
     expect(bad({ grants: { watering: { pail: 0 } } })).toThrow();
     expect(bad({ energy: { ...rules.energy, costs: { ...rules.energy.costs, water: 1 } } })).toThrow();   // watering stays free
+  });
+});
+
+/**
+ * C-152（0.4.5）：农场等级，照 P0 家园等级。在 Scott 处升级，花金币、木材、石头（数值是作者的默认值，SEN-C-152#14 列给所有者确认）；
+ * 每级体力上限 +10；井 1 级 1 口、3 级 2 口、5 级 3 口（3 级、5 级各送一张井的蓝图）；开垦格数不设上限（所有者 SEN-C-137#10）。
+ */
+describe('farm levels (C-152)', () => {
+  const UP: FarmCommand = { type: 'upgrade_farm' };
+  /** level 级、背包里另有 bag、金币 coins 的农场（首次进入后）。 */
+  const at = (level: number, bag: Record<string, number> = {}, coins = 0): ParcelFarmState => {
+    const s = welcomed();
+    return { ...s, level, coins, bag: { ...s.bag, ...bag } };
+  };
+  const enough = (level: number) => {
+    const next = nextFarmLevel(rules, level)!;
+    return at(level, next.items, next.coins);
+  };
+  const wellAt = (x: number): FarmCommand => ({ type: 'place_building', building: 'well', x, y: 30, rotation: 0 });
+
+  it('ships Lv1 to Lv5: coins as P0 Homestead Lv2–5, Timber and Stone rising; wells 1 / 2 / 3 at Lv1 / 3 / 5; Max Energy 200 + 10 a level', () => {
+    expect(rules.farm_levels).toEqual([
+      { level: 2, coins: 40, items: { wood: 6, stone: 4 } },
+      { level: 3, coins: 60, items: { wood: 10, stone: 8 }, buildings: { well: 2 }, gift: { blueprint_well: 1 } },
+      { level: 4, coins: 70, items: { wood: 14, stone: 12 } },
+      { level: 5, coins: 80, items: { wood: 20, stone: 16 }, buildings: { well: 3 }, gift: { blueprint_well: 1 } },
+    ]);
+    expect([1, 2, 3, 4, 5].map(l => maxEnergy(rules, at(l)))).toEqual([200, 210, 220, 230, 240]);
+    expect([1, 2, 3, 4, 5].map(l => buildingMax(rules, 'well', l))).toEqual([1, 1, 2, 2, 3]);
+    expect([1, 3, 5].map(l => buildingMax(rules, 'cottage', l))).toEqual([1, 1, 1]);
+    expect(nextFarmLevel(rules, 5)).toBeNull();
+  });
+
+  it('an old save has no level and reads as Lv1; a new farm starts at Lv1; moving datasets keeps the level', () => {
+    expect(emptyFarm().level).toBe(1);
+    const legacy = { ...welcomed() } as Partial<ParcelFarmState>;
+    delete legacy.level;
+    expect(withEconomy(legacy as ParcelFarmState).level).toBe(1);
+    expect(maxEnergy(rules, legacy as ParcelFarmState)).toBe(200);
+    expect(withEconomy({ ...welcomed(), level: 0 }).level).toBe(1);   // malformed: Lv1
+    expect(rebaseFarm(rules, at(4), T0).level).toBe(4);
+  });
+
+  it('upgrading takes the next level\'s coins, Timber and Stone, costs no Energy and raises Max Energy by 10', () => {
+    const out = applyFarmCommands(rules, enough(1), [UP], T0);
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.state).toMatchObject({ level: 2, coins: 0, energy: { value: 200, at: T0 } });
+    expect(out.state.bag).toEqual(welcomed().bag);
+    expect(maxEnergy(rules, out.state)).toBe(210);
+    // Below the new top, the 10 come back at the usual pace from the upgrade on (the newcomer's 2:40 here).
+    const later = run(out.state, [{ type: 'clear_obstacle', cell: '9,9' }], T0 + 10 * 160_000);
+    expect(later.energy).toEqual({ value: 208, at: T0 + 10 * 160_000, rested_on: null });
+    // Lv3 and Lv5 put one more well blueprint in the bag; leftover coins and materials stay.
+    const three = run({ ...enough(2), coins: 65, bag: { ...enough(2).bag, wood: 11 } }, [UP]);
+    expect(three).toMatchObject({ level: 3, coins: 5, bag: { wood: 1, blueprint_well: 1 } });
+    expect(run(enough(4), [UP]).bag.blueprint_well).toBe(1);
+  });
+
+  it('short of Timber, Stone or coins is refused whole and the save is untouched; materials are named before coins; Lv5 is the top', () => {
+    const next = nextFarmLevel(rules, 1)!;
+    const refuse = (s: ParcelFarmState, commands: FarmCommand[] = [UP]) => {
+      const frozen = structuredClone(s);
+      const out = applyFarmCommands(rules, s, commands, T0);
+      expect(s).toEqual(frozen);
+      return out;
+    };
+    expect(refuse(at(1))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 6 } });
+    expect(refuse(at(1, { wood: 6, stone: 3 }, 40))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH', detail: { item: 'stone', have: 3, need: 4 } });
+    expect(refuse(at(1, next.items, 39))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH_COINS', detail: { coins: 39, need: 40 } });
+    expect(refuse(at(1, { wood: 5, stone: 4 }, 0))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH', detail: { item: 'wood', have: 5, need: 6 } });
+    // Two upgrades in one batch pay for both; with only Lv2's price the second is refused and the first is undone.
+    expect(refuse(enough(1), [UP, UP])).toEqual({ ok: false, index: 1, code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 10 } });
+    expect(refuse(at(5, { wood: 99, stone: 99 }, 999))).toEqual({ ok: false, index: 0, code: 'MAX_LEVEL', detail: { level: 5 } });
+  });
+
+  it('wells: one at Lv1 and Lv2, a second from Lv3, a third from Lv5; the refusal names the level\'s limit', () => {
+    const bp = { blueprint_well: 3 };
+    expect(applyFarmCommands(rules, at(2, bp), [wellAt(30), wellAt(32)], T0)).toEqual({ ok: false, index: 1, code: 'BUILDING_LIMIT', detail: { building: 'well', max: 1 } });
+    const three = run(at(3, bp), [wellAt(30), wellAt(32)]);
+    expect(three.buildings.filter(b => b.type === 'well')).toHaveLength(2);
+    expect(applyFarmCommands(rules, three, [wellAt(34)], T0)).toEqual({ ok: false, index: 0, code: 'BUILDING_LIMIT', detail: { building: 'well', max: 2 } });
+    expect(run(at(5, bp), [wellAt(30), wellAt(32), wellAt(34)]).buildings.filter(b => b.type === 'well')).toHaveLength(3);
+    // Upgrading to Lv3 at Scott's, then building the second well with the blueprint it gave, in one batch.
+    const lv2 = enough(2);
+    const one = run({ ...lv2, bag: { ...lv2.bag, blueprint_well: 1 } }, [wellAt(30)]);
+    expect(one.bag.blueprint_well).toBeUndefined();
+    expect(run(one, [UP, wellAt(32)]).buildings.filter(b => b.type === 'well')).toHaveLength(2);
+    // The cottage stays one at every level.
+    expect(applyFarmCommands(rules, at(5, { blueprint_cottage: 2 }), [{ type: 'place_house', x: 1, y: 20 }, { type: 'place_house', x: 6, y: 20 }], T0))
+      .toMatchObject({ ok: false, index: 1, code: 'HOUSE_PLACED' });
+  });
+
+  it('parses upgrade_farm without fields; refuses malformed farm levels at load time', () => {
+    expect(parseFarmCommands([{ type: 'upgrade_farm', level: 9, coins: 0 }])).toEqual([{ type: 'upgrade_farm' }]);
+    const bad = (farm_levels: unknown) => () => parseParcelRules({ ...structuredClone(rules), farm_levels });
+    const lv2 = rules.farm_levels[0];
+    expect(parseParcelRules({ ...structuredClone(rules), farm_levels: undefined }).farm_levels).toEqual([]);   // only Lv1
+    expect(bad({})).toThrow();
+    expect(bad([{ ...lv2, level: 3 }])).toThrow();                                   // not from Lv2
+    expect(bad([lv2, lv2])).toThrow();                                               // not one level each
+    expect(bad([{ ...lv2, coins: -1 }])).toThrow();
+    expect(bad([{ ...lv2, items: { wood: 0 } }])).toThrow();
+    expect(bad([{ ...lv2, items: undefined }])).toThrow();
+    expect(bad([{ ...lv2, gift: { 'Well!': 1 } }])).toThrow();
+    expect(bad([{ ...lv2, buildings: { castle: 2 } }])).toThrow();                   // not a building type
+    expect(bad([{ ...lv2, buildings: { well: 0 } }])).toThrow();                     // below the base limit
+    expect(bad([{ ...lv2, buildings: { well: 3 } }, { ...rules.farm_levels[1], buildings: { well: 2 } }])).toThrow();   // goes down
+  });
+
+  /**
+   * 客户端和服务端同一套等级规则：tests/dynamic_farm/fixtures/level_cases.json 的每个用例在这里按服务端跑，
+   * 在 tests/dynamic_farm/test_parcel_farming.gd 里按客户端 parcel_farm.gd 跑，两边结果都要等于文件里记的结果。
+   */
+  describe('the client runs the same level cases (shared fixture)', () => {
+    const shared = JSON.parse(readFileSync(path.join(DEFAULT_CONTENT_DIR, '..', '..', '..', 'tests', 'dynamic_farm', 'fixtures', 'level_cases.json'), 'utf8'));
+    for (const c of shared.cases) {
+      it(c.name, () => {
+        const r = applyFarmCommands(rules, structuredClone(c.farm), c.commands, c.now, { parcel_id: shared.parcel_id });
+        expect(r.ok ? { ok: true, level: r.state.level, coins: r.state.coins, bag: r.state.bag, buildings: r.state.buildings.map(b => b.type),
+          energy: r.state.energy } : { ok: false, index: r.index, code: r.code, detail: r.detail ?? {} }).toEqual(c.expect);
+      });
+    }
   });
 });

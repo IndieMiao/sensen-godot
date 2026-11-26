@@ -5,6 +5,7 @@ extends Control
 ## The parcel is `sensen/dynamic_farm/qa_parcel`. On first start, when the parcel has no save yet, it is saved as the
 ## card's problem state: welcomed, the hoe and 2 carrots, no seeds left (C-137#4). No map, server, account or network.
 ## Staged only by tools/dev/dynamic_farm/gather_qa_apk.sh with GATHER_QA_ENTRY=trade; never the main scene of a delivered package.
+## C-152's level_loop_qa.gd starts from its own save and status line on the same entry.
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const HOST := "res://scenes/dynamic_farm/dynamic_farm_host.tscn"
@@ -29,9 +30,7 @@ func _ready() -> void:
 		return
 	farm = raw
 	var store := LocalStore.new(str(farm.block_id))
-	if not FileAccess.file_exists(store._path):
-		store._save(ParcelFarm.normalize({"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": START_BAG,
-			"welcomed_at": int(Time.get_unix_time_from_system() * 1000.0)}), 1)
+	if not FileAccess.file_exists(store._path): store._save(ParcelFarm.normalize(start_save()), 1)
 	var box := VBoxContainer.new()
 	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	box.custom_minimum_size = Vector2(280, 0)
@@ -51,12 +50,19 @@ func _ready() -> void:
 	box.add_child(mine)
 	_refresh()
 
+## The parcel's save on first start.
+func start_save() -> Dictionary:
+	return {"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": START_BAG,
+		"welcomed_at": int(Time.get_unix_time_from_system() * 1000.0)}
+
 ## The save's coins and seeds, read again on each return (QA only; the map has no such line).
+func status(f: Dictionary) -> String:
+	return "QA · %d coins · %d seeds · %d carrots" % [int(f.get("coins", 0)), int(f.get("bag", {}).get("seed_carrot", 0)),
+		int(f.get("bag", {}).get("crop_carrot", 0))]
+
 func _refresh() -> void:
 	var saved: Dictionary = LocalStore.new(str(farm.block_id)).read()
-	var f: Dictionary = saved.get("farm", {})
-	_status.text = "QA · %d coins · %d seeds · %d carrots" % [int(f.get("coins", 0)), int(f.get("bag", {}).get("seed_carrot", 0)),
-		int(f.get("bag", {}).get("crop_carrot", 0))]
+	_status.text = status(saved.get("farm", {}))
 
 func _open(path: String) -> void:
 	var router := get_node_or_null("/root/AppRouter")

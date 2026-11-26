@@ -11,6 +11,8 @@ extends SceneTree
 ## the map on r8, an r6 home opens its r6 farm and its enter names r6 (Q-172: not moved); an r4 home opens in r8 and its
 ## enter names r8 (moved, Q-168). C-151: Build Well, dry carrots that do not grow, Fill at the well for 2 Energy, Water
 ## three cells from one pail (wet soil, growing from then), Pail empty for the fourth until the pail is filled again.
+## C-152: at Lv1 one well stands, a spare well blueprint offers nothing; at Lv3 the Build key offers the second and the
+## Energy chip tops at 220.
 ## Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
@@ -96,6 +98,7 @@ func _run() -> void:
 	await _energy_short_and_rest()
 	await _energy_comes_back()
 	await _watering_loop()
+	await _level_wells()
 	await _older_dataset_claim()
 	await _release_named_on_enter()
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
@@ -864,6 +867,50 @@ func _watering_loop() -> void:
 	await process_frame
 	for name in DirAccess.get_files_at(water_dir): DirAccess.remove_absolute(water_dir.path_join(name))
 	DirAccess.remove_absolute(water_dir)
+
+## C-152: the Build key follows the farm level's well limit (1 at Lv1, 2 from Lv3); the chip's top follows the level.
+func _level_wells() -> void:
+	var data: Dictionary = scene_data()
+	var house_at := _free_block(data)
+	var now: int = int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
+	var cottage := {"model": "cottage", "x": house_at.x, "y": house_at.y, "width": 3, "depth": 3, "rotation": 0, "built_at": 0}
+	var seeded := ParcelFarm.empty_state()
+	seeded.buildings = [cottage.merged({"id": 1, "type": "cottage"})]
+	seeded.house = cottage
+	seeded.welcomed_at = now - 8 * 86400000
+	seeded.grants = {"watering": now}
+	seeded.bag = {"hoe_starter": 1, "pail": 1, "blueprint_well": 2}
+	var level_dir := dir + "_levels"
+	var store := LocalStore.new(raw.block_id, level_dir)
+	store.now_ms = func() -> int: return int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
+	DirAccess.make_dir_recursive_absolute(level_dir)
+	store._save(seeded, 3)
+	var farming := await _open(store)
+	_check(scene._build.visible and scene._build.label == "Build Well", "Lv1 without a well: Build Well")
+	scene._build.activated.emit()
+	await process_frame
+	scene._placement._bar.confirmed.emit()
+	for _i in 3: await process_frame
+	_check(ParcelFarm.wells(farming.rules, farming.farm).size() == 1 and farming.farm.bag.blueprint_well == 1 and not scene._build.visible,
+		"Lv1: one well stands; the spare blueprint offers no second")
+	var saved: Dictionary = store.read()
+	saved.farm.level = 3
+	store._save(saved.farm, int(saved.farm_version))
+	scene.queue_free()
+	await process_frame
+	farming = await _open(store)
+	# The save's 200 (full at Lv1) stays; the top is now Lv3's 220, and the 20 come back with time.
+	_check(scene._header.get_node("Energy").value_label.text == "200/220", "Lv3: the chip tops at 220: " + scene._header.get_node("Energy").value_label.text)
+	_check(scene._build.visible and scene._build.label == "Build Well", "Lv3: the spare blueprint offers the second well")
+	scene._build.activated.emit()
+	await process_frame
+	scene._placement._bar.confirmed.emit()
+	for _i in 3: await process_frame
+	_check(ParcelFarm.wells(farming.rules, farming.farm).size() == 2 and not scene._build.visible, "Lv3: two wells stand")
+	scene.queue_free()
+	await process_frame
+	for name in DirAccess.get_files_at(level_dir): DirAccess.remove_absolute(level_dir.path_join(name))
+	DirAccess.remove_absolute(level_dir)
 
 ## `n` free core cells side by side along x, or [].
 func _free_row(data: Dictionary, farming: Node, n: int) -> Array:
