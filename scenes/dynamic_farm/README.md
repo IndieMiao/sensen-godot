@@ -146,7 +146,7 @@ Track (`accept_request`), Deliver (`deliver_request`, tracked or not, once the b
 a delivery and 8 h after a drop, an open request swapped after 72 h, at most 6 a player day and 100 coins of completion
 bonus; pay is Jasmine's price × 80% (rounded down) × count plus the bonus of the farm level's tier; eggs only with a
 coop. The save's `board` and `requests_done` (the sheep pen's unlock). Draws are a shared hash of the slot's own time,
-so a read and the next command see the same requests. Numbers and copy await the owner and PM (SEN-C-191#6); notes in
+so a read and the next command see the same requests. Numbers: SEN-Q-278 (a template may carry its own `tiers`); copy: SEN-C-191#29; notes in
 `docs/plans/C-191.md`. Tests: `tests/dynamic_farm/test_parcel_board.gd` (shared cases `fixtures/request_cases.json`
 with the server); emulator package: `gather_qa_apk.sh` with `GATHER_QA_ENTRY=board`.
 

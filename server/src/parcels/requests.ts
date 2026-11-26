@@ -4,7 +4,8 @@
  * - slots 个单子格；交完 done_refill_seconds 后补（默认立即），放弃 drop_refill_seconds 后补（8 小时），
  *   开着没人接 expire_seconds 后换一张（72 小时）；接了（accept_request）不过期，但占着格。
  * - 交单（deliver_request）不要求先接：背包里够数就扣物品、加金币。报酬 = 地板价 × 件数 + 完成奖；
- *   地板价是 Jasmine 的售价 × floor_percent%（向下取整），完成奖按抽单时的农场等级取 tiers 的一档（P0 的 10 / 20 / 40）。
+ *   地板价是 Jasmine 的售价 × floor_percent%（向下取整），件数和完成奖按抽单时的农场等级取 tiers 的一档（P0 的 10 / 20 / 40；
+ *   模板自己写了 tiers 就用它的）。
  * - 每个玩家日（同体力，energy.day）最多交 daily_max 单，完成奖合计不超过 daily_bonus_max；到上限后照常能接、
  *   能放弃，交单被拒（DAILY_LIMIT）。
  * - 单子只按玩家已有的出：模板写了 building 的（鸡蛋要鸡场），这块地上有这类建筑才抽得到；两格尽量不重样。
@@ -22,8 +23,11 @@ import { dayKey, nextRollover } from './energy.js';
 import type { BuildingState, ParcelFarmState } from './farm.js';
 import type { ParcelRules } from './rules.js';
 
-/** 一种单子：要的物品（必须是 Jasmine 收的，sell_prices 里有）；building：这块地上有这类建筑才出（鸡蛋要鸡场）。 */
-export interface RequestTemplate { item: string; building?: string }
+/**
+ * 一种单子：要的物品（必须是 Jasmine 收的，sell_prices 里有）；building：这块地上有这类建筑才出（鸡蛋要鸡场）；
+ * tiers：这种单子自己的件数和完成奖分档（可选，没有就用 requests.tiers），按物品分档时只改配置。
+ */
+export interface RequestTemplate { item: string; building?: string; tiers?: RequestTier[] }
 /** 农场 level 级起的一档：每单 qty[0]–qty[1] 件，完成奖 bonus。 */
 export interface RequestTier { level: number; qty: [number, number]; bonus: number }
 export interface RequestRules {
@@ -69,16 +73,22 @@ export function parseRequestRules(r: ParcelRules, fail: (what: string) => never)
   if (!isMap(q) || !count(q.slots, 1, MAX_SLOTS) || !count(q.done_refill_seconds, 0, 30 * 86400) || !count(q.drop_refill_seconds, 0, 30 * 86400)
     || !count(q.expire_seconds, 3600, 30 * 86400) || !count(q.daily_max, 1, 100) || !count(q.daily_bonus_max, 0, 100_000)
     || !count(q.floor_percent, 1, 100)) fail('requests 不对');
-  if (!Array.isArray(q.tiers) || !q.tiers.length || q.tiers[0]?.level !== 1) fail('requests.tiers 要从 1 级起');
-  q.tiers.forEach((t, i) => {
-    if (!isMap(t) || !count(t.level, 1, 999) || (i > 0 && t.level <= q.tiers[i - 1].level) || !Array.isArray(t.qty) || t.qty.length !== 2
-      || !count(t.qty[0], 1, 999) || !count(t.qty[1], t.qty[0], 999) || !count(t.bonus, 0, 10_000)) fail(`requests.tiers[${i}] 不对`);
-  });
+  parseTiers(q.tiers, fail, 'requests.tiers');
   if (!isMap(q.templates) || !Object.keys(q.templates).length) fail('requests.templates 不能为空');
   for (const [id, t] of Object.entries(q.templates)) {
     if (!isId(id) || !isMap(t) || !isId(t.item) || !Object.hasOwn(r.economy.sell_prices, t.item)) fail(`requests.templates.${id} 不对`);
     if (t.building !== undefined && !(isId(t.building) && Object.hasOwn(r.buildings, t.building))) fail(`requests.templates.${id}.building 不对`);
+    if (t.tiers !== undefined) parseTiers(t.tiers, fail, `requests.templates.${id}.tiers`);
   }
+}
+
+/** 分档：从 1 级起、等级递增，件数 1–999 且下限不大于上限，完成奖 0–10000。 */
+function parseTiers(tiers: RequestTier[], fail: (what: string) => never, at: string): void {
+  if (!Array.isArray(tiers) || !tiers.length || tiers[0]?.level !== 1) fail(`${at} 要从 1 级起`);
+  tiers.forEach((t, i) => {
+    if (!isMap(t) || !count(t.level, 1, 999) || (i > 0 && t.level <= tiers[i - 1].level) || !Array.isArray(t.qty) || t.qty.length !== 2
+      || !count(t.qty[0], 1, 999) || !count(t.qty[1], t.qty[0], 999) || !count(t.bonus, 0, 10_000)) fail(`${at}[${i}] 不对`);
+  });
 }
 
 /** 存档里的委托板；没有或不成形时为空板。不成形的格子、单子丢掉，编号至少是现有最大编号。返回新对象。 */
@@ -113,10 +123,11 @@ export function hash32(key: string): number {
   return h >>> 0;
 }
 
-/** 农场 level 级时的那一档：level 不低于它的最后一档。 */
-export function tierFor(q: RequestRules, level: number): RequestTier {
-  let tier = q.tiers[0];
-  for (const t of q.tiers) if (level >= t.level) tier = t;
+/** 农场 level 级时这种单子（template，不给就看公共分档）的那一档：level 不低于它的最后一档。 */
+export function tierFor(q: RequestRules, level: number, template?: string): RequestTier {
+  const tiers = (template !== undefined ? q.templates[template]?.tiers : undefined) ?? q.tiers;
+  let tier = tiers[0];
+  for (const t of tiers) if (level >= t.level) tier = t;
   return tier;
 }
 
@@ -147,7 +158,7 @@ function draw(rules: ParcelRules, s: ParcelFarmState, slot: number, at: number):
   const pool = fresh.length ? fresh : open;
   const seed = `${s.welcomed_at}:${slot}:${at}:${b.seq + 1}`;
   const template = pool[hash32(`${seed}:t`) % pool.length];
-  const tier = tierFor(q, s.level);
+  const tier = tierFor(q, s.level, template);
   const qty = tier.qty[0] + (hash32(`${seed}:q`) % (tier.qty[1] - tier.qty[0] + 1));
   b.seq += 1;
   return { id: b.seq, template, item: q.templates[template].item, qty, bonus: tier.bonus, drawn_at: at, status: 'open' };

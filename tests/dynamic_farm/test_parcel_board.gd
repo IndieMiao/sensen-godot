@@ -69,6 +69,13 @@ func _rules() -> void:
 	_check(bad.call(func(r): r.tiers = [{"level": 1, "qty": [3, 2], "bonus": 10}]), "rules: a count range upside down refused")
 	_check(bad.call(func(r): r.templates = {"x": {"item": "seed_carrot"}}), "rules: an item Jasmine does not buy refused")
 	_check(bad.call(func(r): r.templates = {"x": {"item": "egg", "building": "barn"}}), "rules: an unknown building refused")
+	_check(bad.call(func(r): r.templates.egg_basket.tiers = [{"level": 2, "qty": [1, 2], "bonus": 20}]), "rules: a template's own tiers from Lv1 too")
+	var own: Dictionary = raw.duplicate(true)
+	own.requests.templates.egg_basket.tiers = [{"level": 1, "qty": [1, 1], "bonus": 20}, {"level": 4, "qty": [3, 3], "bonus": 25}]
+	var own_rules := ParcelFarm.parse_rules(own)
+	_check(ParcelFarm.tier_for(own_rules, 1, "egg_basket") == {"level": 1, "qty": [1, 1], "bonus": 20}
+		and ParcelFarm.tier_for(own_rules, 5, "egg_basket") == {"level": 4, "qty": [3, 3], "bonus": 25}
+		and ParcelFarm.tier_for(own_rules, 5, "fresh_greens") == own_rules.requests.tiers[1], "rules: a template's own tiers, the others the shared ones")
 	var none: Dictionary = raw.duplicate(true)
 	none.erase("requests")
 	var parsed := ParcelFarm.parse_rules(none)

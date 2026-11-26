@@ -151,15 +151,8 @@ static func _parse_requests(raw: Variant, parsed: Dictionary) -> Dictionary:
 	var out := {}
 	for field in ["slots", "done_refill_seconds", "drop_refill_seconds", "expire_seconds", "daily_max", "daily_bonus_max", "floor_percent"]:
 		out[field] = int(raw[field])
-	if not raw.get("tiers") is Array or raw.tiers.is_empty(): return {}
-	out.tiers = []
-	for t in raw.tiers:
-		if not t is Dictionary or not whole_in(t.get("level"), 1, 999) or not t.get("qty") is Array or t.qty.size() != 2 \
-				or not whole_in(t.qty[0], 1, 999) or not whole_in(t.qty[1], int(t.qty[0]) if _number(t.qty[0]) else 1, 999) \
-				or not whole_in(t.get("bonus"), 0, 10000):
-			return {}
-		if (out.tiers.is_empty() and int(t.level) != 1) or (not out.tiers.is_empty() and int(t.level) <= int(out.tiers[-1].level)): return {}
-		out.tiers.append({"level": int(t.level), "qty": [int(t.qty[0]), int(t.qty[1])], "bonus": int(t.bonus)})
+	out.tiers = _parse_tiers(raw.get("tiers"))
+	if out.tiers.is_empty(): return {}
 	if not raw.get("templates") is Dictionary or raw.templates.is_empty(): return {}
 	out.templates = {}
 	for id in raw.templates:
@@ -169,6 +162,25 @@ static func _parse_requests(raw: Variant, parsed: Dictionary) -> Dictionary:
 		if t.has("building"):
 			if not t.building is String or not parsed.buildings.has(t.building): return {}
 			out.templates[id].building = t.building
+		# A template's own tiers (count and bonus by item), else the shared ones.
+		if t.has("tiers"):
+			var own := _parse_tiers(t.tiers)
+			if own.is_empty(): return {}
+			out.templates[id].tiers = own
+	return out
+
+## Tiers with the server's bounds (requests.ts parseTiers): from Lv1, levels rising, counts 1–999 low to high, bonus
+## 0–10000; [] when out of them.
+static func _parse_tiers(raw: Variant) -> Array:
+	if not raw is Array or raw.is_empty(): return []
+	var out: Array = []
+	for t in raw:
+		if not t is Dictionary or not whole_in(t.get("level"), 1, 999) or not t.get("qty") is Array or t.qty.size() != 2 \
+				or not whole_in(t.qty[0], 1, 999) or not whole_in(t.qty[1], int(t.qty[0]) if _number(t.qty[0]) else 1, 999) \
+				or not whole_in(t.get("bonus"), 0, 10000):
+			return []
+		if (out.is_empty() and int(t.level) != 1) or (not out.is_empty() and int(t.level) <= int(out[-1].level)): return []
+		out.append({"level": int(t.level), "qty": [int(t.qty[0]), int(t.qty[1])], "bonus": int(t.bonus)})
 	return out
 
 ## C-154 a building's `livestock` with the server's bounds (rules.ts parseLivestock), whole numbers made ints; {} when
@@ -590,9 +602,10 @@ static func hash32(key: String) -> int:
 static func _mul32(a: int, b: int) -> int:
 	return (a * (b & 0xFFFF) + (((a * (b >> 16)) & 0xFFFF) << 16)) & 0xFFFFFFFF
 
-## The tier for a farm level: the last whose level it has reached.
-static func tier_for(rule_set: Dictionary, level: int) -> Dictionary:
-	var tiers: Array = rule_set.requests.tiers
+## The tier for a farm level (of `template`'s own tiers when it has them, else the shared ones): the last whose level
+## it has reached.
+static func tier_for(rule_set: Dictionary, level: int, template := "") -> Dictionary:
+	var tiers: Array = rule_set.requests.templates.get(template, {}).get("tiers", rule_set.requests.tiers)
 	var tier: Dictionary = tiers[0]
 	for t: Dictionary in tiers:
 		if level >= int(t.level): tier = t
@@ -630,7 +643,7 @@ static func _draw(rule_set: Dictionary, state: Dictionary, slot: int, at: int) -
 	if pool.is_empty(): pool = open
 	var seed := "%d:%d:%d:%d" % [int(state.welcomed_at), slot, at, int(b.seq) + 1]
 	var template: String = pool[hash32(seed + ":t") % pool.size()]
-	var tier := tier_for(rule_set, farm_level(state))
+	var tier := tier_for(rule_set, farm_level(state), template)
 	var qty := int(tier.qty[0]) + hash32(seed + ":q") % (int(tier.qty[1]) - int(tier.qty[0]) + 1)
 	b.seq = int(b.seq) + 1
 	return {"id": int(b.seq), "template": template, "item": q.templates[template].item, "qty": qty, "bonus": int(tier.bonus),

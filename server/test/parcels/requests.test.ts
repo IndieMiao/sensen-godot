@@ -76,6 +76,7 @@ describe('dynamic_farm.json requests (C-191)', () => {
     expect(bad({ templates: {} })).toThrow();
     expect(bad({ templates: { x: { item: 'seed_carrot' } } })).toThrow();   // Jasmine 不收的东西不能出单
     expect(bad({ templates: { x: { item: 'egg', building: 'barn' } } })).toThrow();   // 没有这类建筑
+    expect(bad({ templates: { x: { item: 'egg', tiers: [{ level: 2, qty: [1, 2], bonus: 20 }] } } })).toThrow();   // 模板自己的分档也从 1 级起
     const none = parseParcelRules({ ...structuredClone(rules), requests: undefined });
     const s = view(welcomed(), T0, none);
     expect(s.board.slots).toEqual([]);
@@ -236,6 +237,23 @@ describe('delivering (C-191)', () => {
     const r = req(s, 0), before = s.coins;
     s = run(stocked(s, 0), [deliver(r.id)], nextRollover(rules, t));
     expect(s.coins - before).toBe(floorPrice(rules, r.item) * r.qty + 20);
+  });
+
+  it('a template with its own tiers draws its own count and bonus; the others keep the shared tiers', () => {
+    const own = parseParcelRules({ ...structuredClone(rules), requests: { ...rules.requests!, templates: {
+      ...rules.requests!.templates, egg_basket: { item: 'egg', building: 'coop', tiers: [{ level: 1, qty: [1, 1], bonus: 20 }, { level: 4, qty: [3, 3], bonus: 25 }] },
+    } } });
+    expect(tierFor(own.requests!, 1, 'egg_basket')).toEqual({ level: 1, qty: [1, 1], bonus: 20 });
+    expect(tierFor(own.requests!, 5, 'egg_basket')).toEqual({ level: 4, qty: [3, 3], bonus: 25 });
+    expect(tierFor(own.requests!, 5, 'fresh_greens')).toEqual(rules.requests!.tiers[1]);
+    let t = T0, x = view(withCoop(welcomed()), t, own);
+    for (let n = 0; n < 20; n++) {
+      for (const r of reqs(x)) {
+        if (r!.item === 'egg') expect([r!.qty, r!.bonus]).toEqual([1, 20]);
+        else expect([[2, 10], [3, 10]]).toContainEqual([r!.qty, r!.bonus]);
+      }
+      x = view(run(x, [{ type: 'drop_request', request: req(x, 0).id }, { type: 'drop_request', request: req(x, 1).id }], t, own), t += 8 * H, own);
+    }
   });
 
   it('a bonus partly left pays what is left: 40-coin requests pay 40, 40, 20, then 0', () => {
