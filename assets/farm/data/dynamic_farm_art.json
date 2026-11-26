@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "_note": "Client art for dynamic_farm.json's buildings, animals and drops (C-154). Positions are in cells (1 U = one tilled cell), in a building's own unturned frame: origin at the footprint's rear-left corner, x to the right, z toward the entry. Paths that do not exist yet draw placeholders. keep_clear: cells outside the footprint, [x, z, width, depth], that other buildings may not cover; walk ones stay walkable to spawn (the cell outside the entry), the others hold art drawn past the footprint (the rear hedge). drops: scale is the drop's size against its model; lay is how it leaves the animal (FarmLivestock.LAY_DEFAULTS: metres, seconds).",
+  "_note": "Client art for dynamic_farm.json's buildings, animals and drops (C-154). Positions are in cells (1 U = one tilled cell), in a building's own unturned frame: origin at the footprint's rear-left corner, x to the right, z toward the entry. Paths that do not exist yet draw placeholders. keep_clear: cells outside the footprint, [x, z, width, depth], that other buildings may not cover; walk ones stay walkable to spawn (the cell outside the entry), the others hold art drawn past the footprint (the rear hedge). drops: scale is the drop's size against its model; lay is how it leaves the animal (FarmLivestock.LAY_DEFAULTS: metres, seconds). C-181 barn: an animal's or drop's placeholder (drawn while its model path does not exist yet) may be described: an animal's size [width, height, length] in cells with its colour and patch colour, a drop's shape (egg or bottle) with its colour and cap.",
   "buildings": {
     "coop": {
       "name": "Coop",
@@ -18,15 +18,35 @@
         {"id": "feeder", "model": "res://assets/dynamic_farm/chicken_yard/SC-10.glb", "center": [6.5, 2.5], "size": [0.5, 0.5], "height": 0.125, "feeder": true, "color": "#8a6a48"}
       ],
       "ground": {"color": "#e7cf98"}
+    },
+    "barn": {
+      "name": "Barn",
+      "copy": {"fed": "Cows are fed", "full": "Pick up milk first"},
+      "scene": "res://assets/dynamic_farm/cow_barn/cow_barn.tscn",
+      "fence": {"height": 0.75, "thickness": 0.125, "entry_clear_m": 0.4, "openings": [{"side": "front", "from": 3.0, "to": 4.0}]},
+      "entry": [3.5, 6.0],
+      "keep_clear": [{"cells": [3, 6, 1, 1], "walk": true}],
+      "parts": [
+        {"id": "hay_rack", "model": "res://assets/dynamic_farm/cow_barn/hay_rack.glb", "center": [1.4, 0.55], "size": [2.2, 0.8], "height": 1.2, "color": "#a8744a"},
+        {"id": "hay_shed", "model": "res://assets/dynamic_farm/cow_barn/hay_shed.glb", "center": [6.3, 1.2], "size": [3.0, 2.0], "height": 2.0, "color": "#b98552"},
+        {"id": "water_trough", "model": "res://assets/dynamic_farm/cow_barn/water_trough.glb", "center": [5.2, 5.4], "size": [1.6, 0.6], "height": 0.45, "color": "#6aa8c8"},
+        {"id": "feeder", "model": "res://assets/dynamic_farm/cow_barn/feed_trough.glb", "center": [0.75, 3.2], "size": [0.7, 1.2], "height": 0.45, "feeder": true, "color": "#8a6a48"}
+      ],
+      "ground": {"color": "#bfd58a"}
     }
   },
   "animals": {
     "hen_white": {"model": "res://assets/dynamic_farm/chicken_yard/hen_white.tscn", "facing": "-x", "radius": 0.2, "clips": {"walk": "走动", "peck": "啄食", "idle": "发呆"}},
-    "hen_brown": {"model": "res://assets/dynamic_farm/chicken_yard/hen_brown.tscn", "facing": "-x", "radius": 0.2, "clips": {"walk": "走动", "peck": "啄食", "idle": "发呆"}}
+    "hen_brown": {"model": "res://assets/dynamic_farm/chicken_yard/hen_brown.tscn", "facing": "-x", "radius": 0.2, "clips": {"walk": "走动", "peck": "啄食", "idle": "发呆"}},
+    "cow": {"model": "res://assets/dynamic_farm/cow_barn/cow.tscn", "facing": "-x", "radius": 0.45, "clips": {"walk": "走动", "peck": "吃草", "idle": "发呆"},
+      "placeholder": {"size": [0.55, 0.5, 1.15], "color": "#f4f1ea", "patch": "#3b3332"}}
   },
   "drops": {
     "egg": {"model": "res://assets/dynamic_farm/chicken_yard/egg.glb", "scale": 1.6,
-      "lay": {"from_m": 0.2, "toss_m": 0.3, "rise_m": 0.2, "fall_s": 0.45, "bounce_m": 0.06, "bounce_s": 0.2}}
+      "lay": {"from_m": 0.2, "toss_m": 0.3, "rise_m": 0.2, "fall_s": 0.45, "bounce_m": 0.06, "bounce_s": 0.2}},
+    "milk": {"model": "res://assets/dynamic_farm/cow_barn/milk.glb", "scale": 1.0,
+      "placeholder": {"shape": "bottle", "color": "#fbfaf4", "cap": "#4f86c6"},
+      "lay": {"from_m": 0.4, "toss_m": 0.45, "rise_m": 0.2, "fall_s": 0.5, "bounce_m": 0.05, "bounce_s": 0.2}}
   },
   "pickup": {"reach_m": 0.8, "hop_m": 0.25, "flight_s": 0.35, "shrink": 0.6, "chest_m": 0.9}
 }

@@ -2,6 +2,7 @@ extends SceneTree
 ## C-59: the market (Jasmine) and the carpenter (Scott), on the local stand-in for the
 ## parcel save (C-58 rules mirrored in parcel_farm.gd). Headless: portraits stay blank, the flow and saves are real.
 ## C-152: Scott upgrades the farm (Upgrade Farm → the upgrade sheet → upgrade_farm).
+## C-181: Scott sells the barn blueprint for 150 coins (Buy Barn Blueprint · 150 coins → claim_blueprint).
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 ## Loaded at run time: these use autoloads (Avatar, Localization), which a preload here would compile before.
@@ -32,6 +33,7 @@ func _run() -> void:
 	await _buy()
 	await _carpenter()
 	await _upgrade()
+	await _barn_blueprint()
 	await _failures()
 	await _entries()
 	_portraits()
@@ -250,6 +252,49 @@ func _upgrade() -> void:
 	store.send(3, [{"type": "sell", "item": "crop_carrot", "count": 1}])
 	town = await _open(Town.CARPENTER, store)
 	_check(town.keys.has("take") and town.keys.upgrade.kind == UiCommandButton.Kind.SECONDARY, "beside Take Blueprint, Upgrade Farm is secondary")
+	town.close()
+	await process_frame
+
+## C-181: Scott sells the barn blueprint. Short of coins the key reads the gap (secondary, Upgrade Farm stays primary), a
+## tap says why and the store refuses; with the coins it is the primary key, takes 150, gives the blueprint once.
+func _barn_blueprint() -> void:
+	_clean()
+	var store := LocalStore.new(PARCEL, DIR)
+	store.now_ms = func() -> int: return T0
+	store._save(ParcelFarm.normalize({"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {"crop_carrot": 1},
+		"welcomed_at": T0, "coins": 120, "sales": 1, "blueprints_claimed": {"coop": T0}}), 3)
+	var town := await _open(Town.CARPENTER, store)
+	_check(town.card.line == Town.LINES.scott_done, "the coop blueprint already taken: Scott's line as before")
+	_check(town.keys.has("buy_barn") and town.keys.buy_barn.label == "Buy Barn Blueprint · 150 coins", "Scott sells the barn blueprint for 150 coins")
+	_check(town.keys.buy_barn.reason == "Need 30 more coins" and town.keys.buy_barn.kind == UiCommandButton.Kind.SECONDARY,
+		"short of 30 coins: the key reads the gap, secondary")
+	_check(town.keys.upgrade.kind == UiCommandButton.Kind.PRIMARY, "Upgrade Farm stays the primary key")
+	town.keys.buy_barn.unavailable_pressed.emit(town.keys.buy_barn.reason)
+	_check(town.toast.current_text() == "Need 30 more coins", "a tap on the short key says why")
+	var refused: Dictionary = await town.claim_blueprint("barn")
+	_check(not refused.ok and refused.code == "NOT_ENOUGH_COINS" and store.read().farm.coins == 120 \
+		and not store.read().farm.bag.has("blueprint_barn"), "the store refuses: coins and bag unchanged")
+	town.close()
+	await process_frame
+	store.send(store.read().farm_version, [{"type": "sell", "item": "crop_carrot", "count": 1}])
+	var saved: Dictionary = store.read().farm
+	saved.coins = 170
+	store._save(saved, store.read().farm_version)
+	town = await _open(Town.CARPENTER, store)
+	_check(town.keys.buy_barn.reason == "" and town.keys.buy_barn.kind == UiCommandButton.Kind.PRIMARY \
+		and town.keys.upgrade.kind == UiCommandButton.Kind.SECONDARY, "with the coins it is the primary key, Upgrade Farm secondary")
+	town.keys.buy_barn.activated.emit()
+	for i in 3: await process_frame
+	_check(town.farm.coins == 20 and town.farm.bag.get("blueprint_barn") == 1 and town.farm.blueprints_claimed.has("barn"),
+		"150 coins taken, one barn blueprint in the bag")
+	_check(town.toast.current_text() == "Received Barn Blueprint ×1", "the purchase is announced")
+	_check(not town.keys.has("buy_barn"), "bought: no second offer")
+	var again: Dictionary = await town.claim_blueprint("barn")
+	_check(not again.ok and again.code == "BLUEPRINT_CLAIMED" and store.read().farm.coins == 20, "buying again is refused, nothing more taken")
+	town.close()
+	await process_frame
+	town = await _open(Town.CARPENTER, store)
+	_check(not town.keys.has("buy_barn") and store.read().farm.bag.blueprint_barn == 1, "kept after reopening")
 	town.close()
 	await process_frame
 
