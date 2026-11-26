@@ -17,6 +17,10 @@ extends Control
 ## C-128 (0.4.4): a round profile key at the left, level with the locate key, opens the main farm's profile over the
 ## map, and from it Settings and the dressing room (parcel_profile.gd).
 ## C-106: the UI v3 look of the owner-approved C-85 page ⑤ (map_ui.gd); states, actions and lines are unchanged.
+## C-146 (owner 11-25: "移除游客模式, 必须要注册/有账号才能玩"): no guest entry. A package that signs in
+## (`sensen/dynamic_farm/account_restore`: the internal and release packages) opens the map only with an account: without
+## one the sign-in panel stands over an empty screen with no way past it (no ✕) until the player signs in or signs up;
+## signing out puts it back and takes the map and its parcels away.
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
@@ -156,6 +160,7 @@ var _surface_opaque_requested := false
 var _restoring := false # Reloading the saved account before the first ownership read.
 var _signing_out := false
 var _framed_home := "" # Parcel the camera was moved to automatically; "" until the home is framed.
+var _gated := false # The sign-in panel stands over the map: no account yet (C-146).
 var _player_moved := false # The player moved the camera since the last account change.
 
 func _ready() -> void:
@@ -173,6 +178,8 @@ func _ready() -> void:
 		_set_hint("This preview needs the Android parcel map."); return
 	_bridge = AndroidBridge.new()
 	_bridge.set_godot_surface_opaque(false) # A fresh map scene always requests the transparent mode.
+	# C-146: no account, no map. Nothing of the map (native view, parcels, claims) is created before the player is signed in.
+	if not await signed_in_first(): return
 	_camera = CameraInput.new(); add_child(_camera); move_child(_camera, 0)
 	_camera.user_moved.connect(func(): _player_moved = true)
 	_selector = Selection.new(); _selector.config = parser.data; _selector.bridge = _bridge
@@ -190,10 +197,8 @@ func _ready() -> void:
 	_selector.activate()
 	_start_claims()
 
-## Isolated test builds skip Net's boot. Internal and release packages may reload the saved account token
-## (`sensen/dynamic_farm/account_restore`). Only a package with `sensen/dynamic_farm/guest_play` (install-and-play,
-## C-100) then signs in anonymously with this installation's key when no account was restored; the server decides
-## whether that guest may claim and farm (PARCEL_GUEST_WRITES), otherwise the map asks the player to sign in.
+## Isolated test builds skip Net's boot. Internal and release packages reload the saved account token
+## (`sensen/dynamic_farm/account_restore`); there is no guest sign-in any more (C-146).
 ## Only an explicit 401 drops the saved account (Net._resume_account); a server error, rate limit or lost network
 ## keeps it and the top panel says so (C-110).
 func _start_claims() -> void:
@@ -201,16 +206,46 @@ func _start_claims() -> void:
 	var net := get_node_or_null("/root/Net")
 	if net != null and not _fake_claims():
 		_restoring = true; _render()
-		await net.dynamic_farm_sign_in(bool(ProjectSettings.get_setting("sensen/dynamic_farm/account_restore", false)),
-			_guest_play())
+		await net.dynamic_farm_sign_in(_account_restore())
 		_restoring = false
 		_sync_guest()
-	if is_inside_tree() and not _suspended: _claims.start()
+	if is_inside_tree() and not _suspended and not _gated: _claims.start()
 	if is_inside_tree(): _render()
 
-## Install-and-play (C-100): this installation plays as a guest when no account is signed in.
-func _guest_play() -> bool:
-	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/guest_play", false))
+func _account_restore() -> bool:
+	return bool(ProjectSettings.get_setting("sensen/dynamic_farm/account_restore", false))
+
+## C-146: a package that signs in (account_restore, with Net and the real server) needs an account for the map.
+func account_required() -> bool:
+	return get_node_or_null("/root/Net") != null and not _fake_claims() and _account_restore()
+
+## Entry (C-146): the saved account, else the sign-in panel until the player signs in or signs up. True once signed in
+## (or when the package needs no account); false if the map left meanwhile.
+func signed_in_first() -> bool:
+	if not account_required(): return true
+	var net := get_node("/root/Net")
+	_restoring = true; _render()
+	var signed_in: bool = await net.dynamic_farm_sign_in(true)
+	_restoring = false
+	if not is_inside_tree(): return false
+	_render()
+	if signed_in: return true
+	return await _sign_in_gate()
+
+## The sign-in panel with no ✕ (AccountPanel.set_gate) over the map's empty screen; the map's own keys are hidden. It closes
+## only once signed in (sign-up signs in too).
+func _sign_in_gate() -> bool:
+	_gated = true
+	_hud.hide()
+	if _camera != null: _camera.input_enabled = false
+	var panel: CanvasLayer = load(ACCOUNT_PANEL).open(self, "sign_in", "", true, true) # the v3 look (C-85 ④), in English (C-144)
+	panel.set_gate(true)
+	var signed_in: bool = await panel.closed
+	_gated = false
+	if not is_inside_tree(): return false
+	_hud.show()
+	_render()
+	return signed_in
 
 ## Without an account the player is this installation's guest (or signed out): no give-up entry (Q-156).
 func _sync_guest() -> void:
@@ -475,7 +510,7 @@ func _render() -> void:
 	var state: String = _claims.status(id)
 	var idle: bool = not _selector.busy and _selector.map_ready and not _opening and not _claims.busy
 	_open.disabled = not idle or id.is_empty()
-	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy and _profile == null
+	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy and _profile == null and not _gated
 	_render_card(id, state)
 	var claimable: bool = state == "none" and _claims.mine_known and not _claims.has_home() and _claims.in_zone(id)
 	if not claimable or not idle: _confirm.hide()
@@ -664,17 +699,35 @@ func _account_action() -> void:
 	if net.account.signed_in(): _show_dialog(_sign_out_confirm); _render()
 	else: _open_sign_in()
 
-## Revokes this phone's token and clears the saved account. Only an install-and-play package
-## (`sensen/dynamic_farm/guest_play`, C-100) then continues as this installation's guest; others stay signed out.
+## Revokes this phone's token and clears the saved account; nothing signs in as a guest (C-146). Where the map needs an
+## account, it goes away with the account: the parcels are cleared and the native map hidden, and the sign-in panel comes
+## back until someone signs in, then the map loads again for that account.
 func _sign_out() -> void:
 	_sign_out_confirm.hide()
 	var net := get_node_or_null("/root/Net")
 	if net == null or _signing_out or _restoring: return
 	_signing_out = true; _render()
-	await net.sign_out(_guest_play())
+	await net.sign_out(false)
 	_signing_out = false
 	if not is_inside_tree(): return
 	_account_changed()
+	if account_required() and not net.account.signed_in(): await _gate_map()
+
+## Takes the map away for the sign-in panel and brings it back for the account that signs in.
+func _gate_map() -> void:
+	_gated = true # before the parcels are cleared, so nothing redrawn meanwhile lets the map move
+	if _camera != null: _camera.stop()
+	if _selector != null: _selector.pause() # clears the parcel layers and hides the native map
+	if _claims != null: _claims.pause(); _claims.forget()
+	if _entry != null: _entry.close_card()
+	if not await _sign_in_gate(): return
+	_account_changed()
+	if _suspended or _leaving: return # resume() loads the map again
+	if _bridge != null: _bridge.set_map_visible(true)
+	if _camera != null: _camera._changed()
+	if _selector != null: _selector.activate()
+	if _claims != null: _claims.start()
+	_render()
 
 ## Ownership and the framed home were relative to the previous account.
 func _account_changed() -> void:
@@ -917,6 +970,7 @@ func _suspend_map(committing_preview: bool) -> void:
 func resume() -> void:
 	if _leaving: return
 	_suspended = false; process_mode = Node.PROCESS_MODE_INHERIT
+	if _gated: return # Back to the sign-in panel; the map loads once someone signs in (C-146).
 	_hud.visible = _profile == null # Back from the dressing room: the profile is still over the map.
 	_farm_fresh = false # Back from the parcel: its save has moved on.
 	_presentation_epoch += 1
@@ -967,6 +1021,9 @@ func _quit_preview() -> void:
 	get_tree().quit()
 
 func is_back_navigation_locked() -> bool:
+	if _gated: # Back on the sign-in panel leaves the app (C-146); the map behind it never opened.
+		if _bridge == null or not _bridge.move_task_to_back(): _quit_preview()
+		return true
 	if is_instance_valid(_profile):
 		_profile.back()
 		return true

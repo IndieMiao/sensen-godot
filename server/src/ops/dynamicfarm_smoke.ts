@@ -1,6 +1,7 @@
 /**
  * 动态农场正式服冒烟（C-96），入口 tools/dynamicfarm_smoke.ts，由 server/deploy/dynamicfarm/ops.sh smoke 调用。
- * 默认只读、不建号：健康检查、邮箱注册和 Google 登录已开放（C-101）、游客能读不能认领。给了邀请账号再核对登录和“放弃并重选”被拒。
+ * 默认只读、不建号：健康检查、邮箱注册和 Google 登录已开放（C-101）、游客入口已关（C-146）、不登录不能认领。
+ * 给了邀请账号再核对登录和“放弃并重选”被拒。
  * 只有隔离环境（演练）才给 write：用这个账号认领一块地、首次进入、放房开垦播种，再读回存档。正式服不要用，地块会被永久占用。
  */
 import { randomBytes } from 'node:crypto';
@@ -57,16 +58,13 @@ export async function runSmoke(o: SmokeOptions): Promise<SmokeResult> {
   const google = await call('POST', '/auth/google', { id_token: 'smoke', nonce: randomBytes(12).toString('hex') });
   check(google.status === 401 && String(google.json.code ?? '').startsWith('GOOGLE_TOKEN_'), 'Google 登录已开启', said(google));
 
+  // 游客入口已关（C-146）：一个从没见过的安装密钥也拿不到 token，服务器不建号；开着时这里会建出一个游客。
   const anon = await call('POST', '/auth/anonymous', { install_key: randomBytes(16).toString('hex') });
-  const guest = typeof anon.json.token === 'string' ? anon.json.token : '';
-  if (check(Boolean(guest), '游客登录', said(anon))) {
-    const read = await call('GET', '/parcels/mine', undefined, guest);
-    check(read.status === 200, '游客能读', said(read));
-    const claim = await call('POST', '/parcels/claim', { dataset_version: o.write?.dataset_version ?? 'smoke', parcel_id: 'p-smoke', center: [0, 0] }, guest);
-    check(claim.status === 401 && claim.json.code === 'LOGIN_REQUIRED', '游客认领被拒', said(claim));
-    const cmd = await call('POST', '/parcels/mine/commands', { base_version: 0, commands: [{ type: 'till', cell: '1,1' }] }, guest);
-    check(cmd.status === 401 && cmd.json.code === 'LOGIN_REQUIRED', '游客存档被拒', said(cmd));
-  }
+  check(anon.status === 403 && anon.json.code === 'GUEST_CLOSED' && anon.json.token === undefined, '游客入口已关', said(anon));
+  const claim = await call('POST', '/parcels/claim', { dataset_version: o.write?.dataset_version ?? 'smoke', parcel_id: 'p-smoke', center: [0, 0] });
+  check(claim.status === 401 && claim.json.code === 'UNAUTHENTICATED', '不登录不能认领', said(claim));
+  const cmd = await call('POST', '/parcels/mine/commands', { base_version: 0, commands: [{ type: 'till', cell: '1,1' }] });
+  check(cmd.status === 401 && cmd.json.code === 'UNAUTHENTICATED', '不登录不能存档', said(cmd));
 
   let farm: unknown;
   if (o.invite) {

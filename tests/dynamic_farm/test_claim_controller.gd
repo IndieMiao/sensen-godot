@@ -79,7 +79,8 @@ func _run() -> void:
 	await _account_row()
 	await _home_framing()
 	await _earlier_release_home()
-	await _guest_play_sign_in()
+	await _no_guest_sign_in()
+	await _account_gate()
 	await _starter_zone()
 	print("DYNAMIC CLAIM ", checks - failures, "/", checks)
 	quit(1 if failures else 0)
@@ -515,14 +516,14 @@ func _account_row() -> void:
 	check(not net.account.signed_in() and not FileAccess.file_exists(path) and net.client.token.is_empty(), "'Sign out' clears this phone's account and its file")
 	check(calls.size() >= 1 and calls[0] == ["DELETE", "/auth/token", true] and not calls.any(func(c): return c[1] == "/auth/anonymous"), "sign-out revokes this phone's token and does not sign in as a guest")
 	check(page._account_button.text == "Sign in" and not page._avatar.visible and not page._sign_out_confirm.visible, "after signing out the chip offers 'Sign in' again")
-	# C-100: an install-and-play package (guest_play) goes on as this installation's guest after signing out.
+	# C-146: even with C-100's old install-and-play switch left set, nothing signs in as a guest any more.
 	net.account.adopt({"token": "row-token", "user_id": "u1", "player_id": "p1", "display_name": "Ash"}, path)
 	net.client.token = "row-token"
 	ProjectSettings.set_setting("sensen/dynamic_farm/guest_play", true)
 	calls.clear()
 	await page._sign_out()
 	ProjectSettings.set_setting("sensen/dynamic_farm/guest_play", null)
-	check(not net.account.signed_in() and calls.size() >= 2 and calls[0][1] == "/auth/token" and calls.any(func(c): return c[1] == "/auth/anonymous"), "with guest_play, sign-out revokes the account token and signs in as this installation's guest")
+	check(not net.account.signed_in() and calls.size() >= 1 and calls[0][1] == "/auth/token" and not calls.any(func(c): return c[1] == "/auth/anonymous"), "C-146: sign-out never signs in as a guest, whatever the old guest_play setting says")
 	page.queue_free(); selector.queue_free()
 	await process_frame
 	net.use_transport(transport, "https://row.test/v1", "user://test_account.json")
@@ -639,40 +640,118 @@ func _write(path: String, text: String) -> void:
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	f.store_string(text); f.close()
 
-## C-100 install-and-play: Net.dynamic_farm_sign_in signs in anonymously only with guest_play and only when no saved
-## account was restored; a restored account is never replaced by a guest, and an existing guest token is reused.
-func _guest_play_sign_in() -> void:
+## C-146 (no guest entry): Net.dynamic_farm_sign_in only reloads a saved account; it never signs in anonymously, with or
+## without a saved account, and a package that does not restore accounts signs in as nobody.
+func _no_guest_sign_in() -> void:
 	var net = root.get_node_or_null("Net")
 	if net == null:
 		check(false, "Net autoload is present"); return
 	var calls: Array = []
-	var transport := func(method: String, url: String, headers: PackedStringArray, body: String) -> ApiClient.Response:
+	var transport := func(method: String, url: String, headers: PackedStringArray, _body: String) -> ApiClient.Response:
 		var path := url.trim_prefix("https://guest.test/v1")
 		calls.append([method, path])
-		if path == "/auth/anonymous":
-			var key = JSON.parse_string(body).get("install_key", "") if JSON.parse_string(body) is Dictionary else ""
-			return ApiClient.Response.new(true, 200, {"player_id": "g-" + str(key).left(6), "token": "guest-token"})
+		if path == "/auth/anonymous": return ApiClient.Response.new(true, 200, {"player_id": "g1", "token": "guest-token"})
 		if path == "/users/me":
 			return ApiClient.Response.new(true, 200, {"user_id": "u1", "player_id": "p1"}) if "authorization: Bearer saved-token" in headers else ApiClient.Response.new(true, 401, {"code": "UNAUTHENTICATED"})
 		return ApiClient.Response.new(true, 404, {"code": "NOT_FOUND"})
-	var path := "user://c100_guest_account.json"
+	var path := "user://c146_guest_account.json"
 	if FileAccess.file_exists(path): DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	net.use_transport(transport, "https://guest.test/v1", path)
-	check(not await net.dynamic_farm_sign_in(true, false) and calls.is_empty() and net.client.token.is_empty(), "without guest_play nothing signs in anonymously")
-	check(await net.dynamic_farm_sign_in(true, true) and net.client.token == "guest-token", "with guest_play and no saved account the installation signs in as a guest")
-	check(calls.size() == 1 and calls[0] == ["POST", "/auth/anonymous"], "the guest sign-in is one anonymous login with the installation key")
-	calls.clear()
-	check(await net.dynamic_farm_sign_in(true, true) and calls.is_empty(), "an existing guest token is reused, not signed in again")
+	check(not await net.dynamic_farm_sign_in(true) and calls.is_empty() and net.client.token.is_empty(), "no saved account: nothing signs in, no anonymous login")
+	check(not await net.dynamic_farm_sign_in(false) and calls.is_empty() and net.client.token.is_empty(), "a package that does not restore accounts signs in as nobody")
+	_write(path, JSON.stringify({"token": "saved-token", "user_id": "u1", "player_id": "p1"}))
+	check(await net.dynamic_farm_sign_in(true) and net.client.token == "saved-token" and net.account.signed_in(), "a saved account is reloaded")
+	check(calls.all(func(c): return c[1] != "/auth/anonymous"), "never an anonymous login")
 	net.use_transport(transport, "https://guest.test/v1", path)
-	var f := FileAccess.open(path, FileAccess.WRITE)
-	f.store_string(JSON.stringify({"token": "saved-token", "user_id": "u1", "player_id": "p1"})); f.close()
-	calls.clear()
-	check(await net.dynamic_farm_sign_in(true, true) and net.client.token == "saved-token", "a saved account wins over guest play")
-	check(calls.all(func(c): return c[1] != "/auth/anonymous"), "no anonymous login when the account was restored")
-	net.use_transport(transport, "https://guest.test/v1", path)
-	calls.clear()
-	check(await net.dynamic_farm_sign_in(false, true) and net.client.token == "guest-token", "a package that does not restore accounts plays as a guest")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	net.use_transport(transport, "https://guest.test/v1", "user://test_account.json")
+
+## C-146: a package that signs in (account_restore) opens the map only with an account. Without a saved one the map
+## stands behind the sign-in panel, which has no ✕ and closes only once signed in; Back there leaves the app instead of
+## opening anything; signing out takes the map and its parcels away and brings the panel back.
+class GateBridge extends MapBridge:
+	var visible_calls: Array = []
+	var backs := 0
+	func set_map_visible(v: bool) -> void: visible_calls.append(v)
+	func move_task_to_back() -> bool: backs += 1; return true
+class GateSelector extends Selector:
+	var paused := 0
+	var activated := 0
+	func pause() -> void: paused += 1
+	func activate() -> void: activated += 1
+func _account_gate() -> void:
+	var net = root.get_node_or_null("Net")
+	if net == null:
+		check(false, "Net autoload is present"); return
+	const RESTORE := "sensen/dynamic_farm/account_restore"
+	var path := "user://c146_gate_account.json"
+	if FileAccess.file_exists(path): DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	var calls: Array = []
+	var transport := func(method: String, url: String, headers: PackedStringArray, _b: String) -> ApiClient.Response:
+		calls.append([method, url.trim_prefix("https://gate.test/v1")])
+		if url.ends_with("/users/me") and "authorization: Bearer gate-token" in headers:
+			return ApiClient.Response.new(true, 200, {"user_id": "u1", "player_id": "p1", "display_name": "Ash"})
+		if url.ends_with("/auth/token"): return ApiClient.Response.new(true, 200, {"ok": true})
+		return ApiClient.Response.new(true, 401, {"code": "UNAUTHENTICATED"})
+	net.use_transport(transport, "https://gate.test/v1", path)
+	var page = load("res://scenes/dynamic_farm/dynamic_farm_map.tscn").instantiate()
+	root.add_child(page)
+	check(not page.account_required(), "the isolated preview (no account_restore) needs no account")
+	check(await page.signed_in_first() and page.find_children("*", "AccountPanel", true, false).is_empty(), "…and opens without the sign-in panel")
+	ProjectSettings.set_setting(RESTORE, true)
+	check(page.account_required(), "internal and release packages (account_restore) need an account")
+	# No saved account: the panel, with no way past it.
+	var done := {"value": null}
+	var entry := func(): done.value = await page.signed_in_first()
+	entry.call()
+	await process_frame
+	var panels: Array = page.find_children("*", "AccountPanel", true, false)
+	check(panels.size() == 1 and panels[0].gate and not panels[0]._close.visible, "no saved account: the sign-in panel opens with no ✕")
+	check(panels[0].mode == "sign_in" and panels[0].action_button("to_sign_up") != null, "it signs in or leads to sign-up")
+	check(not page._hud.visible and page._gated and done.value == null, "the map's keys are hidden and the map does not open")
+	check(not calls.any(func(c): return c[1] == "/auth/anonymous"), "nothing signs in as a guest")
+	panels[0].dismiss(); await process_frame
+	check(is_instance_valid(panels[0]) and not panels[0].is_queued_for_deletion() and done.value == null, "it cannot be dismissed while signed out")
+	page._bridge = GateBridge.new()
+	check(page.is_back_navigation_locked() and page._bridge.backs == 1 and not page._suspended and not page._leaving, "Back on the panel leaves the app; nothing of the map is opened or suspended")
+	# Signing in (sign-up signs in too) closes it and the map goes on.
+	net.account.adopt({"token": "gate-token", "user_id": "u1", "player_id": "p1", "display_name": "Ash"}, path)
+	net.client.token = "gate-token"
+	panels[0].dismiss()
+	for i in 5: await process_frame
+	check(done.value == true and page._hud.visible and not page._gated, "once signed in the panel closes and the map opens")
+	# A saved account goes straight in.
+	calls.clear()
+	check(await page.signed_in_first() and page.find_children("*", "AccountPanel", true, false).is_empty(), "a saved account opens the map without the panel")
+	# Signing out takes the map away and brings the panel back; signing in again loads the map for that account.
+	var selector := GateSelector.new(); root.add_child(selector)
+	var server := FakeServer.new()
+	page._selector = selector; page._camera = CameraInput.new(); page.add_child(page._camera)
+	page._framed = true; page._area_generation = selector.generation
+	page._claims = controller(server, "nobody", Native.new()); page._claims.changed.connect(page._render)
+	page._claims.mine = {"parcel_id": "p-1", "center": [-122.4, 37.7]}; page._claims.mine_known = true
+	var bridge := GateBridge.new(); page._bridge = bridge
+	var out := {"done": false}
+	var leave := func(): await page._sign_out(); out.done = true
+	leave.call()
+	for i in 5: await process_frame
+	panels = page.find_children("*", "AccountPanel", true, false)
+	check(not net.account.signed_in() and panels.size() == 1 and panels[0].gate, "after signing out the sign-in panel is back, with no ✕")
+	check(selector.paused == 1 and not page._claims.mine_known and page._claims.mine.is_empty() and not page._hud.visible, "the map's parcels and the player's home are gone")
+	check(not page._camera.input_enabled, "the map does not move behind the panel")
+	page.resume() # back from the background meanwhile
+	check(selector.activated == 0 and page._gated, "returning to the app keeps the panel and does not load the map")
+	net.account.adopt({"token": "gate-token", "user_id": "u1", "player_id": "p1", "display_name": "Ash"}, path)
+	net.client.token = "gate-token"
+	panels[0].dismiss()
+	for i in 5: await process_frame
+	check(out.done and selector.activated == 1 and bridge.visible_calls.has(true) and page._hud.visible and not page._gated, "signing in again loads the map for that account")
+	check(not calls.any(func(c): return c[1] == "/auth/anonymous"), "no guest sign-in at any point")
+	ProjectSettings.set_setting(RESTORE, null)
+	page.queue_free(); selector.queue_free()
+	await process_frame
+	if FileAccess.file_exists(path): DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	net.use_transport(transport, "https://gate.test/v1", "user://test_account.json")
 
 ## C-130 starter zone: the server's zone (fake stand-in with the same answers) decides where a player without a home may
 ## claim; the map lands there, hides the claim button outside it and sends the zone to its own native layer.

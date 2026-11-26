@@ -2,6 +2,7 @@
  * 动态农场正式服部署材料（C-96）：冒烟脚本在正式配置（C-101 起开放邮箱注册和 Google 登录）的服务上全部通过，
  * 在关着注册、关着 Google 或开着重选的服务上报错；冒烟不建号。compose 写死正式配置，只在回环地址发布端口，
  * 模板和 ops.sh 的禁写清单与 compose 一致；开放注册后发信必填。
+ * C-146：正式配置关掉游客入口，冒烟核对它关着；ops.sh guests 删游客号前先整库备份、再备份游客数据并核对、加密，才删。
  */
 import { afterEach, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
@@ -30,14 +31,14 @@ describe('dynamic farm smoke', () => {
   let app: FastifyInstance | undefined;
   afterEach(async () => { await app?.close(); app = undefined; });
 
-  async function serve(opts: { signupClosed: boolean; reselect: boolean; google?: boolean }) {
+  async function serve(opts: { signupClosed: boolean; reselect: boolean; google?: boolean; guestsOpen?: boolean }) {
     const now = () => Date.UTC(2026, 10, 24, 4);
     const store = new MemoryStore({ content, timezone: 'America/Los_Angeles', plot: plotFor(content), now, contentVersion: CV });
     const created = await store.createEmailUser('df-abcdefgh@invite.example.org', await hashPassword('k3mq-7hxa-pt2d-wz9e'), now());
     if (created.kind !== 'created') throw new Error('seed');
     app = await buildApp({ store, content, contentVersion: CV, blueprintDir: path.join(ROOT, 'assets', 'blueprints'),
       regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'), pepper: 'test-pepper', now, realtimeEnabled: false,
-      gitSha: 'a'.repeat(40), signupClosed: opts.signupClosed,
+      gitSha: 'a'.repeat(40), signupClosed: opts.signupClosed, guestAccountsClosed: !opts.guestsOpen,
       google: opts.google === false ? undefined : { audiences: ['web-client.apps.googleusercontent.com'], keys: makeKeys('smoke').keys },
       parcels: { store: new MemoryParcelStore(id => store.displayNameOf(id)), rules: loadParcelRules(DEFAULT_CONTENT_DIR), reselect: opts.reselect } });
     const address = await app.listen({ port: 0, host: '127.0.0.1' });
@@ -58,7 +59,9 @@ describe('dynamic farm smoke', () => {
     expect(result.ok).toBe(true);
     expect(result.farm).toMatchObject({ parcel_id: 'p-3512001', farm: { tilled: ['1,1'], house: expect.any(Object) } });
     expect(lines.join('\n')).not.toContain('k3mq-7hxa-pt2d-wz9e');
-    expect(lines).toEqual(expect.arrayContaining(['✓ 邮箱注册已开放', '✓ Google 登录已开启']));
+    expect(lines).toEqual(expect.arrayContaining(['✓ 邮箱注册已开放', '✓ Google 登录已开启', '✓ 游客入口已关', '✓ 不登录不能认领']));
+    // The guest probe never makes a player (C-146).
+    expect(await store.installationKnown('0'.repeat(64))).toBe(false);
     // The sign-up probe never makes an account.
     expect(probes).toHaveLength(1);
     expect(await store.userByEmail(probes[0])).toBeNull();
@@ -66,11 +69,11 @@ describe('dynamic farm smoke', () => {
     expect((await runSmoke({ base, invite, write: WRITE })).ok).toBe(true);
   });
 
-  it('fails when sign-up is closed, Google is off, reselect is on or another build is running', async () => {
-    const { base } = await serve({ signupClosed: true, reselect: true, google: false });
+  it('fails when sign-up is closed, Google is off, guests can sign in, reselect is on or another build is running', async () => {
+    const { base } = await serve({ signupClosed: true, reselect: true, google: false, guestsOpen: true });
     const result = await runSmoke({ base, gitSha: 'b'.repeat(40), invite });
     expect(result.ok).toBe(false);
-    expect(result.failures).toEqual([`运行的是 ${'b'.repeat(40)}`, '邮箱注册已开放', 'Google 登录已开启', '“放弃并重选”关闭']);
+    expect(result.failures).toEqual([`运行的是 ${'b'.repeat(40)}`, '邮箱注册已开放', 'Google 登录已开启', '游客入口已关', '“放弃并重选”关闭']);
   });
 
   it('reads the first account from a CSV and ignores an empty input', () => {
@@ -85,7 +88,7 @@ describe('dynamic farm deploy files', () => {
   const envExample = readFileSync(path.join(DEPLOY, 'env.example'), 'utf8');
   const ops = readFileSync(path.join(DEPLOY, 'ops.sh'), 'utf8');
   const FORCED: Record<string, string> = {
-    ACCOUNT_SIGNUP: 'open', GUEST_WRITES: '"0"', PARCEL_GUEST_WRITES: '"0"', DYNAMIC_FARM_RESELECT: '"0"',
+    ACCOUNT_SIGNUP: 'open', GUEST_ACCOUNTS: 'closed', GUEST_WRITES: '"0"', PARCEL_GUEST_WRITES: '"0"', DYNAMIC_FARM_RESELECT: '"0"',
     GOOGLE_CLIENT_IDS: '870347303349-bkbtvblhsj7epud9cm2ma2ia9r0blj5i\\.apps\\.googleusercontent\\.com', APPLE_BUNDLE_IDS: '""',
     QA_EMAIL_DOMAIN: '""', QA_EMAIL_CODE: '""', QA_PLAYER_IDS: '""', EMAIL_LOG_CODES: '"0"',
   };
@@ -151,7 +154,7 @@ describe('dynamic farm ops.sh under a cron PATH', () => {
   });
 
   /** 在临时目录摆好部署目录和替身，用 env -i PATH=/usr/bin:/bin 跑 ops.sh（默认 backup）；script 拿到临时根目录，返回要运行的脚本。 */
-  function stage(script: (root: string) => string, cmd = 'backup', extraEnv: string[] = []) {
+  function stage(script: (root: string) => string, cmd: string | string[] = 'backup', extraEnv: string[] = [], runEnv: string[] = []) {
     tmp = mkdtempSync(path.join(os.tmpdir(), 'df-cron-'));
     const root = path.join(tmp, 'root');
     const deploy = path.join(tmp, 'opt', 'dynamicfarm');
@@ -176,6 +179,14 @@ case "$sub" in
       pg_dump) printf 'PGDMP-stub' ;;
       pg_restore) cat > /dev/null ;;
       psql) case "$*" in *parcel_claims_md5*) printf 'users 0\\nplayers 0\\n' ;; esac ;;
+      ./node_modules/.bin/tsx) shift
+        [ "$1" = tools/guest_purge.ts ] || exit 2; shift
+        case "$1" in
+          plan) echo 'plan players=2' ;;
+          backup) [ -z "\${FAIL_GUEST_BACKUP:-}" ] || exit 1; printf 'GUEST-BACKUP\\nplayers\\t[]\\n' ;;
+          verify|purge|restore) cat > "$(dirname "$0")/stdin.$1" ;;
+          *) exit 2 ;;
+        esac ;;
       *) exit 2 ;;
     esac ;;
   *) exit 2 ;;
@@ -186,9 +197,9 @@ echo "age $*" >> "$(dirname "$0")/calls.log"
 while [ $# -gt 1 ]; do case "$1" in -o) out=$2; shift 2 ;; *) shift ;; esac; done
 cp "$1" "$out"
 `, { mode: 0o755 });
-    const run = spawnSync('/usr/bin/env', ['-i', 'PATH=/usr/bin:/bin', path.join(deploy, 'ops.sh'), cmd], { encoding: 'utf8' });
+    const run = spawnSync('/usr/bin/env', ['-i', 'PATH=/usr/bin:/bin', ...runEnv, path.join(deploy, 'ops.sh'), ...[cmd].flat()], { encoding: 'utf8' });
     const calls = existsSync(path.join(bin, 'calls.log')) ? readFileSync(path.join(bin, 'calls.log'), 'utf8') : '';
-    return { run, calls, deploy };
+    return { run, calls, deploy, bin };
   }
 
   it.skipIf(realTools)('backs up with only /usr/bin:/bin when docker and age live in /usr/local/bin', () => {
@@ -223,6 +234,40 @@ cp "$1" "$out"
     // Mail passes; the docker stand-in then refuses `compose config`, which proves check got past the mail step.
     expect(good.calls).toMatch(/^docker compose .* config -q$/m);
     expect(good.run.stderr + good.run.stdout).not.toContain('secret-pass');
+  });
+
+  // C-146：删游客号之前先整库备份，再在主机上落盘、核对、加密游客备份，最后把同一份备份交给工具删；任何一步失败都不删。
+  it.skipIf(realTools)('guests purge backs up the database and the guests, verifies and encrypts, then deletes with that backup', () => {
+    const plain = (root: string) => { const m = PATH_LINE.exec(ops)!; return ops.replace(m[0], () => `PATH="\${PATH:+$PATH:}${m[1].split(':').map(d => root + d).join(':')}"; export PATH`); };
+    const release = [`GIT_SHA=${'c'.repeat(40)}`, `APP_IMAGE=dynamicfarm-server:${'c'.repeat(40)}`, `APP_IMAGE_ID=sha256:${'d'.repeat(64)}`];
+    // docker image inspect is the release check; the stand-in answers it with the recorded image ID.
+    const withInspect = (root: string) => plain(root).replace('docker image inspect --format \'{{.Id}}\' "$(envget APP_IMAGE)"', `echo sha256:${'d'.repeat(64)}`);
+    const unconfirmed = stage(withInspect, ['guests', 'purge'], release);
+    expect(unconfirmed.run.status).not.toBe(0);
+    expect(unconfirmed.run.stderr).toContain('--confirm-delete');
+    expect(unconfirmed.calls).toBe('');
+    rmSync(tmp!, { recursive: true, force: true });
+    const done = stage(withInspect, ['guests', 'purge', '--confirm-delete'], release);
+    expect(done.run.status, done.run.stderr).toBe(0);
+    const steps = done.calls.split('\n').filter(Boolean);
+    const at = (re: RegExp) => steps.findIndex(s => re.test(s));
+    expect(at(/pg_dump/)).toBeGreaterThanOrEqual(0);
+    expect(at(/pg_dump/)).toBeLessThan(at(/guest_purge\.ts backup --out -/));
+    expect(at(/guest_purge\.ts backup/)).toBeLessThan(at(/guest_purge\.ts verify --backup -/));
+    expect(at(/guest_purge\.ts verify/)).toBeLessThan(at(/^age -r age1stub -o \S+dynamicfarm-guests-\S+\.txt\.age/));
+    expect(at(/dynamicfarm-guests-\S+\.txt\.age/)).toBeLessThan(at(/guest_purge\.ts purge --backup - --confirm-database sensen_dynamicfarm/));
+    // The tool deleted with exactly the backup that was encrypted; the plaintext is gone, the .age stays.
+    expect(readFileSync(path.join(done.bin, 'stdin.purge'), 'utf8')).toBe('GUEST-BACKUP\nplayers\t[]\n');
+    const kept = readdirSync(path.join(done.deploy, 'backups'));
+    expect(kept.filter(f => /^dynamicfarm-guests-\d{8}T\d{6}Z\.txt\.age$/.test(f))).toHaveLength(1);
+    expect(kept.filter(f => f.includes('.part'))).toEqual([]);
+    expect(kept.some(f => /pre-guest-purge\.dump\.age$/.test(f))).toBe(true);
+    rmSync(tmp!, { recursive: true, force: true });
+    const failed = stage(withInspect, ['guests', 'purge', '--confirm-delete'], release, ['FAIL_GUEST_BACKUP=1']);
+    expect(failed.run.status).not.toBe(0);
+    expect(failed.run.stderr).toContain('什么都没删');
+    expect(failed.calls).not.toMatch(/guest_purge\.ts purge/);
+    expect(readdirSync(path.join(failed.deploy, 'backups')).filter(f => f.includes('guests'))).toEqual([]);
   });
 
   it.skipIf(realTools)('fails to find docker without the PATH line (the cron failure this guards against)', () => {

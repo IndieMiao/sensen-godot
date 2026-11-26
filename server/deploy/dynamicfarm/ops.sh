@@ -10,6 +10,9 @@
 #   ops.sh backup [标签]                       备份：pg_dump → 在临时库里试恢复并记下行数和指纹 → 用 AGE_RECIPIENT 加密
 #   ops.sh restore <备份> --confirm-drop       停 app → 先备份现库 → 删库重建 → 恢复 → 核对行数和指纹 → 起 app
 #   ops.sh invites <create|list|reset|disable> ...  邀请账号；create / reset 的输出必须重定向到受控存储
+#   ops.sh guests plan                        预演：列出会删的游客号和它们的地块、进度的条数，不改数据（C-146）
+#   ops.sh guests purge --confirm-delete      删除游客号：先整库备份，再单独备份游客数据并核对条数，和库里逐字节相同才删
+#   ops.sh guests restore <游客备份.age> --confirm-restore  把删掉的游客号原样插回（AGE_IDENTITY 解密）
 #   ops.sh smoke [--invite] [<入口地址>]        冒烟（只读，不建号、不认领地块）；带 --invite 时从标准输入读一行 email,password 核对登录
 #   ops.sh status                             容器、健康检查、最近的发布和备份
 set -euo pipefail
@@ -27,9 +30,9 @@ IMAGE_REPO=dynamicfarm-server
 
 die() { echo "✗ $*" >&2; exit 1; }
 # 退出时（含失败）删掉解密出的明文和写了一半的备份，释放锁。
-RESTORE_PLAIN=""; BACKUP_PART=""; LOCKED=""
+RESTORE_PLAIN=""; BACKUP_PART=""; GUEST_PLAIN=""; LOCKED=""
 on_exit() {
-  rm -f "${RESTORE_PLAIN}" "${BACKUP_PART}" "${BACKUP_PART:+$BACKUP_PART.age}"
+  rm -f "${RESTORE_PLAIN}" "${BACKUP_PART}" "${BACKUP_PART:+$BACKUP_PART.age}" "${GUEST_PLAIN}"
   [ -z "$LOCKED" ] || rmdir "$DIR/.ops.lock" 2>/dev/null || true
 }
 trap on_exit EXIT
@@ -71,7 +74,7 @@ check_env() {
   [[ "$(envget PG_IMAGE)" == *@sha256:* ]] || die "PG_IMAGE 要按 digest 引用"
   [[ "$(envget TRUSTED_PROXIES)" != *0.0.0.0* ]] || die "TRUSTED_PROXIES 不能是 0.0.0.0/0"
   # 这些开关由 compose.yml 写死；.env 里出现说明有人想改正式配置，先停下来问。
-  for k in ACCOUNT_SIGNUP GUEST_WRITES PARCEL_GUEST_WRITES DYNAMIC_FARM_RESELECT QA_EMAIL_DOMAIN QA_EMAIL_CODE QA_PLAYER_IDS GOOGLE_CLIENT_IDS APPLE_BUNDLE_IDS; do
+  for k in ACCOUNT_SIGNUP GUEST_ACCOUNTS GUEST_WRITES PARCEL_GUEST_WRITES DYNAMIC_FARM_RESELECT QA_EMAIL_DOMAIN QA_EMAIL_CODE QA_PLAYER_IDS GOOGLE_CLIENT_IDS APPLE_BUNDLE_IDS; do
     ! grep -qE "^$k=" "$ENV_FILE" || die ".env 里不要写 ${k}：正式配置写死在 compose.yml"
   done
 }
@@ -274,6 +277,44 @@ do_invites() {
   dc exec -T app ./node_modules/.bin/tsx tools/invite_accounts.ts "$@" ${extra[@]+"${extra[@]}"}
 }
 
+# 删除游客号（C-146，所有者在 Q-265 选了 delete）。工具 tools/guest_purge.ts 在 app 容器里只连本库；
+# 游客数据的备份在这台主机上落盘、核对、用 AGE_RECIPIENT 加密后，才把同一份备份交给工具删：工具在锁表的事务里重新取一遍，
+# 和备份逐字节相同才删，删完核对条数，不对就整体回滚。明文备份退出时（含失败）删掉，只留 .age。
+guest_tool() { dc exec -T app ./node_modules/.bin/tsx tools/guest_purge.ts "$@"; }
+do_guests() {
+  local sub="${1:-}"; [ $# -gt 0 ] && shift
+  case "$sub" in
+    plan) check_env; check_release_env; guest_tool plan ;;
+    purge)
+      [ "${1:-}" = --confirm-delete ] || die "删除游客号不可撤销（只能用备份恢复）；先跑 ops.sh guests plan 看条数，确认后加 --confirm-delete"
+      lock; check_env; check_release_env; wait_pg
+      say "先整库备份（标签 pre-guest-purge）"
+      NO_PRUNE=1 do_backup pre-guest-purge >/dev/null
+      local dir; dir=$(backup_dir); mkdir -p "$dir"; chmod 700 "$dir"
+      local base; base="$dir/dynamicfarm-guests-$(date -u +%Y%m%dT%H%M%SZ)"
+      GUEST_PLAIN="$base.txt.part"
+      guest_tool backup --out - > "$GUEST_PLAIN" || die "游客数据备份失败，什么都没删"
+      [ -s "$GUEST_PLAIN" ] || die "游客数据备份是空文件，什么都没删"
+      guest_tool verify --backup - < "$GUEST_PLAIN" >&2 || die "游客数据备份核对失败，什么都没删"
+      age -r "$(envget AGE_RECIPIENT)" -o "$base.txt.age" "$GUEST_PLAIN" || die "age 加密失败，什么都没删"
+      chmod 600 "$base.txt.age"
+      guest_tool purge --backup - --confirm-database "$DB" < "$GUEST_PLAIN" >&2 || die "删除没有完成，已整体回滚（游客备份留在 $base.txt.age）"
+      say "游客号已删除；游客备份 $base.txt.age，整库备份见上一行 pre-guest-purge"
+      printf '%s\n' "$base.txt.age" ;;
+    restore)
+      local file="${1:-}"
+      [ -n "$file" ] && [ -f "$file" ] && [[ "$file" == *.txt.age ]] || die "用法：ops.sh guests restore <ops.sh guests purge 产出的 .txt.age> --confirm-restore"
+      [ "${2:-}" = --confirm-restore ] || die "恢复会把备份里的游客号插回本库；确认后加 --confirm-restore"
+      [ -n "${AGE_IDENTITY:-}" ] && [ -f "$AGE_IDENTITY" ] || die "加密备份要用 AGE_IDENTITY=<私钥文件> 解密（私钥不放在服务器上，用完即删）"
+      lock; check_env; check_release_env; wait_pg
+      mkdir -p "$(backup_dir)"; chmod 700 "$(backup_dir)"
+      GUEST_PLAIN=$(mktemp "$(backup_dir)/guests-restore.XXXXXX")
+      age -d -i "$AGE_IDENTITY" -o "$GUEST_PLAIN" "$file" || die "解密失败"
+      guest_tool restore --backup - --confirm-database "$DB" < "$GUEST_PLAIN" >&2 || die "恢复没有完成，已整体回滚" ;;
+    *) die "用法：ops.sh guests <plan|purge --confirm-delete|restore <备份> --confirm-restore>" ;;
+  esac
+}
+
 do_smoke() {
   check_env; check_release_env
   # 默认在 app 容器里打它自己的 3000 端口；给了入口地址（如 https://…/dynamicfarm/v1）就走入口。
@@ -301,7 +342,8 @@ case "$cmd" in
   backup) lock; do_backup "$@" ;;
   restore) lock; do_restore "$@"; start_app ;;
   invites) do_invites "$@" ;;
+  guests) do_guests "$@" ;;
   smoke) do_smoke "$@" ;;
   status) do_status ;;
-  *) sed -n '2,15p' "$0" >&2; exit 2 ;;
+  *) sed -n '2,18p' "$0" >&2; exit 2 ;;
 esac

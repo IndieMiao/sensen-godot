@@ -31,3 +31,14 @@ export function anonymousSignupLimitsFromEnv(env: Record<string, string | undefi
   }
   return limits;
 }
+
+/**
+ * C-146：游客入口开关 GUEST_ACCOUNTS（所有者 11-25：“移除游客模式, 必须要注册/有账号才能玩”）。不设、空或 open 为开
+ * （Journey 和开发服照旧）；closed 时 /v1/auth/anonymous 一律回 403 GUEST_CLOSED（新安装和已有游客都不再签发 token），
+ * 已经发出去的游客 token 也不再算登录。其它值返回 null，进程拒绝启动，免得拼错后悄悄开着。动态农场正式服在 compose.yml 写死 closed。
+ */
+export function guestAccountsClosedFromEnv(env: Record<string, string | undefined>): boolean | null {
+  const v = env.GUEST_ACCOUNTS;
+  if (v === undefined || v === '' || v === 'open') return false;
+  return v === 'closed' ? true : null;
+}

@@ -2,11 +2,13 @@
 
 `dynamic-farm` is the isolated preview: Journey endpoints are disabled. `dynamic-farm-internal` is the
 internal test package (C-39): Journey points only at an approved isolated test service, and the map's
-internal-only settings (C-32; install-and-play guest sign-in, C-100) are on. `dynamic-farm-release` is the release package (C-98): the
+internal-only settings (C-32) are on. `dynamic-farm-release` is the release package (C-98): the
 preview's package, Journey fixed to the US West dynamic farm production service,
 one's own farm and the saved sign-in on, reselect off. Since C-101 its account panel offers email sign-in (invite
 accounts included), email sign-up and password reset; Google sign-in stays hidden in every dynamic farm package until
 it is scheduled (C-137#18, Q-243). None carries an account or credential.
+No package has a guest entry (C-146, owner 11-25: "移除游客模式, 必须要注册/有账号才能玩"): the internal and release
+packages open the map only with an account, and the readback refuses C-100's install-and-play switch in every package.
 
 Nothing a player sees carries "sensen" (C-142, the owner's C-101#91): the package names, display names, the
 launcher icon (farm-dev's P0 icon, tools/app_icon/android, owner's C-142#7) and the delivered APK file names.
@@ -44,11 +46,12 @@ APPROVED_TARGETS = ('https://aliyun-sh-plane.taildf0ff5.ts.net:8443/v1',)
 # The dynamic farm production service in US West (C-96 materials, C-97 entry). The release package uses
 # exactly this address; it is not a build argument.
 RELEASE_TARGET = 'https://farm.sensenjoy.cn/dynamicfarm/v1'
-# Read by the map (C-32; own_farm: C-34 Q-72; guest_play: C-100); only the internal package may set all of them.
-# guest_play signs in anonymously when no account was restored (install-and-play); the server decides whether a
-# guest may claim and farm (PARCEL_GUEST_WRITES). The release package does not carry it until the owner opens it.
+# Read by the map (C-32; own_farm: C-34 Q-72); only the internal package may set all of them. account_restore also makes
+# the map require an account (C-146).
+INTERNAL_SETTINGS = ('dynamic_farm/reselect', 'dynamic_farm/account_restore', 'dynamic_farm/own_farm')
+# C-100's install-and-play switch (signing in anonymously when no account was restored). Removed with the guest entry
+# (C-146); refused in every package so an old project setting cannot bring it back.
 GUEST_PLAY = 'dynamic_farm/guest_play'
-INTERNAL_SETTINGS = ('dynamic_farm/reselect', 'dynamic_farm/account_restore', 'dynamic_farm/own_farm', GUEST_PLAY)
 # The release package: one's own farm and the saved sign-in, never reselect. It connects only to the address it was
 # built with: fixed_server makes Net ignore user://server.txt (C-116). Only the release package may set it.
 # C-98 also limited its account panel to invite accounts (account/invite_only); C-101 opened email sign-up.
@@ -190,6 +193,8 @@ def exported_config(settings, variant):
     config = dict(variant=variant, online_qa=s.get('network/online_qa', False), journey_base_url=urls[0],
                   journey_mobile_base_url=urls[1], fixed_server=s.get(FIXED_SERVER, False),
                   **{key.split('/')[1]: s.get(key, False) for key in INTERNAL_SETTINGS})
+    if GUEST_PLAY in s:
+        raise ValueError('guest entry (install-and-play) in a package; there is none since C-146')
     if unknown:
         raise ValueError('unexpected dynamic farm setting in export')
     # Google sign-in stays hidden in every dynamic farm package (C-101) and only there.
@@ -202,8 +207,6 @@ def exported_config(settings, variant):
             raise ValueError('release package must keep Net from signing in anonymously and enable its settings')
         if 'dynamic_farm/reselect' in s:
             raise ValueError('reselect in the release package')
-        if GUEST_PLAY in s:
-            raise ValueError('install-and-play in the release package')
         if urls != [RELEASE_TARGET, RELEASE_TARGET]:
             raise ValueError('release package must point only at the production service')
         if [settings.get(key) for key in USER_DIR_KEYS] != [True, PREVIEW_USER_DIR]:

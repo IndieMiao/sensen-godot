@@ -83,6 +83,11 @@ export interface AppDeps {
   signupClosed?: boolean;
   /** New anonymous players per hour by network, address block and in total (C-100, C-120); see signup_limits.ts. */
   anonymousSignupLimits?: Partial<AnonymousSignupLimits>;
+  /**
+   * No guest entry (C-146, GUEST_ACCOUNTS=closed): /v1/auth/anonymous refuses every installation with 403 GUEST_CLOSED,
+   * and a guest token issued earlier no longer authenticates anywhere. Off by default (Journey and development servers).
+   */
+  guestAccountsClosed?: boolean;
   /** Dynamic farm parcel claims and parcel farms (C-31); absent leaves the /v1/parcels routes out. */
   parcels?: Omit<ParcelRouteDeps, 'now'>;
 }
@@ -117,7 +122,9 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   const auth = async (req: FastifyRequest): Promise<PlayerRow | null> => {
     const raw = req.headers.authorization;
     if (!raw?.startsWith('Bearer ')) return null;
-    return deps.store.playerByToken(tokenHash(raw.slice(7)), deps.now());
+    const p = await deps.store.playerByToken(tokenHash(raw.slice(7)), deps.now());
+    // Without a guest entry (C-146) a guest's earlier token is simply not a sign-in.
+    return p && deps.guestAccountsClosed && !p.user_id ? null : p;
   };
   const isGuest = (p: PlayerRow) => !p.user_id && !deps.guestWrites;
   /** Writes need an account; a guest token is authenticated but read-only. */
@@ -173,6 +180,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     // bounded separately below (C-100).
     config: { rateLimit: { max: 600, timeWindow: '1 hour' } },
   }, async (req, reply) => {
+    // C-146: no guest entry. Checked first, so a refused call creates no player, issues no token and uses no quota.
+    if (deps.guestAccountsClosed) return reply.code(403).send({ code: 'GUEST_CLOSED', server_time: deps.now() });
     const quota = await installationLoginLimit(req);
     if (!quota.isAllowed && quota.isExceeded) return reply.code(429).header('retry-after', quota.ttlInSeconds).send({ code: 'RATE_LIMITED' });
     const body = req.body as { install_key?: unknown };

@@ -178,17 +178,15 @@ choose a production signing identity, install an app or authorize publication.
    **Internal test package (C-39).** Only when explicitly selected,
    `--dynamic-farm-internal TARGET` builds `com.gensen.mapfarm.internal` from the same
    staging, but points both Journey URLs at `TARGET` and sets
-   `sensen/dynamic_farm/reselect`, `sensen/dynamic_farm/account_restore` (C-32),
-   `sensen/dynamic_farm/own_farm` (C-34: "Enter my farm" opens the farmable own parcel) and
-   `sensen/dynamic_farm/guest_play` (C-100: install-and-play). `TARGET`
+   `sensen/dynamic_farm/reselect`, `sensen/dynamic_farm/account_restore` (C-32) and
+   `sensen/dynamic_farm/own_farm` (C-34: "Enter my farm" opens the farmable own parcel). `TARGET`
    must exactly equal an entry of `APPROVED_TARGETS` in `dynamic_farm_export.py`: today only
    the isolated C-38 test service `https://aliyun-sh-plane.taildf0ff5.ts.net:8443/v1`
    (tailnet only). Production, devserver, P0 and any other address are refused before staging.
    `online_qa` stays on, so `Net` never boots. The map reloads a token the tester saved by signing in
-   on the device; without one, `guest_play` signs in anonymously with this installation's key, and
-   the server decides whether that guest may claim and farm (`PARCEL_GUEST_WRITES`, off by default;
-   otherwise the map asks the player to sign in). No account or credential goes into the package.
-   The release package below never carries `guest_play` until the owner decides to open install-and-play. Use it for internal testing only: no signing or distribution.
+   on the device; without one it shows only the sign-in panel (no ✕) until the tester signs in or signs up:
+   there is no guest entry in any package (C-146), and the readback refuses C-100's `guest_play`.
+   No account or credential goes into the package. Use it for internal testing only: no signing or distribution.
 
    ```sh
    tools/android/build_worker_apk.sh --dynamic-farm-internal \
@@ -215,8 +213,8 @@ choose a production signing identity, install an app or authorize publication.
    production project starting 870347303349, not gensen-preview). The production compose's
    `GOOGLE_CLIENT_IDS` must contain that id; `test_worker_apk.py` and
    `server/test/ops/dynamicfarm.test.ts` check it.
-   `online_qa` stays on, so `Net` never signs in anonymously; without an account the player can only
-   look at the map.
+   `online_qa` stays on, so `Net` never signs in anonymously; without an account the map does not open
+   at all: only the sign-in panel (no ✕) shows until the player signs in or signs up (C-146).
    Building it does not sign or publish it: signing with the 0.4.1 certificate and distribution are C-99.
 
    ```sh
