@@ -8,8 +8,12 @@ extends "res://scenes/p0/p0_outpost.gd"
 ## Tapping Jasmine or her counter walks to the counter and opens her greeting, Sell her counter (LOCK-16); tapping Scott
 ## walks to him and opens his greeting (C-59's parcel_town.gd: the same lines, keys, save and commands). The door, or
 ## Back, returns to the map. Trades go through the player's own parcel save (`store`), as from the map before.
+## C-191: the kit's board on the left wall (farm-dev's Fare Board, use_fee_board) is the Request Board: a facility
+## (LOCK-07 v2: its icon button and `Request Board` strip, no badge), tapping it walks there and opens the board drawer
+## (parcel_board.gd, through parcel_town.gd) with no greeting.
 ## Lock scope (C-115#9): LOCK-07 and LOCK-16 apply as on the main farm; Scott is no resident (no dialogue bar,
-## LOCK-18) and the room holds two roles (LOCK-19 is for the main farm's outposts).
+## LOCK-18) and the room holds two roles (LOCK-19 is for the main farm's outposts). C-191 (SEN-C-191#6): the board's
+## rows are P0's UiBoardCard (E-11) with the gap on the key (LOCK-10); Jasmine's greeting and counter are unchanged.
 
 const Town := preload("res://scenes/dynamic_farm/parcel_town.gd")
 const Entry := preload("res://scenes/dynamic_farm/town_entry.gd")
@@ -18,9 +22,12 @@ const Entry := preload("res://scenes/dynamic_farm/town_entry.gd")
 const OUTPOST_ID := "sh_post_1"
 ## Who stands at which npc_ anchor, by parcel_town role.
 const CAST := {"npc_keeper": Town.MARKET, "npc_sam": Town.CARPENTER}
-## The anchors a tap may take: the keeper and the counter (one, LOCK-16), Scott, the door. The kit's Stamp Desk and
-## Fare Board are the main farm's (passport, fares) and stay scenery here.
-const TAPPABLE := ["npc_keeper", "use_counter", "npc_sam", "exit"]
+## C-191: the board's anchor and its strip's name.
+const BOARD_ANCHOR := "use_fee_board"
+const BOARD_NAME := "Request Board"
+## The anchors a tap may take: the keeper and the counter (one, LOCK-16), Scott, the Request Board (C-191: the kit's
+## Fare Board), the door. The kit's Stamp Desk is the main farm's passport and stays scenery here.
+const TAPPABLE := ["npc_keeper", "use_counter", "npc_sam", BOARD_ANCHOR, "exit"]
 ## The top bar's second line: the city (farm-dev's chip reads `San Francisco · <place>`).
 const CITY := "San Francisco"
 
@@ -95,10 +102,12 @@ func _marker(n: String, _view: Dictionary) -> Dictionary:
 		return {kind = "npc", name = str(npcs[n].name), head = (npcs[n].root as Node3D).to_global(NAME_OVER_HEAD),
 			talking = is_instance_valid(town) and town.who == str(npcs[n].id)}
 	if n == "exit": return {kind = "facility", icon = load("res://assets/p0/icons/door.svg"), name = exit_to}
+	if n == BOARD_ANCHOR: return {kind = "facility", icon = P0Logic.icon("board"), name = BOARD_NAME}
 	return {}
 
 func _on_facility(n: String) -> void:
 	if n == "npc_keeper" or n == "use_counter": open_town(Town.MARKET)
+	elif n == BOARD_ANCHOR: open_town(Town.BOARD)
 	elif npcs.has(n): open_town(str(npcs[n].id))
 
 # ---------------------------------------------------------------- the keepers' greetings (C-59 parcel_town.gd)
@@ -131,7 +140,7 @@ func _pop() -> void:
 ## player walks out through the door.
 func is_back_navigation_locked() -> bool:
 	if is_instance_valid(town):
-		if not town.stack.back(): town.close()
+		if not town.step_back(): town.close()
 		return true
 	return super.is_back_navigation_locked()
 

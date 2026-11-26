@@ -5,7 +5,7 @@
   interactions and P0/P1/P2/P3 scope, including its latest review amendments.
   Figma (current game UI): page "14 · UI semantic refactor"
   https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-4
-  （R1 修订中，锁定项以 SGODOT-197 为准）. The former Prototype page
+  （R1 修订中，锁定项以 docs/governance/locked-components.md 为准）. The former Prototype page
   (node-id=5-3) is Archive，截至 2026-10-06.
   Use `docs/README.md` and `docs/design/README.md` to find current documents.
   Older entries below are dated implementation/release evidence, not competing
@@ -14,22 +14,23 @@
   Keep technical constraints and current data-preservation rules when relevant;
   design cleanup does not itself authorize a release, migration or save reset.
 
-- Locked UI decisions adopted on 2026-10-07: before changing any UI design,
-  Figma component, generator script or UI implementation, read Plane card
-  SGODOT-197 "拍板组件清单 Locked Components". Locked items keep their structure,
+- Locked UI decisions adopted on 2026-10-07 (moved into the repository on
+  2026-11-27, SEN-C-194): before changing any UI design, Figma component,
+  generator script or UI implementation, read
+  `docs/governance/locked-components.md` (LOCK-01–34 and HOME-PICK v2, the
+  current version of each item with its source). It replaces Plane card
+  SGODOT-197, which is frozen and kept only as history in
+  `docs/governance/plane-SGODOT-197/`. Locked items keep their structure,
   semantic role, primary action, visual weight, entry point and key copy;
   refactors may only unify tokens (colors, type sizes, radius, spacing, touch
-  targets, copy format). Changing a locked attribute requires an explicit user
-  decision recorded as a 复议 comment on that card and in gameplay-plan-v2 §1.5;
-  never "normalize" a locked component silently. Treat unapproved deviations as
-  P0 regressions. Locked items: Energy card, NEED-TILE (gaps on buttons), main
-  action key, action radial, quick bar, pin state, two-row HUD and location
-  chip, tap-triggered facilities, no auto-jumps, STATE-ICONS, bag drawer,
-  Bag | Gear, parcels and Inbox tabs, counter + bag drawer, outpost keeper
-  greeting and keeper bar, unattended Homestead Stall, resident dialogue bar,
-  one space per outpost role, cooking panel v5, per-floor mine costs and labels,
-  full-screen Profile, English-only UI copy, P0 reuse of old art and feel.
-  Unless explicitly specified, do not reference the Figma Legacy page (formerly
+  targets, copy format). A card that touches a locked component writes its
+  scope on that card before work starts (which items, reuse or change, which
+  locked attributes stay). Changing a locked attribute requires an explicit
+  owner decision (复议) on that card; PM records the conclusion with its
+  decision id in `docs/governance/locked-components.md` (and in
+  gameplay-plan-v2 §1.5), not on Plane. Never "normalize" a locked component
+  silently. Treat unapproved deviations as P0 regressions. Unless explicitly
+  specified, do not reference the Figma Legacy page (formerly
   "Approved / App UI") and keep to portrait only (multi-size adaptation is
   postponed).
 
@@ -1138,35 +1139,28 @@
 
 # Review Materials
 
-- Rule adopted on 2026-10-09 at the user's request: upload every review
-  material (screenshots, frame strips, screen recordings, before/after
-  comparisons, test-result reports) to the relevant Plane card as a comment
-  with attachments, under your own virtual_user_id. This applies even when the
-  reviewer is another agent (cross review, design walkthrough, art acceptance)
-  rather than the user. Local paths such as /Volumes/ACASIS/tmp/... are only a
-  supplement; when reporting to the user or the project director, link the
-  Plane card (https://plane.sensenjoy.cn/zili/browse/SGODOT-<n>/) instead of
-  only a local path. Text reports may be pasted as the comment body when a file
-  cannot be attached. Walkthroughs should ask the author to upload missing
-  materials before reviewing.
-- The Plane MCP can only attach files from public URLs. Upload local files with
-  the shared script (Plane REST; credentials read from ../plane.env, never
-  printed; it signs both the attachments and the comment with your id):
-  `uv run --with requests python3 /Volumes/ACASIS/tmp/gensen-ui-review/tools/plane_upload.py <work_item_uuid> <your_virtual_user_id> <file> [<file> ...] [--comment "<html>"]`.
-  Get the card UUID with the MCP `retrieve_work_item_by_identifier`
-  (e.g. SGODOT-231); prefix file names with the card number; virtual user ids
-  are in /Volumes/ACASIS/tmp/gensen-ui-review/pm/virtual-users.md.
-- Rule adopted on 2026-10-09 after the Plane upgrade (migration 0126): sign
-  every Plane write with your own virtual_user_id, not only comments. Pass it to
-  create_work_item (and subtasks), update_work_item, manage_work_item_assignee,
-  manage_work_item_label, create_work_item_comment, attachment upload/delete,
-  link create/update/delete and create_page / update_page / rename_page (Pages
-  also need an explicit project_id). Signing does not assign; set assignees
-  separately. Archive, restore and delete of cards or pages are not signable and
-  stay on the real account. Custom REST scripts put "virtual_user_id" in the
-  JSON body (attachments: both the upload request and the is_uploaded confirm);
-  never write created_by or actor directly. Reference: Plane page "Zili Plane
-  API 更新与 Agent 接入指南" (page 2fe96f61-9b3c-42ea-abef-f6ce11ca2490).
+- Rule adopted on 2026-11-27 (SEN-C-196), superseding the 2026-10-09 Plane
+  upload and signing rules: since the Cardigan cutover on 2026-11-20 Plane is
+  frozen and read-only. Attach every review material (screenshots, frame
+  strips, screen recordings, before/after comparisons, logs, test-result
+  reports) to the relevant Cardigan card as an attachment, bound to the
+  delivery or review it supports. Each delivery and review names the full
+  commit SHA it covers; evidence for an older SHA is not reused for a new one.
+  This applies even when the reviewer is another agent (cross review, design
+  walkthrough, art acceptance) rather than the user. Local paths such as
+  /Volumes/ACASIS/tmp/... are only a supplement; when reporting to the user or
+  the project director, cite the card number (SEN-C-<n>) and attachment
+  instead of only a local path. Text reports may go in the comment or delivery
+  body when a file cannot be attached. Walkthroughs should ask the author to
+  attach missing materials before reviewing.
+- Large files (APK, AAB, IPA, data packs, long screen recordings) go to the
+  controlled artifact storage under project rule 9 (cardigan C-496), not into
+  card attachments or the repository. On the card, record the artifact ID or
+  path, byte size and full SHA-256, plus versionCode (and versionName) for
+  app packages; never write a signed download URL into the card or repository.
+- Do not write to Plane. Plane cards, pages and the former `plane_upload.py`
+  / virtual_user_id signing workflow are history only; the frozen snapshots
+  are under `docs/governance/plane-SGODOT-*/`.
 - Never upload the user's private screens: phone home screen, other apps,
   photos, notifications or system settings captured during device tests stay
   local only; say in the comment that they were withheld. Upload only frames of

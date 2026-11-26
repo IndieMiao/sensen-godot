@@ -40,8 +40,14 @@
  * 牛棚（C-181，0.4.6）：照鸡场，是又一类养殖建筑（barn），盖的时候除蓝图外扣 materials（木材、石头）；喂一次扣 livestock.feed_amount
  * 个饲料（2 根胡萝卜），一次仍只产一份（牛奶）。牛棚蓝图在 Scott 处花金币买：economy.blueprints 里带 coins 的蓝图，claim_blueprint
  * 时扣这么多金币，不够整批拒绝（NOT_ENOUGH_COINS），只能买一次（同 blueprints_claimed）。不加存档字段，版本号不变。
+ *
+ * 驿站委托板（C-191，照搬 P0 系统委托板，见 requests.ts）：board 存两格单子和今天交了几单、发了多少完成奖，requests_done
+ * 是累计交了几单（羊圈解锁要用）。接单、交单、放弃（accept_request / deliver_request / drop_request）不花体力，“人在驿站”由客户端限定。
+ * 每批命令前后各补一次委托板（settleBoard），读档在副本上补。board、requests_done 也是 v1 上追加的字段：旧存档按空板、0 单读。
+ * 换数据集不动委托板。
  */
 import { dayKey, energyCost, maxEnergy, nextRollover, nextTickIn, settleEnergy, spendEnergy, type EnergyState } from './energy.js';
+import { boardOf, emptyBoard, requestCommand, settleBoard, type BoardState } from './requests.js';
 import { buildingMax, gatherSourceOf, HOME_BUILDING, MAX_BUILDINGS, nextFarmLevel, type ParcelRules } from './rules.js';
 
 export const FARM_STATE_VERSION = 1;
@@ -122,6 +128,10 @@ export interface ParcelFarmState {
   grants: Record<string, number>;
   /** C-152：农场等级，从 1 起。 */
   level: number;
+  /** C-191：驿站委托板的格子、单号和今天的单数、完成奖（requests.ts）。 */
+  board: BoardState;
+  /** C-191：累计交了几单委托（羊圈解锁要用）。 */
+  requests_done: number;
 }
 
 export type FarmCommand =
@@ -146,7 +156,9 @@ export type FarmCommand =
   /** C-151：浇一格播下还没浇的作物。 */
   | { type: 'water'; cell: string }
   /** C-152：在 Scott 处把农场升到下一级。 */
-  | { type: 'upgrade_farm' };
+  | { type: 'upgrade_farm' }
+  /** C-191：在驿站委托板上接单、交单、放弃，request 是单号。 */
+  | { type: 'accept_request' | 'deliver_request' | 'drop_request'; request: number };
 
 /** 命令执行时服务端核实过的上下文：本人地块编号（来自 token 查到的那一行，不来自请求体）。 */
 export interface FarmContext { parcel_id: string }
@@ -158,13 +170,14 @@ export type FarmOutcome =
 /** 认领时的空农场：背包为空，赠品等首次进入时再发（认领和进入不是同一个动作）。 */
 export function emptyFarm(): ParcelFarmState {
   return { v: FARM_STATE_VERSION, buildings: [], house: null, cleared: [], tilled: [], crops: {}, bag: {}, welcomed_at: null,
-    coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1 };
+    coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1,
+    board: emptyBoard(), requests_done: 0 };
 }
 
 /**
  * 旧存档兼容：C-31 时期写下的地块农场没有经济字段，按开局值补上（金币 0、没卖过、没采过、没领过）；
  * C-150 之前的存档没有 buildings，按 house 补上（见 withBuildings）；C-151 之前的没有水桶次数和补发记录，按 0 次、没发过补上；
- * C-152 之前的没有等级，按 1 级补上。
+ * C-152 之前的没有等级，按 1 级补上；C-191 之前的没有委托板，按空板、0 单补上。
  * 只补缺的，不动已有字段；返回新对象，不改入参。
  */
 export function withEconomy(state: ParcelFarmState): ParcelFarmState {
@@ -182,6 +195,8 @@ export function withEconomy(state: ParcelFarmState): ParcelFarmState {
   s.pail_water = count(s.pail_water);
   s.grants = map(s.grants);
   s.level = Number.isInteger(s.level) && s.level >= 1 ? s.level : 1;
+  s.board = boardOf(s.board);
+  s.requests_done = count(s.requests_done);
   return s;
 }
 
@@ -340,6 +355,10 @@ export function parseFarmCommands(raw: unknown): FarmCommand[] | null {
       case 'upgrade_farm':
         out.push({ type: 'upgrade_farm' });
         break;
+      case 'accept_request': case 'deliver_request': case 'drop_request':
+        if (!Number.isInteger(c.request) || (c.request as number) < 1 || (c.request as number) > MAX_ID) return null;
+        out.push({ type: c.type, request: c.request as number });
+        break;
       default:
         return null;
     }
@@ -392,11 +411,13 @@ function overlapped(s: ParcelFarmState, f: Rect): string[] {
  * 一批命令全部成功才生效；任一失败整批不变，返回失败的序号。
  * ctx 是服务端从 token 查到的本人地块；没有 ctx 时采集一律按不是自家物件拒绝。
  * 体力先结算到 now；每条命令先做它自己的检查，再看体力够不够（NO_ENERGY 带 need / have / next_in），够了才改存档。
+ * 委托板（C-191）在第一条命令前补到 now，整批成功后再补一次（交完的格子立即补上）。
  */
 export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, commands: FarmCommand[], now: number, ctx?: FarmContext): FarmOutcome {
   const s = withEconomy(state);
   const eco = rules.economy;
   settleEnergy(rules, s, now);
+  settleBoard(rules, s, now);
   for (const [index, c] of commands.entries()) {
     const fail = (code: string, detail?: Record<string, unknown>): FarmOutcome => ({ ok: false, index, code, ...(detail ? { detail } : {}) });
     const cost = energyCost(rules, c);
@@ -620,8 +641,15 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         s.level = next.level;
         break;
       }
+      case 'accept_request': case 'deliver_request': case 'drop_request': {
+        // 在驿站委托板前（C-191）：服务端不知道人站在哪，“在驿站”由客户端限定。
+        const refusal = requestCommand(rules, s, c, now, fail as Parameters<typeof requestCommand>[4], MAX_COINS);
+        if (refusal) return refusal;
+        break;
+      }
     }
   }
+  settleBoard(rules, s, now);
   return { ok: true, state: s };
 }
 

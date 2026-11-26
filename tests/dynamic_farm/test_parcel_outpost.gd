@@ -2,7 +2,8 @@ extends SceneTree
 ## C-115: the dynamic farm's 3D space (parcel_outpost.tscn), farm-dev's Travel Post room run without the
 ## P0 runtime, with Jasmine (Market) and Scott (Carpenter). Headless, on the local stand-in for the parcel save: the
 ## cast and prompts, a tap walks to the keeper and opens her greeting, a sale and the coop blueprint go through the
-## save, the door returns to the map (AppRouter pops the room), and no P0 runtime, session or online room starts.
+## save, the Request Board opens its drawer (C-191), the door returns to the map (AppRouter pops the room), and no P0
+## runtime, session or online room starts.
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const RouterFixture = preload("res://tests/dynamic_farm/app_router_fixture.gd")
@@ -53,7 +54,10 @@ func _run() -> void:
 		and room.npcs.npc_sam.name == "Scott" and room.npcs.size() == 2, "Jasmine at the counter, Scott where Sam stands, nobody else")
 	var taps := Array(room._tappable())
 	taps.sort()
-	_check(taps == ["exit", "npc_keeper", "npc_sam", "use_counter"], "only the keeper, her counter, Scott and the door take taps (%s)" % [taps])
+	_check(taps == ["exit", "npc_keeper", "npc_sam", "use_counter", "use_fee_board"],
+		"only the keeper, her counter, Scott, the Request Board (C-191) and the door take taps (%s)" % [taps])
+	var board_mark: Dictionary = room._marker("use_fee_board", {})
+	_check(board_mark.kind == "facility" and board_mark.name == "Request Board", "the board is a facility named Request Board (LOCK-07 v2)")
 	var hud: Node = room.get_node_or_null("RoomHud")
 	_check(hud != null and hud.find_child("TopBar", true, false) != null, "the room has its own top bar")
 	var tags: Array = hud.find_children("Tag_*", "", true, false)
@@ -93,6 +97,19 @@ func _run() -> void:
 		_check(store.read().farm.bag.get("blueprint_coop") == 1, "the coop blueprint is in the parcel's bag")
 		room.town.close()
 		await process_frame
+	# C-191: the Request Board on the left wall: walking up to it opens the board drawer, no greeting; Back closes it.
+	room.walk_to("use_fee_board")
+	deadline = Time.get_ticks_msec() + 20000
+	while not is_instance_valid(room.town) and Time.get_ticks_msec() < deadline: await process_frame
+	_check(is_instance_valid(room.town) and room.town.who == "board", "walking up to the board opens it")
+	if is_instance_valid(room.town):
+		deadline = Time.get_ticks_msec() + 10000
+		while room.town.busy and Time.get_ticks_msec() < deadline: await process_frame
+		_check(room.town.card == null and room.town.board != null and room.town.board.cards.size() == 2,
+			"the board drawer lists its two requests, no greeting")
+		room.is_back_navigation_locked()
+		await process_frame
+		_check(not is_instance_valid(room.town) and room.is_inside_tree(), "Back closes the board; the room stays")
 	_check(_no_p0_runtime(), "no P0 runtime, session or online room was started")
 	# The door: walking out pops the room.
 	var left := [false]

@@ -14,6 +14,9 @@ extends Control
 ## - Since C-181 Scott sells the blueprints the rules price in coins (`economy.blueprints.<id>.coins`, the barn's 150):
 ##   one key each, `Buy Barn Blueprint · 150 coins`, until it is bought; short of coins it reads P0's `Need N more coins`
 ##   (LOCK-10) and a tap says so. It sends `claim_blueprint`, which takes the coins on the server.
+## - Since C-191 the room's Request Board opens here too (who = BOARD): no keeper and no greeting, the board drawer
+##   (parcel_board.gd) straight away; its keys send `accept_request` / `deliver_request` / `drop_request`, and closing
+##   it leaves.
 ## The parcel save (store: read / send, parcel_farm_remote_store.gd or the local stand-in) is authoritative; this
 ## node draws what it answers. Coins are the parcel's own, separate from the main farm's.
 signal closed
@@ -22,9 +25,12 @@ const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const ParcelItems = preload("res://modules/dynamic_farm/parcel_items.gd")
 const Counter = preload("res://scenes/dynamic_farm/parcel_counter.gd")
 const Upgrade = preload("res://scenes/dynamic_farm/parcel_upgrade.gd")
+const Board = preload("res://scenes/dynamic_farm/parcel_board.gd")
 const Portraits = preload("res://modules/p0/p0_keeper_portraits.gd")
 const MARKET := "market"
 const CARPENTER := "carpenter"
+## C-191: the Request Board, a facility rather than a keeper.
+const BOARD := "board"
 const BLUEPRINT := "coop"
 ## Looks from catalogue parts (no NPC-only part of another keeper, no hairHat + cloth pair another NPC wears).
 const NPCS := {
@@ -60,13 +66,16 @@ var stack: ModalStack
 var card: UiNpcCard
 var counter: Counter
 var upgrade_sheet: Upgrade
+var board: Board
+## Server time minus this device's clock at the last answer (the board's countdowns and day run on the server's clock).
+var server_offset := 0
 var toast: ToastLayer
 ## A greeting's keys, by name (tests and the map read them).
 var keys := {}
 var _switching := false   # the card closes because the counter opens over it
 var _met_path := MET_PATH
 
-## who: MARKET or CARPENTER; store answers read() and send(); parcel_id names the player's parcel (the met record).
+## who: MARKET, CARPENTER or BOARD; store answers read() and send(); parcel_id names the player's parcel (the met record).
 static func open(parent: Node, who_: String, store_: RefCounted, parcel_id_: String, met_path := MET_PATH) -> Control:
 	var town: Control = load("res://scenes/dynamic_farm/parcel_town.gd").new()
 	town.who = who_
@@ -99,6 +108,9 @@ func _ready() -> void:
 
 ## Reads the parcel save and greets again; a failed read says so and offers Retry.
 func reload() -> void:
+	if who == BOARD:
+		await _reload_board()
+		return
 	busy = true
 	_greet()
 	var result: Dictionary = await store.read()
@@ -119,9 +131,49 @@ func _adopt(result: Dictionary) -> bool:
 	if next.is_empty(): return false
 	farm = next
 	farm_version = int(result.get("farm_version", farm_version))
+	if result.has("server_time"): server_offset = int(result.server_time) - _device_ms()
 	if counter != null and is_instance_valid(counter): counter.refresh(farm)
 	if upgrade_sheet != null and is_instance_valid(upgrade_sheet): upgrade_sheet.refresh(farm)
+	if board != null and is_instance_valid(board): board.refresh(farm)
 	return true
+
+func _device_ms() -> int: return int(Time.get_unix_time_from_system() * 1000.0)
+
+## The server's clock now (the last answer's server_time carried forward on this device's clock).
+func server_now() -> int: return _device_ms() + server_offset
+
+# ---------------------------------------------------------------- the Request Board (C-191)
+## The board drawer at once (`…` until the save is read), then the save; a failed read says so and offers Retry.
+func _reload_board() -> void:
+	if board == null or not is_instance_valid(board): _open_board()
+	busy = true
+	if farm.is_empty(): board.show_status(Board.COPY.loading)
+	var result: Dictionary = await store.read()
+	busy = false
+	if not is_inside_tree() or board == null or not is_instance_valid(board): return
+	if not _adopt(result) and farm.is_empty(): board.show_status(Board.COPY.unreachable, reload)
+
+func _open_board() -> void:
+	board = Board.new(farm)
+	board.now_ms = server_now
+	board.close_requested.connect(func(): stack.close_drawer())
+	board.command_requested.connect(board_command)
+	board.refill_due.connect(func(): if not busy: _reload_board())
+	stack.open_drawer(board)
+	toast.anchor_above(board)
+
+## A board key's command. A delivery floats its coins up from its key; a drop shows BOARD-DROPPED. A refusal toasts
+## what the server said (the keys already carry the gaps it checks).
+func board_command(command: Dictionary) -> Dictionary:
+	if busy or board == null or not is_instance_valid(board): return {}
+	var at := board.key_point(int(command.get("request", 0)))
+	var coins := int(farm.get("coins", 0))
+	var result := await _send(command)
+	if not result.get("ok", false) or board == null or not is_instance_valid(board): return result
+	match str(command.type):
+		"deliver_request": if at != Vector2.INF: board.float_coins(int(farm.coins) - coins, at)
+		"drop_request": board.dropped()
+	return result
 
 ## The keeper's greeting card: a fresh one each time it is shown (the read, a sale, the blueprint).
 func _greet() -> void:
@@ -303,12 +355,14 @@ func _met() -> Dictionary:
 	var raw = JSON.parse_string(FileAccess.get_file_as_string(_met_path)) if FileAccess.file_exists(_met_path) else null
 	return raw if raw is Dictionary else {}
 
-## The counter closing goes back to the greeting; the greeting closing leaves.
+## The counter closing goes back to the greeting; the greeting closing leaves. The board has no greeting: closing it leaves.
 func _on_layer_closed(layer: int, _content: Control) -> void:
 	if layer == ModalStack.Layer.DRAWER:
 		counter = null
 		upgrade_sheet = null
-		if is_inside_tree(): _greet_again.call_deferred()
+		board = null
+		if who == BOARD: close()
+		elif is_inside_tree(): _greet_again.call_deferred()
 	elif layer == ModalStack.Layer.CARD:
 		card = null
 		if not _switching and not stack.has_drawer(): close()
@@ -321,7 +375,16 @@ func close() -> void:
 	queue_free()
 	closed.emit()
 
+## Back: a board sheet goes back a page (BOARD-3 to its request, the others to the list), else the top layer closes;
+## false when nothing was open.
+func step_back() -> bool:
+	if board != null and is_instance_valid(board) and board.page != "list":
+		if board.page == "drop": board.open_request(int(board.focus.get("id", 0)))
+		else: board.back_to_list()
+		return true
+	return stack.back()
+
 func _unhandled_input(e: InputEvent) -> void:
 	if e.is_action_pressed(&"ui_cancel"):
-		if not stack.back(): close()
+		if not step_back(): close()
 		get_viewport().set_input_as_handled()

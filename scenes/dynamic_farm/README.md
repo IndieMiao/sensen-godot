@@ -135,6 +135,21 @@ into the Bag (`+1 Egg`). Numbers, the pickup and the copy await the owner (SEN-C
 `docs/plans/C-154.md`. Tests: `tests/dynamic_farm/test_coop.gd` (shared cases `fixtures/coop_cases.json` with the
 server, walls, hens, pickup); captures: `tools/dev/dynamic_farm/coop_probe.gd`.
 
+## Request Board (C-191, 0.4.6)
+
+P0's system board at the Washington Square Travel Post: the room's board on the left wall (the kit's Fare Board,
+`use_fee_board`) is a facility named `Request Board` (LOCK-07 v2). Tapping it walks there and opens the board drawer
+(`parcel_board.gd`, through `parcel_town.gd` with no greeting): the page facts and one P0 `UiBoardCard` per request —
+Track (`accept_request`), Deliver (`deliver_request`, tracked or not, once the bag holds enough) or the gap on the key
+(LOCK-10) — and the request sheets after P0's BOARD-1 / 3 / DROPPED (`drop_request`). The rules are the `requests` of
+`dynamic_farm.json` (server `server/src/parcels/requests.ts`, client `parcel_farm.gd`): 2 slots, refilled at once after
+a delivery and 8 h after a drop, an open request swapped after 72 h, at most 6 a player day and 100 coins of completion
+bonus; pay is Jasmine's price × 80% (rounded down) × count plus the bonus of the farm level's tier; eggs only with a
+coop. The save's `board` and `requests_done` (the sheep pen's unlock). Draws are a shared hash of the slot's own time,
+so a read and the next command see the same requests. Numbers: SEN-Q-278 (a template may carry its own `tiers`); copy: SEN-C-191#29; notes in
+`docs/plans/C-191.md`. Tests: `tests/dynamic_farm/test_parcel_board.gd` (shared cases `fixtures/request_cases.json`
+with the server); emulator package: `gather_qa_apk.sh` with `GATHER_QA_ENTRY=board`.
+
 ## First-visit guide (C-35, 0.4.2; C-61, 0.4.3)
 
 `modules/dynamic_farm/parcel_guide.gd` reads the next step of the first ten minutes from the save alone, so a parcel

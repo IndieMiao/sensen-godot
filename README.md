@@ -1,7 +1,7 @@
 # Sensen Godot / Gensen
 
 当前玩法、数值、交互与分期以 [玩法方案 v2](docs/product/gameplay-plan-v2-2026-10-02.md) 为唯一基准，包含 2026-10-05 最新审图修订。
-界面设计：[Figma 页面 14 · UI semantic refactor](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-4)（R1 修订中，锁定项以 [SGODOT-197](https://plane.sensenjoy.cn/zili/browse/SGODOT-197/) 为准）；旧 [Figma · Prototype](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-3) 为 Archive，截至 2026-10-06。
+界面设计：[Figma 页面 14 · UI semantic refactor](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-4)（R1 修订中，锁定项以 [锁定组件清单](docs/governance/locked-components.md) 为准）；旧 [Figma · Prototype](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-3) 为 Archive，截至 2026-10-06。
 
 - [文档入口与保留范围](docs/README.md)
 - [当前设计稿索引](docs/design/README.md)
