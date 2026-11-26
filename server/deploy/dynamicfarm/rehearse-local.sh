@@ -135,7 +135,7 @@ step "空库部署当前版本：ops.sh deploy"
 ops deploy "$HEAD_SHA" "$(image_id "$HEAD_SHA")"
 ok "建表后 public 下 $(sql "SELECT count(*) FROM information_schema.tables WHERE table_schema='public'") 张表；服务日志：$(grep -o 'farm-server listening.*' "$R/app.log" | tail -n1 | sed 's/content=[^ ]* //')"
 
-step "只读冒烟（没有账号、不建号）：健康检查、邮箱注册和 Google 登录已开放、游客能读不能认领"
+step "只读冒烟（没有账号、不建号）：健康检查、邮箱注册和 Google 登录已开放、游客入口已关、不登录不能认领"
 ops smoke "http://127.0.0.1:$APP_PORT/v1"
 
 step "邀请账号：ops.sh invites create，输出重定向到受控文件（0600）"

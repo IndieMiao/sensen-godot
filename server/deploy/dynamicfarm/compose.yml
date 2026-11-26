@@ -18,8 +18,11 @@ services:
       # GOOGLE_CLIENT_IDS 是正式包向 Google 要登录令牌用的 OAuth Web 客户端 ID（不是秘密），必须与 project.godot 的
       # sensen/auth/google_web_client_id 一致（所有者的正式 Google Cloud 项目，870347303349 开头；测试会比对）。
       # 同一个项目里要有包名 com.sensen.dynamicfarm.cardigan 加签名证书 SHA-1 的 Android 客户端，手机上才拿得到令牌。
-      # 装上即建号（C-100，游客认领和存档自己的地块）还关着：什么时候对外开放由所有者另定，到时改这一行并重新部署。
+      # 没有游客入口（C-146，所有者 11-25：“移除游客模式, 必须要注册/有账号才能玩”）：GUEST_ACCOUNTS closed 时
+      # /v1/auth/anonymous 一律 403 GUEST_CLOSED，不建游客号，之前发出的游客 token 也不再算登录。已有的游客号按 Q-265
+      # 删除，用 ops.sh guests（先备份、核对条数再删，见 README）。装上即建号（C-100）因此也不再开放。
       ACCOUNT_SIGNUP: open
+      GUEST_ACCOUNTS: closed
       GUEST_WRITES: "0"
       PARCEL_GUEST_WRITES: "0"
       DYNAMIC_FARM_RESELECT: "0"

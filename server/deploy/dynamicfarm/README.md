@@ -6,7 +6,7 @@
 
 ## 部署的是什么
 
-- **服务**：Journey 服务端（`server/`，镜像用 `server/Dockerfile` 构建）。动态农场用到的是地块认领、地块存档、市场（出售）和木匠（领蓝图），接口见 [docs/plans/C-31.md](../../../docs/plans/C-31.md)。Journey 的其它接口仍在，游客对它们也只读。
+- **服务**：Journey 服务端（`server/`，镜像用 `server/Dockerfile` 构建）。动态农场用到的是地块认领、地块存档、市场（出售）和木匠（领蓝图），接口见 [docs/plans/C-31.md](../../../docs/plans/C-31.md)。Journey 的其它接口仍在，同样要账号。
 - **隔离**：独立的 compose 项目 `dynamicfarm`（`compose.yml`），里面是 app 和 PostgreSQL 16。
   - 数据卷 `dynamicfarm_pgdata`，网络 `dynamicfarm_default`，都是本项目自己的。
   - 不加入 P0 或旧 farm 的网络，不挂它们的卷，不连 P0 演示服的数据。
@@ -16,7 +16,7 @@
   - Google 登录开启（C-101）：`GOOGLE_CLIENT_IDS` 写死为正式包实际使用的 OAuth Web 客户端 ID（`project.godot` 的 `sensen/auth/google_web_client_id`，所有者的正式 Google Cloud 项目，870347303349 开头；不是秘密），两边不一致时 `server/test/ops/dynamicfarm.test.ts` 和 `tools/android/test_worker_apk.py` 会失败。手机上能拿到令牌，还要求同一个项目里有包名 `com.gensen.mapfarm`（C-142 改名）加签名证书 SHA-1 的 Android 客户端，这一项由所有者在 Google Cloud 控制台配置（C-172 已建好正式包和内部包 `com.gensen.mapfarm.internal` 的两个客户端）。
   - Apple 登录关闭，返回 503 `APPLE_UNAVAILABLE`。
   - 以后要回到只用邀请账号：把 `ACCOUNT_SIGNUP` 改回 `closed` 再部署，邮箱注册和 Google 首次登录建号都回 403 `SIGNUP_CLOSED`，已有账号照常登录。
-  - 游客只读：认领和存档返回 401 `LOGIN_REQUIRED`。
+  - 没有游客入口（`GUEST_ACCOUNTS=closed`，C-146）：`/v1/auth/anonymous` 对新安装和已有游客一律回 403 `GUEST_CLOSED`，不建游客号；之前发出的游客 token 不再算登录（回 401 `UNAUTHENTICATED`）。已有的游客号按所有者在 Q-265 的选择删除，见下文“删除游客号”。
   - “放弃并重选”关闭：返回 403 `RESELECT_DISABLED`。
   - 不用 QA 固定验证码和 QA 玩家，验证码不写进日志。
 - **数据**：从空库开始，不搬内网测试服的数据（C-95#5）。
@@ -49,7 +49,7 @@ handle_path /dynamicfarm/* {
 | `.env` 必填 | `POSTGRES_PASSWORD`、`TOKEN_PEPPER`、`TRUSTED_PROXIES`、`INVITE_EMAIL_DOMAIN`、`PG_IMAGE`、`AGE_RECIPIENT`、`SMTP_URL`、`MAIL_FROM`（后两项 C-101 起必填，含发信密码，只放 `.env`） |
 | `ops.sh deploy` / `rollback` 写入，不要手改 | `APP_IMAGE`、`APP_IMAGE_ID`、`GIT_SHA` |
 | `.env` 选填 | `DF_HOST_PORT`、`DF_SUBNET`、`DF_BACKUP_DIR`、`DF_BACKUP_KEEP`、`PARCEL_IDLE_RECLAIM_DAYS`（游客地块闲置多少天收回，不写为 30，0 为不收回；C-100）、`ANONYMOUS_SIGNUPS_PER_NETWORK_HOUR` / `ANONYMOUS_SIGNUPS_PER_BLOCK_HOUR` / `ANONYMOUS_SIGNUPS_PER_HOUR`（每小时新建匿名玩家的上限：每个网络、每个 IPv6 /48、合计，不写为 10 / 50 / 1000；C-120）、`PARCEL_STARTER_ZONE`（起步区，不写按配置文件、0 关、1 开；C-130）、`LOGIN_ATTEMPTS_PER_NETWORK_15MIN` / `LOGIN_ATTEMPTS_PER_ACCOUNT_15MIN` / `LOGIN_TRUSTED_NETWORK_DAYS`（密码尝试：每个邮箱每个网络、每个邮箱来自没登录过的网络合计，不写为 10 / 10；登录过的网络记 90 天；C-132）、`MAIL_PER_RECIPIENT_HOUR` / `MAIL_PER_RECIPIENT_DAY` / `MAIL_PER_HOUR` / `MAIL_PER_DAY`（验证信：每个收件邮箱、整个服务，不写为 5 / 10 / 200 / 1000；C-132） |
-| `compose.yml` 写死 | `ACCOUNT_SIGNUP`、`GUEST_WRITES`、`PARCEL_GUEST_WRITES`、`DYNAMIC_FARM_RESELECT`、`GOOGLE_CLIENT_IDS`、`APPLE_BUNDLE_IDS`、`QA_EMAIL_DOMAIN`、`QA_EMAIL_CODE`、`QA_PLAYER_IDS`、`EMAIL_LOG_CODES`、`NODE_OPTIONS`、`DATABASE_URL` |
+| `compose.yml` 写死 | `ACCOUNT_SIGNUP`、`GUEST_ACCOUNTS`、`GUEST_WRITES`、`PARCEL_GUEST_WRITES`、`DYNAMIC_FARM_RESELECT`、`GOOGLE_CLIENT_IDS`、`APPLE_BUNDLE_IDS`、`QA_EMAIL_DOMAIN`、`QA_EMAIL_CODE`、`QA_PLAYER_IDS`、`EMAIL_LOG_CODES`、`NODE_OPTIONS`、`DATABASE_URL` |
 | 只在操作员一侧，恢复加密备份时用 | `AGE_IDENTITY`（age 私钥文件的路径；私钥不放在服务器上） |
 
 ## 主机资源需求
@@ -145,6 +145,28 @@ P0 正式服那台机器还剩多少资源没有核过。C-97 开工前先看 `f
 - **发给玩家**：由所有者本人发（C-95#5）。
 - **直接调工具**：`tools/invite_accounts.ts` 也可以直接用。用 `--out <新文件>` 时，文件必须是新建的（0600），而且不能在 Git 工作区里。
 
+## 删除游客号
+
+所有者在 Q-265 选了删除所有游客号和它们的地块、进度（C-146）。游客号是 `players` 里没有账号（`user_id` 为空）、`install_key_hmac` 是安装密钥 HMAC（64 位十六进制）的行；邮箱账号、邀请账号和预置农场的系统玩家都不会被选中。一并删除的是这些玩家的登录令牌、Journey 农场（含建农场记录、命令记录、访客快照）、联机座位、地块和地块存档、收回地块的存档。库里出现别的表引用这些表时，工具拒绝运行。
+
+| 步骤 | 命令（在主机部署目录） |
+|---|---|
+| 预演（只看不删） | `./ops.sh guests plan`：列出每张表会删的条数和保留的账号玩家数，不改数据 |
+| 删除 | `./ops.sh guests purge --confirm-delete` |
+| 恢复 | `AGE_IDENTITY=<私钥文件> ./ops.sh guests restore <backups/dynamicfarm-guests-….txt.age> --confirm-restore` |
+
+`purge` 的顺序，任何一步失败都停下，什么都不删：
+
+1. 整库备份（标签 `pre-guest-purge`，同“备份与恢复”，试恢复核对后加密）。
+2. 游客数据单独备份到主机上的明文临时文件，`verify` 核对格式、SHA-256 和每张表的条数。
+3. 用 `AGE_RECIPIENT` 加密成 `backups/dynamicfarm-guests-<时间>.txt.age`。
+4. 把同一份备份交给工具删：工具锁住这些表，重新取一遍游客数据，必须和备份逐字节相同才删（备份之后有人登录、存档就不删，重跑一次即可）；删完核对每张表删掉的条数等于备份条数、账号玩家和系统玩家一条没少，不对就整体回滚。
+5. 删掉明文临时文件，只留 `.age`。
+
+恢复把备份里的行原样插回，再核对和备份逐字节相同才提交；那块地已经被别人认领等冲突时整体回滚，库保持原样。整库备份 `pre-guest-purge` 仍可按“备份与恢复”整体恢复。
+
+工具也可以直接用（`tools/guest_purge.ts plan | backup --out <新文件|-> | verify | purge | restore`，只连 `DATABASE_URL`），`purge` 和 `restore` 要写 `--confirm-database <库名>`。正式服上实际删除随正式服部署（H-71）另行确认，由主机操作员执行。
+
 ## 冒烟
 
 `./ops.sh smoke [--invite] [<入口地址>]` 默认在 app 容器里打它自己的端口。逐项检查：
@@ -152,11 +174,12 @@ P0 正式服那台机器还剩多少资源没有核过。C-97 开工前先看 `f
 - 健康检查通过，运行的是 `.env` 里写的提交号；
 - 邮箱注册已开放：用一个太短的密码试注册，应回 400 `WEAK_PASSWORD`（不建号、不发信）；
 - Google 登录已开启：用一个不成形的令牌试登录，应回 401 `GOOGLE_TOKEN_*`（不去 Google 取公钥）；
-- 游客能读，但认领和存档都被拒。
+- 游客入口已关：用一个随机安装密钥试游客登录，应回 403 `GUEST_CLOSED`（不建号）；
+- 不登录不能认领、不能存档（401 `UNAUTHENTICATED`）。
 
 带 `--invite` 并从标准输入给一行 `email,password` 时，再加两项：邀请账号能登录，“放弃并重选”被拒。例如 `ssh <主机> '/opt/dynamicfarm/ops.sh smoke --invite' < 冒烟账号.csv`。
 
-每次冒烟会用一个随机安装密钥登录一次游客，在库里留下一个游客玩家行（只读，没有农场和地块）。正式服上的冒烟不认领地块，因为认领会永久占用一块地。认领和存档只在隔离环境里验证，见下文“隔离演练”。
+冒烟不建号，也不留游客玩家行（C-146 之前每次冒烟会留下一个，它们由下文“删除游客号”一并删掉）。正式服上的冒烟不认领地块，因为认领会永久占用一块地。认领和存档只在隔离环境里验证，见下文“隔离演练”。
 
 ## 隔离演练
 

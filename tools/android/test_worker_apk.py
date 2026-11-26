@@ -131,14 +131,16 @@ class WorkerAPK(unittest.TestCase):
             self.assertEqual(internal[key], TARGET)
             self.assertEqual(isolated[key], farm.DISABLED)
             self.assertNotIn(release[key], (TARGET, farm.DISABLED))
-        self.assertIs(internal['sensen/network/online_qa'], True)  # Net never boots; only the map's guest_play signs in.
+        self.assertIs(internal['sensen/network/online_qa'], True)  # Net never boots; the map reloads only a saved account.
         self.assertIs(isolated['sensen/network/online_qa'], True)
         self.assertNotIn('sensen/network/online_qa', release)
-        for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/account_restore', 'sensen/dynamic_farm/own_farm',
-                    'sensen/dynamic_farm/guest_play'):
+        for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/account_restore', 'sensen/dynamic_farm/own_farm'):
             self.assertIs(internal[key], True)
             self.assertNotIn(key, isolated)
             self.assertNotIn(key, release)
+        # No guest entry (C-146): C-100's install-and-play switch is in no package.
+        for settings in (internal, isolated, release, exported_settings('dynamic-farm-release')):
+            self.assertNotIn('sensen/dynamic_farm/guest_play', settings)
         self.assertNotIn('sensen/dynamic_farm/fake_claims', internal)
         # The device stand-in save (C-34; the market and carpenter use it too, C-59) never ships in any package.
         for settings in (internal, isolated, release):
@@ -163,7 +165,7 @@ class WorkerAPK(unittest.TestCase):
             self.assertIs(release[key], True)
         # No account/* setting: email sign-up, password reset (C-101) and Google sign-in (C-172) are all offered.
         self.assertEqual([key for key in release if key.startswith('sensen/account/')], [])
-        # Install-and-play (C-100) stays out until the owner decides to open it.
+        # No guest entry (C-146): install-and-play (C-100) is gone.
         for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/fake_claims', 'sensen/dynamic_farm/local_farm_save',
                     'sensen/dynamic_farm/guest_play'):
             self.assertNotIn(key, release)
@@ -270,7 +272,7 @@ class WorkerAPK(unittest.TestCase):
                 self.assertEqual(config['variant'], variant)
                 internal, release = variant == 'dynamic-farm-internal', variant == 'dynamic-farm-release'
                 self.assertEqual(config['reselect'], internal)
-                self.assertEqual(config['guest_play'], internal)
+                self.assertNotIn('guest_play', config)
                 self.assertEqual((config['account_restore'], config['own_farm']), (internal or release,) * 2)
                 self.assertEqual(config['fixed_server'], release)
                 self.assertEqual(config['journey_mobile_base_url'] == TARGET, internal)
@@ -289,6 +291,7 @@ class WorkerAPK(unittest.TestCase):
                ('dynamic-farm-internal', dict(internal, **{'sensen/network/online_qa': False})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/account_restore': False})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/own_farm': False})),
+               ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/guest_play': True})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/dynamic_farm/guest_play': False})),
                ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/dynamic_farm/guest_play': True})),
                ('android', dict(exported_settings('android'), **{'sensen/dynamic_farm/guest_play': True})),

@@ -22,7 +22,7 @@ import { parcelGuestWritesFromEnv, parcelReselectFromEnv } from './parcels/route
 import { parcelIdleDaysFromEnv, scheduleIdleReclaim } from './parcels/reclaim.js';
 import { loadStarterZones, starterZoneSwitchFromEnv } from './parcels/starter_zone.js';
 import { signupClosedFromEnv } from './accounts/routes.js';
-import { anonymousSignupLimitsFromEnv } from './http/signup_limits.js';
+import { anonymousSignupLimitsFromEnv, guestAccountsClosedFromEnv } from './http/signup_limits.js';
 import { accountLimitsFromEnv } from './accounts/limits.js';
 
 const need = (k: string): string => {
@@ -41,6 +41,8 @@ const starterZoneSwitch = starterZoneSwitchFromEnv(process.env);
 if (starterZoneSwitch === null) { console.error('PARCEL_STARTER_ZONE 只能是 0 或 1（不设则按配置文件）'); process.exit(1); }
 const anonymousSignupLimits = anonymousSignupLimitsFromEnv(process.env);
 if ('invalid' in anonymousSignupLimits) { console.error(`${anonymousSignupLimits.invalid} 只能是 1–1000000 的整数`); process.exit(1); }
+const guestAccountsClosed = guestAccountsClosedFromEnv(process.env);
+if (guestAccountsClosed === null) { console.error('GUEST_ACCOUNTS 只能是 open 或 closed'); process.exit(1); }
 const accountLimits = accountLimitsFromEnv(process.env);
 if ('invalid' in accountLimits) { console.error(`${accountLimits.invalid} 只能是 1–1000000 的整数`); process.exit(1); }
 
@@ -135,6 +137,8 @@ const app = await buildApp({
   guestWrites: process.env.GUEST_WRITES === '1',
   // New anonymous players per hour by network, IPv6 /48 and in total (C-100, C-120); defaults 10 / 50 / 1000.
   anonymousSignupLimits,
+  // No guest entry (C-146): the dynamic farm production server sets GUEST_ACCOUNTS=closed; Journey and development keep it open.
+  guestAccountsClosed,
   // Login attempts per email+network and per email from unknown networks; verification mail per recipient and in total (C-132).
   accountLimits,
   // Dynamic farm parcels (C-31). "Abandon and pick again" is for the internal test server only: it stays off unless
@@ -166,4 +170,4 @@ if (process.env.REALTIME_ENABLED !== '0') {
 
 const port = Number(process.env.PORT ?? 3000);
 await app.listen({ port, host: '0.0.0.0' });
-console.log(`farm-server listening on ${port} content=${cv} cities=${cities.size} ip_city=${ipLocator ? 'on' : 'off'} guest_writes=${process.env.GUEST_WRITES === '1'} parcel_reselect=${parcelReselectFromEnv(process.env)} parcel_guest_writes=${parcelGuestWrites} parcel_idle_days=${parcelIdleDays} anonymous_signups=${anonymousSignupLimits.perNetwork}/${anonymousSignupLimits.perBlock}/${anonymousSignupLimits.total} starter_zone=${starterZones.enabled ? starterZones.zones.map(z => z.id).join(',') || 'none' : 'off'} signup=${signupClosed ? 'closed' : 'open'}`);
+console.log(`farm-server listening on ${port} content=${cv} cities=${cities.size} ip_city=${ipLocator ? 'on' : 'off'} guest_writes=${process.env.GUEST_WRITES === '1'} parcel_reselect=${parcelReselectFromEnv(process.env)} parcel_guest_writes=${parcelGuestWrites} parcel_idle_days=${parcelIdleDays} anonymous_signups=${anonymousSignupLimits.perNetwork}/${anonymousSignupLimits.perBlock}/${anonymousSignupLimits.total} starter_zone=${starterZones.enabled ? starterZones.zones.map(z => z.id).join(',') || 'none' : 'off'} signup=${signupClosed ? 'closed' : 'open'} guest_accounts=${guestAccountsClosed ? 'closed' : 'open'}`);

@@ -182,7 +182,9 @@ export class OnlineGateway {
       c.hash = tokenHash(b.token);
       const player = await this.deps.store.playerByToken(c.hash, this.deps.now());
       if (!player) throw new Error('UNAUTHENTICATED');
-      // Guests browse over HTTP only; shared spaces need an account (2026-09-28 decision 2).
+      // Guests browse over HTTP only; shared spaces need an account (2026-09-28 decision 2). Without a guest entry
+      // (C-146) a guest token is not a sign-in at all, even where GUEST_WRITES is set.
+      if (!player.user_id && this.deps.guestAccountsClosed) throw new Error('UNAUTHENTICATED');
       if (!player.user_id && !this.deps.guestWrites) throw new Error('LOGIN_REQUIRED');
       if (c.ws.readyState !== WebSocket.OPEN) return;
       // One active spatial presence per account, across all device tokens and scene types.
