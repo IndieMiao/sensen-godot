@@ -95,12 +95,15 @@ for (const [name, enabled, makeStores] of makers) {
     const claim = (token: string, parcel: typeof A) => post('/v1/parcels/claim', { dataset_version: DATASET, ...parcel }, token);
     const command = (token: string, base_version: number, commands: object[]) => post('/v1/parcels/mine/commands', { base_version, commands }, token);
 
-    /** Device one: claim, take the welcome gift, build, clear, till and sow. Returns the saved version. */
+    /** Device one: claim, take the welcome gift, build, clear, till, sow and water. Returns the saved version. */
     async function playOn(token: string, parcel = A): Promise<number> {
       expect((await claim(token, parcel)).statusCode).toBe(201);
       expect((await post('/v1/parcels/mine/enter', {}, token)).json()).toMatchObject({ granted: true, parcel: { farm_version: 1 } });
       const saved = await command(token, 1, [{ type: 'place_house', x: 9, y: 9 }, { type: 'clear_obstacle', cell: '2,2' },
-        { type: 'till', cell: '1,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' }]);
+        { type: 'till', cell: '1,1' }, { type: 'sow', cell: '1,1', crop: 'crop_carrot' },
+        // C-151: a crop grows only once watered — the well from the entry's grant, a pail drawn, the cell watered.
+        { type: 'place_building', building: 'well', x: 20, y: 20, rotation: 0 }, { type: 'draw_water', building: 2 },
+        { type: 'water', cell: '1,1' }]);
       expect(saved.statusCode).toBe(200);
       return 2;
     }
