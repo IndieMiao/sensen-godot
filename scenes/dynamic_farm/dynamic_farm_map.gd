@@ -723,11 +723,18 @@ func _gate_map() -> void:
 	if not await _sign_in_gate(): return
 	_account_changed()
 	if _suspended or _leaving: return # resume() loads the map again
-	if _bridge != null: _bridge.set_map_visible(true)
+	# Google's account picker leaves the app while the panel is up: that pause made the Godot viewport opaque and
+	# resume() kept it so behind the panel. Undone here, or the map stays grey until the next trip to the background (C-175).
+	_presentation_epoch += 1
+	if _bridge != null:
+		get_viewport().transparent_bg = true
+		_restore_surface_mode()
+		_bridge.set_map_visible(true)
 	if _camera != null: _camera._changed()
 	if _selector != null: _selector.activate()
 	if _claims != null: _claims.start()
 	_render()
+	_record_presentation("map", _presentation_epoch)
 
 ## Ownership and the framed home were relative to the previous account.
 func _account_changed() -> void:

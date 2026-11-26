@@ -2,7 +2,7 @@ extends RefCounted
 ## The first visit's next step on one's own parcel, read from the save alone, so a parcel reopened halfway picks up at
 ## the same step. 0.4.2 (C-35): place the cottage, till, sow, harvest. 0.4.3 (C-61) goes on from the first carrot:
 ## sell it at the Market, gather round the yard, sell what was gathered, then take the Coop Blueprint from the
-## Carpenter; nothing once that blueprint is claimed. The parcel shows the step as the main farm's TipCard (UiTipCard);
+## Carpenter (C-175 goes on from there, below). The parcel shows the step as the main farm's TipCard (UiTipCard);
 ## the community map says where to go for the steps done off the parcel (`map_text`).
 ## The 0.4.3 copy is for PM to finalise (C-45 / Q-61; docs/plans/C-61.md); English only, as the parcel's UI. C-115: the
 ## map's Market and Carpenter buttons became the Washington Square pin (Jasmine and Scott in its room; C-115#30), so the lines name it.
@@ -13,7 +13,8 @@ extends RefCounted
 ## only for Water. Past the first sale the guide follows 0.4.5's content instead of C-61's gathering loop, whose
 ## "sell what you gathered" sold the Timber and Stone the farm upgrade (C-152) needs: Scott's coop blueprint, build the
 ## coop (C-154), feed a hen (growing or buying a carrot first when the bag has none), pick up and sell the egg, gather
-## Timber and Stone and upgrade the farm at Scott's; nothing once the farm is past Lv1. `stage` is that milestone (the
+## Timber and Stone, sell carrots and eggs if the upgrade's coins are short, and upgrade the farm at Scott's; nothing once
+## the farm is past Lv1 (and its coop fed). `stage` is that milestone (the
 ## phone's task rows, ParcelTasks), `step` what to do next for it. The new copy is for PM to finalise (C-45).
 
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -40,6 +41,8 @@ const TIPS := {
 	"sell_egg": "Head back to the map and tap Washington Square to sell your egg.",
 	"gather_upgrade": "Gather Timber from trees and Stone from rocks for your farm upgrade.",
 	"upgrade": "Head back to the map and tap Washington Square. Scott upgrades your farm.",
+	"sell_for_coins": "Need more coins for the upgrade. Sell carrots and eggs at Washington Square.",
+	"earn_coins": "Need more coins for the upgrade. Grow carrots or collect eggs to sell.",
 }
 ## The map's line for the steps done off the parcel (and gathering, done back on it).
 const MAP_TIPS := {
@@ -49,6 +52,8 @@ const MAP_TIPS := {
 	"sell_egg": "Tap Washington Square to sell your egg.",
 	"gather_upgrade": "Enter my farm and gather Timber and Stone.",
 	"upgrade": "Tap Washington Square to upgrade your farm.",
+	"sell_for_coins": "Tap Washington Square to sell carrots and eggs for coins.",
+	"earn_coins": "Enter my farm and grow carrots or collect eggs to sell.",
 }
 
 ## The step to teach for `farm` (ParcelFarm.normalize) at server time `now_ms`: a TIPS key, or "".
@@ -100,9 +105,15 @@ static func step_past_water(farm: Dictionary, now_ms: int) -> String:
 			if int(bag.get(product, 0)) > 0: return "sell_egg"
 			return "egg"
 		"upgrade":
-			var items: Dictionary = ParcelFarm.next_level(rules, ParcelFarm.farm_level(farm)).get("items", {})
+			var next := ParcelFarm.next_level(rules, ParcelFarm.farm_level(farm))
+			var items: Dictionary = next.get("items", {})
 			for item: String in items:
 				if int(bag.get(item, 0)) < int(items[item]): return "gather_upgrade"
+			if int(farm.get("coins", 0)) < int(next.get("coins", 0)):
+				# Short of coins (C-175#51): sell the carrots and eggs in the bag, or grow and collect some first.
+				for item: String in [CROP, str(_livestock(rules).get("product", ""))]:
+					if not item.is_empty() and int(bag.get(item, 0)) > 0: return "sell_for_coins"
+				return "earn_coins"
 			return "upgrade"
 		"harvest":
 			for key: String in crops:

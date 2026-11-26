@@ -401,6 +401,14 @@ func _guide() -> void:
 	var materials: Dictionary = state.duplicate(true)
 	var price: Dictionary = ParcelFarm.next_level(rules, 1)
 	for item: String in price.items: materials.bag[item] = int(price.items[item])
+	# C-175#51: the materials gathered but coins short -> sell the carrots and eggs in the bag, else grow and collect some.
+	materials.coins = int(price.coins) - 5
+	materials.bag.crop_carrot = 1
+	_check(Guide.step(materials, now) == "sell_for_coins" and Guide.stage(materials, now) == "upgrade",
+		"guide: Timber and Stone but 5 coins short, a carrot in the bag -> sell it at Washington Square")
+	materials.bag.erase("crop_carrot")
+	materials.bag.erase("egg")
+	_check(Guide.step(materials, now) == "earn_coins", "guide: coins short and nothing to sell -> grow carrots or collect eggs")
 	materials.coins = int(price.coins)
 	_check(Guide.step(materials, now) == "upgrade", "guide: Timber and Stone for Lv2 -> Scott's upgrade")
 	var upgraded := ParcelFarm.apply(rules, materials, [{"type": "upgrade_farm"}], now)
@@ -420,9 +428,9 @@ func _guide() -> void:
 	unclaimed.bag.erase("crop_carrot")
 	_check(Guide.step(unclaimed, now) == "blueprint", "guide: sold, the blueprint not taken -> Scott")
 	for key: String in ["build", "till", "sow", "well", "water", "water_pail", "harvest", "sell", "blueprint", "coop", "feed",
-			"buy_seeds", "egg", "sell_egg", "gather_upgrade", "upgrade"]:
+			"buy_seeds", "egg", "sell_egg", "gather_upgrade", "upgrade", "sell_for_coins", "earn_coins"]:
 		_check(not Guide.text(key).is_empty(), "guide: copy for " + key)
-	for key: String in ["sell", "blueprint", "buy_seeds", "sell_egg", "gather_upgrade", "upgrade"]:
+	for key: String in ["sell", "blueprint", "buy_seeds", "sell_egg", "gather_upgrade", "upgrade", "sell_for_coins", "earn_coins"]:
 		_check(not Guide.map_text(key).is_empty(), "guide: the map's line for " + key)
 	for key: String in ["build", "till", "sow", "well", "water", "water_pail", "harvest", "coop", "feed", "egg", ""]:
 		_check(Guide.map_text(key).is_empty(), "guide: no map line for '%s' (taught on the parcel)" % key)
