@@ -3,7 +3,8 @@ extends SceneTree
 ## (fixtures/coop_cases.json, also run by server/test/parcels/farm.test.ts), the yard's art file (fence runs with the
 ## entry open, walls, feeders, the placeholder while SEN-C-155's yard is not in), and ParcelLivestock: hens stay on
 ## the open floor and step away from the player, a laid egg is reported in reach once, a failed pickup waits until
-## the player steps away, an unlaid one appears when due.
+## the player steps away, an unlaid one appears when due; at about 3 fps the hen still lays from beside the spot
+## (SEN-C-173).
 ##   godot --headless --path "$QA" --script res://tests/dynamic_farm/test_coop.gd
 const Data = preload("res://modules/dynamic_farm/farm_data.gd")
 const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
@@ -41,6 +42,7 @@ func _run() -> void:
 		_keep_clear_parcel(JSON.parse_string(FileAccess.get_file_as_string(path)))
 	_drop_art()
 	await _animals()
+	await _slow_lay()
 	_items()
 	print("COOP_TESTS checks=%d failures=%d" % [checks, failures])
 	quit(1 if failures else 0)
@@ -472,6 +474,75 @@ func _animals() -> void:
 	_check(host.snapshot()[1].drops.is_empty(), "animals: a picked egg leaves the ground")
 	host.queue_free()
 	await process_frame
+
+## SEN-C-173: frames a third of a second long (about 3 fps, as the emulator records). In each turn, a hen on the far
+## side of the yard from the egg's spot, the egg due in LAY_LEAD_MS: she walks the whole frame in short steps, keeps
+## to the open floor, is beside the spot when the egg is laid, and the egg leaves her (not the air short of the spot).
+## Spots 7, 1 and 2 are where the eggs fell from the air before (C-154#198).
+func _slow_lay() -> void:
+	seed(173)
+	var rules := ParcelFarm.rules()
+	var walk := Walk.new(Data.decode(Fixture.farm()))
+	var lay := Livestock.lay("egg")
+	var base := Vector2i(7, 5)
+	var frame_s := 1.0 / 3.0
+	var beside := 0
+	var tail := 0
+	var laid := 0
+	var inside := true
+	var moved := true
+	for turns in 4:
+		var host := LivestockScene.new()
+		host.setup(walk)
+		root.add_child(host)
+		var farm := ParcelFarm.empty_state()
+		farm.buildings = [{"id": 1, "type": "coop", "model": "chicken_yard", "x": 2, "y": 2, "width": 7, "depth": 5, "rotation": turns,
+			"built_at": T0, "animals": ["hen_white", "hen_brown", "hen_white"]}]
+		var b: Dictionary = farm.buildings[0]
+		var at := Building.transform(walk, Building.at_of(b), Building.base_of(b), turns)
+		var spots: Array = ParcelFarm.livestock_of(rules, b).spots
+		var away := at * Livestock.model_point(Vector2(30, 30), base, walk.cell_m)
+		var now := T0
+		host.sync(farm, rules, now)
+		var yard: Dictionary = host._yards[1]
+		for k in 3:
+			var spot: int = [7, 1, 2][k]
+			var hen: Dictionary = yard.animals[k]
+			# Across the yard from the spot, standing.
+			hen.pos = host._free_point(yard, hen.radius, Vector2(base) - (spots[spot] as Vector2), 40)
+			host._rest(hen, "idle", 0.5)
+			var id := 10 * turns + k + 1
+			farm.drops = [{"id": id, "item": "egg", "amount": 1, "building": 1, "animal": k, "spot": spot, "ready_at": now + LivestockScene.LAY_LEAD_MS}]
+			host.sync(farm, rules, now)
+			var start: Vector2 = hen.pos
+			var after_one := Vector2.INF
+			while not host.snapshot()[1].drops.has(id) and now < T0 + 600000:
+				now += int(frame_s * 1000.0)
+				host.update(frame_s, away, now)
+				if after_one == Vector2.INF: after_one = hen.pos
+				var p: Vector2 = hen.pos
+				inside = inside and Livestock.floor_rect("coop", base, 0.15).grow(0.01).has_point(p)
+				for r: Rect2 in Livestock.blocked_rects("coop", 0.15): inside = inside and not r.grow(-0.01).has_point(p)
+			# One long frame walks the hen the whole frame's way (hurried: WALK_SPEED * 1.4), not a short frame's.
+			moved = moved and absf(start.distance_to(after_one) - LivestockScene.WALK_SPEED * 1.4 * frame_s) < 0.02
+			var snap: Dictionary = host.snapshot()[1]
+			if not snap.landing.has(id): continue
+			laid += 1
+			var ground := at * Livestock.model_point(spots[spot], base, walk.cell_m)
+			var world: Vector3 = snap.animals[k].world
+			var leaving: Vector3 = host.drop_position(id)
+			var hen_gap := Vector2(world.x - ground.x, world.z - ground.z).length()
+			if hen_gap <= lay.toss_m * 2.0 + 0.01: beside += 1
+			if absf(Vector2(leaving.x - world.x, leaving.z - world.z).length() - hen_gap * LivestockScene.LAY_TAIL) < 0.02: tail += 1
+			farm.drops = []
+			host.sync(farm, rules, now)
+		host.queue_free()
+		await process_frame
+	_check(laid == 12, "slow frames: all 12 eggs laid while watched (%d)" % laid)
+	_check(moved, "slow frames: a third of a second walks the hen a third of a second's way")
+	_check(inside, "slow frames: the hens keep to the open floor, never in a part")
+	_check(beside == 12, "slow frames: the hen is beside the spot when it lays, four turns × spots 7, 1, 2 (%d/12)" % beside)
+	_check(tail == 12, "slow frames: the egg leaves the hen, from under her tail (%d/12)" % tail)
 
 func _drop_art() -> void:
 	# The egg is drawn bigger than life (SEN-C-154#145: 1.6x, PM C-154#146); the size sits on the model, not the holder.

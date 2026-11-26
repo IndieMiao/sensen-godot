@@ -12,7 +12,7 @@ extends SceneTree
 ## enter names r8 (moved, Q-168). C-151: Build Well, dry carrots that do not grow, Fill at the well for 2 Energy, Water
 ## three cells from one pail (wet soil, growing from then), Pail empty for the fourth until the pail is filled again.
 ## C-152: at Lv1 one well stands, a spare well blueprint offers nothing; at Lv3 the Build key offers the second and the
-## Energy chip tops at 220.
+## Energy chip tops at 220. SEN-C-173: a slow frame reaches the animals at its real length, not the player's 0.1 s cap.
 ## Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
@@ -77,6 +77,13 @@ class OldClaimServer extends RefCounted:
 		return ApiClient.Response.new(true, 200, {"granted": false, "server_time": int(Time.get_unix_time_from_system() * 1000.0),
 			"parcel": {"parcel_id": block_id, "dataset_version": dataset, "farm_version": 5, "farm": farm}})
 
+## SEN-C-173: records the frame lengths the scene hands the animals.
+class SpyLivestock extends "res://scenes/dynamic_farm/parcel_livestock.gd":
+	var deltas: Array = []
+	func update(delta: float, player: Vector3, now: int, paused := false) -> Array:
+		deltas.append(delta)
+		return super(delta, player, now, paused)
+
 func _initialize() -> void:
 	_run.call_deferred()
 
@@ -101,6 +108,7 @@ func _run() -> void:
 	await _level_wells()
 	await _older_dataset_claim()
 	await _release_named_on_enter()
+	await _slow_frame_animals()
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
 	print("PARCEL_FARMING_SCENE checks=%d failures=%d" % [checks, failures])
@@ -994,6 +1002,23 @@ func _release_named_on_enter() -> void:
 		await process_frame
 	net.client = was_client
 	ProjectSettings.set_setting("sensen/dynamic_farm/local_farm_save", was_local)
+
+## SEN-C-173: the scene caps the player's step at 0.1 s, but a frame a third of a second long (about 3 fps) reaches the
+## animals whole: they keep time with the drops' ready_at, and with the capped step a hen was still on her way to her
+## spot when the egg was due (it fell from the air beside no hen, C-154#198).
+func _slow_frame_animals() -> void:
+	var farming := await _open()
+	var spy := SpyLivestock.new()
+	spy.setup(scene._walk)
+	farming.add_child(spy)
+	var kept = farming.livestock
+	farming.livestock = spy
+	scene._process(1.0 / 3.0)
+	_check(not spy.deltas.is_empty() and is_equal_approx(float(spy.deltas.back()), 1.0 / 3.0),
+		"slow frame: the animals get the frame's 1/3 s, not the player's 0.1 s cap (%s)" % [spy.deltas])
+	farming.livestock = kept
+	scene.queue_free()
+	await process_frame
 
 func _dust() -> Array:
 	return scene.get_children().filter(func(n): return n is CPUParticles3D)

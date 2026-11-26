@@ -32,8 +32,14 @@ const FEED_PECK_S := 3.0
 const LAY_GROW_FROM := 0.5
 ## A laid drop leaves this share of the way from the animal's middle toward where it lands (from under her tail).
 const LAY_TAIL := 0.25
-## Waypoints an animal takes at most on its way to lay (its walks are straight lines round the parts).
+## Waypoints an animal takes at most on its way to lay (its walks are straight lines round the parts), and new plans
+## it makes at most when a step of that walk is blocked.
 const LAY_HOPS := 3
+## Animals move in steps of at most this long (s): a slow frame (the emulator records at 2–4 fps) is walked in short
+## steps, the whole frame's time, so a hen neither falls behind her drop's ready_at nor takes one long step into a part
+## (SEN-C-173). A frame longer than MAX_FRAME_S (the app was away) moves them that long only.
+const STEP_S := 1.0 / 30.0
+const MAX_FRAME_S := 1.0
 
 var _walk: RefCounted
 var _cell_m := 0.8
@@ -119,12 +125,16 @@ func _build_yard(b: Dictionary, rule: Dictionary) -> void:
 
 # ------------------------------------------------------------------ frame
 
-## One frame: animals move, due drops pop in, and laid drops now within reach of `player` are returned (ids) for
-## ParcelFarming to pick up (none while `paused`).
+## One frame (`delta`: its real length, s): animals move, due drops pop in, and laid drops now within reach of
+## `player` are returned (ids) for ParcelFarming to pick up (none while `paused`).
 func update(delta: float, player: Vector3, now: int, paused := false) -> Array:
+	var frame := clampf(delta, 0.0, MAX_FRAME_S)
+	var steps := maxi(1, ceili(frame / STEP_S - 0.001))
+	var step := frame / float(steps)
 	for yard: Dictionary in _yards.values():
 		var local := Livestock.local_point((yard.root as Node3D).transform.affine_inverse() * player, yard.base, _cell_m)
-		for i in yard.animals.size(): _tick(yard, yard.animals[i], i, delta, local, now)
+		for k in steps:
+			for i in yard.animals.size(): _tick(yard, yard.animals[i], i, step, local, now)
 	_draw_laid(now, true)
 	var reach: float = _pickup.reach_m
 	var out := []
@@ -227,6 +237,11 @@ func _tick(yard: Dictionary, a: Dictionary, index: int, delta: float, player: Ve
 		else:
 			var next: Vector2 = a.pos + to.normalized() * step
 			if not _open(yard, next, a.radius):
+				# On her way to lay: plan again from here instead of giving up (SEN-C-173).
+				if a.errand == "lay" and not a.lay_to.is_empty() and int(a.lay_to.get("replans", 0)) < LAY_HOPS:
+					a.lay_to.replans = int(a.lay_to.get("replans", 0)) + 1
+					_walk_to_lay(yard, a)
+					return
 				_rest(a, "idle", 0.4)
 				a.errand = ""
 				a.then = false
