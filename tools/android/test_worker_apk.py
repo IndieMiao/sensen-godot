@@ -163,9 +163,8 @@ class WorkerAPK(unittest.TestCase):
         self.assertIs(release['sensen/network/online_qa'], True)
         for key in ('sensen/dynamic_farm/own_farm', 'sensen/dynamic_farm/account_restore', 'sensen/network/fixed_server'):
             self.assertIs(release[key], True)
-        # C-101: the only account/* setting hides Google (C-137#18, Q-243); email sign-up and password reset stay.
-        self.assertEqual([key for key in release if key.startswith('sensen/account/')], ['sensen/account/google_off'])
-        self.assertIs(release['sensen/account/google_off'], True)
+        # No account/* setting: email sign-up, password reset (C-101) and Google sign-in (C-172) are all offered.
+        self.assertEqual([key for key in release if key.startswith('sensen/account/')], [])
         # No guest entry (C-146): install-and-play (C-100) is gone.
         for key in ('sensen/dynamic_farm/reselect', 'sensen/dynamic_farm/fake_claims', 'sensen/dynamic_farm/local_farm_save',
                     'sensen/dynamic_farm/guest_play'):
@@ -198,12 +197,11 @@ class WorkerAPK(unittest.TestCase):
         audiences = re.search(r'(?m)^ {6}GOOGLE_CLIENT_IDS: (.+)$', compose).group(1)
         self.assertIn(web_client, [audience.strip() for audience in audiences.split(',')])
 
-    def test_every_dynamic_farm_package_hides_google_sign_in_and_only_they_do(self):
-        # Owner C-137#18 ("注册可以先用邮箱,googleplay可以再往后放"), Q-243: Google stays in the code but hidden.
-        for variant in farm.PACKAGES:
+    def test_no_package_hides_google_sign_in(self):
+        # C-101 hid Google in the dynamic farm packages until it was scheduled; C-172 opens it (owner C-101#206).
+        for variant in farm.VARIANTS:
             with self.subTest(variant=variant):
-                self.assertIs(exported_settings(variant)['sensen/account/google_off'], True)
-        self.assertNotIn('sensen/account/google_off', exported_settings('android'))
+                self.assertNotIn('sensen/account/google_off', exported_settings(variant))
         self.assertNotRegex(PROJECT, r'(?m)^account/google_off')
         for setting in ('account/google_off=true', 'account/google_off=false', 'account/google_off.android=false'):
             for target, release in ((None, False), (TARGET, False), (None, True)):
@@ -338,13 +336,13 @@ class WorkerAPK(unittest.TestCase):
                ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/network/fixed_server': True})),
                ('android', dict(exported_settings('android'), **{'sensen/network/fixed_server': True})),
                ('dynamic-farm-internal', dict(internal, **{'sensen/account/invite_only': True})),
-               # Google sign-in stays hidden in every dynamic farm package (C-101) and only there.
-               ('dynamic-farm-release', {k: v for k, v in release.items() if k != 'sensen/account/google_off'}),
+               # C-101's switch that hid Google sign-in is refused everywhere since C-172.
+               ('dynamic-farm-release', dict(release, **{'sensen/account/google_off': True})),
                ('dynamic-farm-release', dict(release, **{'sensen/account/google_off': False})),
-               ('dynamic-farm-internal', {k: v for k, v in internal.items() if k != 'sensen/account/google_off'}),
-               ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/account/google_off': False})),
+               ('dynamic-farm-internal', dict(internal, **{'sensen/account/google_off': True})),
+               ('dynamic-farm', dict(exported_settings('dynamic-farm'), **{'sensen/account/google_off': True})),
                ('android', dict(exported_settings('android'), **{'sensen/account/google_off': True})),
-               ('dynamic-farm-release', dict(release, **{'sensen/account/google_off.android': False})),
+               ('dynamic-farm-release', dict(release, **{'sensen/account/google_off.android': True})),
                ('android', dict(exported_settings('android'), **{'sensen/account/invite_only': True})),
                ('android', dict(exported_settings('android'), **{'sensen/network/mobile_base_url': farm.RELEASE_TARGET}))]
         for variant, settings in bad:

@@ -202,12 +202,13 @@ choose a production signing identity, install an app or authorize publication.
    `sensen/network/fixed_server`, which makes `Net` ignore `user://server.txt` (C-116): the release only
    ever connects to the address it was built with. Every other package still reads the override.
    Since C-101 the account panel offers email sign-in (which invite accounts use too), email sign-up
-   and password reset. C-98's `sensen/account/invite_only` is refused in every package. Sign in with
-   Google stays hidden for now (owner C-137#18, Q-243): every dynamic farm package (preview, internal,
-   release) gets `sensen/account/google_off=true`, so `GoogleSignIn.available()` answers false and the
-   button never shows; the code stays. To open Google later, drop `GOOGLE_OFF` from `staged_project`.
+   and password reset. C-98's `sensen/account/invite_only` is refused in every package. C-101 hid Sign
+   in with Google behind `sensen/account/google_off`; C-172 (owner C-101#206) removed that switch, so
+   every dynamic farm package shows the Google button on a phone with Google Play services, and the
+   readback refuses any `sensen/account/*` setting, `google_off` included.
    If the server still takes no new accounts (`ACCOUNT_SIGNUP=closed`), sign-up says so. Google
-   sign-in, once opened, needs an Android OAuth client for `com.gensen.mapfarm`
+   sign-in needs an Android OAuth client for `com.gensen.mapfarm` (and one for
+   `com.gensen.mapfarm.internal` with the certificate the internal package is signed with)
    and the signing certificate's SHA-1 in the same Google Cloud project as the web client id the
    package asks tokens for (`sensen/auth/google_web_client_id` in `project.godot`, the owner's
    production project starting 870347303349, not gensen-preview). The production compose's
