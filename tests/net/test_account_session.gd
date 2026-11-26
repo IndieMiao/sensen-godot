@@ -174,6 +174,7 @@ func test_sign_out_revokes_this_device_and_returns_to_guest() -> void:
 	assert_str(t.requests[5].method).is_equal("DELETE")
 	assert_str(t.requests[5].url).ends_with("/auth/token")
 	assert_str(_auth_header(t.requests[5])).is_equal("authorization: Bearer acct-token")
+	assert_bool(str(t.requests[5].headers).contains("content-type")).is_false()
 	assert_str(n.client.token).is_equal("guest-token-2")
 	assert_bool(n.session.has_farm()).is_false()
 	assert_bool(AccountSession.new().load_saved(ACCOUNT)).is_false()
