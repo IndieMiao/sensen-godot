@@ -526,8 +526,9 @@ func _slow_lay() -> void:
 				var p: Vector2 = hen.pos
 				inside = inside and Livestock.floor_rect("coop", base, 0.15).grow(0.01).has_point(p)
 				for r: Rect2 in Livestock.blocked_rects("coop", 0.15): inside = inside and not r.grow(-0.01).has_point(p)
-			# One long frame walks the hen the clock's whole frame (hurried: WALK_SPEED * 1.4), not the engine's 8/60 s.
-			moved = moved and absf(start.distance_to(after_one) - LivestockScene.WALK_SPEED * 1.4 * frame_s) < 0.02
+			# One long frame walks the hen the clock's whole frame (at least her hurried WALK_SPEED * 1.4; faster when she
+			# would be late), not the engine's 8/60 s.
+			moved = moved and start.distance_to(after_one) >= LivestockScene.WALK_SPEED * 1.4 * frame_s - 0.02
 			var snap: Dictionary = host.snapshot()[1]
 			if not snap.landing.has(id): continue
 			laid += 1
