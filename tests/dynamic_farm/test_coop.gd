@@ -475,10 +475,11 @@ func _animals() -> void:
 	host.queue_free()
 	await process_frame
 
-## SEN-C-173: frames a third of a second long (about 3 fps, as the emulator records). In each turn, a hen on the far
-## side of the yard from the egg's spot, the egg due in LAY_LEAD_MS: she walks the whole frame in short steps, keeps
-## to the open floor, is beside the spot when the egg is laid, and the egg leaves her (not the air short of the spot).
-## Spots 7, 1 and 2 are where the eggs fell from the air before (C-154#198).
+## SEN-C-173: frames a third of a second long (about 3 fps, as the emulator renders), for which Godot reports a delta
+## of only 8/60 s (max_physics_steps_per_frame / physics_ticks_per_second), while the server clock moves 1/3 s. In each
+## turn, a hen on the far side of the yard from the egg's spot, the egg due in LAY_LEAD_MS: she walks the clock's whole
+## frame in short steps, keeps to the open floor, is beside the spot when the egg is laid, and the egg leaves her (not
+## the air short of the spot). Spots 7, 1 and 2 are where the eggs fell from the air before (C-154#198).
 func _slow_lay() -> void:
 	seed(173)
 	var rules := ParcelFarm.rules()
@@ -486,6 +487,7 @@ func _slow_lay() -> void:
 	var lay := Livestock.lay("egg")
 	var base := Vector2i(7, 5)
 	var frame_s := 1.0 / 3.0
+	var engine_delta := 8.0 / 60.0
 	var beside := 0
 	var tail := 0
 	var laid := 0
@@ -514,16 +516,17 @@ func _slow_lay() -> void:
 			var id := 10 * turns + k + 1
 			farm.drops = [{"id": id, "item": "egg", "amount": 1, "building": 1, "animal": k, "spot": spot, "ready_at": now + LivestockScene.LAY_LEAD_MS}]
 			host.sync(farm, rules, now)
+			host.update(0.0, away, now)
 			var start: Vector2 = hen.pos
 			var after_one := Vector2.INF
 			while not host.snapshot()[1].drops.has(id) and now < T0 + 600000:
 				now += int(frame_s * 1000.0)
-				host.update(frame_s, away, now)
+				host.update(engine_delta, away, now)
 				if after_one == Vector2.INF: after_one = hen.pos
 				var p: Vector2 = hen.pos
 				inside = inside and Livestock.floor_rect("coop", base, 0.15).grow(0.01).has_point(p)
 				for r: Rect2 in Livestock.blocked_rects("coop", 0.15): inside = inside and not r.grow(-0.01).has_point(p)
-			# One long frame walks the hen the whole frame's way (hurried: WALK_SPEED * 1.4), not a short frame's.
+			# One long frame walks the hen the clock's whole frame (hurried: WALK_SPEED * 1.4), not the engine's 8/60 s.
 			moved = moved and absf(start.distance_to(after_one) - LivestockScene.WALK_SPEED * 1.4 * frame_s) < 0.02
 			var snap: Dictionary = host.snapshot()[1]
 			if not snap.landing.has(id): continue
@@ -539,7 +542,7 @@ func _slow_lay() -> void:
 		host.queue_free()
 		await process_frame
 	_check(laid == 12, "slow frames: all 12 eggs laid while watched (%d)" % laid)
-	_check(moved, "slow frames: a third of a second walks the hen a third of a second's way")
+	_check(moved, "slow frames: a third of a second on the clock walks the hen a third of a second's way, not the 8/60 s delta")
 	_check(inside, "slow frames: the hens keep to the open floor, never in a part")
 	_check(beside == 12, "slow frames: the hen is beside the spot when it lays, four turns × spots 7, 1, 2 (%d/12)" % beside)
 	_check(tail == 12, "slow frames: the egg leaves the hen, from under her tail (%d/12)" % tail)

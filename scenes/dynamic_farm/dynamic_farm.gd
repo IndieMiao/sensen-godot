@@ -526,10 +526,7 @@ func _process(delta: float) -> void:
 			else:
 				_play("idle")
 	if _farming != null:
-		# The frame's real length, not `dt`: the animals keep time with the drops' ready_at (server clock), and on a slow
-		# frame the capped step left a hen short of her laying spot when the egg came due (SEN-C-173). They divide a long
-		# frame into short steps themselves (ParcelLivestock.update).
-		_farming.update(delta, _walk.cell_at(_actor.position + _facing * _walk.cell_m * 0.8), steering,
+		_farming.update(dt, _walk.cell_at(_actor.position + _facing * _walk.cell_m * 0.8), steering,
 			_actor.position, _facing)
 	if steering: _showing_house = false
 	if not _overview and not _showing_house:

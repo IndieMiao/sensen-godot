@@ -35,9 +35,12 @@ const LAY_TAIL := 0.25
 ## Waypoints an animal takes at most on its way to lay (its walks are straight lines round the parts), and new plans
 ## it makes at most when a step of that walk is blocked.
 const LAY_HOPS := 3
-## Animals move in steps of at most this long (s): a slow frame (the emulator records at 2–4 fps) is walked in short
-## steps, the whole frame's time, so a hen neither falls behind her drop's ready_at nor takes one long step into a part
-## (SEN-C-173). A frame longer than MAX_FRAME_S (the app was away) moves them that long only.
+## Animals keep time with the drops' ready_at (server time, `now`), not only the engine's frame delta: on a slow frame
+## (the emulator renders at 1.5–4 fps) Godot reports at most max_physics_steps_per_frame / physics_ticks_per_second
+## (8 / 60 s) and capped scenes report less, so a hen walking by delta fell behind and the egg came due before she
+## reached her spot (SEN-C-173). A frame is the longer of `delta` and the time `now` moved, walked in steps of at most
+## STEP_S, so she neither falls behind nor takes one long step into a part. A frame longer than MAX_FRAME_S (the app
+## was away, the clock was corrected) moves them that long only.
 const STEP_S := 1.0 / 30.0
 const MAX_FRAME_S := 1.0
 
@@ -52,6 +55,8 @@ var _held_off := {}
 var _expected := {}
 ## Drop ids still falling out of the animal (not picked up until they lie on the ground).
 var _landing := {}
+## `now` of the last update (ms), or -1 before the first.
+var _last_now := -1
 var _pickup := Livestock.pickup()
 
 func setup(walk: RefCounted) -> void:
@@ -125,10 +130,12 @@ func _build_yard(b: Dictionary, rule: Dictionary) -> void:
 
 # ------------------------------------------------------------------ frame
 
-## One frame (`delta`: its real length, s): animals move, due drops pop in, and laid drops now within reach of
-## `player` are returned (ids) for ParcelFarming to pick up (none while `paused`).
+## One frame: animals move, due drops pop in, and laid drops now within reach of `player` are returned (ids) for
+## ParcelFarming to pick up (none while `paused`).
 func update(delta: float, player: Vector3, now: int, paused := false) -> Array:
-	var frame := clampf(delta, 0.0, MAX_FRAME_S)
+	var clock_s := float(now - _last_now) / 1000.0 if _last_now >= 0 else 0.0
+	_last_now = now
+	var frame := clampf(maxf(delta, clock_s), 0.0, MAX_FRAME_S)
 	var steps := maxi(1, ceili(frame / STEP_S - 0.001))
 	var step := frame / float(steps)
 	for yard: Dictionary in _yards.values():
