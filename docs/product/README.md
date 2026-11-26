@@ -3,7 +3,7 @@
 ## 规则与实施
 
 - [玩法方案 v2](gameplay-plan-v2-2026-10-02.md) 是唯一玩法基准；[HTML 阅读版](gameplay-plan-v2-2026-10-02.html) 是阅读导出，冲突时回到 Markdown 最新修订。
-- [Figma 页面 14 · UI semantic refactor](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-4)（R1 修订中，锁定项以 [SGODOT-197](https://plane.sensenjoy.cn/zili/browse/SGODOT-197/) 为准）与 [本地设计索引](../design/README.md) 用于界面对照；旧 [Figma · Prototype](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-3) 为 Archive，截至 2026-10-06。
+- [Figma 页面 14 · UI semantic refactor](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-4)（R1 修订中，锁定项以 [锁定组件清单](../governance/locked-components.md) 为准）与 [本地设计索引](../design/README.md) 用于界面对照；旧 [Figma · Prototype](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-3) 为 Archive，截至 2026-10-06。
 - [P0 进度](../qa/p0-progress-audit-2026-10-05.md) 区分已实现、缺失和未验收；[交接经过](research/gameplay-plan-v2-2026-10-02/HANDOFF-2026-10-04.md) 只补充各日期的事实和技术经验。
 - [P1 第一步开发包：第 5 天之后的种田](p1-step1-farming-2026-10-08.md)（40 格、卷心菜 / 玉米 / 黄瓜、洒水器；q(59)）是方案 §17.3.3 第 1 行的开工依据，规则冲突时以方案为准。
 
