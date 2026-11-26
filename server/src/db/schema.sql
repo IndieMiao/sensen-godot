@@ -157,6 +157,22 @@ CREATE TABLE IF NOT EXISTS email_codes (
   attempts    int NOT NULL DEFAULT 0,
   PRIMARY KEY (email, purpose)
 );
+-- 用过的第三方 ID token nonce（C-132，防重放）：nonce_hash 是 token 里的 nonce 声明（原始 nonce 的 SHA-256）。
+-- expires_at 之后 token 本身已过期，可以清掉。
+CREATE TABLE IF NOT EXISTS id_token_nonces (
+  provider    text NOT NULL,
+  nonce_hash  text NOT NULL,
+  expires_at  bigint NOT NULL,
+  PRIMARY KEY (provider, nonce_hash)
+);
+CREATE INDEX IF NOT EXISTS id_token_nonces_expires_idx ON id_token_nonces(expires_at);
+-- 账号成功登录过的网络（C-132）：旁人试错锁不住本人从这些网络登录。只存网络键的 HMAC，不存 IP。
+CREATE TABLE IF NOT EXISTS login_networks (
+  user_id          uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  network_hash     text NOT NULL,
+  last_success_at  bigint NOT NULL,
+  PRIMARY KEY (user_id, network_hash)
+);
 -- 删号墓碑：不带 FK、不留邮箱。
 CREATE TABLE IF NOT EXISTS account_deletions (
   user_id           uuid PRIMARY KEY,

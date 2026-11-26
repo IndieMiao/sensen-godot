@@ -81,12 +81,17 @@ for (const [name, enabled, makeStores] of makers) {
 
     const post = (url: string, payload: object, token?: string) =>
       app.inject({ method: 'POST', url, payload, headers: token ? bearer(token) : {} });
-    const googleToken = (sub: string, over: Record<string, unknown> = {}) => {
+    const googleToken = (sub: string, over: Record<string, unknown> = {}, nonce = NONCE) => {
       const s = Math.floor(clock / 1000);
       return signToken(GOOGLE_KEYS, { iss: 'https://accounts.google.com', aud: GOOGLE_AUD, sub, iat: s, exp: s + 3600,
-        nonce: sha256Hex(NONCE), email_verified: true, ...over });
+        nonce: sha256Hex(nonce), email_verified: true, ...over });
     };
-    const google = (sub: string, over: Record<string, unknown> = {}) => post('/v1/auth/google', { id_token: googleToken(sub, over), nonce: NONCE });
+    // Each sign-in uses a fresh nonce, as the app does: a nonce signs in only once (C-132).
+    let nonces = 0;
+    const google = (sub: string, over: Record<string, unknown> = {}) => {
+      const nonce = `${NONCE}-${++nonces}`;
+      return post('/v1/auth/google', { id_token: googleToken(sub, over, nonce), nonce });
+    };
     const register = (email: string) => post('/v1/auth/email/register', { email, password: 'correct horse', display_name: 'Ada' });
     const login = (email: string, password = 'correct horse') => post('/v1/auth/email/login', { email, password });
     const mine = async (token: string) => (await app.inject({ method: 'GET', url: '/v1/parcels/mine', headers: bearer(token) })).json().parcel;

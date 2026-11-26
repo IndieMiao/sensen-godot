@@ -331,6 +331,25 @@ export class PgStore implements Store {
       throw e;
     } finally { client.release(); }
   }
+  async claimIdTokenNonce(provider: string, nonceHash: string, expiresAt: number, now: number) {
+    await this.d.pool.query('DELETE FROM id_token_nonces WHERE expires_at < $1', [now]);
+    // One statement: of two concurrent sign-ins with the same nonce only one inserts the row.
+    const r = await this.d.pool.query(
+      `INSERT INTO id_token_nonces (provider, nonce_hash, expires_at) VALUES ($1,$2,$3)
+         ON CONFLICT (provider, nonce_hash) DO NOTHING RETURNING 1`, [provider, nonceHash, expiresAt]);
+    return r.rowCount === 1;
+  }
+  async trustLoginNetwork(userId: string, networkHash: string, now: number) {
+    await this.d.pool.query(
+      `INSERT INTO login_networks (user_id, network_hash, last_success_at) SELECT $1::uuid, $2::text, $3::bigint WHERE EXISTS (SELECT 1 FROM users WHERE id = $1::uuid)
+         ON CONFLICT (user_id, network_hash) DO UPDATE SET last_success_at = GREATEST(login_networks.last_success_at, EXCLUDED.last_success_at)`,
+      [userId, networkHash, now]);
+  }
+  async loginNetworkTrusted(userId: string, networkHash: string, since: number) {
+    const r = await this.d.pool.query(
+      'SELECT 1 FROM login_networks WHERE user_id = $1 AND network_hash = $2 AND last_success_at >= $3', [userId, networkHash, since]);
+    return (r.rowCount ?? 0) > 0;
+  }
   async deleteUser(userId: string, tombstone: DeletionRecord) {
     const players = await this.d.pool.query('SELECT id FROM players WHERE user_id = $1', [userId]);
     for (const row of players.rows) await this.realtimeDirectory(row.id as string, 'leave').catch(() => undefined);
