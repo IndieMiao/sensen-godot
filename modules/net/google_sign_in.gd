@@ -9,11 +9,15 @@ const SINGLETON := "GodotGoogleSignIn"
 const DEFAULT_WEB_CLIENT := "105022638066-s710gs2tsaikbkhbtvstdino7cq661go.apps.googleusercontent.com"
 ## 测试与桌面预览可强制显示按钮。
 static var force_available := false
+## Set at export on the dynamic farm packages (tools/android/dynamic_farm_export.py, C-101): Google sign-in is
+## hidden there until it is scheduled (owner C-137#18, Q-243). Wins over force_available; never set in the project.
+const OFF_SETTING := "sensen/account/google_off"
 
 static var _play_services := -1
 
 ## 插件在、且手机有可用的 Google Play 服务才显示按钮；结果缓存，避免每次重画都跨 JNI。
 static func available() -> bool:
+	if turned_off(): return false
 	if force_available: return true
 	if not Engine.has_singleton(SINGLETON): return false
 	if _play_services < 0:
@@ -21,6 +25,9 @@ static func available() -> bool:
 		# Android plugin singletons do not report their methods through has_method(); call it directly.
 		_play_services = 1 if bool(plugin.call("isAvailable")) else 0
 	return _play_services == 1
+
+static func turned_off() -> bool:
+	return bool(ProjectSettings.get_setting(OFF_SETTING, false))
 
 static func web_client_id() -> String:
 	return str(ProjectSettings.get_setting("sensen/auth/google_web_client_id", DEFAULT_WEB_CLIENT))
@@ -37,7 +44,7 @@ static func parse_result(payload: String) -> Dictionary:
 ## 调起系统账号选择。transport 可注入：func(nonce_hash: String) -> String（测试替身，返回原生回包）。
 static func authorize(nonce: String, transport: Callable = Callable()) -> Dictionary:
 	if transport.is_valid(): return parse_result(await transport.call(nonce.sha256_text()))
-	if not Engine.has_singleton(SINGLETON): return {"ok": false, "code": "GOOGLE_UNAVAILABLE"}
+	if turned_off() or not Engine.has_singleton(SINGLETON): return {"ok": false, "code": "GOOGLE_UNAVAILABLE"}
 	var plugin := Engine.get_singleton(SINGLETON)
 	plugin.signIn(web_client_id(), nonce.sha256_text())
 	var payload = await plugin.google_sign_in_result

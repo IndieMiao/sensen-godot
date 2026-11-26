@@ -2,9 +2,11 @@
 
 `dynamic-farm` is the isolated preview: Journey endpoints are disabled. `dynamic-farm-internal` is the
 internal test package (C-39): Journey points only at an approved isolated test service, and the map's
-internal-only settings (C-32; install-and-play guest sign-in, C-100) are on. `dynamic-farm-release` is the invite-only release package (C-98): the
+internal-only settings (C-32; install-and-play guest sign-in, C-100) are on. `dynamic-farm-release` is the release package (C-98): the
 preview's package, Journey fixed to the US West dynamic farm production service,
-one's own farm and the saved sign-in on, reselect off. None carries an account or credential.
+one's own farm and the saved sign-in on, reselect off. Since C-101 its account panel offers email sign-in (invite
+accounts included), email sign-up and password reset; Google sign-in stays hidden in every dynamic farm package until
+it is scheduled (C-137#18, Q-243). None carries an account or credential.
 
 Nothing a player sees carries "sensen" (C-142, the owner's C-101#91): the package names, display names, the
 launcher icon (farm-dev's P0 icon, tools/app_icon/android, owner's C-142#7) and the delivered APK file names.
@@ -47,10 +49,14 @@ RELEASE_TARGET = 'https://farm.sensenjoy.cn/dynamicfarm/v1'
 # guest may claim and farm (PARCEL_GUEST_WRITES). The release package does not carry it until the owner opens it.
 GUEST_PLAY = 'dynamic_farm/guest_play'
 INTERNAL_SETTINGS = ('dynamic_farm/reselect', 'dynamic_farm/account_restore', 'dynamic_farm/own_farm', GUEST_PLAY)
-# The release package: one's own farm and the saved sign-in, never reselect; the account panel only signs in
-# with an invite account (C-98, server ACCOUNT_SIGNUP=closed). Only the release package may set invite_only.
-INVITE_ONLY = 'account/invite_only'
-RELEASE_SETTINGS = ('dynamic_farm/account_restore', 'dynamic_farm/own_farm', INVITE_ONLY)
+# The release package: one's own farm and the saved sign-in, never reselect. It connects only to the address it was
+# built with: fixed_server makes Net ignore user://server.txt (C-116). Only the release package may set it.
+# C-98 also limited its account panel to invite accounts (account/invite_only); C-101 opened email sign-up.
+FIXED_SERVER = 'network/fixed_server'
+RELEASE_SETTINGS = ('dynamic_farm/account_restore', 'dynamic_farm/own_farm', FIXED_SERVER)
+# Every dynamic farm package hides Google sign-in for now (owner C-137#18: "注册可以先用邮箱,googleplay可以再往后放";
+# Q-243). The code stays; GoogleSignIn.available() answers false while this is set. Drop it to open Google again.
+GOOGLE_OFF = 'account/google_off'
 URL_KEYS = ('network/base_url', 'network/mobile_base_url')
 # The 0.4.1 preview's user directory, kept by the release package (C-116). Since the package name changed (C-142)
 # nothing is upgraded in place any more, but the name is internal (never shown) and stays as it is.
@@ -58,7 +64,7 @@ PREVIEW_USER_DIR = 'DynamicFarmCardigan'
 USER_DIR_KEYS = ('application/config/use_custom_user_dir', 'application/config/custom_user_dir_name')
 VARIANTS = ('android', *PACKAGES)
 # A feature-tag override (e.g. `network/base_url.mobile=`) would win at run time over the staged value.
-OVERRIDDEN = re.compile(r'^(?:sensen/)?network/(?:online_qa|base_url|mobile_base_url)\.')
+OVERRIDDEN = re.compile(r'^(?:sensen/)?network/(?:online_qa|base_url|mobile_base_url|fixed_server)\.')
 
 
 def replace_one(text, pattern, replacement):
@@ -78,8 +84,8 @@ def internal_target(url):
 def staged_project(text, target=None, release=False):
     # Net reads online_qa before the map scene starts, so it never boots or signs in anonymously.
     # Retain the real autoloads.
-    if re.search(r'^(?:network/online_qa|config/(?:use_custom_user_dir|custom_user_dir_name)|dynamic_farm/\w+|'
-                 r'account/invite_only)[=.]', text, re.M) or any(OVERRIDDEN.match(line) for line in text.splitlines()):
+    if re.search(r'^(?:network/(?:online_qa|fixed_server)|config/(?:use_custom_user_dir|custom_user_dir_name)|dynamic_farm/\w+|'
+                 r'account/\w+)[=.]', text, re.M) or any(OVERRIDDEN.match(line) for line in text.splitlines()):
         raise ValueError('unexpected pre-existing QA overrides')
     url, user_dir, extra, variant = DISABLED, PREVIEW_USER_DIR, '', 'dynamic-farm'
     if release:
@@ -97,7 +103,7 @@ def staged_project(text, target=None, release=False):
     text = replace_one(text, r'^run/main_scene="[^"]+"$', f'run/main_scene="{MAP_SCENE}"')
     text = replace_one(text, r'^\[application\]$', '[application]\nconfig/use_custom_user_dir=true\n'
                        f'config/custom_user_dir_name="{user_dir}"')
-    text = replace_one(text, r'^\[sensen\]$', '[sensen]\nnetwork/online_qa=true' + extra)
+    text = replace_one(text, r'^\[sensen\]$', f'[sensen]\nnetwork/online_qa=true\n{GOOGLE_OFF}=true' + extra)
     for key in URL_KEYS:
         text = replace_one(text, rf'^{key}="[^"]+"$', f'{key}="{url}"')
     return text
@@ -179,13 +185,18 @@ def exported_config(settings, variant):
         raise ValueError('feature-tag override of a Journey setting in export')
     s = {key[len('sensen/'):]: value for key, value in settings.items() if key.startswith('sensen/')}
     unknown = ({key for key in s if key.startswith('dynamic_farm/')} - set(INTERNAL_SETTINGS) |
-               {key for key in s if key.startswith('account/')} - {INVITE_ONLY})
+               {key for key in s if key.startswith('account/')} - {GOOGLE_OFF})
     urls = [s.get(key) for key in URL_KEYS]
     config = dict(variant=variant, online_qa=s.get('network/online_qa', False), journey_base_url=urls[0],
-                  journey_mobile_base_url=urls[1], invite_only=s.get(INVITE_ONLY, False),
+                  journey_mobile_base_url=urls[1], fixed_server=s.get(FIXED_SERVER, False),
                   **{key.split('/')[1]: s.get(key, False) for key in INTERNAL_SETTINGS})
     if unknown:
         raise ValueError('unexpected dynamic farm setting in export')
+    # Google sign-in stays hidden in every dynamic farm package (C-101) and only there.
+    if variant in PACKAGES and s.get(GOOGLE_OFF) is not True:
+        raise ValueError('dynamic farm package must hide Google sign-in')
+    if variant not in PACKAGES and GOOGLE_OFF in s:
+        raise ValueError('Google sign-in hidden outside the dynamic farm packages')
     if variant == 'dynamic-farm-release':
         if config['online_qa'] is not True or any(s.get(key) is not True for key in RELEASE_SETTINGS):
             raise ValueError('release package must keep Net from signing in anonymously and enable its settings')
@@ -198,8 +209,8 @@ def exported_config(settings, variant):
         if [settings.get(key) for key in USER_DIR_KEYS] != [True, PREVIEW_USER_DIR]:
             raise ValueError('release package must keep the preview user directory')
         return config
-    if INVITE_ONLY in s:
-        raise ValueError('invite-only sign-in outside the release package')
+    if FIXED_SERVER in s:
+        raise ValueError('fixed server outside the release package')
     if RELEASE_TARGET in urls:
         raise ValueError('production dynamic farm service outside the release package')
     internal = variant == 'dynamic-farm-internal'

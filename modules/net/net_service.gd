@@ -15,8 +15,8 @@ const DEFAULT_BASE := "https://farm.sensenjoy.cn/v1"
 const MOBILE_BASE := "https://farm.sensenjoy.cn/preview/journey/v1"
 ## 放一行 URL 就能把客户端指到别的服务器（局域网调试用），不用改代码重打包。
 const SERVER_OVERRIDE := "user://server.txt"
-## 动态农场正式包（C-98）才打开；它只连包里写死的正式地址，忽略 SERVER_OVERRIDE（C-116）。
-const INVITE_ONLY_SETTING := "sensen/account/invite_only"
+## 动态农场正式包（C-98，C-101 起改用这个开关）才打开；它只连包里写死的正式地址，忽略 SERVER_OVERRIDE（C-116）。
+const FIXED_SERVER_SETTING := "sensen/network/fixed_server"
 
 var client: ApiClient
 var session: FarmSession
@@ -51,8 +51,8 @@ static func is_test_process() -> bool:
 	return false
 
 static func base_url() -> String:
-	var invite_only := bool(ProjectSettings.get_setting(INVITE_ONLY_SETTING, false))
-	if not invite_only and FileAccess.file_exists(SERVER_OVERRIDE):
+	var fixed := bool(ProjectSettings.get_setting(FIXED_SERVER_SETTING, false))
+	if not fixed and FileAccess.file_exists(SERVER_OVERRIDE):
 		var s := FileAccess.get_file_as_string(SERVER_OVERRIDE).strip_edges()
 		if s.begins_with("http"):
 			return s.trim_suffix("/")
