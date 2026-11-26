@@ -18,7 +18,8 @@ import { loadParcelRules } from '../../src/parcels/rules.js';
 import { MemoryParcelStore, type ParcelStore } from '../../src/parcels/store.js';
 import { PgParcelStore } from '../../src/parcels/pg_store.js';
 import { parcelReselectFromEnv } from '../../src/parcels/routes.js';
-import { emptyFarm, NEVER } from '../../src/parcels/farm.js';
+import { emptyFarm, NEVER, withEconomy, type ParcelFarmState } from '../../src/parcels/farm.js';
+import { emptyBoard, settleBoard } from '../../src/parcels/requests.js';
 import type { StarterZones } from '../../src/parcels/starter_zone.js';
 
 const DSN = process.env.TEST_DATABASE_URL;
@@ -938,20 +939,23 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
       // C-148: a save from before Energy also reads at full Energy, nothing else changes.
       const full = { value: 200, at: clock, rested_on: null };
       // C-151: and as an empty pail, no one-off grant given yet. C-152: and at farm level 1.
-      // C-154: and with nothing on the ground yet.
+      // C-154: and with nothing on the ground yet. C-191: and with no requests done; the read shows the board drawn now, not saved.
+      const drawn = withEconomy(legacy as unknown as ParcelFarmState);
+      settleBoard(rules, drawn, clock);
       expect((await mine(app, ada)).farm).toEqual({ ...legacy, buildings, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, drops: [], drop_seq: 0,
-        pail_water: 0, grants: {}, level: 1, energy: full });
+        pail_water: 0, grants: {}, level: 1, energy: full, board: drawn.board, requests_done: 0 });
       // Re-entering an old save gives no first-entry gift; it gets the watering grant (C-151) once, which writes the new fields.
       expect((await enter(app, ada)).json()).toMatchObject({ granted: false, gift: WATERING, parcel: { farm_version: 5 } });
       const bag = { hoe_starter: 1, seed_carrot: 2, crop_carrot: 1, ...WATERING };
       const entered = { ...legacy, buildings, bag, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, drops: [], drop_seq: 0, pail_water: 0,
-        grants: { watering: clock }, level: 1 };
+        grants: { watering: clock }, level: 1, board: emptyBoard(), requests_done: 0 };
       expect((await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state).toEqual(entered);
       expect((await enter(app, ada)).json()).toMatchObject({ granted: false, gift: {}, parcel: { farm_version: 5 } });
       const sold = await command(app, ada, 5, [{ type: 'sell', item: 'crop_carrot', count: 1 }]);
       expect(sold.statusCode).toBe(200);
       const stored = (await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state;
-      expect(stored).toEqual({ ...entered, bag: { hoe_starter: 1, seed_carrot: 2, ...WATERING }, coins: 12, sales: 1, energy: full });
+      // The sale settles the board first, so the save now holds the board the read showed.
+      expect(stored).toEqual({ ...entered, bag: { hoe_starter: 1, seed_carrot: 2, ...WATERING }, coins: 12, sales: 1, energy: full, board: drawn.board });
     } finally { await app.close(); }
   });
 
