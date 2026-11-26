@@ -1,8 +1,29 @@
-[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
 [ext_resource type="Texture2D" path="res://assets/dynamic_farm/sheep_pen/staple.png" id="1"]
 
+[sub_resource type="Shader" id="Staple"]
+code = "shader_type spatial;
+render_mode cull_back, diffuse_burley, specular_schlick_ggx;
+// Linear packed atlas: tangent-space relief in RG, fibre value in B.
+// One fetch for the fleece, bare face, hooves, and both ends of the roll.
+uniform sampler2D staple_map : filter_linear_mipmap, repeat_disable;
+varying float scattering;
+void fragment() {
+    scattering = (1.0 - step(0.705, UV.x)) * 0.26;
+    vec3 staple = texture(staple_map, UV).rgb;
+    ALBEDO = COLOR.rgb * staple.b;
+    NORMAL_MAP = vec3(staple.rg, 1.0);
+    ROUGHNESS = 0.93;
+    SPECULAR = 0.19;
+}
+void light() {
+    float cosine = dot(NORMAL, LIGHT);
+    float diffuse = max(0.0, (cosine + scattering) / (1.0 + scattering));
+    DIFFUSE_LIGHT += (LIGHT_COLOR * ATTENUATION) * (diffuse / PI);
+}"
+
 [resource]
-resource_name = "Dyed wool and clay"
-vertex_color_use_as_albedo = true
-roughness = 0.93
-albedo_texture = ExtResource("1")
+resource_name = "Lanolin and clay"
+shader = SubResource("Staple")
+shader_parameter/staple_map = ExtResource("1")
