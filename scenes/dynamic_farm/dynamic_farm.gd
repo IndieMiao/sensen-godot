@@ -53,6 +53,13 @@ const PAIL_ACTIONS = preload("res://assets/dynamic_farm/watering/bucket_actions.
 const PAIL_LIBRARY := &"pail"
 ## Labour verbs played with the pail -> their action in PAIL_ACTIONS.
 const PAIL_MOTIONS := {"fill": "draw", "water": "pour"}
+## The scene gives up loading (its shade masks and the player's look) after this much time in drawn frames (C-168).
+## Time with no frames does not count: building the scene in _ready (about 19 s under an emulator's software renderer),
+## a lost Android render surface, the app in the background. Counted wall time from _ready, a slow build alone spent it,
+## and Retry, building again, failed at its first frame.
+const LOAD_LIMIT_S := 15.0
+## One frame adds at most this much to the loading time: the first frame after a stall is not seconds of loading.
+const LOAD_FRAME_CAP_S := 0.25
 ## The top bar's second row, the place capsule (two 13 / 12 lines and its 4 + 4): what it is drawn at, give or take.
 const PLACE_ROW_H := 36.0
 
@@ -97,6 +104,8 @@ var _suspended := false
 var _focused := true
 var _overview := false
 var _started_ms := 0
+## Loading time so far in drawn frames (LOAD_LIMIT_S).
+var _loading_s := 0.0
 var _clip := ""
 var _summary := {}
 var _hint: Label
@@ -217,7 +226,11 @@ func _ready() -> void:
 		# C-148: the parcel's Energy in the top bar, P0's chip just before the coins.
 		_header.add_child(_farming.energy_chip)
 		_header.move_child(_farming.energy_chip, _coins_capsule.get_index())
+		# C-107: the task button (C-H3) beside the Energy chip, before it.
+		_header.add_child(_farming.task_button)
+		_header.move_child(_farming.task_button, _farming.energy_chip.get_index())
 		_farming.tip_top = top_bar_bottom() + UiTokens.SPACE_S5
+		_farming.bar_bottom = top_bar_bottom()
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_fit_place_chip()
@@ -474,7 +487,7 @@ func _process(delta: float) -> void:
 			# Only once the scene is up: building it stalls the main thread for seconds, and an
 			# HTTP request started during that stall times out (V-123).
 			if _farming != null: _farming.enter()
-		elif Time.get_ticks_msec() - _started_ms > 15000:
+		elif loading_timed_out(delta):
 			_fail("The farm preview could not finish loading.")
 		return
 	if not _focused or _placement != null: return
@@ -522,6 +535,11 @@ func _process(delta: float) -> void:
 		_focus += CameraRules.follow_shift(_camera,_actor.position,safe)
 		if input.is_zero_approx() and _route.is_empty(): _focus = _focus.lerp(_actor.position,minf(dt*2.8,1.0))
 		_place_camera()
+
+## Adds one drawn frame (at most LOAD_FRAME_CAP_S of it) to the loading time; true once it passes LOAD_LIMIT_S.
+func loading_timed_out(delta: float) -> bool:
+	_loading_s += clampf(delta, 0.0, LOAD_FRAME_CAP_S)
+	return _loading_s > LOAD_LIMIT_S
 
 ## The Energy card's Rest tile (`Show home`, C-148): the camera turns to the cottage and stays there until the
 ## player moves; it never walks the player there or rests for them (LOCK-09: tiles only guide).
@@ -818,13 +836,13 @@ func is_back_navigation_locked() -> bool:
 	_request_back()
 	return true
 
-## Closes the page on top of the profile (the profile last), else the farming UI's open drawer (the bag) or Energy
-## card / panel; false when none was open.
+## Closes the page on top of the profile (the profile last), else the farming UI's open drawer (the bag), Energy
+## card / panel or phone (C-107); false when none was open.
 func close_modal() -> bool:
 	if is_instance_valid(_profile):
 		_profile.back()
 		return true
-	return _farming != null and (_farming.close_energy() or _farming.close_bag())
+	return _farming != null and (_farming.close_energy() or _farming.close_bag() or _farming.close_phone())
 
 ## The profile over the parcel (C-108; C-85 ①: the HUD avatar opens it): the parcel's HUD hides and its touches stop
 ## until it closes; Settings and the dressing room open from it (parcel_profile.gd). The player stops where they are.
@@ -837,6 +855,8 @@ func open_profile() -> Control:
 	if _farming != null:
 		_farming.close_energy()
 		_farming.close_bag()
+		_farming.close_phone()
+		if _farming.drop_down != null: _farming.drop_down.fold()
 	_profile_layer = CanvasLayer.new()
 	_profile_layer.name = "ProfileLayer"
 	_profile_layer.layer = PROFILE_LAYER
