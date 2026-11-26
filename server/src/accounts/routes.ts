@@ -20,6 +20,9 @@ import { verifyAppleIdToken, type AppleVerifyOptions } from './apple_token.js';
 import type { AppleRevoker } from './apple_revoke.js';
 import { verifyGoogleIdToken, type GoogleVerifyOptions } from './google_token.js';
 import { IdTokenError } from './firebase_token.js';
+import { DEFAULT_ACCOUNT_LIMITS, type AccountLimits } from './limits.js';
+import { networkKey } from '../http/network.js';
+import { createHmac } from 'node:crypto';
 
 export interface AccountRouteDeps {
   store: Store;
@@ -45,7 +48,12 @@ export interface AccountRouteDeps {
    * 已有账号照常登录。账号由 tools/invite_accounts.ts 直接写库。
    */
   signupClosed?: boolean;
+  /** 登录与发信上限（C-132）；见 limits.ts。 */
+  limits?: Partial<AccountLimits>;
 }
+
+/** 不存在的账号也照样查一次可信网络，免得多一次查询的耗时泄露注册与否。 */
+const NO_USER = '00000000-0000-0000-0000-000000000000';
 
 /**
  * ACCOUNT_SIGNUP：不设或 open 照旧开放注册；closed 只用邀请账号（C-96）。
@@ -81,10 +89,27 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
   const isQa = (email: string) => Boolean(deps.qaEmailDomain && deps.qaEmailCode && email.endsWith('@' + deps.qaEmailDomain));
   const bodyEmail = (req: FastifyRequest) => normalizeEmail((req.body as { email?: unknown } | undefined)?.email);
 
-  const loginLimit = app.createRateLimit({ max: 10, timeWindow: '15 minutes', keyGenerator: req => {
+  const limits = { ...DEFAULT_ACCOUNT_LIMITS, ...deps.limits };
+  const trustMs = limits.trustedNetworkDays * 86_400_000;
+  const networkHash = (req: FastifyRequest) =>
+    createHmac('sha256', deps.pepper).update('login-network:' + networkKey(req.ip), 'utf8').digest('hex').slice(0, 32);
+
+  // C-132: password attempts per email *and* network, so a stranger's wrong passwords only use up their own network's
+  // budget. The per-email budget below covers networks the account never signed in from, which keeps brute force at
+  // the old per-email rate while the owner's known networks stay usable.
+  const loginLimit = app.createRateLimit({ max: limits.loginPerNetwork, timeWindow: '15 minutes', keyGenerator: req => {
     const email = bodyEmail(req);
-    return email ? 'login:' + emailKey(email, deps.pepper) : 'login-invalid:' + req.ip;
+    return email ? 'login:' + emailKey(email, deps.pepper) + ':' + networkKey(req.ip) : 'login-invalid:' + networkKey(req.ip);
   } });
+  const loginAccountLimit = app.createRateLimit({ max: limits.loginPerAccount, timeWindow: '15 minutes',
+    keyGenerator: req => 'login-account:' + emailKey(bodyEmail(req) ?? '', deps.pepper) });
+  // C-132: every verification email counts against its recipient and the whole server.
+  const mailLimits = [
+    app.createRateLimit({ max: limits.mailPerRecipientHour, timeWindow: '1 hour', keyGenerator: req => 'mail-to-h:' + emailKey(bodyEmail(req) ?? '', deps.pepper) }),
+    app.createRateLimit({ max: limits.mailPerRecipientDay, timeWindow: '1 day', keyGenerator: req => 'mail-to-d:' + emailKey(bodyEmail(req) ?? '', deps.pepper) }),
+    app.createRateLimit({ max: limits.mailPerHour, timeWindow: '1 hour', keyGenerator: () => 'mail-all-h' }),
+    app.createRateLimit({ max: limits.mailPerDay, timeWindow: '1 day', keyGenerator: () => 'mail-all-d' }),
+  ];
   const codeLimit = app.createRateLimit({ max: 8, timeWindow: '1 hour', keyGenerator: req => {
     const email = bodyEmail(req);
     return email ? 'code:' + emailKey(email, deps.pepper) : 'code-invalid:' + req.ip;
@@ -97,6 +122,28 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     }
     return false;
   };
+
+  /** 来自该账号没成功登录过的网络时扣按邮箱的额度；用尽回 429。 */
+  const accountLimited = async (user: UserRow | null, req: FastifyRequest, reply: FastifyReply) => {
+    if (await deps.store.loginNetworkTrusted(user?.id ?? NO_USER, networkHash(req), deps.now() - trustMs) && user) return false;
+    return limited(loginAccountLimit, req, reply);
+  };
+  /** 签发会话的地方都调：这个网络从此算该账号登录过的网络。 */
+  const trustNetwork = (userId: string, req: FastifyRequest) => deps.store.trustLoginNetwork(userId, networkHash(req), deps.now());
+  /**
+   * 扣一封验证信的额度（请求体里的收件邮箱 + 全局）。超限返回需等待的秒数，否则 null。
+   * QA 域名不发信，不扣。
+   */
+  const mailQuotaWait = async (email: string, req: FastifyRequest): Promise<number | null> => {
+    if (isQa(email)) return null;
+    for (const limit of mailLimits) {
+      const quota = await limit(req);
+      if (!quota.isAllowed && quota.isExceeded) return quota.ttlInSeconds;
+    }
+    return null;
+  };
+  const mailLimited = (reply: FastifyReply, waitS: number) => reply.code(429).header('retry-after', waitS)
+    .send({ code: 'RATE_LIMITED', reason: 'MAIL_LIMIT', retry_after_s: waitS, server_time: deps.now() });
 
   const sendCode = async (email: string, purpose: CodePurpose): Promise<{ ok: true } | { ok: false; retry_after_ms: number }> => {
     const code = isQa(email) ? deps.qaEmailCode! : newCode();
@@ -136,8 +183,12 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
       if (parsed.ok) { await deps.store.updateUserProfile(created.user.id, parsed.profile); created.user.display_name = parsed.profile.display_name; }
     }
     const session = await deps.store.authUser(created.user.id, deps.now());
-    const sent = await sendCode(email, 'verify');
-    return reply.code(201).send({ token: session.token, ...userView(created.user, session.player, deps.now()), verification_sent: sent.ok, server_time: deps.now() });
+    await trustNetwork(created.user.id, req);
+    // Over the mail limit the account still exists; the code can be asked for again later.
+    const mailWait = await mailQuotaWait(email, req);
+    const sent = mailWait === null ? await sendCode(email, 'verify') : { ok: false };
+    return reply.code(201).send({ token: session.token, ...userView(created.user, session.player, deps.now()), verification_sent: sent.ok,
+      ...(mailWait === null ? {} : { verification_error: 'MAIL_LIMIT', retry_after_s: mailWait }), server_time: deps.now() });
   });
 
   app.post('/v1/auth/email/login', { config: { rateLimit: { max: 120, timeWindow: '1 hour' } } }, async (req, reply) => {
@@ -147,9 +198,11 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     if (!email || typeof body?.password !== 'string' || body.password.length > 256)
       return reply.code(400).send({ code: 'SCHEMA', server_time: deps.now() });
     const user = await deps.store.userByEmail(email);
+    if (await accountLimited(user, req, reply)) return;
     if (!user) { await burnPasswordCheck(body.password); return reply.code(401).send({ code: 'INVALID_CREDENTIALS', server_time: deps.now() }); }
     if (!await verifyPassword(body.password, user.password_hash)) return reply.code(401).send({ code: 'INVALID_CREDENTIALS', server_time: deps.now() });
     const session = await deps.store.authUser(user.id, deps.now());
+    await trustNetwork(user.id, req);
     return reply.send({ token: session.token, ...userView(user, session.player, deps.now()), server_time: deps.now() });
   });
 
@@ -201,10 +254,14 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
       log(`[google] verify failed: ${(error as Error).message}`);
       return reply.code(503).send({ code: 'GOOGLE_UNAVAILABLE', server_time: deps.now() });
     }
+    // C-132: each nonce signs in once. A captured id_token and nonce sent again is refused, also when both race.
+    if (!await deps.store.claimIdTokenNonce('google', identity.nonceHash, identity.usableUntil, deps.now()))
+      return reply.code(401).send({ code: 'GOOGLE_TOKEN_REPLAYED', server_time: deps.now() });
     const resolved = await resolveIdentityUser('google', identity.sub, identity.emailVerified ? identity.email : undefined, identity.givenName);
     if (resolved === 'closed') return reply.code(403).send({ code: 'SIGNUP_CLOSED', server_time: deps.now() });
     if (!resolved) return reply.code(409).send({ code: 'EMAIL_IN_USE', server_time: deps.now() });
     const session = await deps.store.authUser(resolved.user.id, deps.now());
+    await trustNetwork(resolved.user.id, req);
     return reply.code(resolved.created ? 201 : 200).send({ token: session.token, ...userView(resolved.user, session.player, deps.now()),
       created: resolved.created, server_time: deps.now() });
   });
@@ -239,6 +296,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
       } catch (error) { log(`[apple] code exchange failed: ${(error as Error).message}`); }
     }
     const session = await deps.store.authUser(user.id, deps.now());
+    await trustNetwork(user.id, req);
     return reply.code(created ? 201 : 200).send({ token: session.token, ...userView(user, session.player, deps.now()),
       created, server_time: deps.now() });
   });
@@ -249,6 +307,9 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     const body = req.body as { email?: unknown; purpose?: unknown } | undefined;
     const email = normalizeEmail(body?.email);
     if (!email || !isCodePurpose(body?.purpose)) return reply.code(400).send({ code: 'SCHEMA', server_time: deps.now() });
+    // Counted before looking the address up, so the limit answers the same whether or not it has an account.
+    const mailWait = await mailQuotaWait(email, req);
+    if (mailWait !== null) return mailLimited(reply, mailWait);
     const user = await deps.store.userByEmail(email);
     if (user && !(body.purpose === 'verify' && user.email_verified)) {
       const sent = await sendCode(email, body.purpose);
@@ -284,6 +345,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     if (!user.email_verified) await deps.store.markEmailVerified(user.id);
     await deps.store.revokeUserTokens(user.id);
     const session = await deps.store.authUser(user.id, deps.now());
+    await trustNetwork(user.id, req);
     await deps.closeSessions?.(session.player.id);
     return reply.send({ token: session.token, ...userView({ ...user, email_verified: true }, session.player, deps.now()), server_time: deps.now() });
   });
@@ -343,6 +405,8 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     if (await limited(codeLimit, req, reply)) return;
     const email = bodyEmail(req);
     if (!email) return reply.code(400).send({ code: 'INVALID_EMAIL', server_time: deps.now() });
+    const mailWait = await mailQuotaWait(email, req);
+    if (mailWait !== null) return mailLimited(reply, mailWait);
     const user = await deps.store.userByEmail(email);
     if (user) {
       const sent = await sendCode(email, 'delete');
@@ -359,6 +423,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     if (!email || (typeof body?.password !== 'string' && !isValidCode(body?.code)))
       return reply.code(400).send({ code: 'SCHEMA', server_time: deps.now() });
     const user = await deps.store.userByEmail(email);
+    if (await accountLimited(user, req, reply)) return;
     if (typeof body.password === 'string') {
       if (!user) { await burnPasswordCheck(body.password); return reply.code(401).send({ code: 'INVALID_CREDENTIALS', server_time: deps.now() }); }
       if (!await verifyPassword(body.password, user.password_hash)) return reply.code(401).send({ code: 'INVALID_CREDENTIALS', server_time: deps.now() });

@@ -23,6 +23,7 @@ import { parcelIdleDaysFromEnv, scheduleIdleReclaim } from './parcels/reclaim.js
 import { loadStarterZones, starterZoneSwitchFromEnv } from './parcels/starter_zone.js';
 import { signupClosedFromEnv } from './accounts/routes.js';
 import { anonymousSignupLimitsFromEnv, guestAccountsClosedFromEnv } from './http/signup_limits.js';
+import { accountLimitsFromEnv } from './accounts/limits.js';
 
 const need = (k: string): string => {
   const v = process.env[k];
@@ -42,6 +43,8 @@ const anonymousSignupLimits = anonymousSignupLimitsFromEnv(process.env);
 if ('invalid' in anonymousSignupLimits) { console.error(`${anonymousSignupLimits.invalid} 只能是 1–1000000 的整数`); process.exit(1); }
 const guestAccountsClosed = guestAccountsClosedFromEnv(process.env);
 if (guestAccountsClosed === null) { console.error('GUEST_ACCOUNTS 只能是 open 或 closed'); process.exit(1); }
+const accountLimits = accountLimitsFromEnv(process.env);
+if ('invalid' in accountLimits) { console.error(`${accountLimits.invalid} 只能是 1–1000000 的整数`); process.exit(1); }
 
 const ROOT = process.env.ASSET_ROOT ?? path.resolve(process.cwd(), '..');
 const CONTENT_DIR = path.join(ROOT, 'assets', 'farm', 'data');
@@ -136,6 +139,8 @@ const app = await buildApp({
   anonymousSignupLimits,
   // No guest entry (C-146): the dynamic farm production server sets GUEST_ACCOUNTS=closed; Journey and development keep it open.
   guestAccountsClosed,
+  // Login attempts per email+network and per email from unknown networks; verification mail per recipient and in total (C-132).
+  accountLimits,
   // Dynamic farm parcels (C-31). "Abandon and pick again" is for the internal test server only: it stays off unless
   // DYNAMIC_FARM_RESELECT=1 is set there; production never sets it.
   // Install-and-play (C-100): PARCEL_GUEST_WRITES=1 lets guests claim, enter and save their own parcel only. Off unless set.

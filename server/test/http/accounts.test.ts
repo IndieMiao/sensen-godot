@@ -58,14 +58,16 @@ for (const [name, enabled, makeStore] of makers) {
       appleCalls = [];
       clock = Date.UTC(2026, 8, 28, 2);
       store = makeStore(() => clock);
-      app = await buildApp({ store, content, contentVersion: CV, blueprintDir: path.join(ROOT, 'assets', 'blueprints'),
+      app = await build();
+    });
+    const build = (extra: Partial<Parameters<typeof buildApp>[0]> = {}) =>
+      buildApp({ store, content, contentVersion: CV, blueprintDir: path.join(ROOT, 'assets', 'blueprints'),
         regionsFile: REGIONS, pepper: 'test-pepper', now: () => clock, mailer, ipLocator,
         qaEmailDomain: 'qa.sensen.test', qaEmailCode: '424242',
         apple: { audiences: ['app.gensen.maps'], keys: APPLE_KEYS.keys },
         google: { audiences: [GOOGLE_AUD], keys: GOOGLE_KEYS.keys },
         appleRevoker: { exchange: async code => { appleCalls.push('exchange:' + code); return code === 'good-code' ? 'refresh-1' : null; },
-          revoke: async token => { appleCalls.push('revoke:' + token); return true; } } });
-    });
+          revoke: async token => { appleCalls.push('revoke:' + token); return true; } }, ...extra });
     afterEach(async () => { await app.close(); });
 
     const bearer = (token: string) => ({ authorization: `Bearer ${token}` });
@@ -405,12 +407,15 @@ for (const [name, enabled, makeStore] of makers) {
       await app.inject({ method: 'DELETE', url: '/v1/users/me', headers: bearer(other.token) });
       expect((await store.deletion(other.user_id))?.apple_revocation).toBe('pending');
     });
+    // Each sign-in carries a fresh nonce, as the app does: a nonce signs in only once (C-132).
+    let nonces = 0;
     const googleToken = (sub: string, over: Record<string, unknown> = {}) => {
-      const s = Math.floor(clock / 1000);
-      return signToken(GOOGLE_KEYS, { iss: 'https://accounts.google.com', aud: GOOGLE_AUD, sub, iat: s, exp: s + 3600,
-        nonce: sha256Hex(APPLE_NONCE), email_verified: true, ...over });
+      const s = Math.floor(clock / 1000), nonce = `${APPLE_NONCE}-${++nonces}`;
+      return { id_token: signToken(GOOGLE_KEYS, { iss: 'https://accounts.google.com', aud: GOOGLE_AUD, sub, iat: s, exp: s + 3600,
+        nonce: sha256Hex(nonce), email_verified: true, ...over }), nonce };
     };
-    const google = (token: string) => app.inject({ method: 'POST', url: '/v1/auth/google', payload: { id_token: token, nonce: APPLE_NONCE } });
+    const google = (payload: { id_token: string; nonce: string }, remoteAddress?: string) =>
+      app.inject({ method: 'POST', url: '/v1/auth/google', payload, ...(remoteAddress ? { remoteAddress } : {}) });
 
     it('signs in with Google, links to a verified email account and rejects bad tokens', async () => {
       const first = await google(googleToken('g-1', { email: 'grace@gmail.com', given_name: 'Grace' }));
@@ -426,7 +431,7 @@ for (const [name, enabled, makeStore] of makers) {
       const linked = await google(googleToken('g-2', { email: 'hal@example.com' }));
       expect(linked.json()).toMatchObject({ created: false, user_id: reset.json().user_id, has_password: true });
       expect((await google(googleToken('g-3', { aud: 'other' }))).json().code).toBe('GOOGLE_TOKEN_BAD_AUDIENCE');
-      expect((await google('x.y.z')).json().code).toBe('GOOGLE_TOKEN_MALFORMED');
+      expect((await google({ id_token: 'x.y.z', nonce: APPLE_NONCE })).json().code).toBe('GOOGLE_TOKEN_MALFORMED');
     });
 
     it('invite-only (C-96): no self sign-up by email or Google, existing accounts still sign in', async () => {
@@ -443,13 +448,104 @@ for (const [name, enabled, makeStore] of makers) {
         expect(mail.filter(m => m.email === 'eve@example.com')).toEqual([]);
         const login = await closed.inject({ method: 'POST', url: '/v1/auth/email/login', payload: { email: 'ada@example.com', password: 'correct horse' } });
         expect(login.json()).toMatchObject({ user_id: ada.user_id, player_id: ada.player_id });
-        const viaGoogle = (token: string) => closed.inject({ method: 'POST', url: '/v1/auth/google', payload: { id_token: token, nonce: APPLE_NONCE } });
+        const viaGoogle = (payload: { id_token: string; nonce: string }) => closed.inject({ method: 'POST', url: '/v1/auth/google', payload });
         expect((await viaGoogle(googleToken('g-1', { email: 'grace@gmail.com' }))).json()).toMatchObject({ created: false, user_id: grace.user_id });
         const stranger = await viaGoogle(googleToken('g-9', { email: 'mallory@gmail.com' }));
         expect(stranger.statusCode).toBe(403);
         expect(stranger.json().code).toBe('SIGNUP_CLOSED');
         expect(await store.userByIdentity('google', 'g-9')).toBeNull();
       } finally { await closed.close(); }
+    });
+
+    it('signs in once per Google nonce: a replayed id_token and nonce is refused, also when racing (C-132)', async () => {
+      const t = googleToken('g-1', { email: 'grace@gmail.com' });
+      const first = await google(t);
+      expect(first.statusCode).toBe(201);
+      const replay = await google(t, '203.0.113.50');
+      expect(replay.statusCode).toBe(401);
+      expect(replay.json().code).toBe('GOOGLE_TOKEN_REPLAYED');
+      // Another token minted for the same nonce is refused as well.
+      const sameNonce = signToken(GOOGLE_KEYS, { iss: 'https://accounts.google.com', aud: GOOGLE_AUD, sub: 'g-1', iat: Math.floor(clock / 1000),
+        exp: Math.floor(clock / 1000) + 3600, nonce: sha256Hex(t.nonce), email: 'grace@gmail.com', email_verified: true });
+      expect((await google({ id_token: sameNonce, nonce: t.nonce })).json().code).toBe('GOOGLE_TOKEN_REPLAYED');
+      // Two sign-ins with one fresh token at the same time: exactly one session is issued.
+      const fresh = googleToken('g-1', { email: 'grace@gmail.com' });
+      const raced = await Promise.all([google(fresh), google(fresh), google(fresh)]);
+      expect(raced.filter(r => r.statusCode === 200)).toHaveLength(1);
+      expect(raced.filter(r => r.statusCode === 401).map(r => r.json().code)).toEqual(['GOOGLE_TOKEN_REPLAYED', 'GOOGLE_TOKEN_REPLAYED']);
+      // A new nonce signs in as usual.
+      expect((await google(googleToken('g-1', { email: 'grace@gmail.com' }))).json()).toMatchObject({ created: false, user_id: first.json().user_id });
+    });
+
+    it('lets the owner sign in from their own network while a stranger guesses passwords (C-132)', async () => {
+      const OWNER = '198.51.100.7';
+      const tryLogin = (password: string, remoteAddress: string) =>
+        app.inject({ method: 'POST', url: '/v1/auth/email/login', remoteAddress, payload: { email: 'ada@example.com', password } });
+      const owner = (await app.inject({ method: 'POST', url: '/v1/auth/email/register', remoteAddress: OWNER,
+        payload: { email: 'ada@example.com', password: 'correct horse' } })).json();
+      const stranger = [];
+      for (let i = 0; i < 12; i++) stranger.push((await tryLogin('wrong guess', '203.0.113.50')).statusCode);
+      expect(stranger).toEqual([...Array(10).fill(401), 429, 429]);
+      // Moving to other networks does not reset the budget: unknown networks share one per-email budget (no looser brute force).
+      expect((await tryLogin('wrong guess', '203.0.113.51')).json().code).toBe('RATE_LIMITED');
+      expect((await tryLogin('wrong guess', '2001:db8:1:2::1')).json().code).toBe('RATE_LIMITED');
+      // The owner's own network is unaffected.
+      const back = await tryLogin('correct horse', OWNER);
+      expect(back.statusCode).toBe(200);
+      expect(back.json().user_id).toBe(owner.user_id);
+      // A known network still has its own per-network cap: guessing from it is no easier than before.
+      const fromOwnerNetwork = [];
+      for (let i = 0; i < 10; i++) fromOwnerNetwork.push((await tryLogin('wrong guess', OWNER)).statusCode);
+      expect(fromOwnerNetwork).toEqual([...Array(9).fill(401), 429]);
+      // Same for an address that never had an account: unknown networks are limited the same way.
+      const ghost = [];
+      for (let i = 0; i < 11; i++) ghost.push((await app.inject({ method: 'POST', url: '/v1/auth/email/login', remoteAddress: `192.0.2.${i + 1}`,
+        payload: { email: 'ghost@example.com', password: 'wrong guess' } })).statusCode);
+      expect(ghost).toEqual([...Array(10).fill(401), 429]);
+    });
+
+    it('caps verification mail per recipient without revealing which addresses have accounts (C-132)', async () => {
+      await app.close();
+      app = await build({ accountLimits: { mailPerRecipientHour: 2 } });
+      const code = (email: string, purpose = 'reset') => app.inject({ method: 'POST', url: '/v1/auth/email/code', payload: { email, purpose } });
+      expect((await register('ada@example.com')).json().verification_sent).toBe(true);
+      expect((await code('ada@example.com')).statusCode).toBe(200);
+      clock += 61_000;
+      const over = await code('ada@example.com', 'verify');
+      expect(over.statusCode).toBe(429);
+      expect(over.json()).toMatchObject({ code: 'RATE_LIMITED', reason: 'MAIL_LIMIT' });
+      expect(Number(over.headers['retry-after'])).toBeGreaterThan(0);
+      expect((await app.inject({ method: 'POST', url: '/v1/account/delete/code', payload: { email: 'ada@example.com' } })).json())
+        .toMatchObject({ code: 'RATE_LIMITED', reason: 'MAIL_LIMIT' });
+      expect(mail.map(m => m.email)).toEqual(['ada@example.com', 'ada@example.com']);
+      // An address without an account gets the same answers after the same number of requests.
+      expect((await code('ghost@example.com')).statusCode).toBe(200);
+      clock += 61_000;
+      expect((await code('ghost@example.com')).statusCode).toBe(200);
+      const ghost = await code('ghost@example.com');
+      expect(ghost.statusCode).toBe(429);
+      expect(Object.keys(ghost.json()).sort()).toEqual(Object.keys(over.json()).sort());
+      expect(ghost.json()).toMatchObject({ code: 'RATE_LIMITED', reason: 'MAIL_LIMIT' });
+      // Signing up with an address already at its limit creates the account but sends nothing, and says so.
+      const signup = await register('ghost@example.com');
+      expect(signup.statusCode).toBe(201);
+      expect(signup.json()).toMatchObject({ verification_sent: false, verification_error: 'MAIL_LIMIT' });
+      expect(mail.filter(m => m.email === 'ghost@example.com')).toEqual([]);
+      // QA addresses are never mailed and so never limited.
+      for (let i = 0; i < 4; i++) { clock += 61_000; expect((await code('bot@qa.sensen.test')).statusCode).toBe(200); }
+    });
+
+    it('caps verification mail for the whole server (C-132)', async () => {
+      await app.close();
+      app = await build({ accountLimits: { mailPerHour: 3 } });
+      for (const name of ['a1', 'a2', 'a3']) expect((await register(`${name}@example.com`)).json().verification_sent).toBe(true);
+      const fourth = await register('a4@example.com');
+      expect(fourth.statusCode).toBe(201);
+      expect(fourth.json()).toMatchObject({ verification_sent: false, verification_error: 'MAIL_LIMIT' });
+      const resend = await app.inject({ method: 'POST', url: '/v1/auth/email/code', payload: { email: 'a1@example.com', purpose: 'reset' } });
+      expect(resend.statusCode).toBe(429);
+      expect(resend.json()).toMatchObject({ code: 'RATE_LIMITED', reason: 'MAIL_LIMIT' });
+      expect(mail.map(m => m.email)).toEqual(['a1@example.com', 'a2@example.com', 'a3@example.com']);
     });
   });
 }
