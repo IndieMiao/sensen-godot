@@ -59,7 +59,8 @@ static func install_key() -> String:
 ## FakeTransport 是同步的——`await` 一个非协程值会立刻返回，所以单测不受影响。
 ## G1-B 曾把这里写成同步，结果昨天 e2e 只能绕开 FarmSession 直接打传输层才跑通。
 func request(method: String, path: String, body: Variant = null) -> Response:
-	var headers := PackedStringArray(["content-type: application/json"])
+	# 没有 body 不声明 JSON：服务端把空 JSON body 当错误，登出的 DELETE 曾因此 400、会话没撤销（C-174）。
+	var headers := PackedStringArray() if body == null else PackedStringArray(["content-type: application/json"])
 	if not token.is_empty():
 		headers.append("authorization: Bearer %s" % token)
 	var text := "" if body == null else JSON.stringify(body, "", true, true)

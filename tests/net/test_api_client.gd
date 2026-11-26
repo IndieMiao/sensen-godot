@@ -10,6 +10,20 @@ func test_prefixes_base_url_and_sends_json() -> void:
 	assert_bool(r.is_success()).is_true()
 	assert_str(t.requests[0].url).is_equal("https://example.test/v1/farms")
 	assert_str(t.requests[0].body.region_id).is_equal("hk")
+	assert_bool(t.requests[0].headers.has("content-type: application/json")).is_true()
+
+## C-174：服务端拒收空的 JSON body，登出的 DELETE 曾因此 400、会话没撤销。
+func test_bodyless_request_sends_no_json_content_type() -> void:
+	var t := FakeTransport.new([{"status": 200}, {"status": 200}, {"status": 200}])
+	var c := _client(t)
+	c.token = "abc"
+	await c.request("DELETE", "/auth/token")
+	await c.request("GET", "/farms/me")
+	await c.request("POST", "/x", {})
+	assert_bool(str(t.requests[0].headers).contains("content-type")).is_false()
+	assert_bool(t.requests[0].headers.has("authorization: Bearer abc")).is_true()
+	assert_bool(str(t.requests[1].headers).contains("content-type")).is_false()
+	assert_bool(t.requests[2].headers.has("content-type: application/json")).is_true()
 
 func test_omits_auth_header_until_token_set() -> void:
 	var t := FakeTransport.new([{"status": 200}, {"status": 200}])

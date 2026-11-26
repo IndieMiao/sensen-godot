@@ -167,6 +167,36 @@ describe('鉴权', () => {
     expect((await app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(token) })).statusCode).toBe(401);
   });
 
+  it('登出这台设备：已发出的客户端带着 JSON content-type 发空 body，会话照样撤销（C-174）', async () => {
+    const { token } = await login();
+    const other = await login();
+    const out = await app.inject({ method: 'DELETE', url: '/v1/auth/token',
+      headers: { ...authed(token), 'content-type': 'application/json' } });
+    expect(out.statusCode).toBe(200);
+    expect((await app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(token) })).statusCode).toBe(401);
+    expect((await app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(other.token) })).statusCode).toBe(404);
+    // 新客户端不带 content-type，同样撤销。
+    const next = await login();
+    expect((await app.inject({ method: 'DELETE', url: '/v1/auth/token', headers: authed(next.token) })).statusCode).toBe(200);
+    expect((await app.inject({ method: 'GET', url: '/v1/farms/me', headers: authed(next.token) })).statusCode).toBe(401);
+  });
+
+  it('带 body 的请求照旧解析 JSON：空 body 与坏 JSON 仍是 400', async () => {
+    const json = { 'content-type': 'application/json' };
+    const empty = await app.inject({ method: 'POST', url: '/v1/auth/anonymous', headers: json, payload: '' });
+    expect(empty.statusCode).toBe(400);
+    expect(empty.json().code).toBe('FST_ERR_CTP_EMPTY_JSON_BODY');
+    const bad = await app.inject({ method: 'POST', url: '/v1/auth/anonymous', headers: json, payload: '{' });
+    expect(bad.json().code).toBe('FST_ERR_CTP_INVALID_JSON_BODY');
+    const poisoned = await app.inject({ method: 'POST', url: '/v1/auth/anonymous', headers: json,
+      payload: '{"__proto__":{"x":1},"install_key":"' + newInstallKey() + '"}' });
+    expect(poisoned.statusCode).toBe(400);
+    const ok = await app.inject({ method: 'POST', url: '/v1/auth/anonymous', headers: json,
+      payload: JSON.stringify({ install_key: newInstallKey() }) });
+    expect(ok.statusCode).toBe(200);
+    expect(ok.json().token).toEqual(expect.any(String));
+  });
+
   it('换绑 install_key 需要同时持有 token 与旧 key——否则泄露者能抢先接管', async () => {
     const { key, token } = await login();
     const wrong = await app.inject({

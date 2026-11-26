@@ -100,6 +100,13 @@ export const NEARBY_LIMIT = 20;
 export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   const app = Fastify({ logger: process.env.HTTP_LOG === '1', trustProxy: deps.trustedProxies?.length ? deps.trustedProxies : false });
   await app.register(rateLimit, { global: false });
+  // 已发出的客户端登出时给没有 body 的 DELETE 也带 content-type: application/json，默认解析器回 400、
+  // 会话没被撤销（C-174）。DELETE 的空 body 按没有 body 处理；其它请求仍走默认解析（空 body 照旧 400）。
+  const json = app.getDefaultJsonParser('error', 'error');
+  app.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body: string, done) => {
+    if (req.method === 'DELETE' && body.length === 0) done(null, undefined);
+    else json(req, body, done);
+  });
   const regions = JSON.parse(readFileSync(deps.regionsFile, 'utf8')) as Regions;
   const cities = deps.cities ?? CityCatalog.fromRegionsFile(deps.regionsFile);
   const seenBlueprints = new Set<string>();
