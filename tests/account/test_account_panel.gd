@@ -355,24 +355,19 @@ func test_google_button_follows_apple_or_the_primary_action() -> void:
 	GoogleSignIn.force_available = false
 	_restore_net()
 
-## The dynamic farm packages (C-101): email sign-in (invite accounts too), sign-up and reset. Google is hidden there
-## for now (owner C-137#18, Q-243): the export sets sensen/account/google_off, which wins even on a phone with Google
-## Play services. The C-98 invite-only switch is gone, so an old setting left behind changes nothing.
-func test_dynamic_farm_package_offers_email_sign_up_and_reset_without_google() -> void:
+## The dynamic farm packages (C-101, C-172): email sign-in (invite accounts too), sign-up and reset, and Google on a
+## phone with Google Play services, in the classic and the v3 look. C-101 hid Google until it was scheduled; C-172
+## opens it again (owner C-101#206). The C-98 invite-only switch is gone, so an old setting left behind changes nothing.
+func test_dynamic_farm_package_offers_email_sign_up_reset_and_google() -> void:
 	GoogleSignIn.force_available = true
-	ProjectSettings.set_setting(GoogleSignIn.OFF_SETTING, true)
 	ProjectSettings.set_setting("sensen/account/invite_only", true)
-	assert_bool(GoogleSignIn.available()).is_false()
 	for v3 in [false, true]:
 		var p := _v3_panel() if v3 else _panel()
 		assert_array(_visible_fields(p)).contains_exactly(["Email", "Password"])
-		for id in ["sign_in", "to_sign_up", "to_forgot"]: assert_object(p.action_button(id)).is_not_null()
-		assert_object(p.action_button("google")).is_null()
-		assert_object(p.find_child("Providers", true, false)).is_null()
+		for id in ["sign_in", "to_sign_up", "to_forgot", "google"]: assert_object(p.action_button(id)).is_not_null()
 		p.set_mode("sign_up")
 		assert_str(p.mode).is_equal("sign_up")
-		for id in ["sign_up", "to_sign_in"]: assert_object(p.action_button(id)).is_not_null()
-		assert_object(p.find_child("Providers", true, false)).is_null()
+		for id in ["sign_up", "to_sign_in", "google"]: assert_object(p.action_button(id)).is_not_null()
 		p.set_mode("forgot")
 		assert_str(p.mode).is_equal("forgot")
 		for id in ["send_reset", "to_sign_in"]: assert_object(p.action_button(id)).is_not_null()
@@ -380,11 +375,7 @@ func test_dynamic_farm_package_offers_email_sign_up_and_reset_without_google() -
 		assert_object(p.find_child("Providers", true, false)).is_null()
 		await get_tree().process_frame
 		p.queue_free()
-	var r := await GoogleSignIn.authorize("nonce")
-	assert_str(r.code).is_equal("GOOGLE_UNAVAILABLE")
 	ProjectSettings.set_setting("sensen/account/invite_only", null)
-	ProjectSettings.set_setting(GoogleSignIn.OFF_SETTING, null)
-	assert_bool(GoogleSignIn.available()).is_true() # dropping the setting brings the button back
 	GoogleSignIn.force_available = false
 	_restore_net()
 
