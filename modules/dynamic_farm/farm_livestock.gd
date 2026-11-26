@@ -15,6 +15,10 @@ const ART_PATH := "res://assets/farm/data/dynamic_farm_art.json"
 const GROUND_LIFT := 0.004
 ## Pickup feel (C-154#19 design) when the file leaves it out.
 const PICKUP_DEFAULTS := {"reach_m": 0.8, "hop_m": 0.25, "flight_s": 0.35, "shrink": 0.6, "chest_m": 0.9}
+## Laying (the owner on SEN-C-154#145, PM C-154#146) when a drop's art leaves `lay` out: the drop leaves the animal
+## `from_m` above the ground, `toss_m` (horizontal) from where it lands, arcs `rise_m` above the straight line down over
+## `fall_s`, then bounces once `bounce_m` high over `bounce_s`. The animal stands `toss_m` from the drop's spot to lay.
+const LAY_DEFAULTS := {"from_m": 0.2, "toss_m": 0.3, "rise_m": 0.2, "fall_s": 0.45, "bounce_m": 0.06, "bounce_s": 0.2}
 const SIDES := ["back", "front", "left", "right"]
 ## Width the player's centre has to pass an opening (C-154#89) when the art file's fence leaves `entry_clear_m` out.
 const ENTRY_CLEAR_M := 0.4
@@ -47,6 +51,20 @@ static func pickup() -> Dictionary:
 		for key: String in out:
 			if raw.get(key) is float or raw.get(key) is int: out[key] = float(raw[key])
 	return out
+
+## How a drop of `item` is laid (LAY_DEFAULTS, overridden key by key by the drop's `lay`).
+static func lay(item: String) -> Dictionary:
+	var out := LAY_DEFAULTS.duplicate()
+	var raw = drop_art(item).get("lay")
+	if raw is Dictionary:
+		for key: String in out:
+			if (raw.get(key) is float or raw.get(key) is int) and float(raw[key]) >= 0.0: out[key] = float(raw[key])
+	return out
+
+## A drop's size against its model (the drop's `scale`, default 1; SEN-C-154#145: the egg is drawn bigger than life).
+static func drop_scale(item: String) -> float:
+	var raw = drop_art(item).get("scale")
+	return float(raw) if (raw is float or raw is int) and float(raw) > 0.0 else 1.0
 
 ## A point of the building's own frame (cells) on the ground of the model's frame (metres, pivot on the middle).
 static func model_point(local: Vector2, base: Vector2i, cell_m: float) -> Vector3:
@@ -311,12 +329,14 @@ static func animal(kind: String, cell_m: float) -> Dictionary:
 		pivot.add_child(blob)
 	return {"node": pivot, "player": player, "clips": a.get("clips", {}), "radius": float(a.get("radius", 0.2))}
 
-## A drop's model on the ground (cells to metres), or a small egg-shaped placeholder.
+## A drop's model on the ground (cells to metres, times `drop_scale`), or a small egg-shaped placeholder. The size is
+## on the model under the holder, so the holder's own scale stays 1 for the lay and pickup animations.
 static func drop_model(item: String, cell_m: float) -> Node3D:
 	var path := str(drop_art(item).get("model", ""))
+	var size := drop_scale(item)
 	if not path.is_empty() and ResourceLoader.exists(path) and load(path) is PackedScene:
 		var node: Node3D = (load(path) as PackedScene).instantiate()
-		node.scale = Vector3.ONE * cell_m
+		node.scale = Vector3.ONE * cell_m * size
 		var holder := Node3D.new()
 		holder.name = "Drop_" + item
 		holder.add_child(node)
@@ -328,7 +348,8 @@ static func drop_model(item: String, cell_m: float) -> Node3D:
 	sphere.radius = 0.055 * cell_m
 	sphere.height = 0.15 * cell_m
 	blob.mesh = sphere
-	blob.position.y = 0.075 * cell_m
+	blob.scale = Vector3.ONE * size
+	blob.position.y = 0.075 * cell_m * size
 	blob.material_override = _flat(Color(0.98, 0.94, 0.84))
 	holder.add_child(blob)
 	return holder

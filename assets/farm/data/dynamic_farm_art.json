@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "_note": "Client art for dynamic_farm.json's buildings, animals and drops (C-154). Positions are in cells (1 U = one tilled cell), in a building's own unturned frame: origin at the footprint's rear-left corner, x to the right, z toward the entry. Paths that do not exist yet draw placeholders. keep_clear: cells outside the footprint, [x, z, width, depth], that other buildings may not cover; walk ones stay walkable to spawn (the cell outside the entry), the others hold art drawn past the footprint (the rear hedge).",
+  "_note": "Client art for dynamic_farm.json's buildings, animals and drops (C-154). Positions are in cells (1 U = one tilled cell), in a building's own unturned frame: origin at the footprint's rear-left corner, x to the right, z toward the entry. Paths that do not exist yet draw placeholders. keep_clear: cells outside the footprint, [x, z, width, depth], that other buildings may not cover; walk ones stay walkable to spawn (the cell outside the entry), the others hold art drawn past the footprint (the rear hedge). drops: scale is the drop's size against its model; lay is how it leaves the animal (FarmLivestock.LAY_DEFAULTS: metres, seconds).",
   "buildings": {
     "coop": {
       "name": "Coop",
@@ -25,7 +25,8 @@
     "hen_brown": {"model": "res://assets/dynamic_farm/chicken_yard/hen_brown.tscn", "facing": "-x", "radius": 0.2, "clips": {"walk": "走动", "peck": "啄食", "idle": "发呆"}}
   },
   "drops": {
-    "egg": {"model": "res://assets/dynamic_farm/chicken_yard/egg.glb"}
+    "egg": {"model": "res://assets/dynamic_farm/chicken_yard/egg.glb", "scale": 1.6,
+      "lay": {"from_m": 0.2, "toss_m": 0.3, "rise_m": 0.2, "fall_s": 0.45, "bounce_m": 0.06, "bounce_s": 0.2}}
   },
   "pickup": {"reach_m": 0.8, "hop_m": 0.25, "flight_s": 0.35, "shrink": 0.6, "chest_m": 0.9}
 }

@@ -39,6 +39,7 @@ func _run() -> void:
 	_keep_clear()
 	for path in OS.get_cmdline_user_args():
 		_keep_clear_parcel(JSON.parse_string(FileAccess.get_file_as_string(path)))
+	_drop_art()
 	await _animals()
 	_items()
 	print("COOP_TESTS checks=%d failures=%d" % [checks, failures])
@@ -374,6 +375,8 @@ func _reaches(walk: RefCounted, target: Vector3) -> bool:
 	return false
 
 func _animals() -> void:
+	# The hens wander at random (randf); a fixed seed keeps the checks below the same on every run.
+	seed(154)
 	var rules := ParcelFarm.rules()
 	var data := Data.decode(Fixture.farm())
 	var walk := Walk.new(data)
@@ -421,19 +424,67 @@ func _animals() -> void:
 	# The second egg is laid at T0 + 5 s: it appears; the hen that laid it went to its spot first.
 	host.update(0.016, far, T0 + 6000)
 	_check(host.snapshot()[1].drops.has(2), "animals: the egg appears when it is due")
+	# Laid while watched (SEN-C-154#145): the hen walks beside the spot, the egg leaves her above the ground, arcs down
+	# onto its spot and bounces once; it is not picked up while it is still in the air.
+	var lay := Livestock.lay("egg")
+	var away := egg + Vector3(30, 0, 30)
+	farm.drops.append({"id": 4, "item": "egg", "amount": 1, "building": 1, "animal": 0, "spot": 3, "ready_at": T0 + 12000})
+	host.sync(farm, rules, T0 + 6000)
+	for i in 375: host.update(1.0 / 60.0, away, T0 + 6000 + i * 16)
+	var hen: Vector3 = host.snapshot()[1].animals[0].world
+	host.update(0.016, away, T0 + 12000)
+	var ground := frame * Livestock.model_point(ParcelFarm.livestock_of(rules, b).spots[3], Vector2i(7, 5), walk.cell_m)
+	var leaving: Vector3 = host.drop_position(4)
+	_check(host.snapshot()[1].landing.has(4), "lay: the egg is in the air when laid")
+	var hen_gap := Vector2(hen.x - ground.x, hen.z - ground.z).length()
+	var from_hen := Vector2(leaving.x - hen.x, leaving.z - hen.z).length()
+	_check(is_equal_approx(leaving.y - ground.y, lay.from_m) and hen_gap <= lay.toss_m * 2.0 + 0.01
+		and absf(from_hen - hen_gap * LivestockScene.LAY_TAIL) < 0.02,
+		"lay: it leaves the hen %.2f m up, under her tail (%s, hen %s)" % [lay.from_m, leaving, hen])
+	var toss := Vector2(leaving.x - ground.x, leaving.z - ground.z).length()
+	_check(toss > 0.05 and toss <= lay.toss_m * 2.0 + 0.01, "lay: the hen laid it beside its spot (%.2f m)" % toss)
+	_check(not host.update(0.016, leaving, T0 + 12000).has(4), "lay: an egg in the air is not picked up")
+	var peak := -INF
+	var bounced := false
+	var started := Time.get_ticks_msec()
+	while Time.get_ticks_msec() - started < int((lay.fall_s + lay.bounce_s + 0.5) * 1000.0):
+		await process_frame
+		var at: Vector3 = host.drop_position(4)
+		peak = maxf(peak, at.y - ground.y)
+		# Over its spot and still off the ground: the bounce after the fall.
+		if Vector2(at.x - ground.x, at.z - ground.z).length() < 0.001 and at.y - ground.y > 0.005: bounced = true
+		if host.snapshot()[1].landing.is_empty(): break
+	var landed: Vector3 = host.drop_position(4)
+	_check(host.snapshot()[1].landing.is_empty() and landed.distance_to(ground) < 0.001, "lay: it ends on its spot (%s vs %s)" % [landed, ground])
+	_check(peak > lay.from_m, "lay: it arcs up out of the hen before falling (peak %.2f m)" % peak)
+	_check(bounced, "lay: it bounces once on its spot")
+	_check(host.update(0.016, ground, T0 + 12000).has(4), "lay: once on the ground it is picked up")
 	# A new feeding: the hen goes to a feeder.
 	farm.drops.append({"id": 3, "item": "egg", "amount": 1, "building": 1, "animal": 2, "spot": 7, "ready_at": T0 + 200000})
-	host.sync(farm, rules, T0 + 7000)
+	host.sync(farm, rules, T0 + 13000)
 	_check(host.snapshot()[1].animals[2].errand == "feed", "animals: a fed hen goes to the feeder")
 	var feeder := frame * Livestock.model_point(Livestock.feeders("coop")[0], Vector2i(7, 5), walk.cell_m)
 	_check(not host.feeder_near(feeder + Vector3(0.6, 0, 0), 1.1).is_empty() and host.feeder_near(feeder + Vector3(2, 0, 0), 1.1).is_empty(),
 		"feeding: the key's feeder within 1.1 m")
 	# Gone from the save (picked elsewhere): gone from the ground.
 	farm.drops = []
-	host.sync(farm, rules, T0 + 8000)
+	host.sync(farm, rules, T0 + 14000)
 	_check(host.snapshot()[1].drops.is_empty(), "animals: a picked egg leaves the ground")
 	host.queue_free()
 	await process_frame
+
+func _drop_art() -> void:
+	# The egg is drawn bigger than life (SEN-C-154#145: 1.6x, PM C-154#146); the size sits on the model, not the holder.
+	_check(is_equal_approx(Livestock.drop_scale("egg"), 1.6) and is_equal_approx(Livestock.drop_scale("no_such_item"), 1.0),
+		"drop art: the egg is 1.6x its model, other drops 1x")
+	var egg := Livestock.drop_model("egg", 0.8)
+	_check(egg.scale == Vector3.ONE and (egg.get_child(0) as Node3D).scale.is_equal_approx(Vector3.ONE * 0.8 * 1.6),
+		"drop art: the egg model is scaled, its holder is not")
+	egg.free()
+	var lay := Livestock.lay("egg")
+	_check(lay.keys() == Livestock.LAY_DEFAULTS.keys() and lay.fall_s > 0.0 and lay.toss_m > 0.0 and lay.from_m > 0.0,
+		"drop art: the egg's laying motion is configured")
+	_check(Livestock.lay("no_such_item") == Livestock.LAY_DEFAULTS, "drop art: a drop without one lays by the defaults")
 
 func _items() -> void:
 	# Loaded here, not preloaded: it reads P0's content through autoloads that exist only once the tree runs.

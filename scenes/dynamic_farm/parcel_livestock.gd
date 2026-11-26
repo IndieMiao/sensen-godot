@@ -7,7 +7,9 @@ extends Node3D
 ## idle). They wander the yard's open floor, peck and stand about, and step away from a player who comes close; no
 ## physics, straight walks between free points (a blocked walk just picks another point). A fed animal goes to the
 ## nearest feeder and pecks; shortly before its product is due it walks to the drop's spot, and at `ready_at` (server
-## time) the drop pops in beside it. Drops already laid when the parcel opens just lie there.
+## time) the drop bounces out of it onto the ground (SEN-C-154#145: out of the hen, not up from the ground; the motion
+## is FarmLivestock.lay, the drop's size FarmLivestock.drop_scale). Drops already laid when the parcel opens just lie
+## there. A drop still in the air is not picked up.
 ##
 ## Pickup (the design on SEN-C-154#19): a laid drop within `reach_m` of the player on the ground is reported by
 ## `update`; `fly` hops it up `hop_m` and arcs it into the player's chest over `flight_s`, shrinking to `shrink`, then
@@ -21,11 +23,17 @@ const WALK_SPEED := 0.9
 const FLEE_SPEED := 2.2
 const SHY_CELLS := 1.3
 const FLEE_CELLS := 2.2
-## An animal sets off for its laying spot this long before the drop is due (ms).
-const LAY_LEAD_MS := 4000
+## An animal sets off for its laying spot this long before the drop is due (ms): long enough to cross the yard round
+## a part at its hurried walk (WALK_SPEED * 1.4).
+const LAY_LEAD_MS := 6500
 ## A fed animal pecks at the feeder this long (s).
 const FEED_PECK_S := 3.0
-const POP_S := 0.25
+## A laid drop grows from this share of its size while it leaves the animal (over the first third of the fall).
+const LAY_GROW_FROM := 0.5
+## A laid drop leaves this share of the way from the animal's middle toward where it lands (from under her tail).
+const LAY_TAIL := 0.25
+## Waypoints an animal takes at most on its way to lay (its walks are straight lines round the parts).
+const LAY_HOPS := 3
 
 var _walk: RefCounted
 var _cell_m := 0.8
@@ -36,6 +44,8 @@ var _flying := {}
 var _held_off := {}
 ## Drop ids seen unlaid while watching (they pop in when laid) and ids already drawn.
 var _expected := {}
+## Drop ids still falling out of the animal (not picked up until they lie on the ground).
+var _landing := {}
 var _pickup := Livestock.pickup()
 
 func setup(walk: RefCounted) -> void:
@@ -72,6 +82,7 @@ func sync(farm: Dictionary, rules: Dictionary, now: int) -> void:
 			if not present.has(id) and not _flying.has(id):
 				(yard.drops[id] as Node3D).queue_free()
 				yard.drops.erase(id)
+				_landing.erase(id)
 	for id: int in _held_off.keys():
 		if not present.has(id): _held_off.erase(id)
 	for id: int in _expected.keys():
@@ -98,7 +109,7 @@ func _build_yard(b: Dictionary, rule: Dictionary) -> void:
 		var made := Livestock.animal(str(kinds[i]), _cell_m)
 		var radius: float = made.radius
 		var a := {"node": made.node, "player": made.player, "clips": made.clips, "radius": radius, "state": "idle", "left": 0.0,
-			"target": Vector2.ZERO, "speed": WALK_SPEED, "errand": "", "clip": ""}
+			"target": Vector2.ZERO, "speed": WALK_SPEED, "errand": "", "clip": "", "then": false, "lay_to": {}}
 		root.add_child(made.node)
 		a.pos = _free_point(yard, radius, Vector2(base) * Vector2(0.3 + 0.2 * i, 0.55), 40)
 		_place_animal(yard, a, Vector2.RIGHT.rotated(float(i) * 2.1))
@@ -120,7 +131,7 @@ func update(delta: float, player: Vector3, now: int, paused := false) -> Array:
 	for yard: Dictionary in _yards.values():
 		for id: int in yard.drops:
 			var node: Node3D = yard.drops[id]
-			if _flying.has(id): continue
+			if _flying.has(id) or _landing.has(id): continue
 			var gap := Vector2(node.global_position.x - player.x, node.global_position.z - player.z).length()
 			if _held_off.has(id):
 				if gap > reach * 1.6: _held_off.erase(id)
@@ -128,7 +139,8 @@ func update(delta: float, player: Vector3, now: int, paused := false) -> Array:
 			if not paused and gap <= reach: out.append(id)
 	return out
 
-## Drops laid by `now` get their model (popping in when `animate`, i.e. laid while the player watches).
+## Drops laid by `now` get their model (bouncing out of the animal that laid it when `animate`, i.e. laid while the
+## player watches).
 func _draw_laid(now: int, animate: bool) -> void:
 	for yard: Dictionary in _yards.values():
 		for id: int in yard.pending:
@@ -142,12 +154,45 @@ func _draw_laid(now: int, animate: bool) -> void:
 			node.rotation.y = float(id % 7) * 0.9
 			(yard.root as Node3D).add_child(node)
 			yard.drops[id] = node
-			if animate and _expected.has(id):
-				node.scale = Vector3.ONE * 0.01
-				var tw := node.create_tween()
-				tw.tween_property(node, "scale", Vector3.ONE * 1.15, POP_S * 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-				tw.tween_property(node, "scale", Vector3.ONE, POP_S * 0.4)
+			if animate and _expected.has(id): _lay(yard, id, d, node)
 			_expected.erase(id)
+
+## The drop leaves the animal that laid it `from_m` up, from under her tail (she turns it to the spot), arcs down onto
+## its spot and bounces once (FarmLivestock.lay). From `toss_m` short of the spot when that animal is not beside it
+## (fled, or blocked on its way).
+func _lay(yard: Dictionary, id: int, d: Dictionary, node: Node3D) -> void:
+	var lay := Livestock.lay(str(d.item))
+	var land := node.position
+	var toss: float = lay.toss_m
+	var away := Vector3(0, 0, toss)
+	var index := int(d.animal)
+	if index >= 0 and index < yard.animals.size():
+		var a: Dictionary = yard.animals[index]
+		var at := Livestock.model_point(a.pos, yard.base, _cell_m) - land
+		at.y = 0.0
+		var gap := at.length()
+		if gap > toss * 2.0: away = at / gap * toss
+		elif gap > 0.01: away = at
+		# Her tail to the spot: the drop comes out behind her.
+		if not a.state in ["walk", "flee"]: _face(yard, a, Vector2(at.x, at.z))
+	var start := land + away * (1.0 - LAY_TAIL) + Vector3(0, float(lay.from_m), 0)
+	var rise: float = lay.rise_m
+	var bounce: float = lay.bounce_m
+	_landing[id] = true
+	node.position = start
+	node.scale = Vector3.ONE * LAY_GROW_FROM
+	var tw := node.create_tween()
+	tw.tween_method(func(t: float):
+		var p := start.lerp(land, t)
+		p.y += 4.0 * rise * t * (1.0 - t)
+		node.position = p
+		node.scale = Vector3.ONE * lerpf(LAY_GROW_FROM, 1.0, minf(1.0, t * 3.0)), 0.0, 1.0, maxf(0.01, float(lay.fall_s)))
+	tw.tween_method(func(t: float): node.position = land + Vector3(0, 4.0 * bounce * t * (1.0 - t), 0), 0.0, 1.0,
+		maxf(0.01, float(lay.bounce_s)))
+	tw.tween_callback(func():
+		node.position = land
+		node.scale = Vector3.ONE
+		_landing.erase(id))
 
 func _tick(yard: Dictionary, a: Dictionary, index: int, delta: float, player: Vector2, now: int) -> void:
 	# Due soon: off to the spot where this animal's next drop lies; once it is laid the errand is over.
@@ -158,8 +203,8 @@ func _tick(yard: Dictionary, a: Dictionary, index: int, delta: float, player: Ve
 	if due != null and a.errand != "lay" and int(due.ready_at) - now <= LAY_LEAD_MS:
 		var spots: Array = yard.rule.spots
 		if int(due.spot) < spots.size():
-			var beside: Vector2 = spots[int(due.spot)] + Vector2(0.35, 0).rotated(float(index))
-			_go(yard, a, _free_point(yard, a.radius, beside, 12, 0.5), WALK_SPEED * 1.4, "lay")
+			a.lay_to = {"spot": spots[int(due.spot)], "toss": float(Livestock.lay(str(due.item)).toss_m) / _cell_m, "hops": 0, "index": index}
+			_walk_to_lay(yard, a)
 	var shy: bool = a.pos.distance_to(player) < SHY_CELLS
 	if shy and a.errand == "" and a.state != "flee":
 		var away: Vector2 = (a.pos - player).normalized() if a.pos.distance_to(player) > 0.01 else Vector2.RIGHT
@@ -184,6 +229,7 @@ func _tick(yard: Dictionary, a: Dictionary, index: int, delta: float, player: Ve
 			if not _open(yard, next, a.radius):
 				_rest(a, "idle", 0.4)
 				a.errand = ""
+				a.then = false
 			else:
 				_place_animal(yard, a, to, next)
 		return
@@ -200,13 +246,20 @@ func _tick(yard: Dictionary, a: Dictionary, index: int, delta: float, player: Ve
 	else: _rest(a, "idle", randf_range(1.5, 3.0))
 
 func _arrive(yard: Dictionary, a: Dictionary) -> void:
+	if a.errand == "lay" and a.then and int(a.lay_to.hops) < LAY_HOPS:
+		a.lay_to.hops = int(a.lay_to.hops) + 1
+		_walk_to_lay(yard, a)
+		return
 	match a.errand:
 		"feed":
 			_rest(a, "peck", FEED_PECK_S)
 			a.errand = ""
 			var feeder = _nearest_feeder(yard, a.pos)
 			if feeder != null: _face(yard, a, feeder - a.pos)
-		"lay": _rest(a, "idle", 2.0)
+		"lay":
+			_rest(a, "idle", 2.0)
+			# Her tail to the spot already, so she does not swing round as she lays.
+			if not a.lay_to.is_empty(): _face(yard, a, a.pos - (a.lay_to.spot as Vector2))
 		_: _rest(a, "idle" if randf() < 0.5 else "peck", randf_range(1.0, 2.5))
 	if a.errand != "lay": a.errand = ""
 
@@ -254,6 +307,91 @@ func _face(_yard: Dictionary, a: Dictionary, heading: Vector2) -> void:
 	if heading.length() < 0.001: return
 	# The building's own frame: +x right, +z toward the entry; the pivot looks down −Z.
 	(a.node as Node3D).rotation.y = atan2(-heading.x, -heading.y)
+
+## Off to lay beside `a.lay_to.spot`, `toss` (cells) from it: straight to the nearest open point round the spot that it
+## can walk to in a line, else to a waypoint (a part's corner, or a random point of the floor) from which one is (or,
+## failing that, the one nearest the spot; it plans again there, `then`), else to the open point nearest the first
+## try (the drop then leaves `toss_m` short of its spot, see _lay).
+func _walk_to_lay(yard: Dictionary, a: Dictionary) -> void:
+	var index := int(a.lay_to.index)
+	var radius: float = a.radius
+	var spot: Vector2 = a.lay_to.spot
+	var toss: float = a.lay_to.toss
+	var targets := []
+	for k in 8:
+		var p := spot + Vector2(toss, 0).rotated(float(index) + float(k) * TAU / 8.0)
+		if _open(yard, p, radius): targets.append(p)
+	# Nearest first, but the side of the spot away from the camera before the others: the drop then falls toward the
+	# viewer instead of behind the animal.
+	var back := _away_from_camera(yard)
+	var cost := func(p: Vector2) -> float: return a.pos.distance_to(p) + (0.0 if (p - spot).dot(back) >= -0.01 else 3.0)
+	targets.sort_custom(func(p: Vector2, q: Vector2): return cost.call(p) < cost.call(q))
+	a.then = false
+	for p: Vector2 in targets:
+		if _clear_line(yard, a.pos, p, radius):
+			_go(yard, a, p, WALK_SPEED * 1.4, "lay")
+			return
+	var rects: Dictionary = _rects(yard, radius)
+	var floor_rect: Rect2 = rects.floor
+	var ways := []
+	for r: Rect2 in rects.blocked:
+		var g := r.grow(0.05)
+		ways.append_array([g.position, Vector2(g.end.x, g.position.y), Vector2(g.position.x, g.end.y), g.end])
+	for k in 12: ways.append(Vector2(randf_range(floor_rect.position.x, floor_rect.end.x), randf_range(floor_rect.position.y, floor_rect.end.y)))
+	var best = null
+	var best_len := INF
+	var nearest = null
+	var nearest_d := INF
+	for w: Vector2 in ways:
+		if w.distance_to(a.pos) < 0.05 or not _open(yard, w, radius) or not _clear_line(yard, a.pos, w, radius): continue
+		if w.distance_to(spot) < nearest_d:
+			nearest_d = w.distance_to(spot)
+			nearest = w
+		for p: Vector2 in targets:
+			var length: float = a.pos.distance_to(w) + w.distance_to(p)
+			if length < best_len and _clear_line(yard, w, p, radius):
+				best_len = length
+				best = w
+	var via = best if best != null else nearest
+	if via != null and not targets.is_empty():
+		_go(yard, a, via, WALK_SPEED * 1.4, "lay")
+		a.then = true
+		return
+	_go(yard, a, _free_point(yard, radius, spot + Vector2(toss, 0).rotated(float(index)), 12, 0.5), WALK_SPEED * 1.4, "lay")
+
+## The direction (building frame, cells) the camera looks along over the ground, or zero without a camera.
+func _away_from_camera(yard: Dictionary) -> Vector2:
+	var camera := get_viewport().get_camera_3d() if is_inside_tree() else null
+	if camera == null: return Vector2.ZERO
+	var look: Vector3 = (yard.root as Node3D).global_basis.inverse() * -camera.global_basis.z
+	return Vector2(look.x, look.z).normalized()
+
+## The straight walk from `from` to `to` (cells) stays on the open floor: `to` is open and the segment past `from`
+## crosses no part (the floor is a rectangle, so both ends on it keep the whole walk on it). A segment clear of a part
+## keeps every step of the walk (`_open` per frame) clear of it, even from a point on the part's edge.
+func _clear_line(yard: Dictionary, from: Vector2, to: Vector2, radius: float) -> bool:
+	if not _open(yard, to, radius): return false
+	for r: Rect2 in _rects(yard, radius).blocked:
+		if _segment_hits(from, to, r): return false
+	return true
+
+## Whether the segment `a`→`b` meets `r` anywhere past its very start (Liang–Barsky clipping).
+static func _segment_hits(a: Vector2, b: Vector2, r: Rect2) -> bool:
+	var t0 := 0.0001
+	var t1 := 1.0
+	var d := b - a
+	for axis in 2:
+		var lo: float = r.position[axis] - a[axis]
+		var hi: float = r.end[axis] - a[axis]
+		if absf(d[axis]) < 1e-9:
+			if lo > 0.0 or hi < 0.0: return false
+			continue
+		var ta: float = lo / d[axis]
+		var tb: float = hi / d[axis]
+		t0 = maxf(t0, minf(ta, tb))
+		t1 = minf(t1, maxf(ta, tb))
+		if t0 > t1: return false
+	return true
 
 ## A point of the open floor near `want` (cells), else the nearest of `tries` random ones round it, else the floor's
 ## middle.
@@ -350,11 +488,12 @@ func covers(cell: Vector2i) -> bool:
 		if yard.cells.has(cell): return true
 	return false
 
-## For tests and probes: {building id: {animals: [{pos, state, errand}], drops: [ids drawn]}}.
+## For tests and probes: {building id: {animals: [{pos, state, errand}], drops: [ids drawn], landing: [ids in the air]}}.
 func snapshot() -> Dictionary:
 	var out := {}
 	for id: int in _yards:
 		var yard: Dictionary = _yards[id]
 		out[id] = {"animals": yard.animals.map(func(a): return {"pos": a.pos, "state": a.state, "errand": a.errand,
-			"world": (a.node as Node3D).global_position}), "drops": yard.drops.keys()}
+			"world": (a.node as Node3D).global_position}), "drops": yard.drops.keys(),
+			"landing": yard.drops.keys().filter(func(id): return _landing.has(id))}
 	return out

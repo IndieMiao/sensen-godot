@@ -6,7 +6,9 @@ extends SceneTree
 ## still on the ground.
 ##   godot --path "$QA" --script res://tools/dev/dynamic_farm/coop_probe.gd -- <farm.json> <out> [turns]
 ##   add --write-movie <out>/pickup.avi --fixed-fps 30 for the prototype recording (desktop, scripted input).
-## `turns` (0–3, default 1) is how far the built coop is turned. Scripted input; not touch or device evidence.
+## `turns` (0–3, default 1) is how far the built coop is turned. A fourth argument `tour` adds the walk round three
+## eggs; `closeup` films the laying up close (SEN-C-154#145: the egg bounces out of the hen onto the ground) and the
+## pickup at the nearest zoom, noting the movie frames in the report. Scripted input; not touch or device evidence.
 ## With --headless it checks the same states without images. The save lives in <out>/save and is removed first.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const Building = preload("res://modules/dynamic_farm/farm_building.gd")
@@ -31,6 +33,7 @@ func _run() -> void:
 	raw = JSON.parse_string(FileAccess.get_file_as_string(args[0]))
 	out = args[1]
 	var build_turns := int(args[2]) % 4 if args.size() > 2 else 1
+	var mode: String = args[3] if args.size() > 3 else ""
 	var save_dir := out.path_join("save")
 	DirAccess.make_dir_recursive_absolute(save_dir)
 	for name in DirAccess.get_files_at(save_dir): DirAccess.remove_absolute(save_dir.path_join(name))
@@ -92,7 +95,30 @@ func _run() -> void:
 	# Two minutes on: the hen walks to the spot and lays (the clock jumps to 5 s before the egg is due).
 	var due: int = int(f.farm.drops[0].ready_at)
 	_jump(due - 5000 - f.server_now())
-	await create_timer(6.5).timeout
+	if mode == "closeup":
+		# Up close on the egg's spot: the hen walks up, the egg leaves her and bounces onto the ground.
+		# The camera follows the player, so the player stands 1.8 cells from the spot (out of reach) looking at it, and the
+		# view is closer than a pinch allows.
+		var rule := ParcelFarm.livestock_of(ParcelFarm.rules(), _coop())
+		var lay_at: Vector2 = rule.spots[int(f.farm.drops[0].spot)]
+		_stand(_yard_point(lay_at + (Vector2(3.5, 2.5) - lay_at).normalized() * 1.8), _yard_point(lay_at))
+		scene._zoom = 0.45
+		scene._place_camera()
+		report.closeup = {"start_frame": Engine.get_frames_drawn()}
+		# Recording runs slower than the wall clock, so here the clock follows the frames: the hen gets her real
+		# walk to the spot (she sets off 6.5 s before the egg is due) on the recording.
+		var clock := float(due - 6000)
+		_jump(int(clock) - f.server_now())
+		while f.server_now() < due:
+			await process_frame
+			clock += root.get_process_delta_time() * 1000.0
+			_jump(int(clock) - f.server_now())
+		report.closeup.laid_frame = Engine.get_frames_drawn()
+		for k in 8:
+			await create_timer(0.1).timeout
+			await _shot(id + "-6-laying-%d" % k, false)
+		await create_timer(1.0).timeout
+	else: await create_timer(6.5).timeout
 	report.laid = {"drawn": f.livestock.snapshot()}
 	var egg = f.livestock.drop_position(int(f.farm.drops[0].id))
 	report.egg_at = [egg.x, egg.z] if egg is Vector3 else null
@@ -105,6 +131,7 @@ func _run() -> void:
 		_stand(from, egg)
 		for i in 4: await process_frame
 		var bag_before: int = int(f.farm.bag.get("egg", 0))
+		if report.has("closeup"): report.closeup.walk_frame = Engine.get_frames_drawn()
 		var dir: Vector3 = (egg - from).normalized()
 		var shots := 0
 		for i in 120:
@@ -117,8 +144,11 @@ func _run() -> void:
 		scene._movement = Vector2.ZERO
 		await create_timer(1.2).timeout
 		report.picked = {"eggs": int(f.farm.bag.get("egg", 0)) - bag_before, "drops": f.farm.drops, "gain": f.last_gains}
+		if report.has("closeup"):
+			report.closeup.end_frame = Engine.get_frames_drawn()
+			scene._zoom = 1.0
 		await _shot(id + "-8-in-bag")
-	if args.size() > 3 and args[3] == "tour": await _tour(feeder)
+	if mode == "tour": await _tour(feeder)
 	# A second egg left on the ground, then the scene is closed and opened again: it is still there.
 	_stand(_yard_point(feeder + Vector2(0, 0.75)), _yard_point(feeder))
 	for i in 6: await process_frame
