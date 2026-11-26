@@ -53,6 +53,13 @@ const PAIL_ACTIONS = preload("res://assets/dynamic_farm/watering/bucket_actions.
 const PAIL_LIBRARY := &"pail"
 ## Labour verbs played with the pail -> their action in PAIL_ACTIONS.
 const PAIL_MOTIONS := {"fill": "draw", "water": "pour"}
+## The scene gives up loading (its shade masks and the player's look) after this much time in drawn frames (C-168).
+## Time with no frames does not count: building the scene in _ready (about 19 s under an emulator's software renderer),
+## a lost Android render surface, the app in the background. Counted wall time from _ready, a slow build alone spent it,
+## and Retry, building again, failed at its first frame.
+const LOAD_LIMIT_S := 15.0
+## One frame adds at most this much to the loading time: the first frame after a stall is not seconds of loading.
+const LOAD_FRAME_CAP_S := 0.25
 ## The top bar's second row, the place capsule (two 13 / 12 lines and its 4 + 4): what it is drawn at, give or take.
 const PLACE_ROW_H := 36.0
 
@@ -97,6 +104,8 @@ var _suspended := false
 var _focused := true
 var _overview := false
 var _started_ms := 0
+## Loading time so far in drawn frames (LOAD_LIMIT_S).
+var _loading_s := 0.0
 var _clip := ""
 var _summary := {}
 var _hint: Label
@@ -471,7 +480,7 @@ func _process(delta: float) -> void:
 			# Only once the scene is up: building it stalls the main thread for seconds, and an
 			# HTTP request started during that stall times out (V-123).
 			if _farming != null: _farming.enter()
-		elif Time.get_ticks_msec() - _started_ms > 15000:
+		elif loading_timed_out(delta):
 			_fail("The farm preview could not finish loading.")
 		return
 	if not _focused or _placement != null: return
@@ -519,6 +528,11 @@ func _process(delta: float) -> void:
 		_focus += CameraRules.follow_shift(_camera,_actor.position,safe)
 		if input.is_zero_approx() and _route.is_empty(): _focus = _focus.lerp(_actor.position,minf(dt*2.8,1.0))
 		_place_camera()
+
+## Adds one drawn frame (at most LOAD_FRAME_CAP_S of it) to the loading time; true once it passes LOAD_LIMIT_S.
+func loading_timed_out(delta: float) -> bool:
+	_loading_s += clampf(delta, 0.0, LOAD_FRAME_CAP_S)
+	return _loading_s > LOAD_LIMIT_S
 
 ## The Energy card's Rest tile (`Show home`, C-148): the camera turns to the cottage and stays there until the
 ## player moves; it never walks the player there or rests for them (LOCK-09: tiles only guide).

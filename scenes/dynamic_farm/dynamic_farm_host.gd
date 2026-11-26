@@ -24,7 +24,52 @@ func setup(args:Dictionary) -> void:
 func _ready() -> void:
 	get_viewport().transparent_bg=false
 	_build_hud()
-	_open_view()
+	_retry.hide() # Loading while the surface settles: Retry only after an error.
+	if await _surface_settled():_open_view()
+
+## C-168: as this scene is pushed the map asks Android for an opaque Godot surface (dynamic_farm_map._suspend_map), and
+## Android replaces the surface on its UI thread. The parcel is built in one long frame (seconds under an emulator's
+## software renderer); replaced during it, the render thread presents to the old surface (EGL_BAD_SURFACE) and Godot
+## draws nothing more until the app is backgrounded. So the first build waits until the map plugin reports the surface
+## opaque (at most SURFACE_WAIT_MS), then SURFACE_SETTLE_FRAMES drawn frames: the render thread is on the new surface.
+## Without the plugin (desktop, tests) it builds at once. False when Back left meanwhile.
+const MAP_PLUGIN:="GodotMap"
+const RGBX_8888:=2 # android.graphics.PixelFormat: the map plugin's opaque format
+const SURFACE_WAIT_MS:=1500
+const SURFACE_SETTLE_FRAMES:=2
+## Frames waited for the surface on the last open (tests).
+var surface_wait_frames:=0
+func _surface_settled() -> bool:
+	surface_wait_frames=0
+	if not Engine.has_singleton(MAP_PLUGIN):return true
+	var plugin:=Engine.get_singleton(MAP_PLUGIN)
+	if not is_instance_valid(plugin) or not _plugin_has(plugin,"getMapVisibilityState"):return true
+	var started:=Time.get_ticks_msec()
+	# getMapVisibilityState returns the UI thread's last snapshot and asks for a new one: a stale one is not opaque yet.
+	while Time.get_ticks_msec()-started<SURFACE_WAIT_MS and not surface_is_opaque(str(plugin.getMapVisibilityState())):
+		if not await _drawn_frame():return false
+	for frame in SURFACE_SETTLE_FRAMES:
+		if not await _drawn_frame():return false
+	return true
+
+## Android singletons are JavaObject wrappers: Object.has_method sees only the wrapper (MapBridgeAndroid._supports).
+static func _plugin_has(plugin:Object,method:String) -> bool:
+	if plugin.has_method("has_java_method"):return plugin.has_java_method(method)
+	return plugin.has_method(method)
+
+## One frame drawn (AppRouter._render_frame); false when Back left meanwhile.
+func _drawn_frame() -> bool:
+	await get_tree().process_frame
+	if DisplayServer.get_name()!="headless":await RenderingServer.frame_post_draw
+	surface_wait_frames+=1
+	return not _leaving and is_inside_tree()
+
+## The plugin's cached state (getMapVisibilityState): the opaque mode asked for, and the surface Android has made in it.
+static func surface_is_opaque(state_json:String) -> bool:
+	var state=JSON.parse_string(state_json)
+	if not state is Dictionary or not state.has("godot_surface_mode"):return true # an older plugin: nothing to wait for
+	return int(state.godot_surface_mode)&1==1 and int(state.get("godot_requested_format",0))==RGBX_8888 \
+		and int(state.get("godot_observed_format",0))==RGBX_8888
 func _build_hud() -> void:
 	_hud=CanvasLayer.new();_hud.layer=30;add_child(_hud)
 	var root:=Control.new();root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT);root.mouse_filter=Control.MOUSE_FILTER_IGNORE;_hud.add_child(root)
