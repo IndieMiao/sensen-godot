@@ -35,10 +35,12 @@ export interface BuildingRule {
  * 掉在地上，人走近拾取（pick_up）。每只动物同时只等一个产物；这栋建筑地上的产物（含还没产出的）到 max_ground 就不能再喂。
  * spots 是落点，按建筑未转向的自身坐标（[x, z]，单位为格，原点在占地后左角，x 向右，z 向入口），服务端只用它的个数，
  * 位置给客户端画；落点数不少于 max_ground。牛奶、羊毛等以后的产物同样按这份配置，换物品不改代码。
+ * feed_amount（C-181 牛棚，可选，默认 1）：喂一次扣几个 feed（牛：2 根胡萝卜），体力仍是 energy.costs.feed，一次仍只产一份。
  */
 export interface LivestockRule {
   animals: string[];
   feed: string;
+  feed_amount?: number;
   product: string;
   amount: number;
   produce_seconds: number;
@@ -62,8 +64,11 @@ export interface FarmLevelRule {
   buildings?: Record<string, number>;
   gift?: Record<string, number>;
 }
-/** 一次性领取的蓝图：卖成功过至少 min_sales 次后可领，只发一次。 */
-export interface BlueprintRule { item: string; amount: number; min_sales: number }
+/**
+ * 一次性领取的蓝图：卖成功过至少 min_sales 次后可领，只发一次。
+ * coins（C-181，可选，默认 0）：领的时候要花的金币，即在 Scott 处花金币买（牛棚 150，羊圈以后照用）；金币不够整批拒绝。
+ */
+export interface BlueprintRule { item: string; amount: number; min_sales: number; coins?: number }
 export interface EconomyRules {
   /** 能卖的物品与单价（金币）；不在表里的不能卖。 */
   sell_prices: Record<string, number>;
@@ -167,11 +172,12 @@ export function parseParcelRules(raw: unknown): ParcelRules {
   return r;
 }
 
-/** 养殖规则的边界：1–16 只动物，产出 1–99 个、1 秒–7 天，地上 1–64 个，落点不少于地上上限、都在未转向的占地里。 */
+/** 养殖规则的边界：1–16 只动物，喂一次 1–99 个饲料（不写为 1），产出 1–99 个、1 秒–7 天，地上 1–64 个，落点不少于地上上限、都在未转向的占地里。 */
 function parseLivestock(l: LivestockRule, b: BuildingRule, fail: (what: string) => never, at: string): void {
   if (!l || typeof l !== 'object' || !Array.isArray(l.animals) || l.animals.length < 1 || l.animals.length > MAX_ANIMALS
     || !l.animals.every(isId) || !isId(l.feed) || !isId(l.product) || !count(l.amount, 1, 99)
-    || !count(l.produce_seconds, 1, 7 * 24 * 3600) || !count(l.max_ground, 1, MAX_GROUND_DROPS)) fail(`${at} 不对`);
+    || !count(l.produce_seconds, 1, 7 * 24 * 3600) || !count(l.max_ground, 1, MAX_GROUND_DROPS)
+    || (l.feed_amount !== undefined && !count(l.feed_amount, 1, 99))) fail(`${at} 不对`);
   if (!Array.isArray(l.spots) || l.spots.length < l.max_ground || l.spots.length > MAX_GROUND_DROPS * 4) fail(`${at}.spots 个数不对`);
   for (const p of l.spots)
     if (!Array.isArray(p) || p.length !== 2 || !p.every(v => typeof v === 'number' && Number.isFinite(v))
@@ -203,7 +209,7 @@ function parseFarmLevels(r: ParcelRules, fail: (what: string) => never): void {
   }
 }
 
-/** 价格、采集、蓝图条件的边界：卖出和买入单价 1–100000，刷新 1 秒–30 天，每次 1–99 个，模型名不跨类重复。 */
+/** 价格、采集、蓝图条件的边界：卖出和买入单价 1–100000，蓝图售价 0–100000（不写为 0），刷新 1 秒–30 天，每次 1–99 个，模型名不跨类重复。 */
 function parseEconomy(e: EconomyRules | undefined, fail: (what: string) => never): void {
   if (!e || typeof e !== 'object') fail('economy 缺失');
   const isMap = (v: unknown): v is Record<string, unknown> => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
@@ -227,7 +233,8 @@ function parseEconomy(e: EconomyRules | undefined, fail: (what: string) => never
   }
   if (!isMap(e!.blueprints)) fail('economy.blueprints 缺失');
   for (const [id, b] of Object.entries(e!.blueprints))
-    if (!isId(id) || !isMap(b) || !isId(b.item) || !count(b.amount, 1, 99) || !count(b.min_sales, 0, 1000)) fail(`economy.blueprints.${id} 不对`);
+    if (!isId(id) || !isMap(b) || !isId(b.item) || !count(b.amount, 1, 99) || !count(b.min_sales, 0, 1000)
+      || (b.coins !== undefined && !count(b.coins, 0, 100_000))) fail(`economy.blueprints.${id} 不对`);
 }
 
 /** 从 level 级升到下一级的规则；已经是配置里最高一级时为 null。 */

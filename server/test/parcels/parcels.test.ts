@@ -426,8 +426,8 @@ for (const [name, enabled, makeStores] of makers) {
       // C-150 place_building: the shape is checked (400), an unknown type or a second cottage is refused (422) and changes nothing.
       expect((await command(app, ada, 5, [{ type: 'place_building', building: 'cottage', x: 1, y: 1, rotation: 4 }])).statusCode).toBe(400);
       expect((await command(app, ada, 5, [{ type: 'place_building', x: 1, y: 1 }])).statusCode).toBe(400);
-      expect((await command(app, ada, 5, [{ type: 'place_building', building: 'barn', x: 30, y: 30 }])).json())
-        .toMatchObject({ code: 'UNKNOWN_BUILDING', index: 0, detail: { building: 'barn' }, parcel: { farm_version: 5 } });
+      expect((await command(app, ada, 5, [{ type: 'place_building', building: 'silo', x: 30, y: 30 }])).json())
+        .toMatchObject({ code: 'UNKNOWN_BUILDING', index: 0, detail: { building: 'silo' }, parcel: { farm_version: 5 } });
       expect((await command(app, ada, 5, [{ type: 'place_building', building: 'cottage', x: 30, y: 30 }])).json())
         .toMatchObject({ code: 'BUILDING_LIMIT', detail: { building: 'cottage', max: 1 }, parcel: { farm_version: 5 } });
       // C-151 draw_water and water: the shape is checked (400); the server's own refusals keep the save.
@@ -604,6 +604,44 @@ for (const [name, enabled, makeStores] of makers) {
       expect((await command(app, ada, after.farm_version, [{ type: 'pick_up', drop: 1 }])).json()).toMatchObject({ code: 'NO_DROP' });
       const sold = await command(app, ada, after.farm_version, [{ type: 'sell', item: 'egg', count: 1 }]);
       expect(sold.json().parcel.farm).toMatchObject({ coins: 32, sales: 2 });
+    });
+
+    it('C-181 barn over HTTP: the blueprint bought with coins, built with materials, two carrots give one milk that stays through re-entry and is picked once', async () => {
+      // The shipped numbers (150 coins, 20 Timber + 10 Stone) are farm.test.ts's; here only the price and materials are scaled down to
+      // what a fresh farm reaches over HTTP: the blueprint 2 coins (one Timber sold), 1 Timber to build. Feed (2 carrots) and timing are the shipped ones.
+      const cheap = structuredClone(rules);
+      cheap.economy.blueprints.barn.coins = 2;
+      cheap.buildings.barn.materials = { wood: 1 };
+      const barnApp = await appFor(stores, { rules: cheap });
+      try {
+        const ada = await account(barnApp, 'Ada');
+        let v = await withCarrots(barnApp, ada, A);
+        const tree = (y: number) => `${A.parcel_id}:outer-groves-v2:wild_pz_tree_20:41,${y}:0`;
+        const poor = await command(barnApp, ada, v, [{ type: 'claim_blueprint', blueprint: 'barn' }]);
+        expect(poor.statusCode).toBe(422);
+        expect(poor.json()).toMatchObject({ code: 'NOT_ENOUGH_COINS', detail: { coins: 0, need: 2 }, parcel: { farm_version: v } });
+        const built = await command(barnApp, ada, v, [{ type: 'gather', object: tree(7) }, { type: 'gather', object: tree(8) },
+          { type: 'sell', item: 'wood', count: 1 }, { type: 'claim_blueprint', blueprint: 'barn' },
+          { type: 'place_building', building: 'barn', x: 22, y: 22, rotation: 1 }, { type: 'feed', building: 2 }]);
+        expect(built.statusCode).toBe(200);
+        const givenAt = T0 + 60_000 + 900_000;
+        expect(built.json().parcel.farm).toMatchObject({ coins: 0, blueprints_claimed: { barn: T0 + 60_000 }, drop_seq: 1,
+          buildings: [{ type: 'well' }, { id: 2, type: 'barn', width: 8, depth: 6, rotation: 1, animals: ['cow', 'cow'] }],
+          drops: [{ id: 1, item: 'milk', amount: 1, building: 2, animal: 0, ready_at: givenAt }] });
+        expect(built.json().parcel.farm.bag).toEqual({ hoe_starter: 1, seed_carrot: 1, blueprint_cottage: 1, pail: 1 });
+        v += 1;
+        expect((await command(barnApp, ada, v, [{ type: 'feed', building: 2 }])).json()).toMatchObject({ code: 'NO_FEED', parcel: { farm_version: v } });
+        expect((await command(barnApp, ada, v, [{ type: 'claim_blueprint', blueprint: 'barn' }])).json()).toMatchObject({ code: 'BLUEPRINT_CLAIMED' });
+        clock = givenAt + 3_600_000;
+        expect((await mine(barnApp, ada)).farm.drops).toEqual(built.json().parcel.farm.drops);
+        expect((await enter(barnApp, ada)).json().parcel.farm.drops).toHaveLength(1);
+        const results = await Promise.all(Array.from({ length: 8 }, () => command(barnApp, ada, v, [{ type: 'pick_up', drop: 1 }])));
+        expect(results.filter(r => r.statusCode === 200)).toHaveLength(1);
+        const after = await mine(barnApp, ada);
+        expect(after.farm).toMatchObject({ bag: { milk: 1 }, drops: [] });
+        expect((await command(barnApp, ada, after.farm_version, [{ type: 'pick_up', drop: 1 }])).json()).toMatchObject({ code: 'NO_DROP' });
+        expect((await command(barnApp, ada, after.farm_version, [{ type: 'sell', item: 'milk', count: 1 }])).json().parcel.farm).toMatchObject({ coins: 45 });
+      } finally { await barnApp.close(); }
     });
 
     it('“abandon and pick again” is refused under the production configuration and leaves the parcel', async () => {

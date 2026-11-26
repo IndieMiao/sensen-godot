@@ -36,6 +36,10 @@
  * 材料或金币不够整批拒绝，存档不变。每级体力上限 +energy.per_level；某一级写了 buildings 的，从这一级起那类建筑能多盖
  * （井：3 级 2 口、5 级 3 口），送的 gift（井的蓝图）升级时进背包。不限制开垦格数（所有者 SEN-C-137#10）。
  * 等级存在 level，也是在 v1 上追加的字段：旧存档没有时按 1 级。换数据集不动等级。
+ *
+ * 牛棚（C-181，0.4.6）：照鸡场，是又一类养殖建筑（barn），盖的时候除蓝图外扣 materials（木材、石头）；喂一次扣 livestock.feed_amount
+ * 个饲料（2 根胡萝卜），一次仍只产一份（牛奶）。牛棚蓝图在 Scott 处花金币买：economy.blueprints 里带 coins 的蓝图，claim_blueprint
+ * 时扣这么多金币，不够整批拒绝（NOT_ENOUGH_COINS），只能买一次（同 blueprints_claimed）。不加存档字段，版本号不变。
  */
 import { dayKey, energyCost, maxEnergy, nextRollover, nextTickIn, settleEnergy, spendEnergy, type EnergyState } from './energy.js';
 import { buildingMax, gatherSourceOf, HOME_BUILDING, MAX_BUILDINGS, nextFarmLevel, type ParcelRules } from './rules.js';
@@ -251,10 +255,10 @@ export function rebaseFarm(rules: ParcelRules, state: ParcelFarmState, now: numb
   }
   for (const d of s.drops) {
     const b = s.buildings.find(x => x.id === d.building);
-    const feed = b && Object.hasOwn(rules.buildings, b.type) ? rules.buildings[b.type].livestock?.feed : undefined;
-    // 已经下了的照样归玩家；没下的退饲料（规则里已没有这类建筑就不知道退什么，不退）。
-    if (d.ready_at <= now || feed === undefined) s.bag[d.item] = (s.bag[d.item] ?? 0) + d.amount;
-    else s.bag[feed] = (s.bag[feed] ?? 0) + 1;
+    const rule = b && Object.hasOwn(rules.buildings, b.type) ? rules.buildings[b.type].livestock : undefined;
+    // 已经下了的照样归玩家；没下的退喂它的饲料（C-181：喂一次几个就退几个；规则里已没有这类建筑就不知道退什么，不退）。
+    if (d.ready_at <= now || rule === undefined) s.bag[d.item] = (s.bag[d.item] ?? 0) + d.amount;
+    else s.bag[rule.feed] = (s.bag[rule.feed] ?? 0) + (rule.feed_amount ?? 1);
   }
   s.drops = [];
   s.buildings = [];
@@ -549,6 +553,10 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         if (!rule) return fail('UNKNOWN_BLUEPRINT');
         if (Object.hasOwn(s.blueprints_claimed, c.blueprint)) return fail('BLUEPRINT_CLAIMED');
         if (s.sales < rule.min_sales) return fail('CONDITION_NOT_MET', { sales: s.sales, min_sales: rule.min_sales });
+        // C-181：带售价的蓝图（牛棚）要花金币买；单价只看服务端配置。
+        const price = rule.coins ?? 0;
+        if (s.coins < price) return fail('NOT_ENOUGH_COINS', { coins: s.coins, need: price });
+        s.coins -= price;
         s.blueprints_claimed[c.blueprint] = now;
         s.bag[rule.item] = (s.bag[rule.item] ?? 0) + rule.amount;
         break;
@@ -571,14 +579,16 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         if (!b) return fail('NO_BUILDING', { building: c.building });
         const rule = Object.hasOwn(rules.buildings, b.type) ? rules.buildings[b.type].livestock : undefined;
         if (!rule || !b.animals?.length) return fail('NOT_LIVESTOCK', { building: c.building });
-        if (!(s.bag[rule.feed] > 0)) return fail('NO_FEED', { item: rule.feed });
+        // C-181：喂一次 feed_amount 个（牛 2 根胡萝卜，鸡 1 根）。
+        const portion = rule.feed_amount ?? 1;
+        if ((s.bag[rule.feed] ?? 0) < portion) return fail('NO_FEED', { item: rule.feed });
         const mine = s.drops.filter(d => d.building === b.id);
         if (mine.length >= rule.max_ground) return fail('GROUND_FULL', { max: rule.max_ground });
         const waiting = new Set(mine.filter(d => d.ready_at > now).map(d => d.animal));
         const animal = b.animals.findIndex((_, i) => !waiting.has(i));
         if (animal < 0) return fail('ANIMALS_FED', { next_at: Math.min(...mine.filter(d => d.ready_at > now).map(d => d.ready_at)) });
         if ((refused = pay())) return refused;
-        take(s.bag, rule.feed, 1);
+        take(s.bag, rule.feed, portion);
         const id = ++s.drop_seq;
         s.drops.push({ id, item: rule.product, amount: rule.amount, building: b.id, animal, spot: freeSpot(rule.spots.length, mine, id),
           ready_at: now + rule.produce_seconds * 1000 });
