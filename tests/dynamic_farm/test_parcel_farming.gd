@@ -401,14 +401,16 @@ func _guide() -> void:
 	var materials: Dictionary = state.duplicate(true)
 	var price: Dictionary = ParcelFarm.next_level(rules, 1)
 	for item: String in price.items: materials.bag[item] = int(price.items[item])
-	# C-175#51: the materials gathered but coins short -> sell the carrots and eggs in the bag, else grow and collect some.
+	# C-175#51: the materials gathered but coins short -> sell the carrots and eggs in the bag, else grow carrots (C-175#79: no eggs yet then).
 	materials.coins = int(price.coins) - 5
 	materials.bag.crop_carrot = 1
 	_check(Guide.step(materials, now) == "sell_for_coins" and Guide.stage(materials, now) == "upgrade",
 		"guide: Timber and Stone but 5 coins short, a carrot in the bag -> sell it at Washington Square")
+	_check(Guide.TIPS.sell_for_coins == "Need more coins to upgrade. Sell carrots and eggs at Washington Square.", "guide: the card's sell-for-coins line (C-175#79): " + Guide.TIPS.sell_for_coins)
 	materials.bag.erase("crop_carrot")
 	materials.bag.erase("egg")
-	_check(Guide.step(materials, now) == "earn_coins", "guide: coins short and nothing to sell -> grow carrots or collect eggs")
+	_check(Guide.step(materials, now) == "earn_coins", "guide: coins short and nothing to sell -> grow carrots")
+	_check(Guide.TIPS.earn_coins == "Need more coins to upgrade. Grow carrots to sell.", "guide: the card's earn-coins line (C-175#79): " + Guide.TIPS.earn_coins)
 	materials.coins = int(price.coins)
 	_check(Guide.step(materials, now) == "upgrade", "guide: Timber and Stone for Lv2 -> Scott's upgrade")
 	var upgraded := ParcelFarm.apply(rules, materials, [{"type": "upgrade_farm"}], now)

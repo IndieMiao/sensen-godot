@@ -41,8 +41,8 @@ const TIPS := {
 	"sell_egg": "Head back to the map and tap Washington Square to sell your egg.",
 	"gather_upgrade": "Gather Timber from trees and Stone from rocks for your farm upgrade.",
 	"upgrade": "Head back to the map and tap Washington Square. Scott upgrades your farm.",
-	"sell_for_coins": "Need more coins for the upgrade. Sell carrots and eggs at Washington Square.",
-	"earn_coins": "Need more coins for the upgrade. Grow carrots or collect eggs to sell.",
+	"sell_for_coins": "Need more coins to upgrade. Sell carrots and eggs at Washington Square.",
+	"earn_coins": "Need more coins to upgrade. Grow carrots to sell.",
 }
 ## The map's line for the steps done off the parcel (and gathering, done back on it).
 const MAP_TIPS := {
@@ -52,8 +52,8 @@ const MAP_TIPS := {
 	"sell_egg": "Tap Washington Square to sell your egg.",
 	"gather_upgrade": "Enter my farm and gather Timber and Stone.",
 	"upgrade": "Tap Washington Square to upgrade your farm.",
-	"sell_for_coins": "Tap Washington Square to sell carrots and eggs for coins.",
-	"earn_coins": "Enter my farm and grow carrots or collect eggs to sell.",
+	"sell_for_coins": "Tap Washington Square to sell carrots and eggs.",
+	"earn_coins": "Enter my farm and grow carrots to sell.",
 }
 
 ## The step to teach for `farm` (ParcelFarm.normalize) at server time `now_ms`: a TIPS key, or "".
