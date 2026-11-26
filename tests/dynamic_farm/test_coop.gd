@@ -299,6 +299,8 @@ func _keep_clear() -> void:
 ## On a real parcel: every coop spot in all four turns keeps its entry and rear row in the core and off solid
 ## obstacles; with the coop standing, every cottage the placement accepts near the entry leaves its floor reachable
 ## from spawn by the real walker.
+## p-5402049 (r4 only, a 267×3 core; not in r8) has no coop spot, so it reports spots=0 and checks nothing more;
+## that is expected (C-193). Whether the current parcels hold the coop is test_building_fit.gd's.
 func _keep_clear_parcel(raw: Dictionary) -> void:
 	var data := Data.decode(raw)
 	if not data.ok: return
