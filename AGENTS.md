@@ -5,7 +5,7 @@
   interactions and P0/P1/P2/P3 scope, including its latest review amendments.
   Figma (current game UI): page "14 · UI semantic refactor"
   https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-4
-  （R1 修订中，锁定项以 SGODOT-197 为准）. The former Prototype page
+  （R1 修订中，锁定项以 docs/governance/locked-components.md 为准）. The former Prototype page
   (node-id=5-3) is Archive，截至 2026-10-06.
   Use `docs/README.md` and `docs/design/README.md` to find current documents.
   Older entries below are dated implementation/release evidence, not competing
@@ -14,22 +14,23 @@
   Keep technical constraints and current data-preservation rules when relevant;
   design cleanup does not itself authorize a release, migration or save reset.
 
-- Locked UI decisions adopted on 2026-10-07: before changing any UI design,
-  Figma component, generator script or UI implementation, read Plane card
-  SGODOT-197 "拍板组件清单 Locked Components". Locked items keep their structure,
+- Locked UI decisions adopted on 2026-10-07 (moved into the repository on
+  2026-11-27, SEN-C-194): before changing any UI design, Figma component,
+  generator script or UI implementation, read
+  `docs/governance/locked-components.md` (LOCK-01–34 and HOME-PICK v2, the
+  current version of each item with its source). It replaces Plane card
+  SGODOT-197, which is frozen and kept only as history in
+  `docs/governance/plane-SGODOT-197/`. Locked items keep their structure,
   semantic role, primary action, visual weight, entry point and key copy;
   refactors may only unify tokens (colors, type sizes, radius, spacing, touch
-  targets, copy format). Changing a locked attribute requires an explicit user
-  decision recorded as a 复议 comment on that card and in gameplay-plan-v2 §1.5;
-  never "normalize" a locked component silently. Treat unapproved deviations as
-  P0 regressions. Locked items: Energy card, NEED-TILE (gaps on buttons), main
-  action key, action radial, quick bar, pin state, two-row HUD and location
-  chip, tap-triggered facilities, no auto-jumps, STATE-ICONS, bag drawer,
-  Bag | Gear, parcels and Inbox tabs, counter + bag drawer, outpost keeper
-  greeting and keeper bar, unattended Homestead Stall, resident dialogue bar,
-  one space per outpost role, cooking panel v5, per-floor mine costs and labels,
-  full-screen Profile, English-only UI copy, P0 reuse of old art and feel.
-  Unless explicitly specified, do not reference the Figma Legacy page (formerly
+  targets, copy format). A card that touches a locked component writes its
+  scope on that card before work starts (which items, reuse or change, which
+  locked attributes stay). Changing a locked attribute requires an explicit
+  owner decision (复议) on that card; PM records the conclusion with its
+  decision id in `docs/governance/locked-components.md` (and in
+  gameplay-plan-v2 §1.5), not on Plane. Never "normalize" a locked component
+  silently. Treat unapproved deviations as P0 regressions. Unless explicitly
+  specified, do not reference the Figma Legacy page (formerly
   "Approved / App UI") and keep to portrait only (multi-size adaptation is
   postponed).
 
