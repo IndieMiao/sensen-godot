@@ -766,6 +766,32 @@ for (const [name, enabled, makeStores] of makers) {
         expect(none.json()).toMatchObject({ enabled: false, zone: null });
       } finally { await zoned.close(); }
     });
+
+    it('C-191 the board the read shows is the one the commands find; a delivery pays, refills the slot and is saved', async () => {
+      const ada = await account(app, 'Ada');
+      const version = await withCarrots(app, ada, A);
+      // Read twice with no command between: the same two requests, drawn at the first entry (T0), not at the read.
+      const first = (await mine(app, ada)).farm.board;
+      clock = T0 + 3_600_000;
+      const read = await mine(app, ada);
+      expect(read.farm.board).toEqual(first);
+      expect(first.slots.map((sl: { req: { id: number; drawn_at: number } }) => [sl.req.id, sl.req.drawn_at])).toEqual([[1, T0], [2, T0]]);
+      // At T0 the first entry draws 2 carrots (slot 1) and 3 timber (slot 2), as request_cases.json's first case.
+      expect(first.slots.map((sl: { req: { item: string; qty: number } }) => [sl.req.item, sl.req.qty])).toEqual([['crop_carrot', 2], ['wood', 3]]);
+      // No timber yet: refused, the save and its version unchanged.
+      const short = await command(app, ada, version, [{ type: 'deliver_request', request: 2 }]);
+      expect(short.statusCode).toBe(422);
+      expect(short.json()).toMatchObject({ code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 3 }, parcel: { farm_version: version } });
+      const res = await command(app, ada, version, [{ type: 'deliver_request', request: 1 }]);
+      expect(res.statusCode).toBe(200);
+      const farm = res.json().parcel.farm;
+      expect(farm.coins).toBe(2 * 9 + 10);
+      expect(farm.bag.crop_carrot).toBeUndefined();
+      expect(farm.requests_done).toBe(1);
+      expect(farm.board.slots[0].req).toMatchObject({ id: 3, drawn_at: T0 + 3_600_000, status: 'open' });
+      expect(farm.board.slots[1].req).toEqual(first.slots[1].req);
+      expect((await mine(app, ada)).farm).toEqual(farm);
+    });
   });
 }
 
