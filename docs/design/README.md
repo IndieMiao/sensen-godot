@@ -2,6 +2,8 @@
 
 玩法、数值、文案和分期以 [玩法方案 v2](../product/gameplay-plan-v2-2026-10-02.md) 为准。当前游戏 UI 设计稿为 [Figma 页面 14 · UI semantic refactor](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-4)，file key `5SVgfevrLzZXqD83uyPgmV`，page `5:4`（R1 修订中，锁定项以 [锁定组件清单](../governance/locked-components.md) 为准）；旧 [Figma · Prototype](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-3)（page `5:3`）为 Archive，截至 2026-10-06。
 
+玩法方向以 [V4.2 第一步](../product/gameplay-v4.2-step1-2026-11-15.md) 为准，[V4.1](../product/gameplay-v4.1-2026-11-10.md) 保留作历史（依据 [v4q(14)](../product/gameplay-v4-q-2026-11-02.md)：按其第三节分组覆盖，未受影响的已批规则继续有效）。
+
 ## 当前 UI 与 P0 美术
 
 - [Art environment setup](art-environment-setup.md): start here on a fresh host; toolchain, Git access, Figma MCP, Windows/remote OAuth callbacks, Lark CLI application/user authorization and readiness checks.
