@@ -316,11 +316,18 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	page._render()
 	check(page._message.text == page.PICK_HOME, "a save of another parcel says nothing about this home")
 	page._farm_parcel = home
+	# C-175: past the first sale, 0.4.5's steps (the coop, its egg, Scott's upgrade); those done on the parcel say PICK_HOME.
+	var coop := {"id": 2, "type": "coop", "model": "chicken_yard", "x": 20, "y": 20, "width": 7, "depth": 5, "rotation": 0, "built_at": 1}
+	var claimed := {"sales": 1, "bag": {}, "blueprints_claimed": {"coop": 1}}
 	var lines := [[{}, "Tap Washington Square to sell your carrot."],
-		[{"sales": 1, "bag": {}}, "Enter my farm and gather from trees, flowers and rocks."],
-		[{"sales": 1, "bag": {"wood": 2}, "gathered": {"x": 1}}, "Tap Washington Square to sell what you gathered."],
-		[{"sales": 2, "bag": {}, "gathered": {"x": 1}}, "Tap Washington Square to get your coop blueprint."],
-		[{"sales": 2, "bag": {}, "gathered": {"x": 1}, "blueprints_claimed": {"coop": 1}}, page.PICK_HOME]]
+		[{"sales": 1, "bag": {}}, "Tap Washington Square to get your coop blueprint."],
+		[claimed.merged({"bag": {"blueprint_coop": 1}}, true), page.PICK_HOME],
+		[claimed.merged({"buildings": [coop]}, true), "Tap Washington Square to buy Carrot Seeds."],
+		[claimed.merged({"buildings": [coop], "bag": {"crop_carrot": 1}}, true), page.PICK_HOME],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"egg": 1}}, true), "Tap Washington Square to sell your egg."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1}, true), "Enter my farm and gather Timber and Stone."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4}}, true), "Tap Washington Square to upgrade your farm."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "level": 2}, true), page.PICK_HOME]]
 	for row: Array in lines:
 		var save: Dictionary = carrot.duplicate(true)
 		save.merge(row[0], true)

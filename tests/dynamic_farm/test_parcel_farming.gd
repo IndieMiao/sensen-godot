@@ -299,8 +299,8 @@ func _store() -> void:
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
 	DirAccess.remove_absolute(dir)
 
-## C-35 / C-61: the guide's step follows the save alone: cottage, till, sow, harvest, sell, gather, sell again, the
-## coop blueprint, then nothing.
+## C-35 / C-61 / C-175: the guide's step follows the save alone: cottage, till, sow, the well and water, harvest, sell,
+## the coop blueprint, the coop, a hen fed, the egg sold, the farm upgraded, then nothing.
 func _guide() -> void:
 	var rules := ParcelFarm.rules()
 	_check(Guide.step({}, T0) == "", "guide: nothing before the save is read")
@@ -314,7 +314,7 @@ func _guide() -> void:
 		[{"type": "till", "cell": "10,10"}, "sow"],
 		[{"type": "sow", "cell": "10,10", "crop": "crop_carrot"}, "well"],
 		[{"type": "place_building", "building": "well", "x": 30, "y": 30, "rotation": 0}, "water"],
-		[{"type": "draw_water", "building": 2}, "water"],
+		[{"type": "draw_water", "building": 2}, "water_pail"],
 		[{"type": "water", "cell": "10,10"}, ""]]
 	for pair: Array in steps:
 		var result := ParcelFarm.apply(rules, state, [pair[0]], T0)
@@ -334,7 +334,10 @@ func _guide() -> void:
 	veteran.bag.blueprint_well = 1
 	_check(Guide.step(veteran, T0) == "well", "guide: a veteran farm with a dry carrot -> Build Well")
 	veteran.buildings = state.buildings.duplicate(true)
-	_check(Guide.step(veteran, T0) == "water", "guide: a veteran farm with a well and a dry carrot -> water")
+	veteran.pail_water = 0
+	_check(Guide.step(veteran, T0) == "water", "guide: a veteran farm with a well, an empty pail and a dry carrot -> water")
+	veteran.pail_water = 1
+	_check(Guide.step(veteran, T0) == "water_pail", "guide: the same with water in the pail -> just Water")
 	veteran.crops["10,10"].watered_at = T0
 	veteran.crops["10,10"].ripe_at = T0 + 60000
 	_check(Guide.step(veteran, T0) == "", "guide: watered, the veteran farm is quiet again")
@@ -346,36 +349,82 @@ func _guide() -> void:
 	var harvested := ParcelFarm.apply(rules, state, [{"type": "harvest", "cell": "10,10"}], T0 + 60000)
 	_check(harvested.ok and Guide.step(harvested.state, T0 + 60000) == "sell", "guide: a carrot in the bag -> sell it at the Market (C-61)")
 	if not harvested.ok: return
-	# C-61 (0.4.3): sell the carrot, gather round the yard, sell what was gathered, take the coop blueprint.
+	# C-175: a ripe carrot comes before selling the one in the bag; a pail with water left asks only for Water.
+	var ripe_too: Dictionary = harvested.state.duplicate(true)
+	ripe_too.crops["11,10"] = {"crop": "crop_carrot", "planted_at": T0, "ripe_at": T0, "watered_at": T0 - 60000}
+	_check(Guide.step(ripe_too, T0 + 60000) == "harvest", "guide: a ripe carrot and one in the bag -> Harvest first")
+	var dry_full: Dictionary = mixed.duplicate(true)
+	dry_full.crops.erase("10,10")
+	_check(dry_full.pail_water == 2 and Guide.step(dry_full, T0) == "water_pail", "guide: water left in the pail -> just Water")
+	dry_full.pail_water = 0
+	_check(Guide.step(dry_full, T0) == "water", "guide: an empty pail -> Fill at the well, then Water")
+	# C-175 (0.4.5): past the first sale, Scott's coop blueprint, the coop, a carrot for a hen (sown first when the bag
+	# has none), the egg picked up and sold, Timber and Stone gathered and the farm upgraded at Scott's; then nothing.
 	state = harvested.state
 	var now := T0 + 60000
-	var object := "p-3139010:%s:wild_pz_rock_08:3,4:0" % ParcelGather.rules().recipe_version
-	var chain := [[{"type": "sell", "item": "crop_carrot", "count": 1}, "gather"],
-		[{"type": "gather", "object": object}, "sell_gathered"],
-		[{"type": "sell", "item": "stone", "count": 1}, "blueprint"],
-		[{"type": "claim_blueprint", "blueprint": "coop"}, ""]]
-	for pair: Array in chain:
-		var result := ParcelFarm.apply(rules, state, [pair[0]], now, "p-3139010")
-		_check(result.ok, "guide: %s applies (%s)" % [pair[0].type, result.get("code", "")])
+	var lay: int = rules.buildings.coop.livestock.produce_seconds * 1000
+	var chain := [[{"type": "sell", "item": "crop_carrot", "count": 1}, "blueprint", "blueprint", now],
+		[{"type": "claim_blueprint", "blueprint": "coop"}, "coop", "coop", now],
+		[{"type": "place_building", "building": "coop", "x": 40, "y": 40, "rotation": 0}, "sow", "feed", now],
+		[{"type": "sow", "cell": "10,10", "crop": "crop_carrot"}, "water_pail", "feed", now],
+		[{"type": "water", "cell": "10,10"}, "", "feed", now],
+		[{"type": "harvest", "cell": "10,10"}, "feed", "feed", now + 60000],
+		[{"type": "feed", "building": 3}, "egg", "sell_egg", now + 60000],
+		[{"type": "pick_up", "drop": 1}, "sell_egg", "sell_egg", now + 60000 + lay],
+		[{"type": "sell", "item": "egg", "count": 1}, "gather_upgrade", "upgrade", now + 60000 + lay]]
+	for c: Array in chain:
+		var result := ParcelFarm.apply(rules, state, [c[0]], c[3], "p-3139010")
+		_check(result.ok, "guide: %s applies (%s)" % [c[0].type, result.get("code", "")])
 		if not result.ok: return
 		state = result.state
-		_check(Guide.step(state, now) == pair[1], "guide: after %s -> '%s' (got '%s')" % [pair[0].type, pair[1], Guide.step(state, now)])
-	var gathered_first: Dictionary = harvested.state.duplicate(true)
-	gathered_first.bag.wild_herb = 1
-	_check(Guide.step(gathered_first, now) == "sell", "guide: gathered before the first sale -> still sell at the Market")
-	var carrots_left: Dictionary = harvested.state.duplicate(true)
-	carrots_left.bag.erase("crop_carrot")
-	carrots_left.sales = 1
-	carrots_left.bag.crop_carrot = 1
-	_check(Guide.step(carrots_left, now) == "gather", "guide: carrots left after the first sale -> gather next")
-	var regrown: Dictionary = carrots_left.duplicate(true)
-	regrown.gathered = {object: now}
-	_check(Guide.step(regrown, now) == "blueprint", "guide: gathered and sold -> the Carpenter")
-	for key: String in ["build", "till", "sow", "well", "water", "harvest", "sell", "gather", "sell_gathered", "blueprint"]:
+		_check(Guide.step(state, c[3]) == c[1] and Guide.stage(state, c[3]) == c[2], "guide: after %s -> '%s' / '%s' (got '%s' / '%s')"
+			% [c[0].type, c[1], c[2], Guide.step(state, c[3]), Guide.stage(state, c[3])])
+	now += 60000 + lay
+	var before_coop: Dictionary = harvested.state.duplicate(true)
+	before_coop.sales = 1
+	before_coop.blueprints_claimed = {"coop": now}
+	before_coop.bag.blueprint_coop = 1
+	var placed := ParcelFarm.apply(rules, before_coop, [{"type": "place_building", "building": "coop", "x": 40, "y": 40, "rotation": 0}], now)
+	_check(placed.ok, "guide: the coop goes down beside a carrot in the bag")
+	if not placed.ok: return
+	var fed: Dictionary = placed.state
+	_check(Guide.step(fed, now) == "feed" and Guide.stage(fed, now) == "feed", "guide: a coop and a carrot in the bag -> Feed")
+	var waiting: Dictionary = ParcelFarm.apply(rules, fed, [{"type": "feed", "building": int(fed.buildings.back().id)}], now).state
+	_check(Guide.step(waiting, now + lay - 1) == "egg" and Guide.step(waiting, now + lay) == "egg", "guide: a hen fed -> her egg, laid or not")
+	var no_seeds: Dictionary = fed.duplicate(true)
+	no_seeds.bag.erase("crop_carrot")
+	no_seeds.bag.erase("seed_carrot")
+	_check(Guide.step(no_seeds, now) == "buy_seeds", "guide: no carrot and no seeds for the hens -> buy seeds")
+	no_seeds.tilled.append("12,12")
+	no_seeds.bag.seed_carrot = 1
+	_check(Guide.step(no_seeds, now) == "sow", "guide: seeds and free soil -> Sow")
+	var materials: Dictionary = state.duplicate(true)
+	var price: Dictionary = ParcelFarm.next_level(rules, 1)
+	for item: String in price.items: materials.bag[item] = int(price.items[item])
+	materials.coins = int(price.coins)
+	_check(Guide.step(materials, now) == "upgrade", "guide: Timber and Stone for Lv2 -> Scott's upgrade")
+	var upgraded := ParcelFarm.apply(rules, materials, [{"type": "upgrade_farm"}], now)
+	_check(upgraded.ok and Guide.step(upgraded.state, now) == "" and Guide.stage(upgraded.state, now) == "", "guide: upgraded -> nothing left")
+	var again: Dictionary = upgraded.state.duplicate(true)
+	again.drops = [{"id": 9, "item": "egg", "amount": 1, "building": 3, "animal": 0, "spot": 0, "ready_at": now}]
+	again.drop_seq = 9
+	_check(Guide.stage(again, now) == "", "guide: eggs on an upgraded farm do not bring the egg step back")
+	var early: Dictionary = materials.duplicate(true)
+	early.buildings = early.buildings.filter(func(b): return b.type != "coop")
+	early.bag.blueprint_coop = 1
+	_check(Guide.step(early, now) == "coop", "guide: materials for the upgrade but no coop yet -> the coop first")
+	early.bag.erase("blueprint_coop")
+	_check(Guide.step(early, now) == "" and Guide.stage(early, now) == "coop", "guide: no coop and no blueprint for it -> nothing to teach")
+	var unclaimed: Dictionary = harvested.state.duplicate(true)
+	unclaimed.sales = 1
+	unclaimed.bag.erase("crop_carrot")
+	_check(Guide.step(unclaimed, now) == "blueprint", "guide: sold, the blueprint not taken -> Scott")
+	for key: String in ["build", "till", "sow", "well", "water", "water_pail", "harvest", "sell", "blueprint", "coop", "feed",
+			"buy_seeds", "egg", "sell_egg", "gather_upgrade", "upgrade"]:
 		_check(not Guide.text(key).is_empty(), "guide: copy for " + key)
-	for key: String in ["sell", "gather", "sell_gathered", "blueprint"]:
+	for key: String in ["sell", "blueprint", "buy_seeds", "sell_egg", "gather_upgrade", "upgrade"]:
 		_check(not Guide.map_text(key).is_empty(), "guide: the map's line for " + key)
-	for key: String in ["build", "till", "sow", "well", "water", "harvest", ""]:
+	for key: String in ["build", "till", "sow", "well", "water", "water_pail", "harvest", "coop", "feed", "egg", ""]:
 		_check(Guide.map_text(key).is_empty(), "guide: no map line for '%s' (taught on the parcel)" % key)
 
 ## C-138: a sown carrot goes through stages 1..6 (stage 0 is tilled soil with nothing sown). Sowing to root thickening

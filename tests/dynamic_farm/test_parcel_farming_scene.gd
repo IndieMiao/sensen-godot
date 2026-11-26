@@ -916,7 +916,8 @@ func _level_wells() -> void:
 
 ## C-171 (SEN-C-154#139): standing within FEED_REACH_M of the coop's feeder, a tapped cell with a step to do keeps its key:
 ## the well's Fill (pressed, the pail fills as ever) and a free cell's Till. Untapped, or tapped on a cell with nothing to
-## do (the well with a full pail, the coop's floor), the key is Feed, and the press feeds.
+## do (the well with a full pail, the coop's floor), the key is Feed, and the press feeds. C-175: from afar, the coop's
+## floor tapped offers Feed too, and the press walks up to the feeder first.
 func _feeder_yields_to_tapped_cell() -> void:
 	var data: Dictionary = scene_data()
 	var house_at := _free_block(data)
@@ -1000,6 +1001,29 @@ func _feeder_yields_to_tapped_cell() -> void:
 	while farming.busy and Time.get_ticks_msec() < deadline: await process_frame
 	_check(farming.farm.bag.get("crop_carrot", 0) == 1 and farming.energy_value() == energy - 1 and farming.farm.pail_water == 3,
 		"Feed pressed: a carrot and 1 Energy, the hens fed")
+	# C-175: away from the coop, a tap on its floor offers the nearest feeder's Feed; the press walks up to it and feeds.
+	var away = null
+	for cell: Dictionary in data.cells:
+		var q: Vector3 = scene._walk.point(Vector2i(cell.x, cell.y))
+		if away == null and q.distance_to(stand) > 4.0 and q.distance_to(stand) < 9.0 and not farming.livestock.covers(Vector2i(cell.x, cell.y)) \
+				and scene._walk.clear_position(q) and not scene._paths.route(q, scene._paths.stand_cells([scene._walk.cell_at(stand)])).is_empty():
+			away = q
+	_check(away != null, "a clear spot away from the coop with a way to its feeder")
+	if away != null:
+		scene._walk.position = away
+		scene._actor.position = away
+		farming.picked = null
+		await process_frame
+		await process_frame
+		_check(farming.livestock.feeder_near(away, farming.get_script().FEED_REACH_M).is_empty() and farming._key.verb != "Feed",
+			"away from the coop: no Feed of its own")
+		_check(await _key(farming, floor_cell) == ["Feed", "1 Energy", UiSceneAction.State.DEFAULT], "away, the coop's floor tapped: Feed")
+		energy = farming.energy_value()
+		var seen := await _press(farming, floor_cell)
+		_check(seen.moved > 2.0 and farming.farm.bag.get("crop_carrot", 0) == 0 and farming.energy_value() == energy - 1,
+			"Feed pressed from afar: the player walks up (%.1f m) and feeds" % seen.moved)
+		_check(not farming.livestock.feeder_near(scene._walk.position, farming.get_script().FEED_REACH_M + 0.5).is_empty(),
+			"the walk ends by a feeder")
 	scene.queue_free()
 	await process_frame
 	for name in DirAccess.get_files_at(feed_dir): DirAccess.remove_absolute(feed_dir.path_join(name))

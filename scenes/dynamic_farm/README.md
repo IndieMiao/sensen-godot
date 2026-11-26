@@ -154,6 +154,15 @@ parcel's card says where to go; the map reads the home's save (`GET /parcels/min
 bottom card names the step done off the parcel (`Tap Washington Square to sell your carrot.` … since C-115), with nothing
 selected or added under `Your home`. Copy and screenshots: `docs/plans/C-61.md`.
 
+0.4.5 (C-175, the run-through of 0.4.5's content) replaces C-61's gathering loop after the first sale, since selling
+what was gathered sold the Timber and Stone the farm upgrade needs: sold -> `blueprint`; the coop blueprint in the bag
+-> `coop`; a coop never fed -> `feed` (with no carrot in the bag: `sow` / `till` with seeds, `buy_seeds` without);
+a hen fed or an egg in the bag on a Lv1 farm -> `egg` (laid or not) / `sell_egg`; then `gather_upgrade` until the bag
+holds Lv2's Timber and Stone, `upgrade` (at Scott's) after; nothing once the farm is past Lv1. A ripe carrot asks for
+`harvest` before anything, a dry one with water left in the pail for `water_pail`. `ParcelGuide.stage` is the milestone
+the phone's task rows follow (`ParcelTasks`: GET STARTED, TOWN, YOUR FARM). A tap on the coop's floor offers the
+nearest feeder's Feed and walks there on the press. Copy: `docs/plans/C-175.md`.
+
 ## Washington Square room (C-115)
 
 The owner on C-103#17: no place icons on the map, one fixed 3D space entry in San Francisco, its look and interaction
