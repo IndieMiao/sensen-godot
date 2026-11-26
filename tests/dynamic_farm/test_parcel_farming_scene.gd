@@ -750,7 +750,7 @@ func _placement_turns() -> void:
 	var middle := Building.center(scene._walk, start, Vector2i(3, 3), 2)
 	_check(node != null and node.transform.basis.z.is_equal_approx(Vector3.FORWARD) and node.position.is_equal_approx(middle),
 		"reopened, the cottage stands where and as it was turned")
-	_check(not scene._walk.clear_position(middle) and scene._buildings[1].proxy != null, "its walls still stop the player")
+	_check(not scene._walk.clear_position(middle) and not scene._buildings[1].proxies.is_empty(), "its walls still stop the player")
 	scene.queue_free()
 	await process_frame
 	for name in DirAccess.get_files_at(turn_dir): DirAccess.remove_absolute(turn_dir.path_join(name))
@@ -810,7 +810,7 @@ func _watering_loop() -> void:
 	var built: Dictionary = scene._buildings.get(int(well.id), {})
 	var well_cell := Building.at_of(well)
 	var middle := Building.center(scene._walk, well_cell, Vector2i.ONE)
-	_check(built.get("node") is Node3D and built.node.get_child_count() == 1 and built.get("proxy") != null and not scene._walk.clear_position(middle),
+	_check(built.get("node") is Node3D and built.node.get_child_count() == 1 and not built.get("proxies", []).is_empty() and not scene._walk.clear_position(middle),
 		"the well's model stands and its ring stops the player")
 	_check(not cells.any(func(at): return at == well_cell), "the well keeps off the carrots")
 	_check(await _key(farming, cells[0]) == ["Water", "Pail empty", UiSceneAction.State.UNAVAILABLE], "an empty pail cannot water")

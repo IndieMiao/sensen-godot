@@ -44,7 +44,8 @@ describe('C-148 numbers are P0’s (assets/p0/p0_content.json, server/src/p0/rul
     const carrot = p0.crops.find((c: { id: string }) => c.id === 'crop_carrot');
     expect(rules.crops.crop_carrot.energy).toBe(carrot.energy);
     // C-151: drawing a pail at the well is the “打一桶水 2” of C-137#10 q3, which the owner took as P0's (C-137#15).
-    expect(rules.energy.costs).toEqual({ clear_obstacle: 2, till: 2, gather: 2, draw_water: 2 });
+    // C-154: feeding an animal 1, P0's.
+    expect(rules.energy.costs).toEqual({ clear_obstacle: 2, till: 2, gather: 2, feed: 1, draw_water: 2 });
     expect(maxEnergy(rules, emptyFarm())).toBe(200);
   });
 
@@ -235,7 +236,7 @@ describe('C-148 old saves read at full Energy', () => {
 
   it('moving to a newer dataset keeps Energy and the day’s rest (they are not cell progress)', () => {
     const s = withEnergy(legacy(), 42, T0, '2026-11-23');
-    expect(rebaseFarm(rules, s).energy).toEqual({ value: 42, at: T0, rested_on: '2026-11-23' });
+    expect(rebaseFarm(rules, s, T0).energy).toEqual({ value: 42, at: T0, rested_on: '2026-11-23' });
   });
 });
 

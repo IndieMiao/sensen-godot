@@ -191,7 +191,7 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
       let farm = parcel.farm, dataset = parcel.dataset_version;
       if (want !== undefined && communityOf(deps.rules, want) === parcel.community_id && isNewerDataset(deps.rules, dataset, want)) {
         rebased = { from: dataset, buildings: withEconomy(farm).buildings.length, cleared: farm.cleared.length, tilled: farm.tilled.length, crops: Object.keys(farm.crops).length };
-        farm = rebaseFarm(deps.rules, farm);
+        farm = rebaseFarm(deps.rules, farm, at);
         dataset = want;
       }
       const gifted = welcome(deps.rules, farm, at);

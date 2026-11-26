@@ -18,6 +18,10 @@ extends Node3D
 ## block) until it grows back. Gathering never touches the walk, the layout or collision.
 ## With a body (the scene, C-73) a press first walks the player beside the cell and plays the
 ## main farm's labour clip; the command goes out with the clip and its result lands as it ends.
+## Livestock (C-154, ParcelLivestock): near a coop's feeder the key reads `Feed` (`1 Energy`); a carrot goes in, and
+## the hen lays an egg on the ground `produce_seconds` later. Walking within reach of a laid egg picks it up by
+## itself: it flies into the player and on into the Bag (`+1 Egg`), the server checking each egg is taken once.
+## The coop's own floor is walked, never farmed: its cells show no key.
 ## The in-game phone (C-107, design C-85 ⑧): the top bar's task button drops the guide's steps under the bar (C-T1–T3)
 ## and the phone button at the right opens the phone (Tasks / Inbox / Collection, ParcelPhone); both read the save.
 signal state_changed(farm: Dictionary)
@@ -30,6 +34,11 @@ const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
 const Guide = preload("res://modules/dynamic_farm/parcel_guide.gd")
 const GATHERED_SHADER = preload("res://modules/dynamic_farm/gathered_prop.gdshader")
 const CropArt = preload("res://modules/dynamic_farm/parcel_crop_art.gd")
+const Livestock = preload("res://scenes/dynamic_farm/parcel_livestock.gd")
+const LivestockArt = preload("res://modules/dynamic_farm/farm_livestock.gd")
+## How near a feeder (m, its centre on the ground) the key offers Feed (C-154): the bowl is solid, so the player
+## stands at least ~0.5 m from its centre.
+const FEED_REACH_M := 1.1
 const Tasks = preload("res://modules/dynamic_farm/parcel_tasks.gd")
 const Phone = preload("res://scenes/dynamic_farm/parcel_phone.gd")
 ## Which task the player last saw in the drop-down or the phone, per parcel on this device: a newer one marks the task
@@ -50,7 +59,7 @@ const BAG_ORDER := ["hoe_starter", "pail", "seed_carrot", "crop_carrot"]
 ## the existing set (the HUD's home), no new art.
 ## C-151: `Water` is P0's key (P0Logic, the plot's Water); `Fill` draws the pail at the well (打水, SEN-C-151).
 const VERBS := {"clear": "Clear", "till": "Till", "sow": "Sow", "harvest": "Harvest", "rest": "Rest", "gather": "Gather",
-	"fill": "Fill", "water": "Water"}
+	"feed": "Feed", "fill": "Fill", "water": "Water"}
 ## C-148: Rested today / Energy full are P0's Rest copy (P0Logic.energy_card, rest_state).
 ## C-151: the pail's refusals in the hoe's form (`Need a hoe`): Need a pail / Pail empty / Pail full.
 const REFUSALS := {Space.OUTSIDE: "Not farmland", Space.PATH: "On the path", Space.HOUSE: "House here",
@@ -127,6 +136,10 @@ var _removed := {}
 var _path := {}
 var _clock_offset_ms := 0
 var _crop_art: CropArt
+## C-154: the animals and drops of the parcel's livestock buildings.
+var livestock: Livestock
+## Drop ids whose pick_up is out.
+var _picking := []
 ## Draw tilled soil wet (WET_SOIL_SETTING; probes may set it too).
 var wet_soil_preview := false
 var _marker: MeshInstance3D
@@ -229,6 +242,9 @@ func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: Ref
 	_crop_art = CropArt.new(walk.point, data.cell_m)
 	_crop_art.name = "ParcelCrops"
 	add_child(_crop_art)
+	livestock = Livestock.new()
+	livestock.setup(walk)
+	add_child(livestock)
 	wet_soil_preview = bool(ProjectSettings.get_setting(WET_SOIL_SETTING, false))
 	_build_marker()
 	_build_ui(canvas)
@@ -288,6 +304,10 @@ func update(delta: float, facing_cell: Vector2i, steering: bool, player = null, 
 	if _placed:
 		_player = player
 		_facing = facing
+	# C-154: animals move; a laid drop in reach is picked up by itself (not while another command is out or a mode holds).
+	if livestock != null and not farm.is_empty():
+		var reached: Array = livestock.update(delta, _player, server_now(), busy or held or not _placed or not _picking.is_empty())
+		if not reached.is_empty(): pick_up(reached)
 	_redraw_left -= delta
 	if _redraw_left <= 0.0:
 		_redraw_left = REDRAW_S
@@ -362,6 +382,11 @@ func _refresh_key() -> void:
 		_bar.visible = false
 		return
 	current = {} if farm.is_empty() else Space.action(rules, _data, _path, _obstacles, farm, target, server_now())
+	# C-154: a coop's floor is never farmed (no key there); at its feeder the key feeds.
+	if not farm.is_empty() and livestock != null:
+		if livestock.covers(target): current = {}
+		var feeder := livestock.feeder_near(_player, FEED_REACH_M) if _placed else {}
+		if not feeder.is_empty(): current = _feed_action(feeder)
 	# A tapped object wins; a nearby one only when no cell was tapped and the cell in front has no step to do.
 	var object := -1 if farm.is_empty() else gather_target()
 	if object >= 0 and (picked_object >= 0 or (picked == null and (current.is_empty() or not str(current.refusal).is_empty()))):
@@ -381,6 +406,7 @@ func _refresh_key() -> void:
 	if current.is_empty(): return
 	var spot: Vector3 = _walk.point(target)
 	if current.has("object"): spot = _walk.point(_walk.cell_at(gatherables[current.object].origin))
+	if current.has("feeder"): spot = current.feeder
 	_marker.position = spot + Vector3(0, 0.045, 0)
 	var refused := not str(current.refusal).is_empty()
 	_marker_material.albedo_color = Color(0.86, 0.32, 0.25, 0.42) if refused else Color(1, 0.98, 0.86, 0.42)
@@ -397,9 +423,15 @@ func _refresh_key() -> void:
 	elif current.verb == "rest":
 		_key.verb = VERBS.rest
 		_key.cost = REFUSALS.get(current.refusal, "+%d Energy" % int(current.get("gain", 0)))
+	elif current.verb == "feed":
+		_key.verb = VERBS.feed
+		_key.cost = str(current.refusal_text) if refused else _price()
 	else:
 		_key.verb = VERBS[current.verb]
 		_key.cost = REFUSALS.get(current.refusal, _price())
+	# The key's badge is the tool or item the press uses: the hoe for farming, the feed (a carrot) at a feeder.
+	var badge: Texture2D = item_icon(str(current.feed_item)) if current.get("verb") == "feed" else _tool_badge()
+	if _keys.tool_icon != badge: _keys.tool_icon = badge
 	_key.state = UiSceneAction.State.UNAVAILABLE if refused else UiSceneAction.State.INSUFFICIENT if key_short \
 		else UiSceneAction.State.DEFAULT
 
@@ -423,6 +455,7 @@ func _on_key() -> void:
 		_toast.show_toast(refusal, ToastLayer.Severity.REFUSED)
 		return
 	if current.verb == "gather": await gather(current)
+	elif current.verb == "feed": await feed(current)
 	else: await work(target, current)
 
 ## One gather press (C-60): the object is already in reach, so the player only faces it and plays
@@ -431,6 +464,58 @@ func gather(action: Dictionary) -> Dictionary:
 	if _body == null: return await send(action.command)
 	_body.labour("harvest", [_walk.cell_at(gatherables[action.object].origin)], LABOUR_S)
 	return await send(action.command, LABOUR_S)
+
+## The key at a livestock building's feeder (C-154): Feed, or why not (`Need 1 Carrot`, the art's `Hens are fed` /
+## `Pick up eggs first`); {verb, refusal, refusal_text, command, feeder}.
+func _feed_action(near: Dictionary) -> Dictionary:
+	var b: Dictionary = near.building
+	var refusal := ParcelFarm.feed_refusal(rules, farm, b, server_now())
+	var rule := ParcelFarm.livestock_of(rules, b)
+	var copy: Dictionary = LivestockArt.building_art(str(b.type)).get("copy", {})
+	var text := ""
+	match refusal:
+		"NO_FEED": text = "Need 1 %s" % str(_names.get(str(rule.get("feed", "")), ParcelItems.name_of(str(rule.get("feed", "")))))
+		"ANIMALS_FED": text = str(copy.get("fed", "Hens are fed"))
+		"GROUND_FULL": text = str(copy.get("full", "Pick up eggs first"))
+		"NOT_LIVESTOCK": text = "That didn't work."
+	return {"verb": "feed", "refusal": refusal, "refusal_text": text, "feed_item": str(rule.get("feed", "")),
+		"command": {"type": "feed", "building": int(b.id)} if refusal.is_empty() else {}, "feeder": near.point}
+
+## One feed press (C-154): the feeder is already in reach, so the player faces it and plays the labour clip while
+## the command goes out; the fed hen then comes to peck (ParcelLivestock).
+func feed(action: Dictionary) -> Dictionary:
+	if _body == null: return await send(action.command)
+	_body.labour("harvest", [_walk.cell_at(action.feeder)], LABOUR_S)
+	return await send(action.command, LABOUR_S)
+
+## Picks up the drops in reach (C-154): each flies into the player as the pick_up goes out; with the reply the items
+## fly on into the Bag (`+1 Egg`, one float and flight per item, merged as ×N). A refused or lost pickup puts the
+## drops back; they are taken again only after the player steps away (no retry loop while standing there).
+func pick_up(ids: Array) -> void:
+	if ids.is_empty() or busy: return
+	_picking = ids.duplicate()
+	for id: int in ids: livestock.fly(id, _player)
+	var started := Time.get_ticks_msec()
+	var before: Dictionary = farm.get("bag", {}).duplicate()
+	busy = true
+	var result: Dictionary = await store.send(farm_version, ids.map(func(id): return {"type": "pick_up", "drop": id}))
+	busy = false
+	if not is_inside_tree(): return
+	# The gain lands once the drops reach the player (the flight's first half), however fast the reply came.
+	var flight_ms := int(float(LivestockArt.pickup().flight_s) * 1000.0)
+	if Time.get_ticks_msec() - started < flight_ms:
+		await get_tree().create_timer((flight_ms - (Time.get_ticks_msec() - started)) / 1000.0).timeout
+		if not is_inside_tree(): return
+	_adopt(result)
+	var ok: bool = result.get("ok", false)
+	livestock.settle(ids, not ok and result.get("code") != "VERSION_CONFLICT")
+	_picking = []
+	if ok:
+		var gains := {}
+		for id: String in farm.bag:
+			var gained := int(farm.bag.get(id, 0)) - int(before.get(id, 0))
+			if gained > 0: gains[id] = gained
+		announce_gains(gains, _player_screen())
 
 ## One press on `cell` (C-73): walk beside it, face it, play the labour clip and send the command
 ## with it. Nothing is sent when the player cannot get there or steers away first.
@@ -624,8 +709,8 @@ func announce_energy(delta: int, from: Vector2) -> void:
 
 ## The key's verb for a command (the Energy card's `Sow needs 3 Energy`).
 static func _verb_of(command: Dictionary) -> String:
-	return {"clear_obstacle": "clear", "till": "till", "sow": "sow", "gather": "gather", "rest": "rest", "draw_water": "fill",
-		"water": "water"}.get(command.get("type", ""), "")
+	return {"clear_obstacle": "clear", "till": "till", "sow": "sow", "gather": "gather", "rest": "rest", "feed": "feed",
+		"draw_water": "fill", "water": "water"}.get(command.get("type", ""), "")
 
 func _adopt(result: Dictionary) -> void:
 	var next := ParcelFarm.normalize(result.get("farm"))
@@ -637,6 +722,7 @@ func _adopt(result: Dictionary) -> void:
 	_drop_cleared()
 	_draw_crops()
 	_draw_gathered()
+	if livestock != null: livestock.sync(farm, rules, server_now())
 	_draw_bag()
 	_refresh_tip()
 	_refresh_tasks()
@@ -733,8 +819,12 @@ func _draw_bag() -> void:
 		slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": int(farm.bag[id])})
 	_bar.slots = slots
 	if _bag == null and phone == null: _bar.visible = not farm.is_empty() and not held
-	_keys.tool_icon = item_icon(str(rules.get("till_tool", ""))) if int(farm.get("bag", {}).get(str(rules.get("till_tool", "")), 0)) > 0 else null
+	_keys.tool_icon = _tool_badge()
 	if _bag != null: _draw_bag_slots(ids)
+
+## The key's tool badge: the hoe while the bag holds it.
+func _tool_badge() -> Texture2D:
+	return item_icon(str(rules.get("till_tool", ""))) if int(farm.get("bag", {}).get(str(rules.get("till_tool", "")), 0)) > 0 else null
 
 ## The bag panel's slots follow the save: one per item in the bag's order, then empty ones to fill the rows.
 func _draw_bag_slots(ids: Array) -> void:

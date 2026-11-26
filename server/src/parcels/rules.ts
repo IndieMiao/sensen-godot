@@ -22,7 +22,29 @@ export interface GatherSource { item: string; amount: number; max_objects: numbe
  * 一种可摆放的建筑（C-150）：模型名、放下要扣的蓝图、未转向时的占地（宽沿格 x、深沿格 y）和一块地上最多几栋。
  * 转 90°/270° 时宽深互换。客户端按同一个类型编号取模型和碰撞（modules/dynamic_farm/farm_building.gd）。
  */
-export interface BuildingRule { model: string; blueprint: string; width: number; depth: number; max: number }
+export interface BuildingRule {
+  model: string; blueprint: string; width: number; depth: number; max: number;
+  /** 放下时除蓝图外还要扣的材料（C-154，可选，默认不扣）：物品编号 → 个数。 */
+  materials?: Record<string, number>;
+  /** 养殖建筑（C-154 鸡场）：里面的动物、喂什么、产什么、多久产、地上最多留几个。没有就是普通建筑。 */
+  livestock?: LivestockRule;
+}
+/**
+ * 养殖建筑的规则（C-154）：放下时带 animals 这些动物（按序号区分，类型只决定外观）。在建筑里喂一次 feed（1 个），
+ * 体力按 energy.costs.feed，喂过 produce_seconds 秒后，这只动物在建筑里的一个落点 spots[i] 下 amount 个 product，
+ * 掉在地上，人走近拾取（pick_up）。每只动物同时只等一个产物；这栋建筑地上的产物（含还没产出的）到 max_ground 就不能再喂。
+ * spots 是落点，按建筑未转向的自身坐标（[x, z]，单位为格，原点在占地后左角，x 向右，z 向入口），服务端只用它的个数，
+ * 位置给客户端画；落点数不少于 max_ground。牛奶、羊毛等以后的产物同样按这份配置，换物品不改代码。
+ */
+export interface LivestockRule {
+  animals: string[];
+  feed: string;
+  product: string;
+  amount: number;
+  produce_seconds: number;
+  max_ground: number;
+  spots: [number, number][];
+}
 /**
  * 浇水（C-151，所有者 SEN-C-137#6、#15）：在 well 类建筑旁打水，水桶（背包里的 pail）装满 pail_uses 次，每浇一格用一次。
  * 打一桶水的体力在 energy.costs.draw_water，浇水不花体力。
@@ -92,6 +114,9 @@ export const MAX_BUILDINGS = 64;
 export const MAX_FARM_LEVEL = 99;
 /** 建筑一边最多几格。 */
 export const MAX_BUILDING_SIDE = 16;
+/** 一栋养殖建筑最多几只动物、地上最多留几个产物（C-154）。 */
+export const MAX_ANIMALS = 16;
+export const MAX_GROUND_DROPS = 64;
 const ID_RE = /^[a-z0-9_-]{1,64}$/;
 const isId = (v: unknown): v is string => typeof v === 'string' && ID_RE.test(v);
 const count = (v: unknown, min: number, max: number): v is number => Number.isInteger(v) && (v as number) >= min && (v as number) <= max;
@@ -114,9 +139,15 @@ export function parseParcelRules(raw: unknown): ParcelRules {
   for (const [id, n] of Object.entries(r.welcome_gift)) if (!isId(id) || !count(n, 1, 999)) fail(`welcome_gift.${id} 不对`);
   if (!isId(r.till_tool)) fail('till_tool 缺失');
   if (!r.buildings || typeof r.buildings !== 'object' || Array.isArray(r.buildings)) fail('buildings 缺失');
-  for (const [id, b] of Object.entries(r.buildings))
+  for (const [id, b] of Object.entries(r.buildings)) {
     if (!isId(id) || !b || !isId(b.model) || !isId(b.blueprint) || !count(b.width, 1, MAX_BUILDING_SIDE) || !count(b.depth, 1, MAX_BUILDING_SIDE)
       || !count(b.max, 1, MAX_BUILDINGS)) fail(`buildings.${id} 不对`);
+    if (b.materials !== undefined) {
+      if (!b.materials || typeof b.materials !== 'object' || Array.isArray(b.materials)) fail(`buildings.${id}.materials 不对`);
+      for (const [item, n] of Object.entries(b.materials)) if (!isId(item) || !count(n, 1, 999)) fail(`buildings.${id}.materials.${item} 不对`);
+    }
+    if (b.livestock !== undefined) parseLivestock(b.livestock, b, fail, `buildings.${id}.livestock`);
+  }
   if (!Object.hasOwn(r.buildings, HOME_BUILDING)) fail(`buildings 缺少 ${HOME_BUILDING}`);
   if (!r.crops || !Object.keys(r.crops).length) fail('crops 不能为空');
   for (const [id, c] of Object.entries(r.crops))
@@ -134,6 +165,17 @@ export function parseParcelRules(raw: unknown): ParcelRules {
   parseFarmLevels(r, fail);
   parseEconomy(r.economy, fail);
   return r;
+}
+
+/** 养殖规则的边界：1–16 只动物，产出 1–99 个、1 秒–7 天，地上 1–64 个，落点不少于地上上限、都在未转向的占地里。 */
+function parseLivestock(l: LivestockRule, b: BuildingRule, fail: (what: string) => never, at: string): void {
+  if (!l || typeof l !== 'object' || !Array.isArray(l.animals) || l.animals.length < 1 || l.animals.length > MAX_ANIMALS
+    || !l.animals.every(isId) || !isId(l.feed) || !isId(l.product) || !count(l.amount, 1, 99)
+    || !count(l.produce_seconds, 1, 7 * 24 * 3600) || !count(l.max_ground, 1, MAX_GROUND_DROPS)) fail(`${at} 不对`);
+  if (!Array.isArray(l.spots) || l.spots.length < l.max_ground || l.spots.length > MAX_GROUND_DROPS * 4) fail(`${at}.spots 个数不对`);
+  for (const p of l.spots)
+    if (!Array.isArray(p) || p.length !== 2 || !p.every(v => typeof v === 'number' && Number.isFinite(v))
+      || p[0] < 0 || p[0] > b.width || p[1] < 0 || p[1] > b.depth) fail(`${at}.spots 有落点不在占地里`);
 }
 
 /** 农场等级的边界：从 2 级起连续，金币 0–100000，材料和赠品每样 1–999，建筑上限是已有类型、不低于前一级。 */

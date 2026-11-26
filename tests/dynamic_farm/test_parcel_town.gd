@@ -44,7 +44,7 @@ func _clean() -> void:
 
 func _rules() -> void:
 	var eco: Dictionary = ParcelFarm.rules().economy
-	_check(eco.sell_prices == {"crop_carrot": 12, "wood": 2, "wild_herb": 1, "stone": 2}, "C-30#36 prices: carrot 12, wood 2, herb 1, stone 2")
+	_check(eco.sell_prices == {"crop_carrot": 12, "wood": 2, "wild_herb": 1, "stone": 2, "egg": 20}, "C-30#36 prices: carrot 12, wood 2, herb 1, stone 2; C-154 egg 20")
 	_check(eco.blueprints.coop == {"item": "blueprint_coop", "amount": 1, "min_sales": 1}, "one coop blueprint after the first sale")
 	_check(eco.buy_prices == {"seed_carrot": 9}, "C-149: Jasmine sells carrot seeds at 9, the P0 seed price")
 	var p0_carrot := {}
