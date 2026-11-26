@@ -173,5 +173,25 @@
         "min_sales": 1
       }
     }
+  },
+  "requests": {
+    "slots": 2,
+    "done_refill_seconds": 0,
+    "drop_refill_seconds": 28800,
+    "expire_seconds": 259200,
+    "daily_max": 6,
+    "daily_bonus_max": 100,
+    "floor_percent": 80,
+    "tiers": [
+      { "level": 1, "qty": [2, 3], "bonus": 10 },
+      { "level": 4, "qty": [4, 6], "bonus": 20 },
+      { "level": 7, "qty": [6, 10], "bonus": 40 }
+    ],
+    "templates": {
+      "fresh_greens": { "item": "crop_carrot" },
+      "timber_run": { "item": "wood" },
+      "stone_order": { "item": "stone" },
+      "egg_basket": { "item": "egg", "building": "coop" }
+    }
   }
 }

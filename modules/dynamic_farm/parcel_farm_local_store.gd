@@ -1,8 +1,9 @@
 extends RefCounted
 ## Local stand-in for the C-31 parcel farm save (/v1/parcels/mine/enter and /commands),
 ## kept on this device until the client talks to the server. It applies the same rules
-## with the device clock standing in for server time. Results use the store contract the
-## scene reads (await-able like the remote store):
+## with the device clock standing in for server time. Like the server's reads, every farm it answers has the request
+## board settled to now (C-191, ParcelFarm.view). Results use the store contract the scene reads (await-able like the
+## remote store):
 ##   {ok, granted?, gift?, farm, farm_version, server_time} or
 ##   {ok:false, code, index, detail?, farm, farm_version, server_time}.
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -30,15 +31,18 @@ func enter() -> Dictionary:
 		for id: String in granted.gift: gift[id] = int(gift.get(id, 0)) + int(granted.gift[id])
 	var next = granted.state if granted != null else welcomed
 	if next == null:
-		return {"ok": true, "granted": false, "gift": {}, "farm": saved.farm, "farm_version": saved.version, "server_time": now}
+		return {"ok": true, "granted": false, "gift": {}, "farm": ParcelFarm.view(rules, saved.farm, now), "farm_version": saved.version,
+			"server_time": now}
 	if not _save(next, saved.version + 1): return _failure("SAVE", 0, {}, saved.farm, saved.version)
-	return {"ok": true, "granted": welcomed != null, "gift": gift, "farm": next, "farm_version": saved.version + 1, "server_time": now}
+	return {"ok": true, "granted": welcomed != null, "gift": gift, "farm": ParcelFarm.view(rules, next, now), "farm_version": saved.version + 1,
+		"server_time": now}
 
 ## The farm as saved, without entering it (no welcome gift), like the server's `GET /parcels/mine`.
 func read() -> Dictionary:
 	if ParcelFarm.rules().is_empty(): return _failure("RULES", 0, {}, ParcelFarm.empty_state(), 0)
 	var saved := _load()
-	return {"ok": true, "farm": saved.farm, "farm_version": saved.version, "server_time": now_ms.call()}
+	var now: int = now_ms.call()
+	return {"ok": true, "farm": ParcelFarm.view(ParcelFarm.rules(), saved.farm, now), "farm_version": saved.version, "server_time": now}
 
 func send(base_version: int, commands: Array) -> Dictionary:
 	var saved := _load()
@@ -52,8 +56,10 @@ func send(base_version: int, commands: Array) -> Dictionary:
 	return {"ok": true, "farm": outcome.state, "farm_version": saved.version + 1, "server_time": now}
 
 func _failure(code: String, index: int, detail: Dictionary, farm: Dictionary, version: int) -> Dictionary:
-	var result := {"ok": false, "code": code, "index": index, "farm": farm, "farm_version": version,
-		"server_time": now_ms.call()}
+	var now: int = now_ms.call()
+	var rules := ParcelFarm.rules()
+	var result := {"ok": false, "code": code, "index": index, "farm": ParcelFarm.view(rules, farm, now) if not rules.is_empty() else farm,
+		"farm_version": version, "server_time": now}
 	if not detail.is_empty(): result.detail = detail
 	return result
 

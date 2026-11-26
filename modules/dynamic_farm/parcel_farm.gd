@@ -26,13 +26,24 @@ extends RefCounted
 ## rules' `farm_levels` entry for the next level in coins and materials, for no Energy; each level adds `energy.per_level`
 ## to Max Energy, and a level's `buildings` lets more of a type stand from it on (wells: 2 at Lv3, 3 at Lv5) with its
 ## `gift` (a well blueprint) put in the bag. The save's `level` (absent before it: 1) is kept across dataset moves.
+## The request board (C-191, P0's system board at the Washington Square Travel Post) mirrors server/src/parcels/requests.ts:
+## the rules' `requests`; the save's `board` {slots: [{req, refill_at}], seq, day, done_today, bonus_today} and
+## `requests_done` (absent before it: an empty board, 0). `settle_board` fills due slots and swaps open requests 72 h old,
+## drawing by `hash32` of (first entry, slot, draw time, id) — the same requests and ids the server draws; `apply` settles
+## before and after a batch and `view` settles a copy (the server's read). `accept_request` / `deliver_request` /
+## `drop_request` take a request id: delivering takes the items and pays the floor price × count plus the bonus left
+## today, at most `daily_max` a player day; dropping refills the slot `drop_refill_seconds` later.
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
 const STATE_VERSION := 1
 const MAX_COORD := 1024
 const MAX_CELLS := 8192
 const MAX_BATCH := 50
 const COMMANDS := ["place_house", "place_building", "clear_obstacle", "till", "sow", "harvest", "sell", "buy", "claim_blueprint",
-	"gather", "rest", "feed", "pick_up", "draw_water", "water", "upgrade_farm"]
+	"gather", "rest", "feed", "pick_up", "draw_water", "water", "upgrade_farm", "accept_request", "deliver_request", "drop_request"]
+## C-191 request commands: the request id is their one field.
+const REQUEST_COMMANDS := ["accept_request", "deliver_request", "drop_request"]
+## Most request board slots (server requests.ts MAX_SLOTS).
+const MAX_SLOTS := 8
 ## Commands priced by `energy.costs` (sowing is priced on the crop; feeding is P0's feed-an-animal 1, C-154).
 const PRICED := ["clear_obstacle", "till", "gather", "draw_water", "feed"]
 ## Most animals in one livestock building, most drops on its ground, largest building / drop id in a command (server).
@@ -122,7 +133,55 @@ static func parse_rules(raw: Variant) -> Dictionary:
 	var levels = _parse_levels(raw.get("farm_levels", []), parsed.buildings)
 	if levels == null: return {}
 	parsed["farm_levels"] = levels
+	# C-191: no `requests`, no board ({}); out of the server's bounds, the rules are refused.
+	parsed["requests"] = {}
+	if raw.has("requests"):
+		parsed.requests = _parse_requests(raw.requests, parsed)
+		if parsed.requests.is_empty(): return {}
 	return parsed
+
+## C-191 `requests` with the server's bounds (requests.ts parseRequestRules), whole numbers made ints; {} when out of them.
+## Templates keep the file's order (the draw indexes them in it).
+static func _parse_requests(raw: Variant, parsed: Dictionary) -> Dictionary:
+	if not raw is Dictionary or not whole_in(raw.get("slots"), 1, MAX_SLOTS) or not whole_in(raw.get("done_refill_seconds"), 0, 30 * 86400) \
+			or not whole_in(raw.get("drop_refill_seconds"), 0, 30 * 86400) or not whole_in(raw.get("expire_seconds"), 3600, 30 * 86400) \
+			or not whole_in(raw.get("daily_max"), 1, 100) or not whole_in(raw.get("daily_bonus_max"), 0, 100000) \
+			or not whole_in(raw.get("floor_percent"), 1, 100):
+		return {}
+	var out := {}
+	for field in ["slots", "done_refill_seconds", "drop_refill_seconds", "expire_seconds", "daily_max", "daily_bonus_max", "floor_percent"]:
+		out[field] = int(raw[field])
+	out.tiers = _parse_tiers(raw.get("tiers"))
+	if out.tiers.is_empty(): return {}
+	if not raw.get("templates") is Dictionary or raw.templates.is_empty(): return {}
+	out.templates = {}
+	for id in raw.templates:
+		var t = raw.templates[id]
+		if not id is String or not t is Dictionary or not t.get("item") is String or not parsed.economy.sell_prices.has(t.item): return {}
+		out.templates[id] = {"item": t.item}
+		if t.has("building"):
+			if not t.building is String or not parsed.buildings.has(t.building): return {}
+			out.templates[id].building = t.building
+		# A template's own tiers (count and bonus by item), else the shared ones.
+		if t.has("tiers"):
+			var own := _parse_tiers(t.tiers)
+			if own.is_empty(): return {}
+			out.templates[id].tiers = own
+	return out
+
+## Tiers with the server's bounds (requests.ts parseTiers): from Lv1, levels rising, counts 1–999 low to high, bonus
+## 0–10000; [] when out of them.
+static func _parse_tiers(raw: Variant) -> Array:
+	if not raw is Array or raw.is_empty(): return []
+	var out: Array = []
+	for t in raw:
+		if not t is Dictionary or not whole_in(t.get("level"), 1, 999) or not t.get("qty") is Array or t.qty.size() != 2 \
+				or not whole_in(t.qty[0], 1, 999) or not whole_in(t.qty[1], int(t.qty[0]) if _number(t.qty[0]) else 1, 999) \
+				or not whole_in(t.get("bonus"), 0, 10000):
+			return []
+		if (out.is_empty() and int(t.level) != 1) or (not out.is_empty() and int(t.level) <= int(out[-1].level)): return []
+		out.append({"level": int(t.level), "qty": [int(t.qty[0]), int(t.qty[1])], "bonus": int(t.bonus)})
+	return out
 
 ## C-154 a building's `livestock` with the server's bounds (rules.ts parseLivestock), whole numbers made ints; {} when
 ## out of them. `spots` stay [x, z] floats in the building's own unturned frame, in cells.
@@ -213,7 +272,11 @@ static func _parse_energy(raw: Variant) -> Dictionary:
 static func empty_state() -> Dictionary:
 	return {"v": STATE_VERSION, "buildings": [], "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {}, "welcomed_at": null,
 		"coins": 0, "sales": 0, "gathered": {}, "blueprints_claimed": {}, "drops": [], "drop_seq": 0, "pail_water": 0, "grants": {},
-		"level": 1}
+		"level": 1, "board": empty_board(), "requests_done": 0}
+
+## A board with no slots yet (C-191; server requests.ts emptyBoard).
+static func empty_board() -> Dictionary:
+	return {"slots": [], "seq": 0, "day": null, "done_today": 0, "bonus_today": 0}
 
 ## A state as returned by the server, with JSON floats turned back into integers.
 ## Returns {} for anything that is not a v1 farm.
@@ -287,12 +350,47 @@ static func normalize(raw: Variant) -> Dictionary:
 	for d: Dictionary in state.drops: state.drop_seq = maxi(state.drop_seq, int(d.id))
 	# C-152: the farm level; a save from before it (or a malformed one, as the server reads it) is Lv1.
 	if whole_in(raw.get("level"), 1, 1 << 30): state.level = int(raw.level)
+	# C-191: the request board and the count; a save from before them has an empty board and 0, malformed parts dropped.
+	state.board = _board(raw.get("board"))
+	state.requests_done = int(raw.requests_done) if whole_in(raw.get("requests_done"), 0, 1 << 30) else 0
 	# C-148 Energy: kept when well formed; without it (or malformed, as the server reads it) the farm is at full Energy.
 	var energy = raw.get("energy")
 	if energy is Dictionary and whole_in(energy.get("value"), 0, 1 << 30) and _number(energy.get("at")) \
 			and (energy.get("rested_on") == null or _is_day(energy.get("rested_on"))):
 		state.energy = {"value": int(energy.value), "at": int(energy.at), "rested_on": energy.get("rested_on")}
 	return state
+
+## The save's request board read as the server reads it (requests.ts boardOf): malformed slots and requests left out,
+## `seq` at least the highest id on the board, the day's counts only with a day.
+static func _board(raw: Variant) -> Dictionary:
+	var out := empty_board()
+	if not raw is Dictionary: return out
+	if raw.get("slots") is Array:
+		for sl in raw.slots:
+			if not sl is Dictionary or not sl.has("req") or not sl.has("refill_at") or not _number(sl.refill_at): continue
+			var req = sl.get("req")
+			if req == null:
+				out.slots.append({"req": null, "refill_at": int(sl.refill_at)})
+				continue
+			var r := _request(req)
+			if not r.is_empty(): out.slots.append({"req": r, "refill_at": int(sl.refill_at)})
+	if whole_in(raw.get("seq"), 0, MAX_ID): out.seq = int(raw.seq)
+	for sl: Dictionary in out.slots:
+		if sl.req != null: out.seq = maxi(int(out.seq), int(sl.req.id))
+	if _is_day(raw.get("day")):
+		out.day = raw.day
+		if whole_in(raw.get("done_today"), 0, 10000): out.done_today = int(raw.done_today)
+		if whole_in(raw.get("bonus_today"), 0, 1000000): out.bonus_today = int(raw.bonus_today)
+	return out
+
+## One request with whole numbers, or {} when malformed (server requests.ts isRequest).
+static func _request(r: Variant) -> Dictionary:
+	if not r is Dictionary or not whole_in(r.get("id"), 1, MAX_ID) or not _is_id(r.get("template")) or not _is_id(r.get("item")) \
+			or not whole_in(r.get("qty"), 1, 999) or not whole_in(r.get("bonus"), 0, 10000) or not _number(r.get("drawn_at")) \
+			or not r.get("status") in ["open", "accepted"]:
+		return {}
+	return {"id": int(r.id), "template": r.template, "item": r.item, "qty": int(r.qty), "bonus": int(r.bonus),
+		"drawn_at": int(r.drawn_at), "status": r.status}
 
 ## A drop entry (C-154) with whole numbers, or {} when malformed (server farm.ts isDrop).
 static func _drop(d: Variant) -> Dictionary:
@@ -479,8 +577,149 @@ static func _day_shift(rule_set: Dictionary) -> int:
 	var d: Dictionary = rule_set.energy.day
 	return (int(d.utc_offset_hours) - int(d.rollover_hour)) * 3600000
 
+## An id as the server's rules and saves take them: 1–64 of a–z, 0–9, _ and -.
+static func _is_id(value: Variant) -> bool:
+	return value is String and RegEx.create_from_string("^[a-z0-9_-]{1,64}$").search(value) != null
+
 static func _is_day(value: Variant) -> bool:
 	return value is String and RegEx.create_from_string("^\\d{4}-\\d{2}-\\d{2}$").search(value) != null
+
+# ------------------------------------------------------------------ Request board (C-191, server requests.ts)
+
+## 32-bit FNV-1a with murmur3's finish, as the server's hash32 (ASCII keys: a byte is a JS char code). Ints stay in
+## [0, 2^32); _mul32 keeps every product inside 64 bits.
+static func hash32(key: String) -> int:
+	var h := 0x811c9dc5
+	for c in key.to_ascii_buffer(): h = ((h ^ c) * 0x01000193) & 0xFFFFFFFF
+	h ^= h >> 16
+	h = _mul32(h, 0x85ebca6b)
+	h ^= h >> 13
+	h = _mul32(h, 0xc2b2ae35)
+	h ^= h >> 16
+	return h
+
+## a × b mod 2^32 (JS Math.imul's bits) for a, b in [0, 2^32).
+static func _mul32(a: int, b: int) -> int:
+	return (a * (b & 0xFFFF) + (((a * (b >> 16)) & 0xFFFF) << 16)) & 0xFFFFFFFF
+
+## The tier for a farm level (of `template`'s own tiers when it has them, else the shared ones): the last whose level
+## it has reached.
+static func tier_for(rule_set: Dictionary, level: int, template := "") -> Dictionary:
+	var tiers: Array = rule_set.requests.templates.get(template, {}).get("tiers", rule_set.requests.tiers)
+	var tier: Dictionary = tiers[0]
+	for t: Dictionary in tiers:
+		if level >= int(t.level): tier = t
+	return tier
+
+## One item's floor price on the board: Jasmine's price × `floor_percent`%, rounded down.
+static func floor_price(rule_set: Dictionary, item: String) -> int:
+	return int(rule_set.economy.sell_prices.get(item, 0)) * int(rule_set.requests.floor_percent) / 100
+
+## The templates that can be drawn now, in the rules' order: those naming no building, or one the farm has.
+static func eligible_templates(rule_set: Dictionary, state: Dictionary) -> Array:
+	var out := []
+	for id: String in rule_set.requests.templates:
+		var b = rule_set.requests.templates[id].get("building")
+		if b == null or buildings_of(state).any(func(x): return x is Dictionary and x.get("type") == b): out.append(id)
+	return out
+
+## Done and bonus paid in the current player day: {done, bonus}.
+static func board_today(rule_set: Dictionary, state: Dictionary, now: int) -> Dictionary:
+	var b: Dictionary = state.get("board", empty_board())
+	if b.get("day") == day_key(rule_set, now): return {"done": int(b.done_today), "bonus": int(b.bonus_today)}
+	return {"done": 0, "bonus": 0}
+
+## Draws slot `slot`'s request at `at` (server requests.ts draw): the open templates less those on the other slots (and
+## an expired one still in this slot), unless that leaves none; count and bonus by the farm level now. null: none open.
+static func _draw(rule_set: Dictionary, state: Dictionary, slot: int, at: int) -> Variant:
+	var q: Dictionary = rule_set.requests
+	var b: Dictionary = state.board
+	var open := eligible_templates(rule_set, state)
+	if open.is_empty(): return null
+	var taken := {}
+	for sl: Dictionary in b.slots:
+		if sl.req != null: taken[sl.req.template] = true
+	var pool := open.filter(func(id): return not taken.has(id))
+	if pool.is_empty(): pool = open
+	var seed := "%d:%d:%d:%d" % [int(state.welcomed_at), slot, at, int(b.seq) + 1]
+	var template: String = pool[hash32(seed + ":t") % pool.size()]
+	var tier := tier_for(rule_set, farm_level(state), template)
+	var qty := int(tier.qty[0]) + hash32(seed + ":q") % (int(tier.qty[1]) - int(tier.qty[0]) + 1)
+	b.seq = int(b.seq) + 1
+	return {"id": int(b.seq), "template": template, "item": q.templates[template].item, "qty": qty, "bonus": int(tier.bonus),
+		"drawn_at": at, "status": "open"}
+
+## Brings `state.board` up to `now` in place (server requests.ts settleBoard): slots added from the first entry, a due
+## empty slot drawn at its refill time, an open request `expire_seconds` old swapped at the latest period it expired.
+## A farm not entered yet, or rules without `requests`, has no board to settle.
+static func settle_board(rule_set: Dictionary, state: Dictionary, now: int) -> void:
+	var q: Dictionary = rule_set.get("requests", {})
+	if q.is_empty() or state.get("welcomed_at") == null: return
+	if not state.get("board") is Dictionary: state.board = empty_board()
+	var b: Dictionary = state.board
+	while b.slots.size() < int(q.slots): b.slots.append({"req": null, "refill_at": int(state.welcomed_at)})
+	var expire := int(q.expire_seconds) * 1000
+	for i in int(q.slots):
+		var sl: Dictionary = b.slots[i]
+		if sl.req == null and now >= int(sl.refill_at):
+			var drawn = _draw(rule_set, state, i, int(sl.refill_at))
+			sl.req = drawn
+		if sl.req != null and sl.req.status == "open" and now >= int(sl.req.drawn_at) + expire:
+			var at := int(sl.req.drawn_at) + (now - int(sl.req.drawn_at)) / expire * expire
+			var swapped = _draw(rule_set, state, i, at)
+			sl.req = swapped
+			sl.refill_at = at
+	var kept := []
+	for i in b.slots.size():
+		if i < int(q.slots) or b.slots[i].req != null: kept.append(b.slots[i])
+	b.slots = kept
+
+## The farm as the server reads it out (routes farmView): a copy with the board settled to `now`.
+static func view(rule_set: Dictionary, state: Dictionary, now: int) -> Dictionary:
+	var out := state.duplicate(true)
+	if not out.has("board"): out.board = empty_board()
+	if not out.has("requests_done"): out.requests_done = 0
+	settle_board(rule_set, out, now)
+	return out
+
+## The slot holding request `id` on the state's board, or {}.
+static func request_slot(state: Dictionary, id: int) -> Dictionary:
+	for sl: Dictionary in state.get("board", {}).get("slots", []):
+		if sl.req != null and int(sl.req.id) == id: return sl
+	return {}
+
+## accept / deliver / drop on `next` (server requests.ts requestCommand), changed only on success: {code, detail}.
+static func _request_command(rule_set: Dictionary, next: Dictionary, command: Dictionary, now: int) -> Dictionary:
+	var q: Dictionary = rule_set.get("requests", {})
+	var id := int(command.request)
+	var sl := request_slot(next, id) if not q.is_empty() else {}
+	if sl.is_empty(): return {"code": "NO_REQUEST", "detail": {"request": id}}
+	var r: Dictionary = sl.req
+	match str(command.type):
+		"accept_request":
+			if r.status == "accepted": return {"code": "ALREADY_ACCEPTED", "detail": {"request": int(r.id)}}
+			r.status = "accepted"
+		"drop_request":
+			sl.req = null
+			sl.refill_at = now + int(q.drop_refill_seconds) * 1000
+		"deliver_request":
+			var done := board_today(rule_set, next, now)
+			if int(done.done) >= int(q.daily_max):
+				return {"code": "DAILY_LIMIT", "detail": {"max": int(q.daily_max), "resets_at": next_rollover(rule_set, now)}}
+			var have := int(next.bag.get(r.item, 0))
+			if have < int(r.qty): return {"code": "NOT_ENOUGH", "detail": {"item": r.item, "have": have, "need": int(r.qty)}}
+			var bonus := maxi(0, mini(int(r.bonus), int(q.daily_bonus_max) - int(done.bonus)))
+			var coins := floor_price(rule_set, r.item) * int(r.qty) + bonus
+			if int(next.coins) + coins > MAX_COINS: return {"code": "COINS_CAP", "detail": {"coins": int(next.coins), "max": MAX_COINS}}
+			_take(next.bag, r.item, int(r.qty))
+			next.coins = int(next.coins) + coins
+			next.board.day = day_key(rule_set, now)
+			next.board.done_today = int(done.done) + 1
+			next.board.bonus_today = int(done.bonus) + bonus
+			next.requests_done = int(next.requests_done) + 1
+			sl.req = null
+			sl.refill_at = now + int(q.done_refill_seconds) * 1000
+	return {"code": "", "detail": {}}
 
 static func key(cell: Vector2i) -> String:
 	return "%d,%d" % [cell.x, cell.y]
@@ -547,11 +786,12 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 		return {"ok": false, "index": 0, "code": "SCHEMA"}
 	var next := state.duplicate(true)
 	var blank := empty_state()
-	for field in ["coins", "sales", "gathered", "blueprints_claimed", "drops", "drop_seq", "pail_water", "grants"]:
+	for field in ["coins", "sales", "gathered", "blueprints_claimed", "drops", "drop_seq", "pail_water", "grants", "board", "requests_done"]:
 		if not next.has(field): next[field] = blank[field]
 	next.level = farm_level(next)
 	next.buildings = buildings_of(next).duplicate(true)
 	settle_energy(rule_set, next, now)
+	settle_board(rule_set, next, now)   # C-191: before the first command and again after the batch
 	for index in commands.size():
 		var command = commands[index]
 		if not command is Dictionary or command.get("type") not in COMMANDS:
@@ -573,6 +813,8 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type == "draw_water":
 			if not whole_in(command.get("building"), 1, 1 << 30): return {"ok": false, "index": index, "code": "SCHEMA"}
+		elif command.type in REQUEST_COMMANDS:
+			if not whole_in(command.get("request"), 1, MAX_ID): return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type == "place_house" or command.type == "place_building":
 			if not whole_in(command.get("x"), 0, MAX_COORD - 1) or not whole_in(command.get("y"), 0, MAX_COORD - 1) \
 					or (command.has("rotation") and not whole_in(command.rotation, 0, 3)) \
@@ -806,12 +1048,18 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 						for item: String in up.get("gift", {}): next.bag[item] = int(next.bag.get(item, 0)) + int(up.gift[item])
 						# Energy was settled to now above, so the higher top fills from the upgrade on.
 						next.level = int(up.level)
+			"accept_request", "deliver_request", "drop_request":
+				# At the Travel Post's board (the room keeps the drawer there); the server cannot tell where the player is.
+				var outcome := _request_command(rule_set, next, command, now)
+				failure = outcome.code
+				detail = outcome.detail
 		if failure == "NO_ENERGY":
 			detail = {"need": cost, "have": int(next.energy.value), "next_in": next_tick_in(rule_set, next, now)}
 		if not failure.is_empty():
 			var result := {"ok": false, "index": index, "code": failure}
 			if not detail.is_empty(): result.detail = detail
 			return result
+	settle_board(rule_set, next, now)
 	return {"ok": true, "state": next}
 
 ## `place_building` (and `place_house`, the cottage) on `next`, changed only on success: {code, detail}, code "" when
