@@ -32,8 +32,21 @@ const FEED_PECK_S := 3.0
 const LAY_GROW_FROM := 0.5
 ## A laid drop leaves this share of the way from the animal's middle toward where it lands (from under her tail).
 const LAY_TAIL := 0.25
-## Waypoints an animal takes at most on its way to lay (its walks are straight lines round the parts).
+## Waypoints an animal takes at most on its way to lay (its walks are straight lines round the parts), and new plans
+## it makes at most when a step of that walk is blocked.
 const LAY_HOPS := 3
+## Animals keep time with the drops' ready_at (server time, `now`), not only the engine's frame delta: on a slow frame
+## (the emulator renders at 1.5–4 fps) Godot reports at most max_physics_steps_per_frame / physics_ticks_per_second
+## (8 / 60 s) and capped scenes report less, so a hen walking by delta fell behind and the egg came due before she
+## reached her spot (SEN-C-173). A frame is the longer of `delta` and the time `now` moved, walked in steps of at most
+## STEP_S, so she neither falls behind nor takes one long step into a part. A frame longer than MAX_FRAME_S (the app
+## was away, the clock was corrected) moves them that long only.
+const STEP_S := 1.0 / 30.0
+const MAX_FRAME_S := 1.0
+## On her way to lay a hen that would arrive late (she set off a slow frame late, or her way round the parts is long)
+## hurries, up to FLEE_SPEED, to be beside the spot this long (s) before the drop is due (SEN-C-173); on time she
+## keeps her hurried walk (WALK_SPEED * 1.4).
+const LAY_SPARE_S := 0.5
 
 var _walk: RefCounted
 var _cell_m := 0.8
@@ -46,6 +59,8 @@ var _held_off := {}
 var _expected := {}
 ## Drop ids still falling out of the animal (not picked up until they lie on the ground).
 var _landing := {}
+## `now` of the last update (ms), or -1 before the first.
+var _last_now := -1
 var _pickup := Livestock.pickup()
 
 func setup(walk: RefCounted) -> void:
@@ -122,9 +137,17 @@ func _build_yard(b: Dictionary, rule: Dictionary) -> void:
 ## One frame: animals move, due drops pop in, and laid drops now within reach of `player` are returned (ids) for
 ## ParcelFarming to pick up (none while `paused`).
 func update(delta: float, player: Vector3, now: int, paused := false) -> Array:
+	var clock_s := float(now - _last_now) / 1000.0 if _last_now >= 0 else 0.0
+	_last_now = now
+	var frame := clampf(maxf(delta, clock_s), 0.0, MAX_FRAME_S)
+	var steps := maxi(1, ceili(frame / STEP_S - 0.001))
+	var step := frame / float(steps)
 	for yard: Dictionary in _yards.values():
 		var local := Livestock.local_point((yard.root as Node3D).transform.affine_inverse() * player, yard.base, _cell_m)
-		for i in yard.animals.size(): _tick(yard, yard.animals[i], i, delta, local, now)
+		for k in steps:
+			# Each step at its own time within the frame, so a walk to lay starts and ends when it should.
+			var at := now - int(float(steps - 1 - k) * step * 1000.0)
+			for i in yard.animals.size(): _tick(yard, yard.animals[i], i, step, local, at)
 	_draw_laid(now, true)
 	var reach: float = _pickup.reach_m
 	var out := []
@@ -218,6 +241,9 @@ func _tick(yard: Dictionary, a: Dictionary, index: int, delta: float, player: Ve
 				best = p
 		_go(yard, a, best, FLEE_SPEED, "")
 		a.state = "flee"
+	if a.errand == "lay" and a.state == "walk" and due != null:
+		a.speed = _lay_speed(a, int(due.ready_at) - now)
+		if a.player != null: (a.player as AnimationPlayer).speed_scale = 1.6 if a.speed > WALK_SPEED * 1.5 else 1.0
 	if a.state in ["walk", "flee"]:
 		var to: Vector2 = a.target - a.pos
 		var step: float = a.speed * delta
@@ -227,6 +253,11 @@ func _tick(yard: Dictionary, a: Dictionary, index: int, delta: float, player: Ve
 		else:
 			var next: Vector2 = a.pos + to.normalized() * step
 			if not _open(yard, next, a.radius):
+				# On her way to lay: plan again from here instead of giving up (SEN-C-173).
+				if a.errand == "lay" and not a.lay_to.is_empty() and int(a.lay_to.get("replans", 0)) < LAY_HOPS:
+					a.lay_to.replans = int(a.lay_to.get("replans", 0)) + 1
+					_walk_to_lay(yard, a)
+					return
 				_rest(a, "idle", 0.4)
 				a.errand = ""
 				a.then = false
@@ -244,6 +275,17 @@ func _tick(yard: Dictionary, a: Dictionary, index: int, delta: float, player: Ve
 		_go(yard, a, _free_point(yard, a.radius, a.pos + Vector2(randf_range(-2.5, 2.5), randf_range(-2.0, 2.0)), 12), WALK_SPEED, "")
 	elif roll < 0.75: _rest(a, "peck", randf_range(2.0, 3.5))
 	else: _rest(a, "idle", randf_range(1.5, 3.0))
+
+## The speed (cells / s) that brings `a` beside her laying spot LAY_SPARE_S before the drop is due in `left_ms`: her
+## hurried walk when that is enough, faster up to FLEE_SPEED when she is late. The way left is this leg, and from a
+## waypoint (`then`) the line on to the spot.
+func _lay_speed(a: Dictionary, left_ms: int) -> float:
+	var way: float = a.pos.distance_to(a.target)
+	if a.then and not a.lay_to.is_empty(): way += maxf(0.0, (a.target as Vector2).distance_to(a.lay_to.spot) - float(a.lay_to.toss))
+	var left_s := float(left_ms) / 1000.0 - LAY_SPARE_S
+	var hurried := WALK_SPEED * 1.4
+	if left_s <= 0.0: return FLEE_SPEED if way > 0.01 else hurried
+	return clampf(way / left_s, hurried, FLEE_SPEED)
 
 func _arrive(yard: Dictionary, a: Dictionary) -> void:
 	if a.errand == "lay" and a.then and int(a.lay_to.hops) < LAY_HOPS:
