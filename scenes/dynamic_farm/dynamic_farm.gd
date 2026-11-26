@@ -226,7 +226,11 @@ func _ready() -> void:
 		# C-148: the parcel's Energy in the top bar, P0's chip just before the coins.
 		_header.add_child(_farming.energy_chip)
 		_header.move_child(_farming.energy_chip, _coins_capsule.get_index())
+		# C-107: the task button (C-H3) beside the Energy chip, before it.
+		_header.add_child(_farming.task_button)
+		_header.move_child(_farming.task_button, _farming.energy_chip.get_index())
 		_farming.tip_top = top_bar_bottom() + UiTokens.SPACE_S5
+		_farming.bar_bottom = top_bar_bottom()
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
 	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_fit_place_chip()
@@ -829,13 +833,13 @@ func is_back_navigation_locked() -> bool:
 	_request_back()
 	return true
 
-## Closes the page on top of the profile (the profile last), else the farming UI's open drawer (the bag) or Energy
-## card / panel; false when none was open.
+## Closes the page on top of the profile (the profile last), else the farming UI's open drawer (the bag), Energy
+## card / panel or phone (C-107); false when none was open.
 func close_modal() -> bool:
 	if is_instance_valid(_profile):
 		_profile.back()
 		return true
-	return _farming != null and (_farming.close_energy() or _farming.close_bag())
+	return _farming != null and (_farming.close_energy() or _farming.close_bag() or _farming.close_phone())
 
 ## The profile over the parcel (C-108; C-85 ①: the HUD avatar opens it): the parcel's HUD hides and its touches stop
 ## until it closes; Settings and the dressing room open from it (parcel_profile.gd). The player stops where they are.
@@ -848,6 +852,8 @@ func open_profile() -> Control:
 	if _farming != null:
 		_farming.close_energy()
 		_farming.close_bag()
+		_farming.close_phone()
+		if _farming.drop_down != null: _farming.drop_down.fold()
 	_profile_layer = CanvasLayer.new()
 	_profile_layer.name = "ProfileLayer"
 	_profile_layer.layer = PROFILE_LAYER
