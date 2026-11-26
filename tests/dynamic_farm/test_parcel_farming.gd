@@ -130,13 +130,14 @@ func _commands() -> void:
 	_check(ParcelFarm.normalize(JSON.parse_string(JSON.stringify(placed))) == placed, "a JSON round trip keeps the buildings")
 	_check(ParcelFarm.normalize({"v": 2}).is_empty(), "other versions are refused")
 
-## The shipped rules have the cottage, (C-154) the 7×5 coop and (C-151) the 1×1 well; a copy lets the well be built 3
-## times and stands a plain 4×2 coop, at most 1, in for the shipped one.
+## The shipped rules have the cottage, (C-154) the 7×5 coop, (C-181) the 8×6 barn and (C-151) the 1×1 well; a copy
+## lets the well be built 3 times and stands a plain 4×2 coop, at most 1, in for the shipped one.
 func _buildings() -> void:
 	var rules := ParcelFarm.rules()
 	_check(rules.buildings.cottage == {"model": "cottage", "blueprint": "blueprint_cottage", "width": 3, "depth": 3, "max": 1, "materials": {}},
 		"buildings: one 3×3 cottage per parcel")
-	_check(rules.buildings.keys() == ["cottage", "coop", "well"] and rules.buildings.coop.width == 7 and rules.buildings.coop.depth == 5 \
+	# C-192: the 8×6 barn (C-181's rules) comes after the coop; its own checks are test_barn.gd's.
+	_check(rules.buildings.keys() == ["cottage", "coop", "barn", "well"] and rules.buildings.coop.width == 7 and rules.buildings.coop.depth == 5 \
 		and rules.buildings.coop.max == 1 and rules.buildings.coop.blueprint == "blueprint_coop", "buildings: one 7×5 coop per parcel (C-154)")
 	_check(rules.buildings.well == {"model": "well", "blueprint": "blueprint_well", "width": 1, "depth": 1, "max": 1, "materials": {}},
 		"buildings: (C-151) one 1×1 well per parcel")
@@ -180,7 +181,7 @@ func _buildings() -> void:
 	var wells: Dictionary = ParcelFarm.apply(multi, start, [place.call("well", 1, 1), place.call("well", 3, 1), place.call("well", 5, 1)], T0).state
 	var limit := ParcelFarm.apply(multi, wells, [place.call("well", 7, 1)], T0)
 	_check(limit.code == "BUILDING_LIMIT" and limit.detail == {"building": "well", "max": 3}, "buildings: each type's limit")
-	_check(ParcelFarm.apply(multi, start, [place.call("barn", 1, 1)], T0).code == "UNKNOWN_BUILDING", "buildings: unknown types refused")
+	_check(ParcelFarm.apply(multi, start, [place.call("silo", 1, 1)], T0).code == "UNKNOWN_BUILDING", "buildings: unknown types refused")
 	_check(ParcelFarm.apply(multi, start, [place.call("coop", 1021, 0)], T0).code == "OUT_OF_BOUNDS" and ParcelFarm.apply(multi, start, [place.call("coop", 1021, 0, 1)], T0).ok,
 		"buildings: the turned footprint stays on the grid")
 	_check(ParcelFarm.apply(multi, start, [place.call("well", 1, 1, 4)], T0).code == "SCHEMA" and ParcelFarm.apply(multi, start, [{"type": "place_building", "x": 1, "y": 1}], T0).code == "SCHEMA",

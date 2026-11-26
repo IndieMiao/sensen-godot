@@ -46,8 +46,11 @@ func _clean() -> void:
 
 func _rules() -> void:
 	var eco: Dictionary = ParcelFarm.rules().economy
-	_check(eco.sell_prices == {"crop_carrot": 12, "wood": 2, "wild_herb": 1, "stone": 2, "egg": 20}, "C-30#36 prices: carrot 12, wood 2, herb 1, stone 2; C-154 egg 20")
-	_check(eco.blueprints.coop == {"item": "blueprint_coop", "amount": 1, "min_sales": 1}, "one coop blueprint after the first sale")
+	_check(eco.sell_prices == {"crop_carrot": 12, "wood": 2, "wild_herb": 1, "stone": 2, "egg": 20, "milk": 45},
+		"C-30#36 prices: carrot 12, wood 2, herb 1, stone 2; C-154 egg 20; C-181 milk 45")
+	# C-181: every blueprint reads a price in coins (0 when the rules give none); the barn's is bought for 150.
+	_check(eco.blueprints.coop == {"item": "blueprint_coop", "amount": 1, "min_sales": 1, "coins": 0}, "one coop blueprint after the first sale")
+	_check(eco.blueprints.barn == {"item": "blueprint_barn", "amount": 1, "min_sales": 0, "coins": 150}, "the barn blueprint for 150 coins")
 	_check(eco.buy_prices == {"seed_carrot": 9}, "C-149: Jasmine sells carrot seeds at 9, the P0 seed price")
 	var p0_carrot := {}
 	var p0 = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/p0_content.json"))

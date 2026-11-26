@@ -13,6 +13,8 @@ const Livestock = preload("res://modules/dynamic_farm/farm_livestock.gd")
 const LivestockScene = preload("res://scenes/dynamic_farm/parcel_livestock.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
+const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
+const Shade = preload("res://modules/dynamic_farm/farm_shade.gd")
 const T0 := 1795406400000
 const BODY := 0.3
 const BASE := Vector2i(8, 6)
@@ -36,6 +38,8 @@ func _run() -> void:
 	_walls()
 	_entry()
 	_placement()
+	for path in OS.get_cmdline_user_args():
+		_fit_parcel(JSON.parse_string(FileAccess.get_file_as_string(path)))
 	_placeholders()
 	_items()
 	_keys()
@@ -201,6 +205,45 @@ func _placement() -> void:
 		_check(not Building.cells(spot, BASE, turns).has(entry)
 			and Building.reason(data, spot, BASE, turns, {}, path, walk.reserved.merged({entry: true}), "barn") == Building.TAKEN,
 			"placement turned %d: a solid obstacle on the cell outside the entry refuses it" % turns)
+
+## C-192: on a real parcel (the pinned r4 fixtures), every barn spot the placement accepts in each turn keeps its
+## entry cell in the core and off solid obstacles, and a solid obstacle there refuses it. How many spots each turn has
+## is printed, not asserted: a small yard may have none (SEN-C-193), as with the coop.
+func _fit_parcel(raw: Dictionary) -> void:
+	var data := Data.decode(raw)
+	if not data.ok: return
+	var walk := Walk.new(data)
+	var planned := Scenery.plan(data, walk)
+	Shade.enforce_budget(planned, data, walk)
+	var layout: Array = planned.core_obstacles.layout
+	var obstacles := {}
+	for item: Dictionary in layout: obstacles[item.cell] = true
+	var path := Space.protected_path(data)
+	# The obstacles cleared, as a player does before building; solid ones still standing are judged below.
+	var taken := Building.blocked({}, {})
+	var stones := Building.solid(layout, obstacles)
+	var exact := true
+	var counts := []
+	var coop := []
+	for turns in 4:
+		var spots := 0
+		var coop_spots := 0
+		for y in range(-1, data.grid_size.y):
+			for x in range(-1, data.grid_size.x):
+				var at := Vector2i(x, y)
+				if Building.reason(data, at, Vector2i(7, 5), turns, taken, path, walk.reserved, "coop") == "": coop_spots += 1
+				var why := Building.reason(data, at, BASE, turns, taken, path, walk.reserved, "barn")
+				var kept := Building.apron_cells("barn", at, BASE, turns)
+				if kept.any(func(c): return not data.by_cell.has(c) or data.by_cell[c].zone != "core"):
+					exact = exact and why == Building.OUTSIDE
+				if why != "": continue
+				spots += 1
+				if kept.any(func(c): return stones.has(c)):
+					exact = exact and Building.reason(data, at, BASE, turns, taken, path, walk.reserved.merged(stones), "barn") == Building.TAKEN
+		counts.append(spots)
+		coop.append(coop_spots)
+	_check(exact, "%s: every barn spot keeps its entry cell in the core, off solid obstacles" % data.block_id)
+	print("BARN fit parcel=%s barn_spots=%s coop_spots=%s" % [data.block_id, counts, coop])
 
 ## Until SEN-C-179's art is in: a four-legged cow from the art's placeholder, a bottle for the milk.
 func _placeholders() -> void:
