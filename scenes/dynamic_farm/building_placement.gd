@@ -32,6 +32,8 @@ var _camera: Camera3D
 var _taken := {}
 var _path := {}
 var _walk_blocked := {}
+## The same with the core obstacles cleared (C-175): a spot valid then reads Building.CLEAR, not Space taken.
+var _cleared := {}
 var _ghost: Node3D
 var _bar: UiPlaceBar
 var _fills: Array = []
@@ -42,10 +44,14 @@ var _finger := -1
 static var _outline: ImageTexture
 
 ## `building` is the type, `footprint` its unturned width × depth; `taken` / `path` / `walk_blocked` as
-## Building.reason takes them; `canvas` holds the bar.
+## Building.reason takes them; `canvas` holds the bar. `cleared`: {taken, walk_blocked} with the core obstacles gone
+## (C-175), or {}; `start_rotation`: the turn the preview starts in.
 func setup(building: String, footprint: Vector2i, data: Dictionary, walk: RefCounted, camera: Camera3D,
-		canvas: CanvasLayer, taken: Dictionary, path: Dictionary, walk_blocked: Dictionary, start: Vector2i) -> void:
+		canvas: CanvasLayer, taken: Dictionary, path: Dictionary, walk_blocked: Dictionary, start: Vector2i,
+		cleared := {}, start_rotation := 0) -> void:
 	type = building
+	_cleared = cleared
+	rotation_steps = posmod(start_rotation, 4)
 	base = footprint
 	_data = data
 	_walk = walk
@@ -86,6 +92,10 @@ func setup(building: String, footprint: Vector2i, data: Dictionary, walk: RefCou
 func move_to(cell: Vector2i) -> void:
 	at = cell
 	reason = Building.reason(_data, at, base, rotation_steps, _taken, _path, _walk_blocked, type)
+	# Refused only for the trees, bushes, rocks and weeds standing there: say what to do (C-175).
+	if reason != "" and reason != Building.OUTSIDE and not _cleared.is_empty() \
+			and Building.reason(_data, at, base, rotation_steps, _cleared.taken, _path, _cleared.walk_blocked, type) == "":
+		reason = Building.CLEAR
 	_ghost.transform = Building.transform(_walk, at, base, rotation_steps)
 	_bar.reason = reason
 	_paint()
@@ -97,9 +107,10 @@ func turn() -> void:
 	move_to(Building.turned_at(at, base, was, rotation_steps))
 
 ## The save changed under the preview (a refused Build brings the current farm): judge the spot again.
-func retake(taken: Dictionary, walk_blocked: Dictionary) -> void:
+func retake(taken: Dictionary, walk_blocked: Dictionary, cleared := {}) -> void:
 	_taken = taken
 	_walk_blocked = walk_blocked
+	_cleared = cleared
 	move_to(at)
 
 ## Scene point under a screen position, on the ground.

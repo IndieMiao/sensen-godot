@@ -935,6 +935,18 @@ func _feeder_yields_to_tapped_cell() -> void:
 	DirAccess.make_dir_recursive_absolute(feed_dir)
 	store._save(seeded, 3)
 	var farming := await _open(store)
+	# C-175#53: the uncleared yard has no room for the coop; its preview starts where the fewest trees, bushes, rocks and
+	# weeds stand in the way and says to clear them, instead of "Outside your yard" / "Space taken" under the player.
+	scene._build_type = "coop"
+	scene.begin_placement()
+	var place = scene._placement
+	_check(place != null and place.type == "coop" and place.reason == Building.CLEAR and place._bar.reason == Building.CLEAR,
+		"an uncleared yard: the coop's preview asks to clear the plants and rocks there (%s)" % [place.reason if place != null else "no preview"])
+	if place != null:
+		var free: Dictionary = scene._cleared()
+		_check(Building.reason(scene._data, place.at, place.base, place.rotation_steps, free.taken, farming.protected_path(), free.walk_blocked, "coop") == "",
+			"...on a spot the coop fits once they are cleared")
+		scene.end_placement()
 	# The core's obstacles cleared, so the 7×5 coop finds room; it goes where it fits, then the well from the Build key.
 	var cleared := {}
 	for anchor: Vector2i in farming._obstacles.values(): cleared[ParcelFarm.key(anchor)] = true

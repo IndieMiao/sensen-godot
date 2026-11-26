@@ -93,7 +93,10 @@ see-through model (its middle cell under the finger); its cells fill green or re
 cells round it, and the protected path's cells in reach show sand. The bottom is the shared `UiPlaceBar`
 (`Cancel · Rotate · Build`, the three-key bar P0's Decorate uses); Rotate turns the preview a quarter in place
 (0, 90, 180, 270°, the owner's SEN-C-134#22 question 3), a turn swapping the footprint's width and depth; the reason a
-spot is refused shows above the bar. The preview starts unturned on the valid spot nearest the player. Build sends
+spot is refused shows above the bar. The preview starts unturned on the valid spot nearest the player, else turned (C-175). A fresh yard often has no room
+for the 7×5 coop until some trees, bushes, rocks and weeds are cleared: with no valid spot the preview starts on the one
+needing the fewest of them cleared (`FarmBuilding.start_spot`), and a spot refused only for core obstacles reads
+`Clear the plants and rocks here first` instead of `Space taken`. Build sends
 `place_building` (type, cell, turn) through `ParcelFarming.send`; it stands at once (no construction time). A refused
 Build (`CELL_OCCUPIED`, `BUILDING_OVERLAP`) keeps the preview, judged again on the farm the reply brought. A
 successful Build (C-114) pops the building in and puffs dust with the main farm's look-swap effect (`P0Fence.pop_in` /
