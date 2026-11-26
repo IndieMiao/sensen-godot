@@ -12,7 +12,8 @@ extends SceneTree
 ## enter names r8 (moved, Q-168). C-151: Build Well, dry carrots that do not grow, Fill at the well for 2 Energy, Water
 ## three cells from one pail (wet soil, growing from then), Pail empty for the fourth until the pail is filled again.
 ## C-152: at Lv1 one well stands, a spare well blueprint offers nothing; at Lv3 the Build key offers the second and the
-## Energy chip tops at 220.
+## Energy chip tops at 220. C-171: beside the coop's feeder a tapped cell with a step to do keeps its key (the well's Fill, a
+## free cell's Till); untapped, or tapped on a cell with nothing to do, the key feeds.
 ## Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
@@ -99,6 +100,7 @@ func _run() -> void:
 	await _energy_comes_back()
 	await _watering_loop()
 	await _level_wells()
+	await _feeder_yields_to_tapped_cell()
 	await _older_dataset_claim()
 	await _release_named_on_enter()
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
@@ -911,6 +913,97 @@ func _level_wells() -> void:
 	await process_frame
 	for name in DirAccess.get_files_at(level_dir): DirAccess.remove_absolute(level_dir.path_join(name))
 	DirAccess.remove_absolute(level_dir)
+
+## C-171 (SEN-C-154#139): standing within FEED_REACH_M of the coop's feeder, a tapped cell with a step to do keeps its key:
+## the well's Fill (pressed, the pail fills as ever) and a free cell's Till. Untapped, or tapped on a cell with nothing to
+## do (the well with a full pail, the coop's floor), the key is Feed, and the press feeds.
+func _feeder_yields_to_tapped_cell() -> void:
+	var data: Dictionary = scene_data()
+	var house_at := _free_block(data)
+	var now: int = int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
+	var cottage := {"model": "cottage", "x": house_at.x, "y": house_at.y, "width": 3, "depth": 3, "rotation": 0, "built_at": 0}
+	var seeded := ParcelFarm.empty_state()
+	seeded.buildings = [cottage.merged({"id": 1, "type": "cottage"})]
+	seeded.house = cottage
+	seeded.welcomed_at = now - 8 * 86400000
+	seeded.grants = {"watering": now}
+	seeded.bag = {"hoe_starter": 1, "pail": 1, "blueprint_well": 1, "blueprint_coop": 1, "crop_carrot": 2}
+	var feed_dir := dir + "_feeder"
+	var store := LocalStore.new(raw.block_id, feed_dir)
+	store.now_ms = func() -> int: return int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
+	DirAccess.make_dir_recursive_absolute(feed_dir)
+	store._save(seeded, 3)
+	var farming := await _open(store)
+	# The core's obstacles cleared, so the 7×5 coop finds room; it goes where it fits, then the well from the Build key.
+	var cleared := {}
+	for anchor: Vector2i in farming._obstacles.values(): cleared[ParcelFarm.key(anchor)] = true
+	seeded.cleared = cleared.keys()
+	store._save(seeded, 4)
+	scene.queue_free()
+	await process_frame
+	farming = await _open(store)
+	var obstacles: Dictionary = farming.obstacle_cells()
+	for turns in 4:
+		var at = Building.nearest(scene._data, data.spawn, Vector2i(7, 5), Building.blocked(obstacles, farming.farm), farming.protected_path(),
+			scene._walk_blocked(obstacles), turns, "coop")
+		if at == null: continue
+		await farming.send({"type": "place_building", "building": "coop", "x": at.x, "y": at.y, "rotation": turns})
+		break
+	for _i in 3: await process_frame
+	if scene._build.visible:
+		scene._build.activated.emit()
+		await process_frame
+		scene._placement._bar.confirmed.emit()
+		for _j in 3: await process_frame
+	var wells: Array = ParcelFarm.wells(farming.rules, farming.farm)
+	var coops: Array = scene.buildings_state().filter(func(b): return b.type == "coop")
+	_check(wells.size() == 1 and coops.size() == 1, "the well and the coop stand: %s" % [scene.buildings_state()])
+	if wells.size() != 1 or coops.size() != 1: return
+	var well_cell := Building.at_of(wells[0])
+	# A clear spot within reach of a feeder (the feeders stand inside the coop, by its open floor).
+	var stand = null
+	for p: Vector3 in farming.livestock._yards.values()[0].feeder_points:
+		for r in [0.5, 0.7, 0.9]:
+			for k in 16:
+				var q: Vector3 = p + Vector3(r, 0, 0).rotated(Vector3.UP, k * TAU / 16)
+				if stand == null and scene._walk.clear_position(q): stand = q
+	_check(stand != null, "a clear spot by the feeder")
+	if stand == null: return
+	var to_feeder := func() -> void:
+		scene._walk.position = stand
+		scene._actor.position = stand
+		farming.picked = null
+		await process_frame
+		await process_frame
+	await to_feeder.call()
+	_check(not farming.livestock.feeder_near(scene._actor.position, farming.get_script().FEED_REACH_M).is_empty()
+		and [farming._key.verb, farming._key.cost] == ["Feed", "1 Energy"], "by the feeder, nothing tapped: Feed")
+	_check(await _key(farming, well_cell) == ["Fill", "2 Energy", UiSceneAction.State.DEFAULT], "by the feeder, the well tapped: Fill")
+	var energy: int = farming.energy_value()
+	await _press(farming, well_cell)
+	_check(farming.farm.pail_water == 3 and farming.energy_value() == energy - 2 and farming.farm.bag.crop_carrot == 2,
+		"Fill pressed by the feeder fills the pail and feeds nothing")
+	await to_feeder.call()
+	var free := _free_cell(data, farming)
+	_check(not farming.livestock.covers(free) and await _key(farming, free) == ["Till", "2 Energy", UiSceneAction.State.DEFAULT],
+		"by the feeder, a free cell tapped: Till")
+	await to_feeder.call()
+	_check((await _key(farming, well_cell))[0] == "Feed", "by the feeder, the well tapped with a full pail: Feed")
+	var floor_cell: Vector2i = scene._walk.cell_at(stand)
+	_check(farming.livestock.covers(floor_cell) and (await _key(farming, floor_cell))[0] == "Feed", "by the feeder, the coop's floor tapped: Feed")
+	farming.picked = null
+	await process_frame
+	await process_frame
+	energy = farming.energy_value()
+	farming._key.pressed_down.emit()
+	var deadline := Time.get_ticks_msec() + 30000
+	while farming.busy and Time.get_ticks_msec() < deadline: await process_frame
+	_check(farming.farm.bag.get("crop_carrot", 0) == 1 and farming.energy_value() == energy - 1 and farming.farm.pail_water == 3,
+		"Feed pressed: a carrot and 1 Energy, the hens fed")
+	scene.queue_free()
+	await process_frame
+	for name in DirAccess.get_files_at(feed_dir): DirAccess.remove_absolute(feed_dir.path_join(name))
+	DirAccess.remove_absolute(feed_dir)
 
 ## `n` free core cells side by side along x, or [].
 func _free_row(data: Dictionary, farming: Node, n: int) -> Array:
