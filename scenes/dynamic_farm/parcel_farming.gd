@@ -428,7 +428,7 @@ func _refresh_key() -> void:
 		_key.cost = REFUSALS.get(current.refusal, "+%d Energy" % int(current.get("gain", 0)))
 	elif current.verb == "feed":
 		_key.verb = VERBS.feed
-		_key.cost = str(current.refusal_text) if refused else _price()
+		_key.cost = str(current.key_text) if refused else _price()
 	else:
 		_key.verb = VERBS[current.verb]
 		_key.cost = REFUSALS.get(current.refusal, _price())
@@ -454,7 +454,9 @@ func _on_key() -> void:
 		open_energy_card(key_cost, VERBS.get(current.verb, ""))
 		return
 	if not str(current.refusal).is_empty():
-		var refusal := "Not ripe yet" if current.refusal == Space.NOT_RIPE else "Not ready yet" if current.refusal == REGROWING else _key.cost
+		# The whole sentence where the key shows a shorter one (the feeder's `Need 2 more Carrot`, C-192).
+		var refusal := "Not ripe yet" if current.refusal == Space.NOT_RIPE else "Not ready yet" if current.refusal == REGROWING \
+			else str(current.get("refusal_text", _key.cost))
 		_toast.show_toast(refusal, ToastLayer.Severity.REFUSED)
 		return
 	if current.verb == "gather": await gather(current)
@@ -469,28 +471,45 @@ func gather(action: Dictionary) -> Dictionary:
 	return await send(action.command, LABOUR_S)
 
 ## The key at a livestock building's feeder (C-154): Feed, or why not (`Need 1 Carrot`, the art's `Hens are fed` /
-## `Pick up eggs first`); {verb, refusal, refusal_text, command, feeder}.
+## `Pick up eggs first`); {verb, refusal, refusal_text, key_text, command, feeder}. `refusal_text` is the whole
+## sentence (the tap's toast); `key_text` is what the key's second line shows: the same where it fits, else its shorter
+## form (C-192, P0's keys: `Need 2 more Carrot` → `Need 2 more`; the art's `full_short` / `fed_short`).
 func _feed_action(near: Dictionary) -> Dictionary:
 	var b: Dictionary = near.building
 	var refusal := ParcelFarm.feed_refusal(rules, farm, b, server_now())
 	var rule := ParcelFarm.livestock_of(rules, b)
 	var copy: Dictionary = LivestockArt.building_art(str(b.type)).get("copy", {})
 	var text := ""
+	var short := ""
 	match refusal:
-		"NO_FEED": text = feed_gap(rule, int(farm.get("bag", {}).get(str(rule.get("feed", "")), 0)))
-		"ANIMALS_FED": text = str(copy.get("fed", "Hens are fed"))
-		"GROUND_FULL": text = str(copy.get("full", "Pick up eggs first"))
+		"NO_FEED":
+			var have := int(farm.get("bag", {}).get(str(rule.get("feed", "")), 0))
+			text = feed_gap(rule, have)
+			short = feed_gap(rule, have, true)
+		"ANIMALS_FED":
+			text = str(copy.get("fed", "Hens are fed"))
+			short = str(copy.get("fed_short", ""))
+		"GROUND_FULL":
+			text = str(copy.get("full", "Pick up eggs first"))
+			short = str(copy.get("full_short", ""))
 		"NOT_LIVESTOCK": text = "That didn't work."
-	return {"verb": "feed", "refusal": refusal, "refusal_text": text, "feed_item": str(rule.get("feed", "")),
+	return {"verb": "feed", "refusal": refusal, "refusal_text": text, "key_text": key_copy(text, short),
+		"feed_item": str(rule.get("feed", "")),
 		"command": {"type": "feed", "building": int(b.id)} if refusal.is_empty() else {}, "feeder": near.point}
+
+## The main key's second line for `text`: itself when it shows whole on the key, else `short` (when there is one).
+static func key_copy(text: String, short: String) -> String:
+	return text if short.is_empty() or UiSceneAction.cost_fits(text) else short
 
 ## The key's reason when the bag has `have` of the feed and a feeding takes the rule's `feed_amount` (C-181): `Need 1
 ## Carrot` with none for one (the coop, as before), else P0's `Need N more <item>` (the barn: `Need 2 more Carrot`).
-func feed_gap(rule: Dictionary, have: int) -> String:
+## `short`: without the item (`Need 2 more`), what the key shows where the whole one does not fit (C-192).
+func feed_gap(rule: Dictionary, have: int, short := false) -> String:
 	var feed := str(rule.get("feed", ""))
 	var name_ := str(_names.get(feed, ParcelItems.name_of(feed)))
 	var need := int(rule.get("feed_amount", 1))
-	return "Need 1 %s" % name_ if need == 1 and have <= 0 else "Need %d more %s" % [need - have, name_]
+	if need == 1 and have <= 0: return "Need 1" if short else "Need 1 %s" % name_
+	return "Need %d more" % (need - have) if short else "Need %d more %s" % [need - have, name_]
 
 ## One feed press (C-154): the feeder is already in reach, so the player faces it and plays the labour clip while
 ## the command goes out; the fed hen then comes to peck (ParcelLivestock).

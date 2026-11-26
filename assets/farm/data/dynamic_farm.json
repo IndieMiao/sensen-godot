@@ -219,7 +219,8 @@
       "fresh_greens": { "item": "crop_carrot" },
       "timber_run": { "item": "wood" },
       "stone_order": { "item": "stone" },
-      "egg_basket": { "item": "egg", "building": "coop" }
+      "egg_basket": { "item": "egg", "building": "coop" },
+      "fresh_milk": { "item": "milk", "building": "barn" }
     }
   }
 }

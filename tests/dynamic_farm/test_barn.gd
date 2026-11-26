@@ -2,8 +2,8 @@ extends SceneTree
 ## The barn (C-181, 0.4.6): the client copy of the rules against the server on the shared cases (fixtures/barn_cases.json,
 ## also run by server/test/parcels/farm.test.ts), the barn's art (fence with the entry open, walls, the feeder, the
 ## placeholder yard, cow and milk while SEN-C-179's art is not in), placing it on a parcel in all four turns, the Build
-## key's material gap and the feed key's reason, and ParcelLivestock with two cows: they keep to the open floor and step
-## away from the player, milk given while away lies there, milk due appears, a laid one is reported in reach.
+## key's material gap and the feed key's reason (shown whole on the key, C-192), and ParcelLivestock with two cows: they
+## keep to the open floor and step away from the player, milk given while away lies there, milk due appears, a laid one is reported in reach.
 ##   godot --headless --path "$QA" --script res://tests/dynamic_farm/test_barn.gd
 const Data = preload("res://modules/dynamic_farm/farm_data.gd")
 const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
@@ -287,6 +287,19 @@ func _keys() -> void:
 	_check(farming.feed_gap(barn, 0) == "Need 2 more Carrot" and farming.feed_gap(barn, 1) == "Need 1 more Carrot",
 		"feed key: two carrots a cow (%s / %s)" % [farming.feed_gap(barn, 0), farming.feed_gap(barn, 1)])
 	_check(farming.feed_gap(coop, 0) == "Need 1 Carrot", "feed key: the coop's reason unchanged")
+	# C-192: the key's second line shows whole; too wide, the shorter form (P0's `Need 2 more`), the toast keeps it all.
+	var key_copy: Callable = farming.get_script().key_copy
+	_check(farming.feed_gap(barn, 0, true) == "Need 2 more" and farming.feed_gap(coop, 0, true) == "Need 1",
+		"feed key: the short forms (%s / %s)" % [farming.feed_gap(barn, 0, true), farming.feed_gap(coop, 0, true)])
+	_check(key_copy.call(farming.feed_gap(barn, 0), farming.feed_gap(barn, 0, true)) == "Need 2 more"
+		and key_copy.call(farming.feed_gap(coop, 0), farming.feed_gap(coop, 0, true)) == "Need 1 Carrot",
+		"feed key: `Need 2 more Carrot` does not fit the key, `Need 1 Carrot` does")
+	for type: String in ["coop", "barn"]:
+		var copy: Dictionary = Livestock.building_art(type).copy
+		for k: String in ["fed", "full"]:
+			var shown: String = key_copy.call(str(copy[k]), str(copy.get(k + "_short", "")))
+			_check(UiSceneAction.cost_fits(shown), "feed key: %s's `%s` shows whole as `%s`" % [type, copy[k], shown])
+	_check(key_copy.call("Pick up milk first", "Pick up milk") == "Pick up milk first", "feed key: `Pick up milk first` fits as it is")
 	var state := ParcelFarm.empty_state()
 	state.bag = {"crop_carrot": 1}
 	var b := {"id": 1, "type": "barn", "animals": ["cow", "cow"]}

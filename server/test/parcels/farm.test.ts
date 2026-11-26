@@ -934,7 +934,7 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
       bag: { crop_carrot: 3 }, welcomed_at: T0, coins: 160, sales: 3, gathered: {}, blueprints_claimed: { coop: T0 },
       drops: [{ id: 4, item: 'egg', amount: 1, building: 1, animal: 0, spot: 2, ready_at: T0 }], drop_seq: 4 } as unknown as ParcelFarmState;
     const frozen = structuredClone(old);
-    expect(withEconomy(old)).toEqual({ ...frozen, pail_water: 0, grants: {}, level: 1 });
+    expect(withEconomy(old)).toEqual({ ...frozen, pail_water: 0, grants: {}, level: 1, board: emptyBoard(), requests_done: 0 });
     // A hen still eats one carrot.
     expect(run(old, [{ type: 'feed', building: 1 }]).bag.crop_carrot).toBe(2);
     expect(run(old, [pick(4)]).bag.egg).toBe(1);

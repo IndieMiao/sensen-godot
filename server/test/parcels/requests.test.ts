@@ -45,6 +45,9 @@ const deliver = (id: number): FarmCommand => ({ type: 'deliver_request', request
 /** 盖好的鸡场（建筑 2），出鸡蛋单要它。 */
 const withCoop = (s: ParcelFarmState): ParcelFarmState =>
   ({ ...structuredClone(s), buildings: [...s.buildings, { id: 2, type: 'coop', model: 'chicken_yard', x: 10, y: 10, width: 7, depth: 5, rotation: 0, built_at: T0, animals: ['hen_white'] }] });
+/** 盖好的牛棚（建筑 3），出牛奶单要它（C-192）。 */
+const withBarn = (s: ParcelFarmState): ParcelFarmState =>
+  ({ ...structuredClone(s), buildings: [...s.buildings, { id: 3, type: 'barn', model: 'cow_barn', x: 20, y: 10, width: 8, depth: 6, rotation: 0, built_at: T0, animals: ['cow', 'cow'] }] });
 
 describe('dynamic_farm.json requests (C-191)', () => {
   it('ships the author defaults awaiting the owner: 2 slots, at once / 8 h / 72 h, 6 a day, bonus 100, floor 80%, P0 tiers', () => {
@@ -53,10 +56,10 @@ describe('dynamic_farm.json requests (C-191)', () => {
       floor_percent: 80,
       tiers: [{ level: 1, qty: [2, 3], bonus: 10 }, { level: 4, qty: [4, 6], bonus: 20 }, { level: 7, qty: [6, 10], bonus: 40 }],
       templates: { fresh_greens: { item: 'crop_carrot' }, timber_run: { item: 'wood' }, stone_order: { item: 'stone' },
-        egg_basket: { item: 'egg', building: 'coop' } },
+        egg_basket: { item: 'egg', building: 'coop' }, fresh_milk: { item: 'milk', building: 'barn' } },
     });
-    // 地板价 = Jasmine 的售价 × 80% 向下取整：胡萝卜 12 → 9、木材 2 → 1、石头 2 → 1、鸡蛋 20 → 16。
-    expect(['crop_carrot', 'wood', 'stone', 'egg'].map(i => floorPrice(rules, i))).toEqual([9, 1, 1, 16]);
+    // 地板价 = Jasmine 的售价 × 80% 向下取整：胡萝卜 12 → 9、木材 2 → 1、石头 2 → 1、鸡蛋 20 → 16、牛奶 45 → 36（C-192）。
+    expect(['crop_carrot', 'wood', 'stone', 'egg', 'milk'].map(i => floorPrice(rules, i))).toEqual([9, 1, 1, 16, 36]);
     expect([1, 3, 4, 5, 6, 7, 99].map(l => tierFor(rules.requests!, l).bonus)).toEqual([10, 10, 20, 20, 20, 40, 40]);
   });
 
@@ -75,7 +78,7 @@ describe('dynamic_farm.json requests (C-191)', () => {
     expect(bad({ tiers: [{ level: 1, qty: [2, 3], bonus: 10 }, { level: 1, qty: [2, 3], bonus: 20 }] })).toThrow();
     expect(bad({ templates: {} })).toThrow();
     expect(bad({ templates: { x: { item: 'seed_carrot' } } })).toThrow();   // Jasmine 不收的东西不能出单
-    expect(bad({ templates: { x: { item: 'egg', building: 'barn' } } })).toThrow();   // 没有这类建筑
+    expect(bad({ templates: { x: { item: 'egg', building: 'pen' } } })).toThrow();   // 没有这类建筑（羊圈还没上）
     expect(bad({ templates: { x: { item: 'egg', tiers: [{ level: 2, qty: [1, 2], bonus: 20 }] } } })).toThrow();   // 模板自己的分档也从 1 级起
     const none = parseParcelRules({ ...structuredClone(rules), requests: undefined });
     const s = view(welcomed(), T0, none);
@@ -121,7 +124,7 @@ describe('drawing requests (C-191)', () => {
     expect(view(welcomed(), T0 + 3 * H)).toEqual(view(welcomed(), T0 + 5000));
   });
 
-  it('only what the farm can make: no eggs without a coop; with one, eggs come up among the kinds', () => {
+  it('only what the farm can make: no eggs without a coop, no milk without a barn; with them, they come up among the kinds', () => {
     const kinds = (s: ParcelFarmState) => {
       const seen = new Set<string>();
       // 每次放弃再到点补位换一张，看 60 张单子都出了什么。
@@ -136,6 +139,8 @@ describe('drawing requests (C-191)', () => {
     };
     expect(kinds(welcomed())).toEqual(['crop_carrot', 'stone', 'wood']);
     expect(kinds(withCoop(welcomed()))).toEqual(['crop_carrot', 'egg', 'stone', 'wood']);
+    expect(kinds(withBarn(welcomed()))).toEqual(['crop_carrot', 'milk', 'stone', 'wood']);
+    expect(kinds(withBarn(withCoop(welcomed())))).toEqual(['crop_carrot', 'egg', 'milk', 'stone', 'wood']);
   });
 
   it('quantity and completion bonus follow the farm level when drawn: Lv1–3 2–3 and +10, Lv4–6 4–6 and +20', () => {

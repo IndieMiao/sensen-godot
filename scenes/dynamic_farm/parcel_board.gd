@@ -34,7 +34,7 @@ const COPY := {"title": "Request Board", "loading": "…", "unreachable": "Could
 	"available": "Available in", "drop": "Drop request", "back": "Back", "drop_effect": "Dropping removes tracking and delays the next request.",
 	"after_drop": "Next request after drop", "stay": "Your %s stay in your bag.", "keep": "Keep tracking", "dropped": "Dropped",
 	"remain": "Your %s remain in your bag.", "close": "Close", "float": "+%d coins"}
-const TITLES := {"fresh_greens": "Fresh Greens", "timber_run": "Timber Run", "stone_order": "Stone Order", "egg_basket": "Egg Basket"}
+const TITLES := {"fresh_greens": "Fresh Greens", "timber_run": "Timber Run", "stone_order": "Stone Order", "egg_basket": "Egg Basket", "fresh_milk": "Fresh Milk"}
 const SLOT_NAMES := ["First", "Second", "Third", "Fourth"]
 
 var farm := {}

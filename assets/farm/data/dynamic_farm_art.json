@@ -4,7 +4,7 @@
   "buildings": {
     "coop": {
       "name": "Coop",
-      "copy": {"fed": "Hens are fed", "full": "Pick up eggs first"},
+      "copy": {"fed": "Hens are fed", "full": "Pick up eggs first", "full_short": "Pick up eggs"},
       "scene": "res://assets/dynamic_farm/chicken_yard/chicken_yard.tscn",
       "fence": {"height": 0.75, "thickness": 0.125, "entry_clear_m": 0.4, "openings": [{"side": "front", "from": 5.0, "to": 6.0}]},
       "entry": [5.5, 5.0],
@@ -21,7 +21,7 @@
     },
     "barn": {
       "name": "Barn",
-      "copy": {"fed": "Cows are fed", "full": "Pick up milk first"},
+      "copy": {"fed": "Cows are fed", "full": "Pick up milk first", "full_short": "Pick up milk"},
       "scene": "res://assets/dynamic_farm/cow_barn/cow_barn.tscn",
       "fence": {"height": 0.75, "thickness": 0.125, "entry_clear_m": 0.4, "openings": [{"side": "front", "from": 3.0, "to": 4.0}]},
       "entry": [3.5, 6.0],
