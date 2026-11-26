@@ -4,6 +4,9 @@
  * RS256 + Google JWKS；iss 为 accounts.google.com（两种写法都合法），aud 为我们的 Web 客户端 ID
  * （Android 端用它请求 token，服务端据此认"是给我们签的"）。客户端把原始 nonce 发来，token 里
  * 的 nonce 是它的 SHA-256 十六进制（与 Apple 同一约定）。
+ *
+ * 校验本身只证明 token 是 Google 签给我们的；nonce 一次性由路由用 Store.claimIdTokenNonce 落库保证（C-132）：
+ * 截获的 id_token + 原始 nonce 再拿来登录会被拒绝。
  */
 import { verify as cryptoVerify } from 'node:crypto';
 import { IdTokenError, googleJwksFetcher, type KeySource } from './firebase_token.js';
@@ -13,7 +16,13 @@ export const GOOGLE_JWKS_URL = 'https://www.googleapis.com/oauth2/v3/certs';
 export const GOOGLE_ISSUERS = ['accounts.google.com', 'https://accounts.google.com'];
 export const googleIdJwksFetcher = () => googleJwksFetcher(GOOGLE_JWKS_URL);
 
-export interface GoogleIdentity { sub: string; aud: string; email?: string; emailVerified: boolean; givenName?: string; familyName?: string }
+export interface GoogleIdentity {
+  sub: string; aud: string; email?: string; emailVerified: boolean; givenName?: string; familyName?: string;
+  /** token 里的 nonce 声明（原始 nonce 的 SHA-256），服务端记下它防重放（C-132）。 */
+  nonceHash: string;
+  /** 这个 token 不再可能通过校验的时刻，毫秒（exp 加允许的时钟偏差）。 */
+  usableUntil: number;
+}
 
 export interface GoogleVerifyOptions {
   audiences: string[];
@@ -52,5 +61,5 @@ export async function verifyGoogleIdToken(token: unknown, rawNonce: unknown, o: 
   if (typeof sub !== 'string' || sub.length === 0 || sub.length > 255) throw new IdTokenError('BAD_SUBJECT');
   const str = (k: string) => (typeof payload[k] === 'string' ? payload[k] as string : undefined);
   return { sub, aud: payload.aud, email: str('email'), emailVerified: payload.email_verified === true || payload.email_verified === 'true',
-    givenName: str('given_name'), familyName: str('family_name') };
+    givenName: str('given_name'), familyName: str('family_name'), nonceHash: payload.nonce as string, usableUntil: (exp + skew) * 1000 };
 }

@@ -129,6 +129,10 @@ export class MemoryStore implements Store {
   // —— 账号（SGODOT-135） ——
   private users = new Map<string, UserRow>();
   private emailCodes = new Map<string, { hash: string; expires_at: number; sent_at: number; attempts: number }>();
+  /** provider:nonce 哈希 → 可清理时刻（C-132）。 */
+  private idTokenNonces = new Map<string, number>();
+  /** userId:网络哈希 → 最近一次成功登录（C-132）。 */
+  private loginNetworks = new Map<string, number>();
   private deletions = new Map<string, DeletionRecord>();
   private identities = new Map<string, { provider: string; provider_uid: string; user_id: string; refresh_token?: string | null; client_id?: string | null }>();
 
@@ -209,6 +213,19 @@ export class MemoryStore implements Store {
     this.emailCodes.delete(key);
     return 'ok';
   }
+  async claimIdTokenNonce(provider: string, nonceHash: string, expiresAt: number, now: number) {
+    for (const [key, until] of this.idTokenNonces) if (until < now) this.idTokenNonces.delete(key);
+    const key = provider + ':' + nonceHash;
+    if (this.idTokenNonces.has(key)) return false;
+    this.idTokenNonces.set(key, expiresAt);
+    return true;
+  }
+  async trustLoginNetwork(userId: string, networkHash: string, now: number) {
+    if (this.users.has(userId)) this.loginNetworks.set(userId + ':' + networkHash, now);
+  }
+  async loginNetworkTrusted(userId: string, networkHash: string, since: number) {
+    return (this.loginNetworks.get(userId + ':' + networkHash) ?? -Infinity) >= since;
+  }
   async deleteUser(userId: string, tombstone: DeletionRecord) {
     const user = this.users.get(userId);
     if (!user) return false;
@@ -224,6 +241,7 @@ export class MemoryStore implements Store {
     }
     for (const key of [...this.emailCodes.keys()]) if (key.endsWith(':' + user.email)) this.emailCodes.delete(key);
     for (const [key, row] of [...this.identities]) if (row.user_id === userId) this.identities.delete(key);
+    for (const key of [...this.loginNetworks.keys()]) if (key.startsWith(userId + ':')) this.loginNetworks.delete(key);
     this.users.delete(userId);
     this.deletions.set(userId, structuredClone(tombstone));
     return true;

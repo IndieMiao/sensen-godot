@@ -83,6 +83,8 @@ export interface AppDeps {
   signupClosed?: boolean;
   /** New anonymous players per hour by network, address block and in total (C-100, C-120); see signup_limits.ts. */
   anonymousSignupLimits?: Partial<AnonymousSignupLimits>;
+  /** Password attempts by email and network, and verification emails by recipient and in total (C-132); see accounts/limits.ts. */
+  accountLimits?: AccountRouteDeps['limits'];
   /** Dynamic farm parcel claims and parcel farms (C-31); absent leaves the /v1/parcels routes out. */
   parcels?: Omit<ParcelRouteDeps, 'now'>;
 }
@@ -398,7 +400,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   registerAccounts(app, {
     store: deps.store, pepper: deps.pepper, now: deps.now, mailer: deps.mailer ?? createLogMailer(),
     qaEmailDomain: deps.qaEmailDomain, qaEmailCode: deps.qaEmailCode, apple: deps.apple, appleRevoker: deps.appleRevoker, google: deps.google,
-    signupClosed: deps.signupClosed,
+    signupClosed: deps.signupClosed, limits: deps.accountLimits,
     closeSessions: async playerId => { online?.closePlayer(playerId); },
     beforeDelete: async playerId => { await online?.forgetPlayer(playerId); },
   }, auth);

@@ -23,6 +23,7 @@ import { parcelIdleDaysFromEnv, scheduleIdleReclaim } from './parcels/reclaim.js
 import { loadStarterZones, starterZoneSwitchFromEnv } from './parcels/starter_zone.js';
 import { signupClosedFromEnv } from './accounts/routes.js';
 import { anonymousSignupLimitsFromEnv } from './http/signup_limits.js';
+import { accountLimitsFromEnv } from './accounts/limits.js';
 
 const need = (k: string): string => {
   const v = process.env[k];
@@ -40,6 +41,8 @@ const starterZoneSwitch = starterZoneSwitchFromEnv(process.env);
 if (starterZoneSwitch === null) { console.error('PARCEL_STARTER_ZONE 只能是 0 或 1（不设则按配置文件）'); process.exit(1); }
 const anonymousSignupLimits = anonymousSignupLimitsFromEnv(process.env);
 if ('invalid' in anonymousSignupLimits) { console.error(`${anonymousSignupLimits.invalid} 只能是 1–1000000 的整数`); process.exit(1); }
+const accountLimits = accountLimitsFromEnv(process.env);
+if ('invalid' in accountLimits) { console.error(`${accountLimits.invalid} 只能是 1–1000000 的整数`); process.exit(1); }
 
 const ROOT = process.env.ASSET_ROOT ?? path.resolve(process.cwd(), '..');
 const CONTENT_DIR = path.join(ROOT, 'assets', 'farm', 'data');
@@ -132,6 +135,8 @@ const app = await buildApp({
   guestWrites: process.env.GUEST_WRITES === '1',
   // New anonymous players per hour by network, IPv6 /48 and in total (C-100, C-120); defaults 10 / 50 / 1000.
   anonymousSignupLimits,
+  // Login attempts per email+network and per email from unknown networks; verification mail per recipient and in total (C-132).
+  accountLimits,
   // Dynamic farm parcels (C-31). "Abandon and pick again" is for the internal test server only: it stays off unless
   // DYNAMIC_FARM_RESELECT=1 is set there; production never sets it.
   // Install-and-play (C-100): PARCEL_GUEST_WRITES=1 lets guests claim, enter and save their own parcel only. Off unless set.

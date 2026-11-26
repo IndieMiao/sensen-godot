@@ -93,6 +93,15 @@ export interface Store extends RealtimePersistence {
   saveEmailCode(email: string, purpose: string, codeHash: string, now: number, ttlMs: number, resendMs: number): Promise<SaveCodeOutcome>;
   /** 校验并消费验证码。错码计次，达上限作废。 */
   consumeEmailCode(email: string, purpose: string, codeHash: string, now: number, maxAttempts: number): Promise<ConsumeCodeOutcome>;
+  /**
+   * 记下一个第三方 ID token 的 nonce（C-132，防重放）。首次记下返回 true；已记过（同一 nonce 再次登录）返回 false。
+   * 并发的两次只有一次返回 true。expiresAt 之后可清掉：token 本身那时已过期。
+   */
+  claimIdTokenNonce(provider: string, nonceHash: string, expiresAt: number, now: number): Promise<boolean>;
+  /** 账号在这个网络上成功登录过（C-132）；networkHash 是网络键的 HMAC，不落 IP。 */
+  trustLoginNetwork(userId: string, networkHash: string, now: number): Promise<void>;
+  /** since 之后在这个网络上成功登录过。 */
+  loginNetworkTrusted(userId: string, networkHash: string, since: number): Promise<boolean>;
   /** 删账号：用户行、账号玩家及其农场 / token / 命令 / 快照 / 联机状态全部级联；写墓碑。 */
   deleteUser(userId: string, tombstone: DeletionRecord): Promise<boolean>;
   deletion(userId: string): Promise<DeletionRecord | null>;
