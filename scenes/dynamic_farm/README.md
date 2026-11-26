@@ -129,7 +129,8 @@ scene (SEN-C-155's `chicken_yard.tscn`; a placeholder of the parts and fence unt
 (walls; the front's opening is the entry, its walls pulled back so the player's centre passes `entry_clear_m`, 0.4 m), the hens' models and clips (SEN-C-156) and the egg's model. The yard's cells
 are never farmed. `scenes/dynamic_farm/parcel_livestock.gd` walks the hens on the open floor (walk, peck, idle; they
 step away from the player; a fed hen pecks at a feeder; a hen walks to her spot before her egg is due) and draws laid
-eggs. Near a feeder the key reads `Feed` · `1 Energy`. An egg within 0.8 m of the player hops into them and flies on
+eggs. Near a feeder the key reads `Feed` · `1 Energy`, unless a tapped cell has a step to do (the well's `Fill`, `Till`;
+SEN-C-171, `test_parcel_farming_scene.gd`). An egg within 0.8 m of the player hops into them and flies on
 into the Bag (`+1 Egg`). Numbers, the pickup and the copy await the owner (SEN-C-154#19); details in
 `docs/plans/C-154.md`. Tests: `tests/dynamic_farm/test_coop.gd` (shared cases `fixtures/coop_cases.json` with the
 server, walls, hens, pickup); captures: `tools/dev/dynamic_farm/coop_probe.gd`.

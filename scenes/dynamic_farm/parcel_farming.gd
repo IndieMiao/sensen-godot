@@ -383,10 +383,12 @@ func _refresh_key() -> void:
 		return
 	current = {} if farm.is_empty() else Space.action(rules, _data, _path, _obstacles, farm, target, server_now())
 	# C-154: a coop's floor is never farmed (no key there); at its feeder the key feeds.
+	# C-171: a tapped cell with a step to do (Fill at a well, Till) wins over the feeder, as a tapped object does.
 	if not farm.is_empty() and livestock != null:
 		if livestock.covers(target): current = {}
 		var feeder := livestock.feeder_near(_player, FEED_REACH_M) if _placed else {}
-		if not feeder.is_empty(): current = _feed_action(feeder)
+		if not feeder.is_empty() and (picked == null or current.is_empty() or not str(current.refusal).is_empty()):
+			current = _feed_action(feeder)
 	# A tapped object wins; a nearby one only when no cell was tapped and the cell in front has no step to do.
 	var object := -1 if farm.is_empty() else gather_target()
 	if object >= 0 and (picked_object >= 0 or (picked == null and (current.is_empty() or not str(current.refusal).is_empty()))):
