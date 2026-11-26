@@ -7,7 +7,8 @@ extends Node3D
 ## at the cottage's door the key rests (+60 once a player day). The store (server or local stand-in) is authoritative; this node
 ## only checks the spatial rules the server cannot (ParcelSpace) and draws the result.
 ## Soil and carrots are drawn by ParcelCropArt (C-138: 1×1 dry or wet soil blocks, seven
-## carrot stages). Main-farm pieces are reused read-only: P0 names and icons, and the main
+## carrot stages). Watering (C-151): a sown carrot sits on dry soil and does not grow; at the well the key
+## fills the pail (`Fill`, 2 Energy), on a dry carrot it waters it (`Water`, one of the pail's 3) and the soil turns wet. Main-farm pieces are reused read-only: P0 names and icons, and the main
 ## farm's UI kit (C-74): the quick bar, the action key and item flights into the bag; the bag
 ## is the UI v3 modal panel and gains the v3 float (C-105). Nothing of P0Ui / P0Runtime; the
 ## parcel's own coins (C-59) show in the scene's top bar as the main HUD's coins capsule, its
@@ -17,6 +18,12 @@ extends Node3D
 ## block) until it grows back. Gathering never touches the walk, the layout or collision.
 ## With a body (the scene, C-73) a press first walks the player beside the cell and plays the
 ## main farm's labour clip; the command goes out with the clip and its result lands as it ends.
+## Livestock (C-154, ParcelLivestock): near a coop's feeder the key reads `Feed` (`1 Energy`); a carrot goes in, and
+## the hen lays an egg on the ground `produce_seconds` later. Walking within reach of a laid egg picks it up by
+## itself: it flies into the player and on into the Bag (`+1 Egg`), the server checking each egg is taken once.
+## The coop's own floor is walked, never farmed: its cells show no key.
+## The in-game phone (C-107, design C-85 ⑧): the top bar's task button drops the guide's steps under the bar (C-T1–T3)
+## and the phone button at the right opens the phone (Tasks / Inbox / Collection, ParcelPhone); both read the save.
 signal state_changed(farm: Dictionary)
 
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -27,15 +34,39 @@ const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
 const Guide = preload("res://modules/dynamic_farm/parcel_guide.gd")
 const GATHERED_SHADER = preload("res://modules/dynamic_farm/gathered_prop.gdshader")
 const CropArt = preload("res://modules/dynamic_farm/parcel_crop_art.gd")
-## Development only: draw every tilled cell as wet soil. Until watering exists (C-137) the game shows dry soil.
+const Livestock = preload("res://scenes/dynamic_farm/parcel_livestock.gd")
+const LivestockArt = preload("res://modules/dynamic_farm/farm_livestock.gd")
+## How near a feeder (m, its centre on the ground) the key offers Feed (C-154): the bowl is solid, so the player
+## stands at least ~0.5 m from its centre.
+const FEED_REACH_M := 1.1
+const Tasks = preload("res://modules/dynamic_farm/parcel_tasks.gd")
+const Phone = preload("res://scenes/dynamic_farm/parcel_phone.gd")
+## Which task the player last saw in the drop-down or the phone, per parcel on this device: a newer one marks the task
+## and phone buttons (`badge/notify`) until it is seen.
+const PHONE_SEEN_PATH := "user://dynamic_farm_local/phone.json"
+## The phone's bottom sits this far above its button (C-L5), its right edge this far in from the screen's (C-L5), and the
+## phone button this far above the action key (C-L3's column spacing).
+const PHONE_ABOVE_BUTTON := UiTokens.SPACE_S4
+const PHONE_RIGHT := 14.0
+const PHONE_BUTTON_GAP := UiTokens.SPACE_S4
+## The drop-down's first row under the top bar (C-T1: 10 under the HUD).
+const DROP_DOWN_GAP := 10.0
+## Development only: draw every tilled cell as wet soil (C-138 captures). The game draws a watered crop's cell wet (C-151).
 const WET_SOIL_SETTING := "sensen/dynamic_farm/preview_wet_soil"
-const BAG_ORDER := ["hoe_starter", "seed_carrot", "crop_carrot"]
+## The tools first (C-151: the pail beside the hoe), then seeds and crops.
+const BAG_ORDER := ["hoe_starter", "pail", "seed_carrot", "crop_carrot"]
 ## Parcel items the main farm's content table does not name (C-74#33, copy per C-45). The icon is a placeholder from
 ## the existing set (the HUD's home), no new art.
-const VERBS := {"clear": "Clear", "till": "Till", "sow": "Sow", "harvest": "Harvest", "rest": "Rest", "gather": "Gather"}
+## C-151: `Water` is P0's key (P0Logic, the plot's Water); `Fill` draws the pail at the well (打水, SEN-C-151).
+const VERBS := {"clear": "Clear", "till": "Till", "sow": "Sow", "harvest": "Harvest", "rest": "Rest", "gather": "Gather",
+	"feed": "Feed", "fill": "Fill", "water": "Water"}
 ## C-148: Rested today / Energy full are P0's Rest copy (P0Logic.energy_card, rest_state).
+## C-151: the pail's refusals in the hoe's form (`Need a hoe`): Need a pail / Pail empty / Pail full.
 const REFUSALS := {Space.OUTSIDE: "Not farmland", Space.PATH: "On the path", Space.HOUSE: "House here",
-	Space.NO_TOOL: "Need a hoe", Space.NO_SEED: "No seeds", Space.RESTED: "Rested today", Space.FULL: "Energy full"}
+	Space.NO_TOOL: "Need a hoe", Space.NO_SEED: "No seeds", Space.RESTED: "Rested today", Space.FULL: "Energy full",
+	Space.NO_PAIL: "Need a pail", Space.PAIL_EMPTY: "Pail empty", Space.PAIL_FULL: "Pail full"}
+## The server's pail refusals (C-151), when its state disagreed with the key's: shown as the key would have said.
+const POUR_REFUSALS := {"PAIL_EMPTY": Space.PAIL_EMPTY, "PAIL_FULL": Space.PAIL_FULL, "NO_PAIL": Space.NO_PAIL}
 ## Crop stages follow server time; redraw them this often.
 const REDRAW_S := 0.25
 ## How close (m, ground plane) the player must be to an outer object's bounds to gather it.
@@ -82,8 +113,11 @@ var held := false:
 		if value:
 			close_bag()
 			close_energy()
+			close_phone()
+			if drop_down != null: drop_down.fold()
 		if _key != null: _refresh_key()
 		_refresh_tip()
+		_refresh_tasks()
 		if not value and _bar != null: _draw_bag()
 ## The cell a press is walking to or working; the key keeps it while the press runs.
 var job = null
@@ -102,6 +136,10 @@ var _removed := {}
 var _path := {}
 var _clock_offset_ms := 0
 var _crop_art: CropArt
+## C-154: the animals and drops of the parcel's livestock buildings.
+var livestock: Livestock
+## Drop ids whose pick_up is out.
+var _picking := []
 ## Draw tilled soil wet (WET_SOIL_SETTING; probes may set it too).
 var wet_soil_preview := false
 var _marker: MeshInstance3D
@@ -136,9 +174,29 @@ var _spent_material: ShaderMaterial
 ## The first visit's next step (C-35, ParcelGuide) as the main farm's TipCard, under the top bar.
 var _tip: UiTipCard
 var _tip_box: CenterContainer
+## Where the guide's card starts, in canvas units (the safe top included); the scene sets it under its own top bar
+## (two rows since C-108). Negative: TIP_TOP under the status bar.
+var tip_top := -1.0
+## Where the scene's top bar ends, in canvas units (the safe top included): the drop-down's rows start 10 under it.
+## Negative: the one-row bar under the status bar.
+var bar_bottom := -1.0
 ## The step on the card, and the step the player closed with a tap (it comes back only at another step).
 var tip_step := ""
 var _tip_closed := ""
+
+## C-107: the top bar's task button (the scene puts it in its bar), the phone button, the task drop-down and the open
+## phone (null when closed; one closing plays out on its own).
+var task_button: UiTaskButton
+var phone_button: UiGlassButton
+var drop_down: UiTaskDropDown
+var phone: Control
+## The task last seen and the rows last counted done (PHONE_SEEN_PATH: {block_id: {seen, reached}}), and how many
+## rows the drop-down last showed done.
+var seen_task := ""
+var tasks_reached := 0
+var phone_seen_path := PHONE_SEEN_PATH
+var _drop_done := -1
+var _seen_read := false
 
 ## The scene: approach(cells) -> "ok" | "unreachable" | "cancelled", labour(verb, cells, seconds).
 var _body: Node
@@ -184,6 +242,9 @@ func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: Ref
 	_crop_art = CropArt.new(walk.point, data.cell_m)
 	_crop_art.name = "ParcelCrops"
 	add_child(_crop_art)
+	livestock = Livestock.new()
+	livestock.setup(walk)
+	add_child(livestock)
 	wet_soil_preview = bool(ProjectSettings.get_setting(WET_SOIL_SETTING, false))
 	_build_marker()
 	_build_ui(canvas)
@@ -209,6 +270,9 @@ func enter() -> void:
 	_refresh_tip()
 	if not result.get("ok", false):
 		_toast.show_toast(OPEN_FAILED, ToastLayer.Severity.ERROR)
+	elif not (result.get("gift", {}) as Dictionary).is_empty():
+		# C-151: everything this entry gave: the first-entry gift and the one-off grants (the well blueprint, the pail).
+		announce_gains(result.gift, _player_screen())
 	elif result.get("granted", false):
 		announce_gains(rules.welcome_gift, _player_screen())
 
@@ -240,12 +304,17 @@ func update(delta: float, facing_cell: Vector2i, steering: bool, player = null, 
 	if _placed:
 		_player = player
 		_facing = facing
+	# C-154: animals move; a laid drop in reach is picked up by itself (not while another command is out or a mode holds).
+	if livestock != null and not farm.is_empty():
+		var reached: Array = livestock.update(delta, _player, server_now(), busy or held or not _placed or not _picking.is_empty())
+		if not reached.is_empty(): pick_up(reached)
 	_redraw_left -= delta
 	if _redraw_left <= 0.0:
 		_redraw_left = REDRAW_S
 		_draw_crops()
 		_draw_gathered()
 		_refresh_tip()
+		_refresh_tasks()
 	_refresh_key()
 	_refresh_energy()
 
@@ -313,6 +382,11 @@ func _refresh_key() -> void:
 		_bar.visible = false
 		return
 	current = {} if farm.is_empty() else Space.action(rules, _data, _path, _obstacles, farm, target, server_now())
+	# C-154: a coop's floor is never farmed (no key there); at its feeder the key feeds.
+	if not farm.is_empty() and livestock != null:
+		if livestock.covers(target): current = {}
+		var feeder := livestock.feeder_near(_player, FEED_REACH_M) if _placed else {}
+		if not feeder.is_empty(): current = _feed_action(feeder)
 	# A tapped object wins; a nearby one only when no cell was tapped and the cell in front has no step to do.
 	var object := -1 if farm.is_empty() else gather_target()
 	if object >= 0 and (picked_object >= 0 or (picked == null and (current.is_empty() or not str(current.refusal).is_empty()))):
@@ -332,6 +406,7 @@ func _refresh_key() -> void:
 	if current.is_empty(): return
 	var spot: Vector3 = _walk.point(target)
 	if current.has("object"): spot = _walk.point(_walk.cell_at(gatherables[current.object].origin))
+	if current.has("feeder"): spot = current.feeder
 	_marker.position = spot + Vector3(0, 0.045, 0)
 	var refused := not str(current.refusal).is_empty()
 	_marker_material.albedo_color = Color(0.86, 0.32, 0.25, 0.42) if refused else Color(1, 0.98, 0.86, 0.42)
@@ -348,9 +423,15 @@ func _refresh_key() -> void:
 	elif current.verb == "rest":
 		_key.verb = VERBS.rest
 		_key.cost = REFUSALS.get(current.refusal, "+%d Energy" % int(current.get("gain", 0)))
+	elif current.verb == "feed":
+		_key.verb = VERBS.feed
+		_key.cost = str(current.refusal_text) if refused else _price()
 	else:
 		_key.verb = VERBS[current.verb]
 		_key.cost = REFUSALS.get(current.refusal, _price())
+	# The key's badge is the tool or item the press uses: the hoe for farming, the feed (a carrot) at a feeder.
+	var badge: Texture2D = item_icon(str(current.feed_item)) if current.get("verb") == "feed" else _tool_badge()
+	if _keys.tool_icon != badge: _keys.tool_icon = badge
 	_key.state = UiSceneAction.State.UNAVAILABLE if refused else UiSceneAction.State.INSUFFICIENT if key_short \
 		else UiSceneAction.State.DEFAULT
 
@@ -374,6 +455,7 @@ func _on_key() -> void:
 		_toast.show_toast(refusal, ToastLayer.Severity.REFUSED)
 		return
 	if current.verb == "gather": await gather(current)
+	elif current.verb == "feed": await feed(current)
 	else: await work(target, current)
 
 ## One gather press (C-60): the object is already in reach, so the player only faces it and plays
@@ -382,6 +464,58 @@ func gather(action: Dictionary) -> Dictionary:
 	if _body == null: return await send(action.command)
 	_body.labour("harvest", [_walk.cell_at(gatherables[action.object].origin)], LABOUR_S)
 	return await send(action.command, LABOUR_S)
+
+## The key at a livestock building's feeder (C-154): Feed, or why not (`Need 1 Carrot`, the art's `Hens are fed` /
+## `Pick up eggs first`); {verb, refusal, refusal_text, command, feeder}.
+func _feed_action(near: Dictionary) -> Dictionary:
+	var b: Dictionary = near.building
+	var refusal := ParcelFarm.feed_refusal(rules, farm, b, server_now())
+	var rule := ParcelFarm.livestock_of(rules, b)
+	var copy: Dictionary = LivestockArt.building_art(str(b.type)).get("copy", {})
+	var text := ""
+	match refusal:
+		"NO_FEED": text = "Need 1 %s" % str(_names.get(str(rule.get("feed", "")), ParcelItems.name_of(str(rule.get("feed", "")))))
+		"ANIMALS_FED": text = str(copy.get("fed", "Hens are fed"))
+		"GROUND_FULL": text = str(copy.get("full", "Pick up eggs first"))
+		"NOT_LIVESTOCK": text = "That didn't work."
+	return {"verb": "feed", "refusal": refusal, "refusal_text": text, "feed_item": str(rule.get("feed", "")),
+		"command": {"type": "feed", "building": int(b.id)} if refusal.is_empty() else {}, "feeder": near.point}
+
+## One feed press (C-154): the feeder is already in reach, so the player faces it and plays the labour clip while
+## the command goes out; the fed hen then comes to peck (ParcelLivestock).
+func feed(action: Dictionary) -> Dictionary:
+	if _body == null: return await send(action.command)
+	_body.labour("harvest", [_walk.cell_at(action.feeder)], LABOUR_S)
+	return await send(action.command, LABOUR_S)
+
+## Picks up the drops in reach (C-154): each flies into the player as the pick_up goes out; with the reply the items
+## fly on into the Bag (`+1 Egg`, one float and flight per item, merged as ×N). A refused or lost pickup puts the
+## drops back; they are taken again only after the player steps away (no retry loop while standing there).
+func pick_up(ids: Array) -> void:
+	if ids.is_empty() or busy: return
+	_picking = ids.duplicate()
+	for id: int in ids: livestock.fly(id, _player)
+	var started := Time.get_ticks_msec()
+	var before: Dictionary = farm.get("bag", {}).duplicate()
+	busy = true
+	var result: Dictionary = await store.send(farm_version, ids.map(func(id): return {"type": "pick_up", "drop": id}))
+	busy = false
+	if not is_inside_tree(): return
+	# The gain lands once the drops reach the player (the flight's first half), however fast the reply came.
+	var flight_ms := int(float(LivestockArt.pickup().flight_s) * 1000.0)
+	if Time.get_ticks_msec() - started < flight_ms:
+		await get_tree().create_timer((flight_ms - (Time.get_ticks_msec() - started)) / 1000.0).timeout
+		if not is_inside_tree(): return
+	_adopt(result)
+	var ok: bool = result.get("ok", false)
+	livestock.settle(ids, not ok and result.get("code") != "VERSION_CONFLICT")
+	_picking = []
+	if ok:
+		var gains := {}
+		for id: String in farm.bag:
+			var gained := int(farm.bag.get(id, 0)) - int(before.get(id, 0))
+			if gained > 0: gains[id] = gained
+		announce_gains(gains, _player_screen())
 
 ## One press on `cell` (C-73): walk beside it, face it, play the labour clip and send the command
 ## with it. Nothing is sent when the player cannot get there or steers away first.
@@ -397,8 +531,10 @@ func work(cell: Vector2i, action: Dictionary) -> Dictionary:
 		job = null
 		if reached == "unreachable": _toast.show_toast(UNREACHABLE, ToastLayer.Severity.REFUSED)
 		return {"ok": false, "code": reached.to_upper()}
-	_body.labour(action.verb, cells, LABOUR_S)
-	var result := await send(action.command, LABOUR_S)
+	# C-151: Fill and Water play C-153's pail actions, as long as they last (the scene's labour_seconds).
+	var seconds: float = _body.labour_seconds(action.verb, LABOUR_S) if _body.has_method("labour_seconds") else LABOUR_S
+	_body.labour(action.verb, cells, seconds)
+	var result := await send(action.command, seconds)
 	job = null
 	return result
 
@@ -408,6 +544,11 @@ func work_cells(cell: Vector2i, action: Dictionary) -> Array[Vector2i]:
 	# Rest (C-148): the middle of the cottage's door row, so the player stands at the door.
 	var door = Space.door_cell(farm) if action.get("verb") == "rest" else null
 	if door != null: cells.append(door)
+	# Fill (C-151): the well's own cells, so the player walks up beside the well.
+	if action.get("verb") == "fill":
+		var wells := Space.well_cells(rules, farm)
+		for at: Vector2i in wells:
+			if wells[at] == action.get("building"): cells.append(at)
 	if action.get("verb") == "clear" and _obstacles.has(cell):
 		for at: Vector2i in _obstacles:
 			if _obstacles[at] == _obstacles[cell]: cells.append(at)
@@ -444,6 +585,8 @@ func send(command: Dictionary, hold_s := 0.0) -> Dictionary:
 		_toast.show_toast("Your farm was updated. Try again.", ToastLayer.Severity.INFO)
 	elif result.get("code") == "NOT_RESPAWNED":
 		_toast.show_toast("Not ready yet", ToastLayer.Severity.REFUSED)
+	elif result.get("code") in POUR_REFUSALS:
+		_toast.show_toast(REFUSALS[POUR_REFUSALS[result.code]], ToastLayer.Severity.REFUSED)
 	else:
 		_toast.show_toast("That didn't work.", ToastLayer.Severity.REFUSED)
 	return result
@@ -566,7 +709,8 @@ func announce_energy(delta: int, from: Vector2) -> void:
 
 ## The key's verb for a command (the Energy card's `Sow needs 3 Energy`).
 static func _verb_of(command: Dictionary) -> String:
-	return {"clear_obstacle": "clear", "till": "till", "sow": "sow", "gather": "gather", "rest": "rest"}.get(command.get("type", ""), "")
+	return {"clear_obstacle": "clear", "till": "till", "sow": "sow", "gather": "gather", "rest": "rest", "feed": "feed",
+		"draw_water": "fill", "water": "water"}.get(command.get("type", ""), "")
 
 func _adopt(result: Dictionary) -> void:
 	var next := ParcelFarm.normalize(result.get("farm"))
@@ -578,8 +722,10 @@ func _adopt(result: Dictionary) -> void:
 	_drop_cleared()
 	_draw_crops()
 	_draw_gathered()
+	if livestock != null: livestock.sync(farm, rules, server_now())
 	_draw_bag()
 	_refresh_tip()
+	_refresh_tasks()
 	state_changed.emit(farm.duplicate(true))
 
 ## Cleared obstacles leave the walk and the art (the layer is redrawn without them).
@@ -650,7 +796,11 @@ func _draw_gathered() -> void:
 func _draw_crops() -> void:
 	if farm.is_empty(): return
 	var soil := {}
-	for key: String in farm.tilled: soil[key] = CropArt.WET if wet_soil_preview else CropArt.DRY
+	# C-151: a watered crop's cell is wet; tilled soil with nothing sown, or a crop not watered yet, is dry.
+	for key: String in farm.tilled:
+		var crop = farm.crops.get(key)
+		var wet: bool = crop is Dictionary and not ParcelFarm.is_dry(crop)
+		soil[key] = CropArt.WET if wet or wet_soil_preview else CropArt.DRY
 	_crop_art.sync(soil, farm.crops, server_now())
 
 ## The bag's items in bar order: the farming items first, then anything else with a name.
@@ -668,9 +818,13 @@ func _draw_bag() -> void:
 		if slots.size() >= UiQuickBar.SLOTS: break
 		slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": int(farm.bag[id])})
 	_bar.slots = slots
-	if _bag == null: _bar.visible = not farm.is_empty() and not held
-	_keys.tool_icon = item_icon(str(rules.get("till_tool", ""))) if int(farm.get("bag", {}).get(str(rules.get("till_tool", "")), 0)) > 0 else null
+	if _bag == null and phone == null: _bar.visible = not farm.is_empty() and not held
+	_keys.tool_icon = _tool_badge()
 	if _bag != null: _draw_bag_slots(ids)
+
+## The key's tool badge: the hoe while the bag holds it.
+func _tool_badge() -> Texture2D:
+	return item_icon(str(rules.get("till_tool", ""))) if int(farm.get("bag", {}).get(str(rules.get("till_tool", "")), 0)) > 0 else null
 
 ## The bag panel's slots follow the save: one per item in the bag's order, then empty ones to fill the rows.
 func _draw_bag_slots(ids: Array) -> void:
@@ -761,6 +915,7 @@ func _cell_screen(cell: Vector2i) -> Vector2:
 func open_bag(focus := "") -> void:
 	if _bag != null or farm.is_empty(): return
 	_bar.cancel_drag()
+	close_phone()
 	_bag = UiModalPanel.new("Bag", BAG_HERO)
 	_bag.name = "BagPanel"
 	_bag.close_requested.connect(close_bag)
@@ -887,6 +1042,22 @@ func _build_ui(canvas: CanvasLayer) -> void:
 	energy_chip.visible = false
 	energy_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	energy_chip.pressed.connect(open_energy_panel)
+	# C-107: the task button (C-H3; the scene puts it in its top bar), its drop-down under the bar (C-T1) and the phone
+	# button at the right above the action key (C-L3).
+	task_button = UiTaskButton.new()
+	task_button.name = "Tasks"
+	task_button.visible = false
+	task_button.pressed.connect(toggle_tasks)
+	drop_down = UiTaskDropDown.new()
+	drop_down.name = "TaskDropDown"
+	drop_down.more_pressed.connect(func(): open_phone(Phone.TASKS_TAB))
+	drop_down.folded.connect(_refresh_tip)
+	_ui.add_child(drop_down)
+	phone_button = UiGlassButton.new(UiArt.sys("phone"))
+	phone_button.name = "PhoneButton"
+	phone_button.visible = false
+	phone_button.pressed.connect(func(): open_phone())
+	_ui.add_child(phone_button)
 	_toast = ToastLayer.new()
 	_toast.name = "Toast"
 	_ui.add_child(_toast)
@@ -931,6 +1102,17 @@ func _place_bar() -> void:
 	_keys.offset_left = -UiTokens.SPACE_PAGE - UiTokens.SIZE_ACTION_KEY_W
 	_keys.offset_bottom = -key_bottom
 	_keys.offset_top = -key_bottom - UiTokens.SIZE_ACTION_KEY_H
+	# C-107: the phone button right-aligned 12 (its Ø36 glass, in a 44 hit area) above the action key (C-L3).
+	var inset := (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5
+	var phone_bottom := key_bottom + UiTokens.SIZE_ACTION_KEY_H + PHONE_BUTTON_GAP - inset
+	phone_button.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	phone_button.offset_right = -UiTokens.SIZE_SCREEN_EDGE + inset
+	phone_button.offset_left = phone_button.offset_right - UiTokens.SIZE_TOUCH_MIN
+	phone_button.offset_bottom = -phone_bottom
+	phone_button.offset_top = -phone_bottom - UiTokens.SIZE_TOUCH_MIN
+	drop_down.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_place_drop_down()
+	if phone != null: _place_phone()
 
 ## The guide's card (C-35): the current step's sentence while nothing else holds the screen. A tap closes it until
 ## the next step; finishing the step moves it on.
@@ -941,9 +1123,166 @@ func _refresh_tip() -> void:
 		tip_step = step
 		if step != _tip_closed: _tip_closed = ""
 		if not step.is_empty(): _tip.show_tip(Guide.text(step))
-	_tip.visible = not tip_step.is_empty() and tip_step != _tip_closed and not held and _bag == null
+	_tip.visible = not tip_step.is_empty() and tip_step != _tip_closed and not held and _bag == null and phone == null \
+		and not (drop_down != null and drop_down.showing)
 	# Under the top bar (the main farm puts its TipCard under the HUD, clear of the key and the bar).
-	if _tip.visible: _tip_box.offset_top = TIP_TOP + _safe_top()
+	if _tip.visible: _tip_box.offset_top = tip_top if tip_top >= 0.0 else TIP_TOP + _safe_top()
+
+# ------------------------------------------------------------------ Tasks and the phone (C-107)
+
+## The drop-down's rows: up to three ending at the current task (the two before it done), so the next step is in view;
+## `More…` opens the phone for the rest. {rows: [{title, state}], done: rows done above the window, start}.
+func drop_rows() -> Dictionary:
+	var rows := Tasks.rows(farm, server_now(), _reached())
+	var done := Tasks.done_count(farm, server_now(), _reached())
+	var start := clampi(done - (UiTaskDropDown.MAX_ROWS - 1), 0, maxi(0, rows.size() - UiTaskDropDown.MAX_ROWS))
+	var shown := []
+	for row: Dictionary in rows.slice(start, start + UiTaskDropDown.MAX_ROWS):
+		shown.append({"title": row.title, "key": row.key, "state": UiTaskRow.State.DONE if row.state == "done"
+			else UiTaskRow.State.CURRENT if row.state == "current" else UiTaskRow.State.TODO})
+	return {"rows": shown, "done": done, "start": start, "more": rows.size() > UiTaskDropDown.MAX_ROWS}
+
+## The task button: drops the rows under the top bar (no scrim, the scene plays on), or folds them.
+func toggle_tasks() -> void:
+	if drop_down.showing:
+		drop_down.fold()
+		return
+	if farm.is_empty() or held: return
+	_open_drop_down()
+	_mark_seen()
+
+func _open_drop_down() -> void:
+	var view := drop_rows()
+	_drop_done = view.done
+	_place_drop_down()
+	drop_down.open(view.rows, view.more)
+	_refresh_tip()
+
+## The drop-down's rows from the bar's left edge, 10 under it (C-T1).
+func _place_drop_down() -> void:
+	drop_down.offset_left = UiTokens.SIZE_SCREEN_EDGE
+	var top := bar_bottom if bar_bottom >= 0.0 else TIP_TOP - UiTokens.SPACE_PAGE + _safe_top()
+	drop_down.offset_top = top + DROP_DOWN_GAP
+
+## Opens the phone on `tab` (M-08 from its button; the quick bar slides away, M-16): Tasks, Inbox or Collection.
+func open_phone(tab := Phone.TASKS_TAB) -> void:
+	if phone != null or farm.is_empty() or held: return
+	close_bag()
+	close_energy()
+	drop_down.fold()
+	_bar.cancel_drag()
+	phone = Phone.new()
+	phone.close_requested.connect(close_phone)
+	phone.task_pressed.connect(_on_task_pressed)
+	_ui.add_child(phone)
+	_ui.move_child(_toast, -1)
+	phone.refresh(Tasks.rows(farm, server_now(), _reached()), {}, [])
+	_place_phone()
+	phone.show_tab(tab)
+	phone.open()
+	_mark_seen()
+	UiMotion.bar_shown(_bar, false, _bar.position.y)
+	_refresh_tip()
+
+## Closes the phone (M-09, input released at once); the quick bar comes back (M-16). False when it was not open.
+func close_phone() -> bool:
+	if phone == null: return false
+	phone.close()
+	phone = null
+	_place_bar()
+	if not farm.is_empty() and not held and _bag == null:
+		var rest := _bar.position.y
+		_bar.position.y = rest + UiMotion.BAR_HIDE_Y
+		UiMotion.bar_shown(_bar, true, rest)
+	_refresh_tip()
+	return true
+
+func phone_open() -> bool: return phone != null
+
+## C-L5: right 14, its bottom 8 above the phone button; on a short screen it may cover the top bar (under its scrim),
+## never past the safe top.
+func _place_phone() -> void:
+	var glass_top := phone_button.position.y + (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5
+	phone.place(Vector2(_ui.size.x - PHONE_RIGHT, glass_top - PHONE_ABOVE_BUTTON), UiTokens.SIZE_SCREEN_SAFE_INSET + _safe_top())
+
+## The current row tapped in the phone: the phone closes and that step's tip shows again (C-85 ⑧-B), nothing more.
+func _on_task_pressed(key: String) -> void:
+	close_phone()
+	if key == Guide.step(farm, server_now()):
+		_tip_closed = ""
+		tip_step = ""
+		_refresh_tip()
+
+## Buttons follow the save: shown once it is read and nothing holds the screen; a task not yet seen marks both. A step
+## done while the drop-down is up plays its finishing beat there, and the rows move on a second later.
+func _refresh_tasks() -> void:
+	if task_button == null: return
+	var ready := not farm.is_empty() and not held
+	task_button.visible = ready
+	phone_button.visible = ready
+	if not ready: return
+	var done := Tasks.done_count(farm, server_now(), _reached())
+	# Follows the count both ways: it holds itself up only on Sell what you gathered, so a lower count is a reset parcel.
+	if done != tasks_reached:
+		tasks_reached = done
+		_keep_local()
+	var current := Tasks.current(farm, server_now(), _reached())
+	var fresh := not current.is_empty() and current != _seen()
+	task_button.badge = fresh
+	phone_button.badge = fresh
+	if drop_down.showing and _drop_done >= 0 and done > _drop_done:
+		# The finished row is the one that was current in the rows still showing.
+		var index := _drop_done - _drop_start()
+		_drop_done = done
+		drop_down.complete(index, _open_drop_down)
+		_mark_seen()
+	elif done != _drop_done:
+		_drop_done = done
+	if phone != null:
+		var rows := Tasks.rows(farm, server_now(), _reached())
+		if rows != phone.tasks: phone.refresh(rows, {}, [])
+
+## Where the drop-down's showing rows start in the task list (its rows were built from the last count).
+func _drop_start() -> int:
+	return clampi(_drop_done - (UiTaskDropDown.MAX_ROWS - 1), 0, maxi(0, Tasks.TASKS.size() - UiTaskDropDown.MAX_ROWS))
+
+func _seen() -> String:
+	_read_local()
+	return seen_task
+
+func _reached() -> int:
+	_read_local()
+	return tasks_reached
+
+func _read_local() -> void:
+	if _seen_read: return
+	_seen_read = true
+	var raw = JSON.parse_string(FileAccess.get_file_as_string(phone_seen_path)) if FileAccess.file_exists(phone_seen_path) else null
+	var entry = raw.get(str(_data.get("block_id", ""))) if raw is Dictionary else null
+	if entry is Dictionary:
+		seen_task = str(entry.get("seen", ""))
+		tasks_reached = int(entry.get("reached", 0))
+	elif entry is String:
+		seen_task = entry
+
+## The current task has been seen (the drop-down or the phone opened on it): the buttons' dots go.
+func _mark_seen() -> void:
+	var current := Tasks.current(farm, server_now(), _reached())
+	if current.is_empty() or current == _seen(): return
+	seen_task = current
+	_keep_local()
+	task_button.badge = false
+	phone_button.badge = false
+
+func _keep_local() -> void:
+	var raw = JSON.parse_string(FileAccess.get_file_as_string(phone_seen_path)) if FileAccess.file_exists(phone_seen_path) else null
+	var all: Dictionary = raw if raw is Dictionary else {}
+	all[str(_data.get("block_id", ""))] = {"seen": seen_task, "reached": tasks_reached}
+	DirAccess.make_dir_recursive_absolute(phone_seen_path.get_base_dir())
+	var file := FileAccess.open(phone_seen_path, FileAccess.WRITE)
+	if file != null:
+		file.store_string(JSON.stringify(all))
+		file.close()
 
 ## Places a scene button (the house's Build Cottage, C-33) at the left on the action key's baseline, so it never
 ## covers the quick bar or the key; it keeps its own `custom_minimum_size`.

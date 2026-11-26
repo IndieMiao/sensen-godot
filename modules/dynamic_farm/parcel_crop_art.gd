@@ -7,6 +7,8 @@ extends Node3D
 ## each, 12 s of the carrot's 60 s); maturity starts at ripe, exactly when Harvest opens. Stages are derived from the
 ## save's planted_at / ripe_at only and never saved, so a carrot sown before this change lands in its stage by how
 ## long it has grown.
+## C-151: a carrot grows from when it is watered (`watered_at`, else planted_at for one sown before watering existed);
+## one not watered yet stays at sowing on dry soil. Which soil a cell shows (dry or wet) is the caller's.
 ## C-139: the seven display meshes share one atlas. The library is unpacked only at setup;
 ## cells still use one MultiMesh per soil state and per occupied plant stage.
 
@@ -17,7 +19,7 @@ const MATURE := 6
 const CARROT := "crop_carrot"
 const DRY := "dry"
 const WET := "wet"
-## Multipliers on the same painted earth: the live game uses DRY until watering exists.
+## Multipliers on the same painted earth.
 const SOIL_COLORS := {DRY: Color.WHITE, WET: Color(0.66, 0.61, 0.59)}
 ## Mesh names in stage order. Stage zero uses the soil layer, never a second copy.
 const PLANTS := [&"Sowing", &"Emergence", &"LeafGrowth", &"Shoulders", &"Thickening", &"Maturity"]
@@ -45,9 +47,10 @@ func _init(point: Callable, cell_m: float) -> void:
 	library.free()
 	_counts = {"soil": {DRY: 0, WET: 0}, "stages": []}
 
-## Stage 1..6 of a sown carrot at `now_ms` (stage 0 is tilled soil with nothing sown).
+## Stage 1..6 of a sown carrot at `now_ms` (stage 0 is tilled soil with nothing sown); 1 until it is watered (C-151).
 static func stage_of(crop: Dictionary, now_ms: int) -> int:
-	var planted := int(crop.get("planted_at", 0))
+	if ParcelFarm.is_dry(crop): return 1
+	var planted := int(crop.get("watered_at", crop.get("planted_at", 0)))
 	var span := int(crop.get("ripe_at", 0)) - planted
 	if span <= 0 or now_ms >= planted + span: return MATURE
 	var growing := MATURE - 1

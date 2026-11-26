@@ -20,6 +20,9 @@ const TITLE := "Washington Square Travel Post"
 const SUBTITLE := "Market · Carpenter"
 const NO_HOME := "Claim a home first."
 const GO := "Go"
+## The pin's name is shown whole (C-145; C-115#62): "Washington Square" is wider than a map pin's usual 96 px short name.
+## Only the width changes, not the copy or its style.
+const NAME_MAX_W := 160.0
 ## CityMapView's selection: the pin grows to FOCUS_SCALE with a back ease, and back.
 const FOCUS_SCALE := 1.6
 const FOCUS_IN_S := 0.28
@@ -40,6 +43,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pin = UiMapDestination.new(load(ICON) if ResourceLoader.exists(ICON) else null, SHORT)
 	pin.name = "WashingtonSquare"
+	pin.short_max_w = NAME_MAX_W
 	add_child(pin)
 	pin.visible = false
 

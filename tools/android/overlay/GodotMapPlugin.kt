@@ -18,6 +18,8 @@ import android.view.SurfaceHolder
 import android.os.SystemClock
 import android.widget.FrameLayout
 import java.util.Locale
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import org.json.JSONArray
 import org.json.JSONObject
@@ -61,6 +63,8 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
         // 永久锚错城市，且后面真实 GPS 定位到达时也不会被拿来纠正。5 分钟内的缓存
         // 视为等同于"当前位置"；更旧的宁可没有，等下面的实时订阅。
         private const val LAST_KNOWN_MAX_AGE_MS = 5 * 60 * 1000L
+        // C-168: how long Godot's render thread waits between frames for the UI thread to change its Surface format.
+        private const val FORMAT_SWAP_WAIT_MS = 1000L
 
         internal fun qaCommandLine(debuggable: Boolean, scene: String?): List<String> =
             if (debuggable && scene == QA_STRESS_SCENE) {
@@ -328,7 +332,9 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
     fun setCityStyle(enabled: Boolean) {
         runOnUiThread {
             cityStyle = enabled
-
+            // C-145: another map page (city map, map_poc) takes the map: the dynamic farm map's hidden place icons come
+            // back first, so the city palette records and later restores their own visibility.
+            parcelController?.releasePlaceIcons()
             mapView?.mapboxMap?.getStyle { applyCityStyle(it) }
         }
     }
@@ -510,13 +516,33 @@ class GodotMapPlugin(godot: Godot) : GodotPlugin(godot) {
         val format = godotSurfaceMode.format()
         if (godotRequestedFormat != format) {
             godotRequestedFormat = format // Set before callbacks; same-format recreation must not loop.
-            try {
-                holder.setFormat(format)
-                godotFormatError = ""
-            } catch (error: RuntimeException) {
-                godotRequestedFormat = Int.MIN_VALUE
-                godotFormatError = error.javaClass.simpleName
+            val renderView = godot.renderView
+            if (mainLoopStarted && renderView != null && holder.surface.isValid) {
+                // C-168: a new format replaces the Surface under Godot's render thread, and Godot's GLSurfaceView
+                // does not wait for it: a frame in flight then presents to the old Surface (EGL_BAD_SURFACE) and the
+                // thread draws nothing more until the Surface is destroyed (the app backgrounded). So the change is
+                // made while that thread waits between frames; it then sees the new size and makes its EGL surface.
+                renderView.queueOnRenderThread {
+                    val applied = CountDownLatch(1)
+                    if (!surface.post { setGodotFormat(holder, format); applied.countDown() }) applied.countDown()
+                    applied.await(FORMAT_SWAP_WAIT_MS, TimeUnit.MILLISECONDS)
+                }
+            } else {
+                setGodotFormat(holder, format)
             }
+        }
+        cacheMapVisibility()
+    }
+
+    /** UI thread. A request already replaced by a newer one (or a newer holder) is not applied. */
+    private fun setGodotFormat(holder: SurfaceHolder, format: Int) {
+        if (presentationDestroyed || holder !== godotFormatHolder || godotRequestedFormat != format) return
+        try {
+            holder.setFormat(format)
+            godotFormatError = ""
+        } catch (error: RuntimeException) {
+            godotRequestedFormat = Int.MIN_VALUE
+            godotFormatError = error.javaClass.simpleName
         }
         cacheMapVisibility()
     }

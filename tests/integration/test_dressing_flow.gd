@@ -120,7 +120,55 @@ func test_back_discards_draft_without_overwriting_saved_outfit() -> void:
 	# 拦住真实换场，只验证 Back 的持久化语义。
 	AppRouter._navigation_pending = true
 	room._on_back()
+	# C-108 (②-C): with changes, Back asks first; Discard leaves without saving.
+	assert_object(room.leave_confirm).is_not_null()
 	assert_str(Avatar.load_outfit().slots[&"cloth"]).is_equal(baseline.slots[&"cloth"])
+	room.leave_confirm.discard.emit()
+	assert_object(room.leave_confirm).is_null()
+	assert_str(Avatar.load_outfit().slots[&"cloth"]).is_equal(baseline.slots[&"cloth"])
+
+## C-108 (C-85 ②-C, approved in Q-124): Back with changes asks `Save your new look?`; ✕, the scrim and Android Back
+## stay; Save saves and leaves; with no changes Back leaves at once.
+func test_leaving_with_changes_asks_first() -> void:
+	Avatar.store.base_dir = "user://test_dressing_leave"
+	Avatar.user_id = "leave_user"
+	_clean_dir("test_dressing_leave")
+	var baseline := Avatar.slot_table.default_config()
+	assert_int(Avatar.save_outfit(baseline)).is_equal(OK)
+	var room := _instantiate_room()
+	await _wait_until_idle(room.rig)
+	AppRouter._navigation_pending = true
+	assert_bool(room.has_changes()).is_false()
+	assert_bool(room.is_back_navigation_locked()).is_false()   # no changes: the router leaves at once
+	assert_object(room.leave_confirm).is_null()
+	var target := _other_cloth_than(baseline.slots[&"cloth"])
+	room.rig.equip(&"cloth", target)
+	await _wait_until_idle(room.rig)
+	assert_bool(room.has_changes()).is_true()
+	assert_bool(room.is_back_navigation_locked()).is_true()   # Android Back: the question
+	var ask: Control = room.leave_confirm
+	assert_object(ask).is_not_null()
+	assert_str((ask.find_child("Title", true, false) as Label).text).is_equal("Save your new look?")
+	assert_str(ask.save_button.text).is_equal("Save")
+	assert_str(ask.discard_button.text).is_equal("Discard")
+	assert_bool(ask.discard_button.get_theme_color(&"font_color").is_equal_approx(UiTokens.COLOR_ACTION_DANGER)).is_true()
+	# no line of explanation (V-241 ③): the title and the two buttons are the card's only text
+	var texts := ask.find_children("*", "Label", true, false).map(func(l): return (l as Label).text)
+	assert_array(texts).contains_exactly(["Save your new look?"])
+	assert_bool(room.is_back_navigation_locked()).is_true()   # Android Back again: stay
+	assert_bool(ask.closing).is_true()
+	assert_object(room.leave_confirm).is_null()
+	room._on_back()
+	ask = room.leave_confirm
+	ask.close_button.pressed.emit()   # ✕: stay
+	assert_bool(ask.closing).is_true()
+	room._on_back()
+	ask = room.leave_confirm
+	ask.save.emit()   # Save: Done's save, then leave
+	for i in 120:
+		await get_tree().process_frame
+		if Avatar.load_outfit().slots[&"cloth"] == target: break
+	assert_str(Avatar.load_outfit().slots[&"cloth"]).is_equal(target)
 
 func test_done_waits_for_pending_assembly_before_saving() -> void:
 	Avatar.store.base_dir = "user://test_dressing_done"
@@ -131,12 +179,13 @@ func test_done_waits_for_pending_assembly_before_saving() -> void:
 	var before: String = room.rig.current_config().slots[&"cloth"]
 	var target := _other_cloth_than(before)
 	assert_str(target).is_not_empty()
-	room.rig.equip(&"cloth", target)
-	assert_bool(room.rig.is_busy()).is_true()
 	AppRouter._navigation_pending = true
 	assert_bool(room.is_back_navigation_locked()).is_false()
+	room.rig.equip(&"cloth", target)
+	assert_bool(room.rig.is_busy()).is_true()
 	room._on_done()
 	assert_bool(room.done_button.disabled).is_true()
+	assert_str(room.done_button.text).is_equal("• • •")
 	assert_bool(room.is_back_navigation_locked()).is_true()
 	assert_bool(AppRouter.scene_locks_back_navigation(room)).is_true()
 	var loaded: AvatarConfig = null
@@ -164,18 +213,27 @@ func test_save_failure_keeps_room_open_with_feedback() -> void:
 	room._on_done()
 	for i in range(4):
 		await get_tree().process_frame
-	assert_bool(room.feedback_panel.visible).is_true()
-	assert_bool(room.feedback_label.text.contains("Couldn't save")).is_true()
+	# ②-D: a toast under the top bar with the red bar; Done comes back and shakes (M-02).
+	var toasts: Array = room.feedback_toasts()
+	assert_int(toasts.size()).is_equal(1)
+	assert_str(toasts[0].text).is_equal("Couldn't save. Try again.")
+	assert_int(toasts[0].kind).is_equal(UiBarToast.Kind.ERROR)
 	assert_bool(room._committing).is_false()
+	assert_str(room.done_button.text).is_equal("Done")
+	# a part that fails to load: the amber toast, under the first
+	var second: UiBarToast = room._show_feedback("Couldn't load Straw Bucket. Previous look kept.", UiBarToast.Kind.WARNING)
+	await get_tree().process_frame
+	assert_float(second.rest_y()).is_greater_equal(toasts[0].rest_y() + toasts[0].size.y)
+	assert_int(room.feedback_toasts().size()).is_equal(2)
 	if user_dir:
 		user_dir.remove(blocker)
 
 func test_new_selection_clears_previous_failure_feedback() -> void:
 	var room := _instantiate_room()
 	await _wait_until_idle(room.rig)
-	room._show_feedback("Couldn't load this style. Previous look kept.")
-	assert_bool(room.feedback_panel.visible).is_true()
+	room._show_feedback("Couldn't load this style. Previous look kept.", UiBarToast.Kind.WARNING)
+	assert_int(room.feedback_toasts().size()).is_equal(1)
 	var slot: StringName = room.parts_panel.current_slot
 	var part_id: String = room.rig.desired_part(slot)
 	room.parts_panel._select_part(slot, part_id)
-	assert_bool(room.feedback_panel.visible).is_false()
+	assert_int(room.feedback_toasts().size()).is_equal(0)

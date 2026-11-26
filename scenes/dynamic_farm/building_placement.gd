@@ -66,6 +66,11 @@ func setup(building: String, footprint: Vector2i, data: Dictionary, walk: RefCou
 		see_through.albedo_color.a = 0.6
 		see_through.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		model.material_override = see_through
+	elif Building.kind(type).get("livestock", false):
+		# C-154: the coop's yard (its scene or placeholder), see-through by each mesh's own transparency.
+		var yard := Building.model(type, base, walk.cell_m)
+		Building.Livestock.see_through(yard)
+		_ghost.add_child(yard)
 	add_child(_ghost)
 	_bar = UiPlaceBar.new()
 	_bar.theme = UiKit.theme()
@@ -80,7 +85,7 @@ func setup(building: String, footprint: Vector2i, data: Dictionary, walk: RefCou
 
 func move_to(cell: Vector2i) -> void:
 	at = cell
-	reason = Building.reason(_data, at, base, rotation_steps, _taken, _path, _walk_blocked)
+	reason = Building.reason(_data, at, base, rotation_steps, _taken, _path, _walk_blocked, type)
 	_ghost.transform = Building.transform(_walk, at, base, rotation_steps)
 	_bar.reason = reason
 	_paint()

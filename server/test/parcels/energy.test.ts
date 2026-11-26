@@ -4,7 +4,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONTENT_DIR } from '../../src/domain/content.js';
 import { dayKey, maxEnergy, nextRollover, nextTickIn, regenMs, settleEnergy } from '../../src/parcels/energy.js';
-import { applyFarmCommands, emptyFarm, parseFarmCommands, rebaseFarm, welcome, withEconomy,
+import { applyFarmCommands, emptyFarm, grant, parseFarmCommands, rebaseFarm, welcome, withEconomy,
   type FarmCommand, type ParcelFarmState } from '../../src/parcels/farm.js';
 import { loadParcelRules, parseParcelRules } from '../../src/parcels/rules.js';
 
@@ -43,7 +43,9 @@ describe('C-148 numbers are P0’s (assets/p0/p0_content.json, server/src/p0/rul
     expect(rules.energy.day.rollover_hour).toBe(p0.day.rollover_hour);
     const carrot = p0.crops.find((c: { id: string }) => c.id === 'crop_carrot');
     expect(rules.crops.crop_carrot.energy).toBe(carrot.energy);
-    expect(rules.energy.costs).toEqual({ clear_obstacle: 2, till: 2, gather: 2 });
+    // C-151: drawing a pail at the well is the “打一桶水 2” of C-137#10 q3, which the owner took as P0's (C-137#15).
+    // C-154: feeding an animal 1, P0's.
+    expect(rules.energy.costs).toEqual({ clear_obstacle: 2, till: 2, gather: 2, feed: 1, draw_water: 2 });
     expect(maxEnergy(rules, emptyFarm())).toBe(200);
   });
 
@@ -63,8 +65,8 @@ describe('C-148 numbers are P0’s (assets/p0/p0_content.json, server/src/p0/rul
 });
 
 describe('C-148 each action costs its Energy', () => {
-  it('clear 2, till 2, sow a carrot 3, gather 2; harvest, sell, blueprint and the house are free', () => {
-    let s = veteran();
+  it('clear 2, till 2, sow a carrot 3, gather 2, draw water 2; watering, harvest, sell, blueprint and buildings are free', () => {
+    let s = grant(rules, veteran(), T0)!.state;
     expect(energy(settle(s))).toBe(200);
     s = run(s, [{ type: 'place_house', x: 10, y: 10 }]);
     expect(energy(s)).toBe(200);
@@ -76,9 +78,15 @@ describe('C-148 each action costs its Energy', () => {
     expect(energy(s)).toBe(193);
     s = run(s, [{ type: 'gather', object: TREE }]);
     expect(energy(s)).toBe(191);
-    // 60 s later the carrot is ripe; less than 4 min, so no point has come back yet.
-    s = run(s, [{ type: 'harvest', cell: '3,3' }, { type: 'sell', item: 'crop_carrot', count: 1 }, { type: 'claim_blueprint', blueprint: 'coop' }], T0 + MIN);
+    s = run(s, [{ type: 'place_building', building: 'well', x: 30, y: 30, rotation: 0 }]);
     expect(energy(s)).toBe(191);
+    s = run(s, [{ type: 'draw_water', building: 2 }]);
+    expect(energy(s)).toBe(189);
+    s = run(s, [{ type: 'water', cell: '3,3' }]);
+    expect(energy(s)).toBe(189);
+    // 60 s after watering the carrot is ripe; less than 4 min, so no point has come back yet.
+    s = run(s, [{ type: 'harvest', cell: '3,3' }, { type: 'sell', item: 'crop_carrot', count: 1 }, { type: 'claim_blueprint', blueprint: 'coop' }], T0 + MIN);
+    expect(energy(s)).toBe(189);
     expect(s.bag).toMatchObject({ blueprint_coop: 1, wood: 1 });
   });
 
@@ -228,7 +236,7 @@ describe('C-148 old saves read at full Energy', () => {
 
   it('moving to a newer dataset keeps Energy and the day’s rest (they are not cell progress)', () => {
     const s = withEnergy(legacy(), 42, T0, '2026-11-23');
-    expect(rebaseFarm(rules, s).energy).toEqual({ value: 42, at: T0, rested_on: '2026-11-23' });
+    expect(rebaseFarm(rules, s, T0).energy).toEqual({ value: 42, at: T0, rested_on: '2026-11-23' });
   });
 });
 

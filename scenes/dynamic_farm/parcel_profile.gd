@@ -1,10 +1,12 @@
 extends Control
-## Profile, Settings and the dressing room in the dynamic farm (C-128, 0.4.4; the owner in C-82#50: the old pages wired
-## back in). The main farm's own pages, opened over the map from its `Profile` entry, as P0Ui opens them from the HUD
-## avatar: the full-screen profile (P0ProfilePage) — its gear opens Settings (P0SettingsPage), `Edit look ›` the existing
+## Profile, Settings and the dressing room in the dynamic farm. C-128 (0.4.4) wired the main farm's pages back in;
+## C-108 (0.4.5) gives the profile and the dressing room the owner-approved v3 design (C-85 pages ① and ②, Q-124).
+## Opened over the map from its profile key, or over the parcel from the top bar's HUD avatar (C-H1; ①'s new entry):
+## the full-screen profile (ParcelProfilePage) — its gear opens Settings (P0SettingsPage, as before), `Edit look ›` the
 ## dressing room, whose Done saves the outfit (Avatar.save_outfit) that the parcel's player and the profile follow.
-## Their look stays as it is (the new design is C-108, 0.4.5); only what applies here shows:
-## - the profile without its skills, farm card, collections and voice (no such data in the dynamic farm);
+## Only what applies here shows:
+## - the profile: the name, and `My farm` with the home's card when there is a home (`home`: its name, status line and
+##   what a tap does); no skills, collections or voice (no such data in the dynamic farm; ①-D ⑦);
 ## - Settings with Legal alone — Licenses (and Map data's `Share anonymous map usage`, the map SDK's own switch) and
 ##   the installed package's version; no Test options, Language, Notifications or account rows (sign-in stays on the map).
 ## English only (C-82#48): the dynamic farm keeps Journey's 中文 table loaded, so the locale is English while these pages
@@ -18,11 +20,14 @@ const DRESS := "res://scenes/dressing_room/dressing_room.tscn"
 var pages: Array[Control] = []
 ## The map's centre and zoom (lat, lng, zoom), for Map data's `Improve this map`.
 var map_view := Vector3.ZERO
+## The player's home for `My farm`: {name, status?, ready?, pressed: Callable}; {} hides the block (no home yet).
+var home := {}
 var _locale := ""
 
-static func open(parent: Node, map_view_ := Vector3.ZERO) -> Control:
+static func open(parent: Node, map_view_ := Vector3.ZERO, home_ := {}) -> Control:
 	var profile: Control = load("res://scenes/dynamic_farm/parcel_profile.gd").new()
 	profile.map_view = map_view_
+	profile.home = home_
 	parent.add_child(profile)
 	return profile
 
@@ -64,18 +69,26 @@ func close() -> void:
 	queue_free()
 	closed.emit()
 
-## The profile: the signed-in account's name (`You` without one), `Look saved` back from the dressing room's Done.
-func open_profile(look_saved := false) -> P0ProfilePage:
-	var page := P0ProfilePage.new(profile_view(), _safe_top(), look_saved, {}, [])
+## The profile: the signed-in account's name (`You` without one), the home's card, `Look saved` back from the dressing
+## room's Done. The farm card goes home: the caller's `pressed` once these pages have closed.
+func open_profile(look_saved := false) -> ParcelProfilePage:
+	var page := ParcelProfilePage.new(profile_view(), _safe_top())
 	page.back_pressed.connect(back)
 	page.settings_pressed.connect(open_settings)
 	page.edit_look_pressed.connect(edit_look)
+	page.farm_pressed.connect(_go_home)
 	_push(page)
+	if look_saved: page.show_look_saved()
 	_time_figure(page)
 	return page
 
+func _go_home() -> void:
+	var go: Callable = home.get("pressed", Callable())
+	close()
+	if go.is_valid(): go.call()
+
 ## How long the figure took to show after the profile opened, for the QA log (C-133): `PARCEL_PROFILE_FIGURE {"ms":…}`.
-func _time_figure(page: P0ProfilePage) -> void:
+func _time_figure(page: ParcelProfilePage) -> void:
 	var rig: AvatarRig = page.preview.rig if page.preview != null else null
 	if rig == null: return
 	var start := Time.get_ticks_msec()
@@ -87,7 +100,10 @@ func profile_view() -> Dictionary:
 	var net := get_node_or_null("/root/Net")
 	var name := ""
 	if net != null and net.account.signed_in(): name = net.account.display_name
-	return {"profile": {"name": name}}
+	var shown := {"profile": {"name": name}}
+	if not home.is_empty():
+		shown["home"] = {"name": str(home.get("name", "")), "status": str(home.get("status", "")), "ready": bool(home.get("ready", false))}
+	return shown
 
 func open_settings() -> P0SettingsPage:
 	var page := P0SettingsPage.settings(version_line(), _safe_top(), _safe_bottom(), {}, "", P0SettingsPage.BLOCKED_NONE,

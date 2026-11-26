@@ -69,6 +69,20 @@ func test_the_static_name_size_is_the_built_one() -> void:
 			.is_equal(UiMapDestination.label_size_for(names[i], names[i] == "Home"))
 	assert_that(UiMapDestination.label_size_for("")).is_equal(Vector2.ZERO)
 
+## C-145: one pin may take a wider short name (the dynamic farm map's Washington Square); the default stays 96.
+func test_a_pin_can_widen_its_short_name() -> void:
+	var long_name := "Hummingbird Kingfisher"
+	var d := _pin(long_name)
+	await get_tree().process_frame
+	assert_float(d.label_size().x).is_equal(UiMapDestination.SHORT_MAX_W)
+	d.short_max_w = 400.0
+	await get_tree().process_frame
+	var whole := UiMapDestination.label_size_for(long_name, false, 400.0)
+	assert_float(whole.x).is_greater(UiMapDestination.SHORT_MAX_W)
+	assert_that(d.label_size()).is_equal(whole)
+	assert_float(d.size.x).is_equal(whole.x)
+	assert_float(UiMapDestination.label_size_for(long_name, false).x).is_equal(UiMapDestination.SHORT_MAX_W)   # cached apart
+
 ## q(137) ③: who is in is the top-right count, a person and the number; none at 0.
 func test_the_online_count_is_a_person_and_the_number() -> void:
 	var d := _pin("Oak")
