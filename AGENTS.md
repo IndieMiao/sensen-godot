@@ -1139,35 +1139,28 @@
 
 # Review Materials
 
-- Rule adopted on 2026-10-09 at the user's request: upload every review
-  material (screenshots, frame strips, screen recordings, before/after
-  comparisons, test-result reports) to the relevant Plane card as a comment
-  with attachments, under your own virtual_user_id. This applies even when the
-  reviewer is another agent (cross review, design walkthrough, art acceptance)
-  rather than the user. Local paths such as /Volumes/ACASIS/tmp/... are only a
-  supplement; when reporting to the user or the project director, link the
-  Plane card (https://plane.sensenjoy.cn/zili/browse/SGODOT-<n>/) instead of
-  only a local path. Text reports may be pasted as the comment body when a file
-  cannot be attached. Walkthroughs should ask the author to upload missing
-  materials before reviewing.
-- The Plane MCP can only attach files from public URLs. Upload local files with
-  the shared script (Plane REST; credentials read from ../plane.env, never
-  printed; it signs both the attachments and the comment with your id):
-  `uv run --with requests python3 /Volumes/ACASIS/tmp/gensen-ui-review/tools/plane_upload.py <work_item_uuid> <your_virtual_user_id> <file> [<file> ...] [--comment "<html>"]`.
-  Get the card UUID with the MCP `retrieve_work_item_by_identifier`
-  (e.g. SGODOT-231); prefix file names with the card number; virtual user ids
-  are in /Volumes/ACASIS/tmp/gensen-ui-review/pm/virtual-users.md.
-- Rule adopted on 2026-10-09 after the Plane upgrade (migration 0126): sign
-  every Plane write with your own virtual_user_id, not only comments. Pass it to
-  create_work_item (and subtasks), update_work_item, manage_work_item_assignee,
-  manage_work_item_label, create_work_item_comment, attachment upload/delete,
-  link create/update/delete and create_page / update_page / rename_page (Pages
-  also need an explicit project_id). Signing does not assign; set assignees
-  separately. Archive, restore and delete of cards or pages are not signable and
-  stay on the real account. Custom REST scripts put "virtual_user_id" in the
-  JSON body (attachments: both the upload request and the is_uploaded confirm);
-  never write created_by or actor directly. Reference: Plane page "Zili Plane
-  API 更新与 Agent 接入指南" (page 2fe96f61-9b3c-42ea-abef-f6ce11ca2490).
+- Rule adopted on 2026-11-27 (SEN-C-196), superseding the 2026-10-09 Plane
+  upload and signing rules: since the Cardigan cutover on 2026-11-20 Plane is
+  frozen and read-only. Attach every review material (screenshots, frame
+  strips, screen recordings, before/after comparisons, logs, test-result
+  reports) to the relevant Cardigan card as an attachment, bound to the
+  delivery or review it supports. Each delivery and review names the full
+  commit SHA it covers; evidence for an older SHA is not reused for a new one.
+  This applies even when the reviewer is another agent (cross review, design
+  walkthrough, art acceptance) rather than the user. Local paths such as
+  /Volumes/ACASIS/tmp/... are only a supplement; when reporting to the user or
+  the project director, cite the card number (SEN-C-<n>) and attachment
+  instead of only a local path. Text reports may go in the comment or delivery
+  body when a file cannot be attached. Walkthroughs should ask the author to
+  attach missing materials before reviewing.
+- Large files (APK, AAB, IPA, data packs, long screen recordings) go to the
+  controlled artifact storage under project rule 9 (cardigan C-496), not into
+  card attachments or the repository. On the card, record the artifact ID or
+  path, byte size and full SHA-256, plus versionCode (and versionName) for
+  app packages; never write a signed download URL into the card or repository.
+- Do not write to Plane. Plane cards, pages and the former `plane_upload.py`
+  / virtual_user_id signing workflow are history only; the frozen snapshots
+  are under `docs/governance/plane-SGODOT-*/`.
 - Never upload the user's private screens: phone home screen, other apps,
   photos, notifications or system settings captured during device tests stay
   local only; say in the comment that they were withheld. Upload only frames of
