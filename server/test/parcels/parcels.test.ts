@@ -864,7 +864,7 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
     const ada = await account(app, 'Ada');
     const v = await withCarrots(app, ada, A);
     expect((await command(app, ada, v, [{ type: 'sell', item: 'crop_carrot', count: 1 }, { type: 'claim_blueprint', blueprint: 'coop' },
-      { type: 'place_building', building: 'coop', x: 20, y: 20, rotation: 0 }, { type: 'feed', building: 1 }])).statusCode).toBe(200);
+      { type: 'place_building', building: 'coop', x: 22, y: 22, rotation: 1 }, { type: 'feed', building: 2 }])).statusCode).toBe(200);
     const saved = await mine(app, ada);
     await app.close();
     await before.end();
@@ -912,13 +912,14 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
       // C-148: a save from before Energy also reads at full Energy, nothing else changes.
       const full = { value: 200, at: clock, rested_on: null };
       // C-151: and as an empty pail, no one-off grant given yet. C-152: and at farm level 1.
-      expect((await mine(app, ada)).farm).toEqual({ ...legacy, buildings, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, pail_water: 0, grants: {}, level: 1,
-        energy: full });
+      // C-154: and with nothing on the ground yet.
+      expect((await mine(app, ada)).farm).toEqual({ ...legacy, buildings, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, drops: [], drop_seq: 0,
+        pail_water: 0, grants: {}, level: 1, energy: full });
       // Re-entering an old save gives no first-entry gift; it gets the watering grant (C-151) once, which writes the new fields.
       expect((await enter(app, ada)).json()).toMatchObject({ granted: false, gift: WATERING, parcel: { farm_version: 5 } });
       const bag = { hoe_starter: 1, seed_carrot: 2, crop_carrot: 1, ...WATERING };
-      const entered = { ...legacy, buildings, bag, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, pail_water: 0, grants: { watering: clock },
-        level: 1 };
+      const entered = { ...legacy, buildings, bag, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, drops: [], drop_seq: 0, pail_water: 0,
+        grants: { watering: clock }, level: 1 };
       expect((await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state).toEqual(entered);
       expect((await enter(app, ada)).json()).toMatchObject({ granted: false, gift: {}, parcel: { farm_version: 5 } });
       const sold = await command(app, ada, 5, [{ type: 'sell', item: 'crop_carrot', count: 1 }]);
