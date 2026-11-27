@@ -306,7 +306,7 @@ func _refresh() -> void:
 	if _row == null: return
 	# MS-10: what the slots showed before this refresh (their items and icons), for the refill motion after it.
 	var before_ids := _bar_ids
-	var before_icons := _cells.map(func(c: UiItemCell): return c.icon)
+	var before_icons := _cells.map(func(c: UiItemCell): return c.icon) if farm_style else []
 	var shown := {}   # the counts now on the bar: an item that left it rolls no stale number when it comes back
 	for i in slot_count:
 		var cell := _cells[i]
