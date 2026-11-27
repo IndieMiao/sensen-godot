@@ -484,25 +484,27 @@ for (const [name, enabled, makeStores] of makers) {
       const short = await command(app, ada, 1, [{ type: 'upgrade_farm' }]);
       expect(short.statusCode).toBe(422);
       expect(short.json()).toMatchObject({ code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 6 }, parcel: { farm_version: 1, farm: { level: 1 } } });
-      // 26 trees and 4 rocks of one's own outer ring (2 Energy each), 20 Timber sold for 40 coins: Lv2's 40 coins, 6 Timber and 4 Stone.
+      // 40 trees and 20 rocks of one's own outer ring (2 Energy each), 34 Timber and 16 Stone sold for 100 coins: Lv2's 100 coins (Q-282), 6 Timber and 4 Stone.
       const tree = (x: number) => ({ type: 'gather', object: `${A.parcel_id}:outer-groves-v2:wild_pz_tree_20:${x},7:0` });
       const rock = (x: number) => ({ type: 'gather', object: `${A.parcel_id}:outer-groves-v2:wild_pz_rock_08:${x},9:0` });
-      const stocked = await command(app, ada, 1, [...Array.from({ length: 26 }, (_, i) => tree(40 + i)), ...Array.from({ length: 4 }, (_, i) => rock(40 + i)),
-        { type: 'sell', item: 'wood', count: 20 }]);
-      expect(stocked.json().parcel.farm).toMatchObject({ coins: 40, bag: { wood: 6, stone: 4 }, energy: { value: 140 } });
-      // A coin short: refused whole, nothing taken.
-      expect((await command(app, ada, 2, [{ type: 'buy', item: 'seed_carrot', count: 1 }, { type: 'upgrade_farm' }])).json())
-        .toMatchObject({ code: 'NOT_ENOUGH_COINS', index: 1, detail: { coins: 31, need: 40 }, parcel: { farm_version: 2, farm: { coins: 40, level: 1 } } });
-      const up = await command(app, ada, 2, [{ type: 'upgrade_farm' }]);
+      expect((await command(app, ada, 1, Array.from({ length: 40 }, (_, i) => tree(40 + i)))).statusCode).toBe(200);
+      const stocked = await command(app, ada, 2, [...Array.from({ length: 20 }, (_, i) => rock(40 + i)),
+        { type: 'sell', item: 'wood', count: 34 }, { type: 'sell', item: 'stone', count: 16 }]);
+      expect(stocked.json().parcel.farm).toMatchObject({ coins: 100, bag: { wood: 6, stone: 4 }, energy: { value: 80 } });
+      // 9 coins short after a seed: refused whole, nothing taken.
+      expect((await command(app, ada, 3, [{ type: 'buy', item: 'seed_carrot', count: 1 }, { type: 'upgrade_farm' }])).json())
+        .toMatchObject({ code: 'NOT_ENOUGH_COINS', index: 1, detail: { coins: 91, need: 100 }, parcel: { farm_version: 3, farm: { coins: 100, level: 1 } } });
+      expect(await mine(app, ada)).toMatchObject({ farm_version: 3, farm: { level: 1, coins: 100, bag: { wood: 6, stone: 4 } } });
+      const up = await command(app, ada, 3, [{ type: 'upgrade_farm' }]);
       expect(up.statusCode).toBe(200);
       const farm = up.json().parcel.farm;
-      expect(farm).toMatchObject({ level: 2, coins: 0, energy: { value: 140 } });
+      expect(farm).toMatchObject({ level: 2, coins: 0, energy: { value: 80 } });
       expect(farm.bag.wood).toBeUndefined();
       expect(farm.bag.stone).toBeUndefined();
       expect((await mine(app, ada)).farm).toMatchObject({ level: 2, coins: 0 });
       // Lv3 asks for 10 Timber: refused, still Lv2.
-      expect((await command(app, ada, 3, [{ type: 'upgrade_farm' }])).json()).toMatchObject({ code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 10 } });
-      expect(await mine(app, ada)).toMatchObject({ farm_version: 3, farm: { level: 2 } });
+      expect((await command(app, ada, 4, [{ type: 'upgrade_farm' }])).json()).toMatchObject({ code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 10 } });
+      expect(await mine(app, ada)).toMatchObject({ farm_version: 4, farm: { level: 2 } });
     });
 
     it('C-58 the same request resent or sent many times at once pays, gathers and grants only once', async () => {

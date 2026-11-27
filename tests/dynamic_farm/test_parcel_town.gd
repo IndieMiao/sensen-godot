@@ -211,7 +211,7 @@ func _upgrade() -> void:
 	var store := LocalStore.new(PARCEL, DIR)
 	store.now_ms = func() -> int: return T0
 	store._save(ParcelFarm.normalize({"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {"wood": 16, "stone": 12},
-		"welcomed_at": T0, "coins": 100}), 3)
+		"welcomed_at": T0, "coins": 400}), 3)
 	var town := await _open(Town.CARPENTER, store)
 	_check(town.keys.has("upgrade") and town.keys.upgrade.label == "Upgrade Farm" and not town.keys.has("take"), "Scott offers Upgrade Farm")
 	_check(town.keys.upgrade.kind == UiCommandButton.Kind.PRIMARY, "alone it is the primary key")
@@ -226,7 +226,7 @@ func _upgrade() -> void:
 	sheet.button.activated.emit()
 	_check(asked[0], "Upgrade reports")
 	for i in 3: await process_frame
-	_check(town.farm.level == 2 and town.farm.coins == 60 and town.farm.bag == {"wood": 10, "stone": 8}, "Lv2: 40 coins, 6 Timber, 4 Stone taken")
+	_check(town.farm.level == 2 and town.farm.coins == 300 and town.farm.bag == {"wood": 10, "stone": 8}, "Lv2: 100 coins, 6 Timber, 4 Stone taken")
 	_check(town.toast.current_text() == "Farm Lv2", "the toast names the level")
 	_check(sheet.title.text == "Farm Lv2 → Lv3" and sheet.button.reason == "", "the sheet moves on to Lv3")
 	await town.upgrade()

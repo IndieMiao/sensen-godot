@@ -58,8 +58,9 @@ Notes: `docs/plans/C-151.md`.
 
 ## Farm levels (C-152, 0.4.5)
 
-As P0's Homestead levels, Lv1 to Lv5 for now (`farm_levels` in `assets/farm/data/dynamic_farm.json`; the costs are the
-author's defaults on SEN-C-152#14 for the owner to confirm). Scott's greeting has `Upgrade Farm`, which opens the upgrade
+As P0's Homestead levels, Lv1 to Lv5 for now (`farm_levels` in `assets/farm/data/dynamic_farm.json`; Lv2–5 cost 100 /
+300 / 600 / 1,000 coins since owner decision SEN-Q-282 (C-198, 0.4.6), materials as on SEN-C-152#14; a farm upgraded at
+the earlier 40 / 60 / 70 / 80 keeps its level and coins). Scott's greeting has `Upgrade Farm`, which opens the upgrade
 sheet (`parcel_upgrade.gd`, P0's HOME-1 in the kit: NEED-TILEs for Timber, Stone and Coins, What changes, the first gap on
 the Upgrade key per LOCK-10); Upgrade sends `upgrade_farm`. The server takes the next level's coins and materials (no
 Energy) or refuses the whole batch (`NOT_ENOUGH` naming the first short material, then `NOT_ENOUGH_COINS`; `MAX_LEVEL`

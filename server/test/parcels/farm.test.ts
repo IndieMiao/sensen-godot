@@ -964,12 +964,12 @@ describe('farm levels (C-152)', () => {
   };
   const wellAt = (x: number): FarmCommand => ({ type: 'place_building', building: 'well', x, y: 30, rotation: 0 });
 
-  it('ships Lv1 to Lv5: coins as P0 Homestead Lv2–5, Timber and Stone rising; wells 1 / 2 / 3 at Lv1 / 3 / 5; Max Energy 200 + 10 a level', () => {
+  it('ships Lv1 to Lv5: coins 100 / 300 / 600 / 1,000 (Q-282), Timber and Stone rising; wells 1 / 2 / 3 at Lv1 / 3 / 5; Max Energy 200 + 10 a level', () => {
     expect(rules.farm_levels).toEqual([
-      { level: 2, coins: 40, items: { wood: 6, stone: 4 } },
-      { level: 3, coins: 60, items: { wood: 10, stone: 8 }, buildings: { well: 2 }, gift: { blueprint_well: 1 } },
-      { level: 4, coins: 70, items: { wood: 14, stone: 12 } },
-      { level: 5, coins: 80, items: { wood: 20, stone: 16 }, buildings: { well: 3 }, gift: { blueprint_well: 1 } },
+      { level: 2, coins: 100, items: { wood: 6, stone: 4 } },
+      { level: 3, coins: 300, items: { wood: 10, stone: 8 }, buildings: { well: 2 }, gift: { blueprint_well: 1 } },
+      { level: 4, coins: 600, items: { wood: 14, stone: 12 } },
+      { level: 5, coins: 1000, items: { wood: 20, stone: 16 }, buildings: { well: 3 }, gift: { blueprint_well: 1 } },
     ]);
     expect([1, 2, 3, 4, 5].map(l => maxEnergy(rules, at(l)))).toEqual([200, 210, 220, 230, 240]);
     expect([1, 2, 3, 4, 5].map(l => buildingMax(rules, 'well', l))).toEqual([1, 1, 2, 2, 3]);
@@ -987,6 +987,17 @@ describe('farm levels (C-152)', () => {
     expect(rebaseFarm(rules, at(4), T0).level).toBe(4);
   });
 
+  it('Q-282: a farm upgraded at the old prices keeps its level and coins on reading, nothing taken or given back; the next level asks the new price', () => {
+    // Lv3, paid 40 + 60 before; 25 coins left over, saved as JSON.
+    const saved = JSON.parse(JSON.stringify({ ...at(3, { wood: 14, stone: 12 }), coins: 25 })) as ParcelFarmState;
+    const read = withEconomy(saved);
+    expect(read).toMatchObject({ level: 3, coins: 25, bag: { wood: 14, stone: 12 } });
+    expect(rebaseFarm(rules, saved, T0)).toMatchObject({ level: 3, coins: 25 });
+    expect(run(read, [{ type: 'clear_obstacle', cell: '9,9' }])).toMatchObject({ level: 3, coins: 25 });
+    expect(applyFarmCommands(rules, read, [UP], T0)).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH_COINS', detail: { coins: 25, need: 600 } });
+    expect(run({ ...read, coins: 625 }, [UP])).toMatchObject({ level: 4, coins: 25, bag: welcomed().bag });
+  });
+
   it('upgrading takes the next level\'s coins, Timber and Stone, costs no Energy and raises Max Energy by 10', () => {
     const out = applyFarmCommands(rules, enough(1), [UP], T0);
     expect(out.ok).toBe(true);
@@ -998,7 +1009,7 @@ describe('farm levels (C-152)', () => {
     const later = run(out.state, [{ type: 'clear_obstacle', cell: '9,9' }], T0 + 10 * 160_000);
     expect(later.energy).toEqual({ value: 208, at: T0 + 10 * 160_000, rested_on: null });
     // Lv3 and Lv5 put one more well blueprint in the bag; leftover coins and materials stay.
-    const three = run({ ...enough(2), coins: 65, bag: { ...enough(2).bag, wood: 11 } }, [UP]);
+    const three = run({ ...enough(2), coins: 305, bag: { ...enough(2).bag, wood: 11 } }, [UP]);
     expect(three).toMatchObject({ level: 3, coins: 5, bag: { wood: 1, blueprint_well: 1 } });
     expect(run(enough(4), [UP]).bag.blueprint_well).toBe(1);
   });
@@ -1012,8 +1023,13 @@ describe('farm levels (C-152)', () => {
       return out;
     };
     expect(refuse(at(1))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 6 } });
-    expect(refuse(at(1, { wood: 6, stone: 3 }, 40))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH', detail: { item: 'stone', have: 3, need: 4 } });
-    expect(refuse(at(1, next.items, 39))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH_COINS', detail: { coins: 39, need: 40 } });
+    expect(refuse(at(1, { wood: 6, stone: 3 }, 100))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH', detail: { item: 'stone', have: 3, need: 4 } });
+    expect(refuse(at(1, next.items, 99))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH_COINS', detail: { coins: 99, need: 100 } });
+    // The old Lv2–5 prices (40 / 60 / 70 / 80) no longer pay for any level (Q-282).
+    for (const [level, old] of [[1, 40], [2, 60], [3, 70], [4, 80]]) {
+      const need = nextFarmLevel(rules, level)!;
+      expect(refuse(at(level, need.items, old))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH_COINS', detail: { coins: old, need: need.coins } });
+    }
     expect(refuse(at(1, { wood: 5, stone: 4 }, 0))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH', detail: { item: 'wood', have: 5, need: 6 } });
     // Two upgrades in one batch pay for both; with only Lv2's price the second is refused and the first is undone.
     expect(refuse(enough(1), [UP, UP])).toEqual({ ok: false, index: 1, code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 10 } });

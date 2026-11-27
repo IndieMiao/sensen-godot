@@ -88,7 +88,7 @@
   "farm_levels": [
     {
       "level": 2,
-      "coins": 40,
+      "coins": 100,
       "items": {
         "wood": 6,
         "stone": 4
@@ -96,7 +96,7 @@
     },
     {
       "level": 3,
-      "coins": 60,
+      "coins": 300,
       "items": {
         "wood": 10,
         "stone": 8
@@ -110,7 +110,7 @@
     },
     {
       "level": 4,
-      "coins": 70,
+      "coins": 600,
       "items": {
         "wood": 14,
         "stone": 12
@@ -118,7 +118,7 @@
     },
     {
       "level": 5,
-      "coins": 80,
+      "coins": 1000,
       "items": {
         "wood": 20,
         "stone": 16
