@@ -196,6 +196,12 @@ var sway_triggers := 0
 ## Layout indices drawn as gathered: index -> true.
 var _spent := {}
 var _spent_material: ShaderMaterial
+## The outer object a gather press is picking (its layout index), -1 none: its reply fades it grey (MS-08).
+var _gathering := -1
+## Layout index → [the batch drawing it, its instance] for the objects drawn as they grow (Scenery.build's `drawn`).
+var _outer_drawn := {}
+## The outer object rocking now (its layout index), -1 none.
+var shaking := -1
 
 ## The first visit's next step (C-35, ParcelGuide) as the main farm's TipCard, under the top bar.
 var _tip: UiTipCard
@@ -239,8 +245,8 @@ var key_cost := 0
 var key_short := false
 
 ## `core` is the scene's built core obstacle layer: {plan, root, proxies, recipe}. `body` is the
-## scene (C-73), `outer` the drawn outer layer, {layout, root, recipe} (its walk profiles are
-## already bound).
+## scene (C-73), `outer` the drawn outer layer, {layout, root, recipe, drawn?} (its walk profiles are
+## already bound; `drawn`: Scenery.build's batch and instance per layout item).
 func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: RefCounted, canvas: CanvasLayer,
 		body: Node = null, outer := {}) -> void:
 	_data = data
@@ -261,6 +267,8 @@ func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: Ref
 	if outer.get("root") is Node3D and outer.get("layout") is Array:
 		_outer_layout = outer.layout
 		_outer_root = outer.root
+		var drawn: Array = outer.get("drawn", [])
+		for i in mini(drawn.size(), _outer_layout.size()): _outer_drawn[i] = drawn[i]
 		var recipe = outer.get("recipe")
 		var version := str(recipe.get("outer_groves", {}).get("version", "")) if recipe is Dictionary else ""
 		gatherables = Gather.objects(_outer_layout, walk, data.block_id, _gather, version)
@@ -498,10 +506,45 @@ func _on_key() -> void:
 
 ## One gather press (C-60): the object is already in reach, so the player only faces it and plays
 ## the hand-picking (harvest) labour clip while the command goes out (C-73's beat, no walk).
+## MS-08 (C-185 §3.2 / §4, C-211): the object rocks twice on the press and, picked, fades into the gathered grey.
 func gather(action: Dictionary) -> Dictionary:
-	if _body == null: return await send(action.command)
-	_body.labour("harvest", [_walk.cell_at(gatherables[action.object].origin)], LABOUR_S)
-	return await send(action.command, LABOUR_S)
+	var index := int(gatherables[action.object].index)
+	shake_object(index)
+	_gathering = index
+	var result: Dictionary
+	if _body == null: result = await send(action.command)
+	else:
+		_body.labour("harvest", [_walk.cell_at(gatherables[action.object].origin)], LABOUR_S)
+		result = await send(action.command, LABOUR_S)
+	_gathering = -1
+	return result
+
+## MS-08: outer object `index` (in the outer layout) rocks ±`motion/angle/gatherShake` twice over
+## `motion/duration/gatherShake` (linear) about its foot, then stands as it was. Reduced: it stays still.
+func shake_object(index: int) -> void:
+	if UiMotion.reduced or not is_inside_tree(): return
+	var at := _outer_instance(index)
+	if at.is_empty(): return
+	var batch: MultiMeshInstance3D = at[0]
+	var i: int = at[1]
+	var rest: Transform3D = _outer_layout[index].transform
+	# A sway from side to side across the view: about the ground's z axis, through its foot.
+	var swing := func(k: float) -> void:
+		if not is_instance_valid(batch) or i >= batch.multimesh.instance_count: return
+		var a := deg_to_rad(UiTokens.MOTION_ANGLE_GATHER_SHAKE) * sin(TAU * 2.0 * k)
+		batch.multimesh.set_instance_transform(i, Transform3D(Basis(Vector3.BACK, a) * rest.basis, rest.origin))
+	shaking = index
+	var tw := create_tween()
+	tw.tween_method(swing, 0.0, 1.0, UiMotion.secs(UiTokens.MOTION_DURATION_GATHER_SHAKE_MS))
+	tw.tween_callback(func():
+		swing.call(0.0)
+		if shaking == index: shaking = -1)
+
+## The batch drawing outer object `index` and its instance there: [MultiMeshInstance3D, i], or [] (not drawn, gone).
+func _outer_instance(index: int) -> Array:
+	var at: Array = _outer_drawn.get(index, [])
+	if at.is_empty() or not is_instance_valid(at[0]) or (at[0] as Node).is_queued_for_deletion(): return []
+	return at
 
 ## The key at a livestock building's feeder (C-154): Feed, or why not (`Need 1 Carrot`, the art's `Hens are fed` /
 ## `Pick up eggs first`); {verb, refusal, refusal_text, key_text, command, feeder}. `refusal_text` is the whole
@@ -619,10 +662,14 @@ func work(cell: Vector2i, action: Dictionary) -> Dictionary:
 	_body.labour(action.verb, cells, seconds)
 	var result := await send(action.command, seconds)
 	job = null
-	# MS-07 (C-185 §3.2): the reply's new soil springs up, a sown seedling grows from its root.
+	# MS-07 (C-185 §3.2): the reply's new soil springs up with a puff of dust, a sown seedling grows from its root, a
+	# watered cell's soil darkens to wet as drops splash off it (C-211).
 	if bool(result.get("ok", false)) and _crop_art != null:
-		if action.verb == "till": _crop_art.pop(cell, &"soil")
+		if action.verb == "till":
+			_crop_art.pop(cell, &"soil")
+			_crop_art.dust(cell)
 		elif action.verb == "sow": _crop_art.pop(cell, &"plant")
+		elif action.verb == "water": _crop_art.wet_in(cell)
 	return result
 
 ## The cells one press works: the whole block of an obstacle (a tree covers four), else the cell.
@@ -878,17 +925,27 @@ func _draw_gathered() -> void:
 		if Gather.ready_at(_gather, farm, object.id, now) > 0: spent[object.index] = true
 	if spent == _spent: return
 	var fresh := []
+	var fresh_at := []
 	var faded := []
+	# MS-08: the object this gather just picked fades into the grey (its own material), the others are grey already.
+	var fading := []
 	for i in _outer_layout.size():
-		if not spent.has(i): fresh.append(_outer_layout[i])
-		elif _outer_layout[i].solid: faded.append(_outer_layout[i])
+		if not spent.has(i):
+			fresh.append(_outer_layout[i])
+			fresh_at.append(i)
+		elif not _outer_layout[i].solid: continue
+		elif i == _gathering and not _spent.has(i): fading.append(_outer_layout[i])
+		else: faded.append(_outer_layout[i])
 	var art := Scenery.build({"layout": fresh}, _walk, _recipe, false)
 	var picked_art := Scenery.build({"layout": faded}, _walk, _recipe, false)
-	if not art.ok or not picked_art.ok:
-		for built: Dictionary in [art, picked_art]:
+	var fading_art := Scenery.build({"layout": fading}, _walk, _recipe, false)
+	if not art.ok or not picked_art.ok or not fading_art.ok:
+		for built: Dictionary in [art, picked_art, fading_art]:
 			if built.ok: built.root.free()
 		return
 	_spent = spent
+	_outer_drawn = {}
+	for k in fresh_at.size(): _outer_drawn[fresh_at[k]] = art.drawn[k]
 	for child in _outer_root.get_children():
 		_outer_root.remove_child(child)
 		child.queue_free()
@@ -903,8 +960,22 @@ func _draw_gathered() -> void:
 		child.name = "Gathered" + child.name
 		(child as GeometryInstance3D).material_override = _spent_material
 		_outer_root.add_child(child)
+	if fading_art.root.get_child_count() > 0:
+		var fade := _spent_material.duplicate() as ShaderMaterial
+		fade.set_shader_parameter(&"amount", 0.0)
+		for child in fading_art.root.get_children():
+			fading_art.root.remove_child(child)
+			child.name = "GatheredFading" + child.name
+			(child as GeometryInstance3D).material_override = fade
+			_outer_root.add_child(child)
+		if is_inside_tree():
+			var tw := create_tween().set_trans(UiTokens.MOTION_EASING_STANDARD[0]).set_ease(UiTokens.MOTION_EASING_STANDARD[1])
+			tw.tween_method(func(v: float): fade.set_shader_parameter(&"amount", v), 0.0, 1.0,
+				UiMotion.secs(UiTokens.MOTION_DURATION_GATHER_FADE_MS))
+		else: fade.set_shader_parameter(&"amount", 1.0)
 	art.root.free()
 	picked_art.root.free()
+	fading_art.root.free()
 
 ## Crop sway on or off (C-141; QA compares the two). Off draws the carrots still, as before.
 func set_sway(on: bool) -> void:
@@ -1259,7 +1330,7 @@ func _build_ui(canvas: CanvasLayer) -> void:
 	_ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	canvas.add_child(_ui)
 	_bar = UiQuickBar.new(true)   # C-186: Seeds end + 4 frosted slots + Bag end (C-185 §3.1 D)
-	_bar.bag_icon = UiArt.SYS_BAG
+	_bar.bag_icon = UiArt.bag_end()   # C-211: the coloured bag (C-185 §3.1 D)
 	_bar.name = "QuickBar"
 	_bar.haptics = OS.has_feature("mobile")
 	_bar.visible = false

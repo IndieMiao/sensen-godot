@@ -321,3 +321,26 @@ func test_clay_switch_swaps_verb_and_cost_together() -> void:
 	assert_bool(k._switch == null or not k._switch.is_valid()).is_true()
 	await get_tree().create_timer(0.3).timeout
 	assert_str(k._cost.text).is_equal("Pail empty")
+
+## C-211 (C-186 V-653): the lump is rounder, the owner's attachment-1816 pebble: inside its box, its corners well
+## inside a rounded square's, its top leaning right and its bottom-left fuller than its bottom-right.
+func test_clay_outline_is_the_reference_pebble() -> void:
+	var w := 104.0
+	var h := 92.0
+	var pts := UiActionClay.outline(w, h)
+	var top := pts[0]
+	var box := Rect2(pts[0], Vector2.ZERO)
+	for p in pts:
+		box = box.expand(p)
+		if p.y < top.y: top = p
+	assert_bool(Rect2(0, 0, w, h).encloses(box)).is_true()
+	assert_float(box.size.x).is_greater(w * 0.95)
+	assert_float(box.size.y).is_greater(h * 0.95)
+	assert_float(top.x).is_greater(w * 0.5)   # the top leans right
+	# Rounder: the diagonal reaches only ~1.05 of the half box (a rounded square's reached ~1.17).
+	var c := Vector2(w, h) * 0.5
+	for i in [9, 27, 45, 63]:
+		var d := (pts[i] - c) / c
+		assert_float(d.length()).is_less(1.09)
+	# Fuller at the bottom-left (i 27, 135°) than at the bottom-right (i 9, 45°).
+	assert_float(((pts[27] - c) / c).length()).is_greater(((pts[9] - c) / c).length())

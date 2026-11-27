@@ -98,6 +98,8 @@ var _avatar: UiHudAvatar
 ## The profile and the pages opened from it, over the parcel (parcel_profile.gd), else null.
 var _profile: Control
 var _profile_layer: CanvasLayer
+## The profile closed but still fading out (MS-21), else null.
+var _profile_leaving: Control
 var _coins: Label
 var _coins_icon: TextureRect
 var _movement := Vector2.ZERO
@@ -233,7 +235,7 @@ func _ready() -> void:
 			else: store = RemoteFarmStore.new(net.client if net != null else null, _data.block_id, _data.dataset_version)
 		_paths = FarmPath.new(_walk)
 		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies, "recipe": _plan.recipe}, store, _canvas,
-			self, {"layout": _plan.layout, "root": _props, "recipe": _plan.recipe})
+			self, {"layout": _plan.layout, "root": _props, "recipe": _plan.recipe, "drawn": art.drawn})
 		_hint.hide()
 		_farming.state_changed.connect(_on_farm_changed)
 		_farming.place_side_button(_build)
@@ -970,7 +972,8 @@ func close_modal() -> bool:
 ## The profile over the parcel (C-108; C-85 ①: the HUD avatar opens it): the parcel's HUD hides and its touches stop
 ## until it closes; Settings and the dressing room open from it (parcel_profile.gd). The player stops where they are.
 func open_profile() -> Control:
-	if is_instance_valid(_profile) or _suspended or _back_sent: return null
+	# A profile still fading out (MS-21) is still on its pages and its locale: a new one waits for it to go.
+	if is_instance_valid(_profile) or is_instance_valid(_profile_leaving) or _suspended or _back_sent: return null
 	end_placement()
 	if not _route.is_empty(): _end_route("cancelled")
 	_movement = Vector2.ZERO
@@ -984,17 +987,21 @@ func open_profile() -> Control:
 	_profile_layer.name = "ProfileLayer"
 	_profile_layer.layer = PROFILE_LAYER
 	add_child(_profile_layer)
-	_profile = load(PROFILE).open(_profile_layer, Vector3.ZERO, profile_home())
+	# MS-21 (C-185 §4, C-211): the profile fades in over the parcel (160); the parcel's HUD goes once it is covered.
+	_profile = load(PROFILE).open(_profile_layer, Vector3.ZERO, profile_home(), true)
 	_profile.closed.connect(_profile_closed)
-	_canvas.visible = false
+	_profile.tree_exited.connect(_profile_layer.queue_free)   # its layer goes when its pages have faded out
 	_controls.process_mode = Node.PROCESS_MODE_DISABLED
+	var profile := _profile
+	get_tree().create_timer(UiMotion.secs(UiTokens.MOTION_DURATION_QUICK_MS)).timeout.connect(func():
+		if is_instance_valid(profile) and profile == _profile: _canvas.visible = false)
 	return _profile
 
-func profile_open() -> bool: return is_instance_valid(_profile) and not _profile.is_queued_for_deletion()
+func profile_open() -> bool: return is_instance_valid(_profile) and not _profile.is_closing()
 
 func _profile_closed() -> void:
+	_profile_leaving = _profile
 	_profile = null
-	if is_instance_valid(_profile_layer): _profile_layer.queue_free()
 	_profile_layer = null
 	_controls.process_mode = Node.PROCESS_MODE_INHERIT
 	_controls.reset()

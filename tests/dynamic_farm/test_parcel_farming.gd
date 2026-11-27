@@ -46,6 +46,7 @@ func _run() -> void:
 	_levels()
 	_level_cases()
 	_upgrade_sheet()
+	await _crop_art_motion()
 	print("PARCEL_FARMING checks=%d failures=%d" % [checks, failures])
 	quit(1 if failures else 0)
 
@@ -577,6 +578,47 @@ func _crop_sway_late(art: CropArt, soil: Dictionary, crops: Dictionary) -> void:
 	art.set_clock(art.clock + CropArt.SHAKE_S)
 	_check(art.shake_of(Vector2i(1, 1)).is_empty() and art.shake_data(Vector2i(1, 1)) == Color(0, 0, 0, 0),
 		"sway late: a shake over is written still by the clock alone, so it cannot come round on the next wrap")
+
+## C-211 MS-07: a watered cell's soil turns from dry to wet (300) on its own block while the wet batch leaves it out,
+## three drops splash off it; tilled soil puffs four grains of dust. Reduced: the soil is simply wet, nothing flies.
+func _crop_art_motion() -> void:
+	for reduced in [false, true]:
+		UiMotion.reduced = reduced
+		var tag := "reduced" if reduced else "full"
+		var art := CropArt.new(func(cell: Vector2i) -> Vector3: return Vector3(cell.x, 0, -cell.y), 0.8)
+		root.add_child(art)
+		var cell := Vector2i(2, 1)
+		art.sync({"2,1": CropArt.DRY}, {}, T0)
+		art.dust(cell)
+		var dust := art.get_node_or_null(^"TillDust") as CPUParticles3D
+		_check((dust != null and dust.amount == UiTokens.MOTION_LIMIT_TILL_DUST) != reduced, "%s: tilled soil puffs 4 grains (none reduced)" % tag)
+		art.sync({"2,1": CropArt.WET}, {}, T0)
+		art.wet_in(cell)
+		var block := art.get_node_or_null(^"WetFade") as MeshInstance3D
+		var drops := art.get_node_or_null(^"WaterDrops") as CPUParticles3D
+		var wet: MultiMeshInstance3D = art._soil[CropArt.WET]
+		if reduced:
+			_check(block == null and drops == null and art.wetting().is_empty() and wet.multimesh.instance_count == 1,
+				"reduced: the watered soil is simply wet")
+		else:
+			_check(block != null and drops != null and drops.amount == UiTokens.MOTION_LIMIT_WATER_DROPS and art.wetting() == [cell],
+				"full: the watered cell fades on its own block, three drops splash")
+			var m := block.material_override as StandardMaterial3D
+			_check(m.albedo_color.is_equal_approx(art._dry_material.albedo_color), "full: it starts dry")
+			await create_timer(0.15).timeout
+			_check(is_instance_valid(block) and m.albedo_color.get_luminance() < art._dry_material.albedo_color.get_luminance(), "full: …darkening")
+			art.sync({"2,1": CropArt.WET}, {"2,1": {"crop": "crop_carrot", "planted_at": T0, "ripe_at": T0 + 60000, "watered_at": T0}}, T0)
+			_check(art.wetting() == [cell] and is_instance_valid(block), "full: a redraw keeps the fade going")
+			await create_timer(0.3).timeout
+			_check(art.wetting().is_empty() and not is_instance_valid(block) and art.get_node_or_null(^"WetFade") == null,
+				"full: then the wet batch draws it again")
+			art.sync({}, {}, T0)
+			art.sync({"2,1": CropArt.WET}, {}, T0)
+			art.wet_in(cell)
+			art.sync({"2,1": CropArt.DRY}, {}, T0)
+			_check(art.wetting().is_empty(), "full: a cell dry again (another reply) ends its fade")
+		art.free()
+	UiMotion.reduced = false
 
 ## C-148: P0's numbers (assets/p0/p0_content.json) and the client's settlement.
 func _energy() -> void:

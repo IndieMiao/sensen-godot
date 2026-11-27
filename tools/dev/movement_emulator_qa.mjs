@@ -2,13 +2,13 @@ import {execFile} from 'node:child_process';
 import {promisify,isDeepStrictEqual} from 'node:util';
 import {mkdir,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import {requireEmulator,runSerial} from './run_serial.mjs';
+import {runEmulator} from './run_serial.mjs';
 
 const run=promisify(execFile);
 const output='output/movement-emulator-2026-09-15';
 await mkdir(output,{recursive:true});
-// The session's serial (run_test.sh), else this Run's emulator (C-212), else the local default; emulators only (C-216).
-const serial=requireEmulator(runSerial(['JOURNEY_SERIAL'],{host:['CARDIGAN_EMULATOR_SERIAL']})||'emulator-5560');
+// The session's serial (run_test.sh), else this Run's emulator (C-212), else the local default outside a Run; emulators only (C-216, C-217).
+const serial=runEmulator();
 const adb=args=>run('adb',['-s',serial,...args],{maxBuffer:8*1024*1024,timeout:15000,encoding:'buffer'});
 const snapshot=async()=> (await fetch('http://127.0.0.1:3155/v1/qa/journey/scene')).json();
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));

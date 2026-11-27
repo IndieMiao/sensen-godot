@@ -62,20 +62,25 @@ static func glyph_color(group: Group) -> Color:
 	if group == Group.OFF: return UiTokens.COLOR_ACTION_CLAY_OFF_INK
 	return UiTokens.COLOR_ACTION_CLAY_VERB
 
-## The clay outline, `n` points round a w × h box: a superellipse with a slight wobble, the top-left a little fuller
-## (the reference's hand-pressed lump). Drawn by UiSceneAction; shared so holding / pending strokes follow it.
+## The lump's shape (C-211, C-186 V-653: rounder, nearer figure 9 and the owner's attachment-1816): the reference's own
+## outline as a radius round the box's centre, r(t) = R0 + Σ a_k cos kt + b_k sin kt (t from the right edge, y down),
+## in units of the half width and half height. Fitted to attachment-1816's silhouette (72 rays, harmonics 1–4: 99.6 %
+## overlap; the C-186 rounded square overlapped it 87.6 %): a pebble, fuller at the bottom-left, its top leaning right.
+const OUTLINE_R0 := 0.998
+const OUTLINE_HARMONICS := [[0.025, 0.0371], [0.0001, -0.0342], [-0.018, 0.0281], [-0.0068, 0.0068]]
+## The outline stays this far inside the box (anti-aliased edge room).
+const OUTLINE_FIT := 0.98
+
+## The clay outline, `n` points round a w × h box, starting at the right and turning clockwise on screen (a quarter of
+## the way round is the bottom, three quarters the top). Drawn by UiSceneAction; shared so holding / pending strokes
+## follow it.
 static func outline(w: float, h: float, n := 72) -> PackedVector2Array:
 	var pts := PackedVector2Array()
 	var c := Vector2(w, h) * 0.5
-	var e := 2.0 / 3.6   # superellipse exponent 2/n with n = 3.6: a rounded square, not a circle
 	for i in n:
 		var t := TAU * float(i) / float(n)
-		var ct := cos(t)
-		var st := sin(t)
-		var x := signf(ct) * pow(absf(ct), e)
-		var y := signf(st) * pow(absf(st), e)
-		var wobble := 1.0 + 0.018 * sin(3.0 * t + 0.6) + 0.012 * sin(5.0 * t + 1.7)
-		# Fuller at the top-left (x < 0, y < 0), a touch narrower at the bottom-right.
-		var lump := 1.0 + 0.03 * maxf(0.0, -(ct + st) * 0.7071)
-		pts.append(c + Vector2(x * c.x, y * c.y) * wobble * lump * 0.97)
+		var r := OUTLINE_R0
+		for k in OUTLINE_HARMONICS.size():
+			r += float(OUTLINE_HARMONICS[k][0]) * cos((k + 1) * t) + float(OUTLINE_HARMONICS[k][1]) * sin((k + 1) * t)
+		pts.append(c + Vector2(cos(t) * c.x, sin(t) * c.y) * r * OUTLINE_FIT)
 	return pts

@@ -21,3 +21,15 @@ export function requireEmulator(serial) {
   if (!serial.startsWith('emulator-')) throw new Error(`${serial} is not an emulator; this script runs on emulators only.`);
   return serial;
 }
+
+// Serial for the emulator-only QA scripts: JOURNEY_SERIAL, then the Run's emulator, else emulator-5560 outside a Run.
+// A Run the host gave only a physical device has no emulator of its own; emulator-5560 belongs to someone else (C-217).
+export function runEmulator({ env = process.env, warn = console.error } = {}) {
+  const serial = runSerial(['JOURNEY_SERIAL'], { host: ['CARDIGAN_EMULATOR_SERIAL'], env, warn });
+  if (serial) return requireEmulator(serial);
+  if (env.CARDIGAN_DEVICE_SERIAL) {
+    throw new Error(`This Run holds no emulator (CARDIGAN_EMULATOR_SERIAL is not set, only the device ${env.CARDIGAN_DEVICE_SERIAL}); ` +
+      'this script runs on emulators only and does not fall back to emulator-5560.');
+  }
+  return 'emulator-5560';
+}
