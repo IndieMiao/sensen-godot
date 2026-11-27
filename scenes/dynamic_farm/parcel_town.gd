@@ -448,14 +448,18 @@ func show_level_card(level: int, rows: Array, sheet = null) -> void:
 	scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	scrim.color = UiTokens.COLOR_SCRIM_MODAL
 	scrim.mouse_filter = Control.MOUSE_FILTER_STOP
+	# Nothing shows until the card is measured and centred next frame (C-186#82: it flashed at (0,0) over a full scrim).
+	scrim.modulate.a = 0.0
 	_level_layer.add_child(scrim)
 	var glow: Control = null
 	if not UiMotion.reduced:
 		glow = UiRewardMoment.Glow.new()
 		glow.name = "Glow"
+		glow.modulate.a = 0.0
 		_level_layer.add_child(glow)
 	var m := UiRewardMoment.new()
 	m.name = "LevelCard"
+	m.modulate.a = 0.0
 	m.tone = UiRewardMoment.Tone.MILESTONE
 	m.event = LINES.upgraded % level
 	m.hero = UiArt.hero("home")
@@ -480,6 +484,7 @@ func show_level_card(level: int, rows: Array, sheet = null) -> void:
 		var side := maxf(m.size.x, m.size.y) * 2.2
 		glow.size = Vector2(side, side)
 		glow.position = m.position + Vector2(m.size.x * 0.5, 0) - glow.size * 0.5
+		glow.modulate.a = 1.0
 	m.play_level_in(scrim)
 
 ## The level-up card leaves (M-05, its scrim fading); `sheet` then shows the next level.

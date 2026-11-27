@@ -36,6 +36,7 @@ func _run() -> void:
 	await _buy()
 	await _carpenter()
 	await _upgrade()
+	await _level_card_first_frame()
 	await _barn_blueprint()
 	await _failures()
 	await _entries()
@@ -279,6 +280,33 @@ func _upgrade() -> void:
 	_check(town.keys.has("take") and town.keys.upgrade.kind == UiCommandButton.Kind.SECONDARY, "beside Take Blueprint, Upgrade Farm is secondary")
 	town.close()
 	await process_frame
+	UiMotion.reduced = false
+
+## C-186#82: the level-up card is measured and centred a frame after it joins the scene; until then nothing of it shows —
+## the card, its light and the scrim all start transparent — so it never flashes at (0, 0) over a full scrim. Both motions.
+func _level_card_first_frame() -> void:
+	for reduced in [false, true]:
+		_clean()
+		UiMotion.reduced = reduced
+		var store := LocalStore.new(PARCEL, DIR)
+		store.now_ms = func() -> int: return T0
+		var town := await _open(Town.CARPENTER, store)
+		town.show_level_card(2, [{"icon": null, "label": "Max Energy", "value": "200 → 210"}])
+		var layer: Control = town.get_node(^"LevelUp")
+		var card: Control = layer.get_node(^"LevelCard")
+		var scrim: CanvasItem = layer.get_node(^"Scrim")
+		var glow: CanvasItem = layer.get_node_or_null(^"Glow")
+		var tag := "reduced" if reduced else "full"
+		_check(card.modulate.a == 0.0 and scrim.modulate.a == 0.0 and (glow == null or glow.modulate.a == 0.0),
+			"%s: before the first frame the card, its light and the scrim are all transparent" % tag)
+		await process_frame
+		var centre := (layer.size - card.size) * 0.5 + Vector2(0, UiRewardMoment.HERO_OVER * 0.5)
+		_check(card.position.is_equal_approx(centre) and card.position != Vector2.ZERO, "%s: then the card is centred (%s)" % [tag, card.position])
+		_check(card.modulate.a < 0.5 and scrim.modulate.a < 0.5, "%s: and fades in from there (card %.2f, scrim %.2f)" % [tag, card.modulate.a, scrim.modulate.a])
+		for i in 30: await process_frame
+		_check(is_equal_approx(card.modulate.a, 1.0) and is_equal_approx(scrim.modulate.a, 1.0), "%s: card and scrim end fully in" % tag)
+		town.close()
+		await process_frame
 	UiMotion.reduced = false
 
 ## C-181: Scott sells the barn blueprint. Below farm level 2 (C-192, SEN-Q-282) the key reads `Farm Lv2 needed` whatever the

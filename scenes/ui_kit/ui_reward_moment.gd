@@ -301,16 +301,15 @@ func row_controls() -> Array: return _rows.get_children() if _rows != null else 
 func event_label() -> Label: return _event
 func hero_rect() -> TextureRect: return _hero
 
-## M-12 (C-185 MS-17): the card 0.6 → 1 in 320 (back out) as `scrim` fades 0 → its alpha in 200 (linear); the hero
-## pops in after `motion/delay/upgradeHero` (80) from y+12 at 0.6, the title drops from y−12 after
+## M-12 (C-185 MS-17): the card 0.6 → 1 in 320 (back out) as `scrim` fades 0 → 1 in 200 (linear; its colour holds the
+## darkness); the hero pops in after `motion/delay/upgradeHero` (80) from y+12 at 0.6, the title drops from y−12 after
 ## `motion/delay/upgradeTitle` (200), each row fades in from `motion/delay/upgradeRows` (260) `motion/stagger/upgradeRow`
 ## (40) apart, the actions after `motion/delay/upgradeButton` (300). Reduced: the card fades in over 120, nothing moves.
 ## Call once the card is in the tree and laid out (centred by the caller).
 func play_level_in(scrim: CanvasItem = null) -> void:
 	if scrim != null:
-		var to := scrim.modulate.a
 		scrim.modulate.a = 0.0
-		UiMotion.tween(scrim, UiTokens.MOTION_EASING_LINEAR).tween_property(scrim, ^"modulate:a", to, UiKit.secs(UiTokens.MOTION_DURATION_BASE_MS))
+		UiMotion.tween(scrim, UiTokens.MOTION_EASING_LINEAR).tween_property(scrim, ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_BASE_MS))
 	modulate.a = 0.0
 	if UiMotion.reduced:
 		UiMotion.tween(self, UiTokens.MOTION_EASING_LINEAR).tween_property(self, ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_FAST_MS))
