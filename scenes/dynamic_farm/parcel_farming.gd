@@ -149,6 +149,7 @@ var _picking := []
 var wet_soil_preview := false
 var _marker: MeshInstance3D
 var _marker_material: StandardMaterial3D
+var _marker_shown := false
 var _keys: UiActionKey
 var _key: UiSceneAction
 var _bar: UiQuickBar
@@ -383,6 +384,7 @@ func _gather_action(index: int) -> Dictionary:
 func _refresh_key() -> void:
 	if held:
 		_marker.visible = false
+		_keys.set_shown(false)
 		_keys.visible = false
 		_bar.visible = false
 		return
@@ -404,7 +406,7 @@ func _refresh_key() -> void:
 	if object >= 0 and (picked_object >= 0 or (picked == null and (current.is_empty() or not str(current.refusal).is_empty()))):
 		current = _gather_action(object)
 	_marker.visible = not current.is_empty()
-	_keys.visible = _marker.visible or farm.is_empty()
+	_keys.set_shown(_marker.visible or farm.is_empty())   # MS-23
 	key_cost = 0
 	key_short = false
 	if unavailable and not busy:
@@ -419,9 +421,8 @@ func _refresh_key() -> void:
 	var spot: Vector3 = _walk.point(target)
 	if current.has("object"): spot = _walk.point(_walk.cell_at(gatherables[current.object].origin))
 	if current.has("feeder"): spot = current.feeder
-	_marker.position = spot + Vector3(0, 0.045, 0)
 	var refused := not str(current.refusal).is_empty()
-	_marker_material.albedo_color = Color(0.86, 0.32, 0.25, 0.42) if refused else Color(1, 0.98, 0.86, 0.42)
+	_place_marker(spot + Vector3(0, 0.045, 0), refused)
 	# C-148: the price of what the key does (P0's key: `Sow` over `3 Energy`; free actions carry no price, LOCK-02).
 	if not refused: key_cost = ParcelFarm.energy_cost(rules, current.command)
 	key_short = key_cost > 0 and energy_value() < key_cost
@@ -572,7 +573,7 @@ func pick_up(ids: Array) -> void:
 		for id: String in farm.bag:
 			var gained := int(farm.bag.get(id, 0)) - int(before.get(id, 0))
 			if gained > 0: gains[id] = gained
-		announce_gains(gains, _player_screen())
+		announce_gains(gains, _player_screen(), true)
 
 ## One press on `cell` (C-73): walk beside it, face it, play the labour clip and send the command
 ## with it. Nothing is sent when the player cannot get there or steers away first.
@@ -593,6 +594,10 @@ func work(cell: Vector2i, action: Dictionary) -> Dictionary:
 	_body.labour(action.verb, cells, seconds)
 	var result := await send(action.command, seconds)
 	job = null
+	# MS-07 (C-185 §3.2): the reply's new soil springs up, a sown seedling grows from its root.
+	if bool(result.get("ok", false)) and _crop_art != null:
+		if action.verb == "till": _crop_art.pop(cell, &"soil")
+		elif action.verb == "sow": _crop_art.pop(cell, &"plant")
 	return result
 
 ## The cells one press works: the whole block of an obstacle (a tree covers four), else the cell.
@@ -706,7 +711,7 @@ func open_energy_card(need: int, verb: String) -> void:
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	center.add_child(card)
-	_open_energy_layer(center, SCRIM)
+	_open_energy_layer(center, UiTokens.COLOR_SCRIM_MODAL)
 	energy_modal = "card"
 
 ## Tapping the Energy chip: P0's Energy panel under it (LOCK-09): the pool, the day's Rest, the Newcomer Blessing.
@@ -726,11 +731,15 @@ func open_energy_panel() -> void:
 	var x := clampf(chip.position.x - UiTokens.SPACE_WITHIN, UiTokens.SIZE_HUD_X, maxf(UiTokens.SIZE_HUD_X, width - UiTokens.SIZE_ENERGY_PANEL_W - UiTokens.SIZE_HUD_X))
 	panel.position = Vector2(x, chip.end.y + UiTokens.SPACE_ROW)
 	panel.pointer_x = chip.get_center().x - x
-	_open_energy_layer(panel, Color(SCRIM, 0.0))
+	_open_energy_layer(panel, Color(UiTokens.COLOR_SCRIM_MODAL, 0.0))
 	energy_modal = "panel"
 
 func _open_energy_layer(content: Control, scrim: Color) -> void:
 	_bar.cancel_drag()
+	# G-02: the bag and the phone close, the drop-down folds; the quick bar slides away (M-16), the guide hides.
+	close_bag()
+	close_phone()
+	if drop_down != null: drop_down.fold()
 	_energy_layer = Control.new()
 	_energy_layer.name = "EnergyLayer"
 	_energy_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -745,16 +754,33 @@ func _open_energy_layer(content: Control, scrim: Color) -> void:
 	_energy_layer.add_child(content)
 	_ui.add_child(_energy_layer)
 	_ui.move_child(_toast, -1)
+	# MS-11 / M-04: the scrim fades in, the card or panel grows 0.88 → 1 (the card from its centre, the panel from its
+	# pointer at the chip).
+	UiMotion.panel_in(content, veil, Vector2(0.5, 0.5) if content is CenterContainer else Vector2(0.15, 0.0))
+	if _bar.visible: UiMotion.bar_shown(_bar, false, _bar.position.y)
+	_refresh_tip()
 
-## Closes the Energy card or panel; false when neither was open.
+## Closes the Energy card or panel (M-05; touches go through at once); false when neither was open.
 func close_energy() -> bool:
 	if _energy_layer == null: return false
-	_energy_layer.queue_free()
+	var layer := _energy_layer
 	_energy_layer = null
 	energy_modal = ""
+	var veil := layer.get_node_or_null("Scrim") as Control
+	if veil != null: veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var content := layer.get_child(layer.get_child_count() - 1) as Control
+	content.propagate_call(&"set_mouse_filter", [Control.MOUSE_FILTER_IGNORE])
+	if layer.is_inside_tree() and content != veil: UiMotion.panel_out(content, veil, layer.queue_free)
+	else: layer.queue_free()
+	if not farm.is_empty() and not held and _bag == null and phone == null and not _bar.visible:
+		var rest := _bar.position.y
+		_bar.position.y = rest + UiMotion.BAR_HIDE_Y
+		UiMotion.bar_shown(_bar, true, rest)
+	_refresh_tip()
 	return true
 
 ## The Energy a reply spent or gave as one float over what it was spent on: `−3 Energy` / `+60 Energy` (P0's tones).
+## C-185 MS-06: it joins the same stack as the reply's item lines, last (not apart, 80 up).
 func announce_energy(delta: int, from: Vector2) -> void:
 	if delta == 0: return
 	var line := UiGainFloat.new(("+%d Energy" if delta > 0 else "−%d Energy") % absi(delta),
@@ -762,7 +788,11 @@ func announce_energy(delta: int, from: Vector2) -> void:
 	line.name = "EnergyFloat"
 	line.theme = UiKit.theme()
 	_ui.add_child(line)
-	line.play(from - Vector2(0, FLOAT_ABOVE * 2.0), 0)
+	var index := 0
+	if not _float_batch.is_empty() and Time.get_ticks_msec() - int(_float_batch.ms) <= ENERGY_JOINS_MS:
+		index = mini(int(_float_batch.lines), UiTokens.MOTION_LIMIT_FLOAT_LINES - 1)
+	_float_batch = {}
+	line.play(from - Vector2(0, FLOAT_ABOVE), index)
 
 ## The key's verb for a command (the Energy card's `Sow needs 3 Energy`).
 static func _verb_of(command: Dictionary) -> String:
@@ -871,13 +901,25 @@ func bag_ids() -> Array:
 func _draw_bag() -> void:
 	var ids := bag_ids()
 	var slots := []
+	# C-186 (C-185 §3.1 D, C-185#79): the seed the key sows sits on the Seeds end, not in a middle slot.
+	var seed := seed_shown(ids)
 	for id: String in ids:
-		if slots.size() >= UiQuickBar.SLOTS: break
+		if slots.size() >= _bar.slot_count: break
+		if id == seed: continue
 		slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": int(farm.bag[id])})
 	_bar.slots = slots
-	if _bag == null and phone == null: _bar.visible = not farm.is_empty() and not held
+	_bar.seeds_item = {} if seed.is_empty() else {"id": seed, "icon": item_icon(seed)}
+	if _bag == null and phone == null and _energy_layer == null: _bar.visible = not farm.is_empty() and not held
 	_keys.tool_icon = _tool_badge()
 	if _bag != null: _draw_bag_slots(ids)
+
+## The seed the Seeds end shows: the rules' sowing seed while the bag holds it, else the bag's first seed, else "".
+func seed_shown(ids: Array) -> String:
+	for crop: Dictionary in rules.get("crops", {}).values():
+		if str(crop.get("seed", "")) in ids: return str(crop.seed)
+	for id: String in ids:
+		if id.begins_with("seed_"): return id
+	return ""
 
 ## The key's tool badge: the hoe while the bag holds it.
 func _tool_badge() -> Texture2D:
@@ -901,10 +943,12 @@ func _draw_bag_slots(ids: Array) -> void:
 			var id: String = ids[i]
 			slot.name = "Slot_" + id
 			slot.item = {"id": id, "icon": item_icon(id), "qty": int(farm.bag[id])}
+			slot.is_new = bag_fresh.has(id)
 			_bag_slots[id] = slot
 		else:
 			slot.name = "Slot_%d" % i
 			slot.item = {}
+			slot.is_new = false
 	if not _bag_slots.has(bag_selected): bag_selected = ""
 	_show_selected()
 
@@ -935,26 +979,50 @@ func item_name(id: String) -> String:
 func show_notice(text: String) -> void:
 	if _toast != null: _toast.show_toast(text, ToastLayer.Severity.INFO)
 
-## A gain (the welcome gift, a harvest; C-33's blueprints and C-59 / C-60 later): one float line per item rising from
-## `from` (screen point of what gave it) and the item flying into the quick bar's Bag, which bumps as it lands.
+## A gain (the welcome gift, a harvest, a gather, a pickup; C-185 MS-04 / MS-06, C-186): one float per item rising from
+## `from` (screen point of what gave it) and the item's icon flying (UiRewardFly) to where it lands on the quick bar
+## (`landing_for`: the slot holding it, else the Bag end), which bumps as it lands. One icon per kind, 60 apart, at
+## most five; a float for the same item still up adds to it (`+3 Carrot`); past four lines a kind joins the newest
+## line. With the bag or the phone open, or the bar away, nothing flies: the float only, and the Bag end bumps once
+## when the bar comes back (land_pending). `pickup`: the egg / milk path, the icon flies at once (MS-05).
 ## Items without a name or icon in the content table are skipped.
-func announce_gains(gains: Dictionary, from: Vector2) -> void:
+func announce_gains(gains: Dictionary, from: Vector2, pickup := false) -> void:
 	last_gains = {}
 	var lines := 0
+	var flights := 0
+	var newest: UiGainFloat = null
+	var on_screen := _bag == null and phone == null and _bar.is_visible_in_tree()
 	for id: String in gains:
 		var count := int(gains[id])
 		if count <= 0 or not _names.has(id): continue
 		last_gains[id] = count
+	if last_gains.is_empty(): return
+	_draw_bag()   # the bar holds the new counts (and a new item's slot) before anything lands on it
+	for id: String in last_gains:
+		var count: int = last_gains[id]
 		var icon := item_icon(id)
-		var line := UiGainFloat.new("+%d %s" % [count, _names[id]], UiGainFloat.Tone.ITEM, icon)
-		line.name = "Gain_" + id
-		line.theme = UiKit.theme()
-		_ui.add_child(line)
-		line.play(from - Vector2(0, FLOAT_ABOVE), lines)
-		var bag := _bar.bag_end()
-		UiItemFly.launch(_ui, from, bag, icon, count, lines * UiItemFly.DELAY_STEP_S, func(): UiItemFly.bump(bag))
-		lines += 1
-	if lines > 0: _draw_bag()
+		var live: Dictionary = _gain_lines.get(id, {})
+		if not live.is_empty() and is_instance_valid(live.line) and (live.line as UiGainFloat).showing():
+			live.count = int(live.count) + count
+			(live.line as UiGainFloat).text = "+%d %s" % [live.count, _names[id]]
+		elif lines >= UiTokens.MOTION_LIMIT_FLOAT_LINES and newest != null:
+			newest.text += " · +%d %s" % [count, _names[id]]
+		else:
+			var line := UiGainFloat.new("+%d %s" % [count, _names[id]], UiGainFloat.Tone.ITEM, icon)
+			line.name = "Gain_" + id
+			line.theme = UiKit.theme()
+			_ui.add_child(line)
+			line.play(from - Vector2(0, FLOAT_ABOVE), lines)
+			_gain_lines[id] = {"line": line, "count": count}
+			newest = line
+			lines += 1
+		if not on_screen:
+			_land_waiting = true
+		elif flights < UiTokens.MOTION_LIMIT_REWARD_ICONS:
+			var to := landing_for(id)
+			if UiRewardFly.launch(_ui, from, to, icon, UiRewardFly.stagger_s(flights), func(): UiMotion.land(to), pickup) != null:
+				flights += 1
+	_float_batch = {"ms": Time.get_ticks_msec(), "lines": lines}
 
 func _player_screen() -> Vector2:
 	if _body != null and _body.has_method("screen_point"): return _body.screen_point(_body.player_position(), 1.9)
@@ -980,7 +1048,10 @@ func _cell_screen(cell: Vector2i) -> Vector2:
 func open_bag(focus := "") -> void:
 	if _bag != null or farm.is_empty(): return
 	_bar.cancel_drag()
+	# G-02 (C-185 §3.5): one overlay at a time; the task drop-down folds first.
 	close_phone()
+	close_energy()
+	if drop_down != null: drop_down.fold()
 	_bag = UiModalPanel.new("Bag", BAG_HERO)
 	_bag.name = "BagPanel"
 	_bag.close_requested.connect(close_bag)
@@ -997,9 +1068,11 @@ func open_bag(focus := "") -> void:
 	_ui.add_child(_bag)
 	_ui.move_child(_toast, -1)
 	bag_selected = ""
+	bag_fresh = _take_bag_fresh()   # C-185 P-01: the items new since the bag was last opened carry a dot this time
 	_draw_bag()
 	if focus != "": select_bag_item(focus)
 	_bag.open()
+	_bag.stagger(_slots.get_children())   # M-06
 	UiMotion.bar_shown(_bar, false, _bar.position.y)
 	_refresh_tip()
 
@@ -1018,6 +1091,7 @@ func close_bag() -> bool:
 		_bar.position.y = rest + UiMotion.BAR_HIDE_Y
 		UiMotion.bar_shown(_bar, true, rest)
 	_refresh_tip()
+	land_pending()
 	return true
 
 func bag_open() -> bool: return _bag != null
@@ -1039,12 +1113,52 @@ func _item_names() -> Dictionary:
 	for id: String in ParcelItems.NAMES: wanted[id] = ParcelItems.NAMES[id]
 	return wanted
 
+## MS-09 (C-185 §3.2, C-W4): the target cell is a white dashed outline (0.92, its inside white 0.10), the danger red
+## when the key refuses; a new target's frame fades in over 120 while the old one fades out.
+func _place_marker(at: Vector3, refused: bool) -> void:
+	var tint := UiTokens.COLOR_ACTION_DANGER if refused else Color.WHITE
+	var moved := not _marker.position.is_equal_approx(at)
+	if moved and _marker.visible and _marker_shown and not UiMotion.reduced and is_inside_tree():
+		var old := _marker.duplicate() as MeshInstance3D
+		old.name = "TargetCellOld"
+		var old_material := _marker_material.duplicate() as StandardMaterial3D
+		old.material_override = old_material
+		add_child(old)
+		var out := create_tween()
+		out.tween_property(old_material, "albedo_color:a", 0.0, UiMotion.secs(UiTokens.MOTION_DURATION_FAST_MS))
+		out.tween_callback(old.queue_free)
+		_marker_material.albedo_color = Color(tint, 0.0)
+		var fade := create_tween()
+		fade.tween_property(_marker_material, "albedo_color:a", 1.0, UiMotion.secs(UiTokens.MOTION_DURATION_FAST_MS))
+	elif not (_marker_material.albedo_color.a < 1.0 and not moved):
+		_marker_material.albedo_color = tint
+	else:
+		_marker_material.albedo_color = Color(tint, _marker_material.albedo_color.a)
+	_marker.position = at
+	_marker_shown = true
+
+## The dashed frame's texture: dashes 8 on 5 off round the edge (2.5 of a 64 px cell is ~4), the inside white 10%.
+static func _dash_texture() -> ImageTexture:
+	var n := 64
+	var w := 4
+	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
+	img.fill(Color(1, 1, 1, 0.10))
+	var period := 13
+	for i in n:
+		var on := (i % period) < 8
+		if not on: continue
+		for k in w:
+			for p: Vector2i in [Vector2i(i, k), Vector2i(i, n - 1 - k), Vector2i(k, i), Vector2i(n - 1 - k, i)]:
+				img.set_pixelv(p, Color(1, 1, 1, 0.92))
+	return ImageTexture.create_from_image(img)
+
 func _build_marker() -> void:
 	var plane := PlaneMesh.new()
 	plane.size = Vector2.ONE * _data.cell_m * 0.94
 	_marker_material = StandardMaterial3D.new()
 	_marker_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	_marker_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_marker_material.albedo_texture = _dash_texture()
 	_marker = MeshInstance3D.new()
 	_marker.name = "TargetCell"
 	_marker.mesh = plane
@@ -1075,7 +1189,7 @@ func _build_ui(canvas: CanvasLayer) -> void:
 	_ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	canvas.add_child(_ui)
-	_bar = UiQuickBar.new()
+	_bar = UiQuickBar.new(true)   # C-186: Seeds end + 4 frosted slots + Bag end (C-185 §3.1 D)
 	_bar.bag_icon = UiArt.SYS_BAG
 	_bar.name = "QuickBar"
 	_bar.haptics = OS.has_feature("mobile")
@@ -1084,6 +1198,7 @@ func _build_ui(canvas: CanvasLayer) -> void:
 	_bar.ghost_tapped.connect(func(_i: int): open_bag())
 	_bar.bag_requested.connect(func(): open_bag())
 	_bar.close_requested.connect(close_bag)
+	_bar.seeds_pressed.connect(func(): open_bag(str(_bar.seeds_item.get("id", ""))))
 	# The bar follows the bag's order and the parcel save keeps no bar layout, so the main farm's long-press drag
 	# (swap, Pin, Remove) has nothing to change here: the cells' drag gestures are not passed to the bar (C-74#39).
 	# Taps still select, and a swipe up still opens the bag.
@@ -1092,7 +1207,7 @@ func _build_ui(canvas: CanvasLayer) -> void:
 			if (connection.callable as Callable).get_object() == _bar: cell.gesture.disconnect(connection.callable)
 		cell.gesture.connect(func(outcome: Dictionary): if outcome.get("kind") == &"swipe_up": open_bag())
 	_ui.add_child(_bar)
-	_keys = UiActionKey.new()
+	_keys = UiActionKey.new(true)   # C-186: the clay key (owner Q-285, C-185 §3.7)
 	_keys.name = "ActionKey"
 	_keys.switch_visible = false   # one action here: no switch key, no radial
 	_keys.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -1101,7 +1216,7 @@ func _build_ui(canvas: CanvasLayer) -> void:
 	_key.name = "MainKey"
 	_key.pressed_down.connect(_on_key)
 	# C-148: the main HUD's Energy chip; the scene puts it in its top bar (it is not under _ui).
-	energy_chip = UiEnergyChip.new()
+	energy_chip = UiEnergyChip.new(true)   # C-186: the clay capsule (C-185 §3.1 A)
 	energy_chip.name = "Energy"
 	energy_chip.theme = UiKit.theme()
 	energy_chip.visible = false
@@ -1135,6 +1250,7 @@ func _build_ui(canvas: CanvasLayer) -> void:
 	_ui.add_child(_tip_box)
 	_tip = UiTipCard.new()
 	_tip.name = "Tip"
+	_tip.set_glass()   # C-186: the dark glass guide bar (C-185 §3.1 C)
 	_tip.visible = false
 	_tip.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	_tip.tapped.connect(func():
@@ -1155,7 +1271,9 @@ func _place_bar() -> void:
 	_bar.offset_right = UiTokens.SIZE_QUICK_BAR_X + UiTokens.SIZE_QUICK_BAR_W
 	_bar.offset_bottom = -bottom
 	_bar.offset_top = -bottom - UiTokens.SIZE_QUICK_BAR_H
-	var key_bottom := bottom + UiTokens.SIZE_QUICK_BAR_H + KEY_ABOVE_BAR
+	# C-186: the clay key's bottom 10 above the bar, 8 from the right (C-185 §3.7, the owner's attachment-1820).
+	var key_bottom := bottom + UiTokens.SIZE_QUICK_BAR_H + UiTokens.SIZE_CLAY_KEY_ABOVE_BAR
+	var group := _keys.get_combined_minimum_size()
 	if is_instance_valid(_side_button):
 		# Left of the action key on its baseline: clear of the quick bar under it and of the key (C-74#17).
 		_side_button.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
@@ -1163,13 +1281,13 @@ func _place_bar() -> void:
 		_side_button.offset_right = UiTokens.SIZE_QUICK_BAR_X + _side_button.custom_minimum_size.x
 		_side_button.offset_bottom = -key_bottom
 		_side_button.offset_top = -key_bottom - _side_button.custom_minimum_size.y
-	_keys.offset_right = -UiTokens.SPACE_PAGE
-	_keys.offset_left = -UiTokens.SPACE_PAGE - UiTokens.SIZE_ACTION_KEY_W
+	_keys.offset_right = -UiTokens.SIZE_CLAY_KEY_RIGHT
+	_keys.offset_left = -UiTokens.SIZE_CLAY_KEY_RIGHT - group.x
 	_keys.offset_bottom = -key_bottom
-	_keys.offset_top = -key_bottom - UiTokens.SIZE_ACTION_KEY_H
+	_keys.offset_top = -key_bottom - group.y
 	# C-107: the phone button right-aligned 12 (its Ø36 glass, in a 44 hit area) above the action key (C-L3).
 	var inset := (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5
-	var phone_bottom := key_bottom + UiTokens.SIZE_ACTION_KEY_H + PHONE_BUTTON_GAP - inset
+	var phone_bottom := key_bottom + group.y + PHONE_BUTTON_GAP - inset
 	phone_button.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	phone_button.offset_right = -UiTokens.SIZE_SCREEN_EDGE + inset
 	phone_button.offset_left = phone_button.offset_right - UiTokens.SIZE_TOUCH_MIN
@@ -1184,14 +1302,38 @@ func _place_bar() -> void:
 func _refresh_tip() -> void:
 	if _tip == null: return
 	var step := "" if unavailable else Guide.step(farm, server_now())
-	if step != tip_step:
+	var was_visible := _tip.visible
+	var changed := step != tip_step
+	if changed:
 		tip_step = step
 		if step != _tip_closed: _tip_closed = ""
 		if not step.is_empty(): _tip.show_tip(Guide.text(step))
 	_tip.visible = not tip_step.is_empty() and tip_step != _tip_closed and not held and _bag == null and phone == null \
-		and not (drop_down != null and drop_down.showing)
+		and not (drop_down != null and drop_down.showing) and _energy_layer == null
 	# Under the top bar (the main farm puts its TipCard under the HUD, clear of the key and the bar).
 	if _tip.visible: _tip_box.offset_top = tip_top if tip_top >= 0.0 else TIP_TOP + _safe_top()
+	# MS-19: a new step slides in from 8 above (160); the bar fades back in (120) when an overlay closes.
+	if _tip.visible and (changed or not was_visible): _tip_in(changed and was_visible)
+
+## MS-19: the guide bar comes in — a new step from y −8 (160, after the old one's 120 fade), or a 120 fade back.
+func _tip_in(new_step: bool) -> void:
+	if UiMotion.reduced or not _tip.is_inside_tree():
+		_tip.modulate.a = 1.0
+		return
+	if _tip.has_meta(&"_tip_tw"):
+		var old = _tip.get_meta(&"_tip_tw")
+		if old is Tween and (old as Tween).is_valid(): (old as Tween).kill()
+	var tw := UiMotion.tween(_tip, UiTokens.MOTION_EASING_STANDARD)
+	_tip.modulate.a = 0.0
+	if new_step:
+		tw.tween_interval(UiMotion.secs(UiTokens.MOTION_DURATION_FAST_MS))
+		var rest := _tip_box.offset_top
+		tw.tween_callback(func(): _tip_box.offset_top = rest - UiTokens.MOTION_OFFSET_GUIDE_ENTER)
+		tw.tween_property(_tip_box, "offset_top", rest, UiMotion.secs(UiTokens.MOTION_DURATION_QUICK_MS))
+		tw.parallel().tween_property(_tip, "modulate:a", 1.0, UiMotion.secs(UiTokens.MOTION_DURATION_QUICK_MS))
+	else:
+		tw.tween_property(_tip, "modulate:a", 1.0, UiMotion.secs(UiTokens.MOTION_DURATION_FAST_MS))
+	_tip.set_meta(&"_tip_tw", tw)
 
 # ------------------------------------------------------------------ Tasks and the phone (C-107)
 
@@ -1260,6 +1402,7 @@ func close_phone() -> bool:
 		_bar.position.y = rest + UiMotion.BAR_HIDE_Y
 		UiMotion.bar_shown(_bar, true, rest)
 	_refresh_tip()
+	land_pending()
 	return true
 
 func phone_open() -> bool: return phone != null
@@ -1368,3 +1511,60 @@ func _safe_bottom() -> float:
 	if not is_inside_tree() or not (OS.has_feature("android") or OS.has_feature("ios")): return 0.0
 	return UIMetrics.safe_margins(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size(),
 		get_viewport().get_visible_rect().size, 0.0).w
+
+# ------------------------------------------------------------------ Reward feedback and the bag's new dot (C-186)
+
+## The Energy float joins the item lines of a reply announced this recently (send() announces both at once).
+const ENERGY_JOINS_MS := 50
+## Which items the bag held when it was last opened, per parcel on this device: an item whose count grew since shows
+## C-185 P-01's `badge/unread` dot until the bag is opened again. Local only, never in the save (as PHONE_SEEN_PATH).
+const BAG_SEEN_PATH := "user://dynamic_farm_local/bag_seen.json"
+var bag_seen_path := BAG_SEEN_PATH
+## Items marked new in the bag open now (id -> true).
+var bag_fresh := {}
+## Item float lines still up (id -> {line, count}): another gain of the item adds to it (MS-06).
+var _gain_lines := {}
+## The last reply's item lines (for the Energy line to queue after them).
+var _float_batch := {}
+## A gain came while nothing could fly (the bag or the phone open): the Bag end bumps when the bar is back.
+var _land_waiting := false
+
+## Where an item's flight lands (MS-04): the quick bar's `landing_for` (the slot holding it, the Seeds end for seeds,
+## else the Bag end); before the bar has it, the slot holding it, else the Bag end.
+func landing_for(id: String) -> Control:
+	if _bar.has_method(&"landing_for"):
+		var at = _bar.call(&"landing_for", id)
+		if at is Control: return at
+	var cell := _bar.cell_for(id)
+	return cell if cell != null else _bar.bag_end()
+
+## Call when the quick bar comes back (the bag or the phone closed): a gain that could not fly while they were open
+## bumps the Bag end once, after the bar's slide back (M-16, 260).
+func land_pending() -> void:
+	if not _land_waiting or not is_inside_tree(): return
+	_land_waiting = false
+	var bag := _bar.bag_end()
+	get_tree().create_timer(UiMotion.secs(UiTokens.MOTION_DURATION_MODERATE_MS)).timeout.connect(func():
+		if is_instance_valid(bag) and bag.is_visible_in_tree(): UiMotion.land(bag))
+
+## The items whose count grew since the bag was last opened here (none recorded: every item, once per device), and
+## records the counts now; the dots stay for this opening.
+func _take_bag_fresh() -> Dictionary:
+	var raw = JSON.parse_string(FileAccess.get_file_as_string(bag_seen_path)) if FileAccess.file_exists(bag_seen_path) else null
+	var all: Dictionary = raw if raw is Dictionary else {}
+	var key := str(_data.get("block_id", ""))
+	var seen = all.get(key)
+	var counts := {}
+	var fresh := {}
+	for id: String in farm.get("bag", {}):
+		var n := int(farm.bag[id])
+		if n <= 0: continue
+		counts[id] = n
+		if n > int(seen.get(id, 0) if seen is Dictionary else 0): fresh[id] = true
+	all[key] = counts
+	DirAccess.make_dir_recursive_absolute(bag_seen_path.get_base_dir())
+	var file := FileAccess.open(bag_seen_path, FileAccess.WRITE)
+	if file != null:
+		file.store_string(JSON.stringify(all))
+		file.close()
+	return fresh

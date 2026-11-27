@@ -116,6 +116,9 @@ var density: Density
 var state: State = State.DEFAULT: set = set_state
 var icon: Texture2D: set = set_icon
 ## Item name: the two-line QuickSlot name or the GearSlot equipment name. Unused by INVENTORY / KITCHEN.
+## C-186 (C-185 §3.1 D, attachment-1820): the farm quick bar's frosted white slot (`bar/frostSlot`, radius 14) with
+## `hud/clay/ink` names and counts; selected takes the gold `bar/selected` outline (M-03). QUICK density only.
+var frost := false
 var title := "": set = set_title
 ## Count as shown, e.g. "×24"; "" hides it. QUICK shows a plain line, INVENTORY / KITCHEN a pill.
 var quantity := "": set = set_quantity
@@ -712,21 +715,23 @@ func _refresh_quick(s: State) -> void:
 	# `action/selected` outline, a drop target its dashes; an empty slot keeps its place, glass with a faint dashed
 	# outline. A pinned slot keeps its warm fill, amber strip and badge (LOCK-05) and its dark ink.
 	var warm := pinned and s not in [State.EMPTY, State.GHOST]
-	var fill := UiTokens.COLOR_PIN_WARM if warm else UiTokens.COLOR_GLASS_SLOT
+	var fill := UiTokens.COLOR_PIN_WARM if warm else UiTokens.COLOR_BAR_FROST_SLOT if frost else UiTokens.COLOR_GLASS_SLOT
+	var radius := float(UiTokens.SIZE_HUD_CLAY_RADIUS) if frost else float(UiTokens.RADIUS_MD)
+	var outline := UiTokens.COLOR_BAR_SELECTED if frost else UiTokens.COLOR_ACTION_SELECTED
 	var box: UiStyleBox
 	match s:
 		State.SELECTED, State.LIFTED:
-			box = UiStyleBox.make(fill, UiTokens.RADIUS_MD, UiTokens.COLOR_ACTION_SELECTED, UiTokens.STROKE_SELECTED)
+			box = UiStyleBox.make(fill, radius, outline, UiTokens.STROKE_SELECTED)
 			if s == State.LIFTED:
 				box.shadow_color = UiTokens.COLOR_LIFT_SHADOW
 				box.shadow_size = UiTokens.SIZE_LIFT_SHADOW_RADIUS
 				box.shadow_offset = Vector2(0.0, UiTokens.SIZE_LIFT_SHADOW_OFFSET_Y)
 		State.EMPTY, State.GHOST:
-			box = _dashed(UiStyleBox.make(fill, UiTokens.RADIUS_MD, UiTokens.COLOR_TEXT_ON_DARK_MUTED, UiTokens.STROKE_DEFAULT), UiTokens.DASH_QUICK)
+			box = _dashed(UiStyleBox.make(fill, radius, UiTokens.COLOR_HUD_CLAY_EDGE if frost else UiTokens.COLOR_TEXT_ON_DARK_MUTED, UiTokens.STROKE_DEFAULT), UiTokens.DASH_QUICK)
 		State.DROP_TARGET:
-			box = _dashed(UiStyleBox.make(fill, UiTokens.RADIUS_MD, UiTokens.COLOR_ACTION_SELECTED, UiTokens.STROKE_SELECTED), UiTokens.DASH_DROP_TARGET)
+			box = _dashed(UiStyleBox.make(fill, radius, outline, UiTokens.STROKE_SELECTED), UiTokens.DASH_DROP_TARGET)
 		_:
-			box = UiStyleBox.make(fill, UiTokens.RADIUS_MD)
+			box = UiStyleBox.make(fill, radius)
 	_surface.add_theme_stylebox_override(&"panel", box)
 	var empty := s == State.EMPTY
 	var name_top := float(UiTokens.SIZE_QUICK_SLOT_ICON) if _icon.visible else 0.0
@@ -753,8 +758,8 @@ func _refresh_quick(s: State) -> void:
 	_qty.visible = quantity != "" and not empty and not ghost
 	# The ghost's "Icon · dimmed" is the same 35 % as the ×0 icon (no separate token yet).
 	_icon.modulate.a = UiTokens.OPACITY_ZERO_ICON if s in [State.ZERO, State.GHOST] else 1.0
-	var ink := UiTokens.COLOR_TEXT if warm else UiTokens.COLOR_TEXT_ON_DARK
-	var quiet := UiTokens.COLOR_SECONDARY if warm else UiTokens.COLOR_TEXT_ON_DARK_MUTED
+	var ink := UiTokens.COLOR_TEXT if warm else UiTokens.COLOR_HUD_CLAY_INK if frost else UiTokens.COLOR_TEXT_ON_DARK
+	var quiet := UiTokens.COLOR_SECONDARY if warm else UiTokens.COLOR_HUD_CLAY_INK_SOFT if frost else UiTokens.COLOR_TEXT_ON_DARK_MUTED
 	_name.add_theme_color_override(&"font_color", quiet if ghost else ink)
 	_qty.add_theme_color_override(&"font_color", quiet if s == State.ZERO else ink)
 	var show_pin := pinned and not empty and not ghost

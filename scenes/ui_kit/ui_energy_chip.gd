@@ -25,8 +25,17 @@ var body: MarginContainer
 var value_label: Label
 var _track: _Track
 var _regen: Label
+## C-186 (C-185 §3.1 A, the owner's attachment-1820): the farm's cream clay capsule — 112 × 40, radius 14, `200/200`
+## in `hud/clay/ink` ExtraBold 14 over a 46 × 6 `hud/energyBar` bar beside the regen line (grey 9), hung on the avatar's
+## right by two small clay links. Colour rules unchanged: `hud/energyLow` only when short of the next action (q(11)).
+var clay := false
+var _rolling := -1.0
 
-func _init() -> void:
+func _init(clay_ := false) -> void:
+	clay = clay_
+	if clay:
+		_build_clay()
+		return
 	focus_mode = Control.FOCUS_NONE
 	custom_minimum_size.x = UiTokens.SIZE_ENERGY_CHIP_W
 	var bg := Panel.new()
@@ -86,9 +95,14 @@ func state() -> UiHud.Energy:
 
 func refresh() -> void:
 	var e := state()
-	value_label.text = "%d/%d" % [roundi(shown) if shown >= 0.0 else energy, energy_max]
-	var ink := UiTokens.COLOR_TEXT
-	if e == UiHud.Energy.LOW: ink = UiTokens.COLOR_WARNING
+	var fmt := "%d/" + str(energy_max)
+	if clay and _rolling >= 0.0 and _rolling != float(energy) and shown < 0.0 and is_visible_in_tree():
+		UiMotion.roll(value_label, _rolling, energy, fmt)   # MS-03
+	elif not (clay and UiMotion.rolling(value_label) and shown < 0.0):
+		value_label.text = "%d/%d" % [roundi(shown) if shown >= 0.0 else energy, energy_max]
+	_rolling = float(energy)
+	var ink := UiTokens.COLOR_HUD_CLAY_INK if clay else UiTokens.COLOR_TEXT
+	if e == UiHud.Energy.LOW: ink = UiTokens.COLOR_HUD_ENERGY_LOW if clay else UiTokens.COLOR_WARNING
 	elif e == UiHud.Energy.EMPTY: ink = UiTokens.COLOR_DANGER
 	value_label.add_theme_color_override(&"font_color", ink)
 	_regen.text = regen
@@ -96,17 +110,73 @@ func refresh() -> void:
 
 func regen_text() -> String: return _regen.text
 
-func margin_y() -> float: return maxf(0.0, (UiTokens.SIZE_TOUCH - UiTokens.SIZE_ENERGY_CHIP_H) * 0.5)
+func margin_y() -> float:
+	var h := UiTokens.SIZE_HUD_CLAY_ENERGY_H if clay else UiTokens.SIZE_ENERGY_CHIP_H
+	return maxf(0.0, (UiTokens.SIZE_TOUCH - h) * 0.5)
 
 ## The drawn 42 px box, centred in the 44 px hit area.
 func visual_rect() -> Rect2:
 	var r := get_global_rect()
-	if r.size.y > UiTokens.SIZE_ENERGY_CHIP_H:
-		r.position.y += (r.size.y - UiTokens.SIZE_ENERGY_CHIP_H) * 0.5
-		r.size.y = UiTokens.SIZE_ENERGY_CHIP_H
+	var h := float(UiTokens.SIZE_HUD_CLAY_ENERGY_H if clay else UiTokens.SIZE_ENERGY_CHIP_H)
+	if r.size.y > h:
+		r.position.y += (r.size.y - h) * 0.5
+		r.size.y = h
 	return r
 
+## The clay capsule (see `clay`): the face, two links reaching left to the avatar, `200/200` over the bar and the regen.
+func _build_clay() -> void:
+	focus_mode = Control.FOCUS_NONE
+	custom_minimum_size = Vector2(UiTokens.SIZE_HUD_CLAY_ENERGY_W, UiTokens.SIZE_TOUCH)
+	for k in 2:
+		var link := Panel.new()
+		link.name = "Link%d" % k
+		link.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		link.add_theme_stylebox_override(&"panel", UiClay.face(2.0))
+		link.size = Vector2(UiTokens.SPACE_S3 + 6.0, 6.0)
+		link.position = Vector2(-UiTokens.SPACE_S3 - 3.0, margin_y() + 9.0 + 16.0 * k)
+		add_child(link)
+	var bg := Panel.new()
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var box := UiClay.face(UiTokens.SIZE_HUD_CLAY_RADIUS)
+	box.expand_margin_top = -margin_y()
+	box.expand_margin_bottom = -margin_y()
+	bg.add_theme_stylebox_override(&"panel", box)
+	add_child(bg)
+	body = MarginContainer.new()
+	body.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	body.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	body.add_theme_constant_override(&"margin_left", 12)
+	body.add_theme_constant_override(&"margin_top", int(margin_y() + 3.0))
+	body.add_theme_constant_override(&"margin_bottom", int(margin_y() + 3.0))
+	add_child(body)
+	var col := VBoxContainer.new()
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_theme_constant_override(&"separation", 0)
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	body.add_child(col)
+	value_label = UiKit.label("", UiTokens.STYLE_C14_XB, UiTokens.COLOR_HUD_CLAY_INK)
+	value_label.name = "Value"
+	col.add_child(value_label)
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override(&"separation", 5)
+	col.add_child(row)
+	_track = _Track.new()
+	_track.chip = self
+	_track.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_track.custom_minimum_size = Vector2(UiTokens.SIZE_HUD_CLAY_BAR_W, UiTokens.SIZE_HUD_CLAY_BAR_H)
+	_track.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(_track)
+	_regen = UiKit.label("", UiTokens.STYLE_C10_B, UiTokens.COLOR_HUD_CLAY_INK_SOFT)
+	_regen.name = "Regen"
+	_regen.add_theme_font_size_override(&"font_size", UiTokens.SIZE_HUD_CLAY_REGEN_FONT)
+	row.add_child(_regen)
+	refresh()
+	_rolling = -1.0   # the first real value shows at once; later changes roll
+
 func _get_minimum_size() -> Vector2:
+	if clay: return Vector2(UiTokens.SIZE_HUD_CLAY_ENERGY_W, UiTokens.SIZE_TOUCH)
 	return body.get_combined_minimum_size() if body != null else Vector2.ZERO
 
 ## The 84 × 3 bar: the border colour under a fill to the share of the pool, amber when short (LOCK-06), none at 0.
@@ -116,12 +186,13 @@ class _Track extends Control:
 	func _draw() -> void:
 		var rect := Rect2(Vector2.ZERO, size)
 		var radius := size.y * 0.5
-		draw_style_box(UiStyleBox.make(UiTokens.COLOR_BORDER, radius), rect)
+		draw_style_box(UiStyleBox.make(UiTokens.COLOR_HUD_CLAY_EDGE if chip.clay else UiTokens.COLOR_BORDER, radius), rect)
 		var e := chip.state()
 		if e == UiHud.Energy.EMPTY: return
 		var mx := maxf(1.0, float(chip.energy_max))
 		var pct := clampf(float(chip.energy) / mx, 0.0, 1.0)
 		var fill := UiTokens.COLOR_ENERGY_HUD_FILL if e == UiHud.Energy.LOW else UiTokens.COLOR_PRIMARY
+		if chip.clay: fill = UiTokens.COLOR_HUD_ENERGY_LOW if e == UiHud.Energy.LOW else UiTokens.COLOR_HUD_ENERGY_BAR
 		draw_style_box(UiStyleBox.make(fill, radius), Rect2(Vector2.ZERO, Vector2(maxf(size.y, size.x * pct), size.y)))
 		if e == UiHud.Energy.BONUS:
 			var over := clampf((float(chip.energy) - mx) / mx, 0.0, 1.0)

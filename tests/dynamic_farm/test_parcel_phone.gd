@@ -149,22 +149,24 @@ func _kit() -> void:
 	_check(row.strike_progress() == 1.0 and row.label().get_theme_color(&"font_color") == UiTokens.COLOR_PHONE_TEXT_MUTED,
 		"after the beat: struck through and grey")
 	holder.queue_free()
-	# UiTaskDropDown: at most three rows, More…, no touches taken by the rows, folds on its own.
+	# UiTaskDropDown: at most three rows in all — More… takes the third row's place (C-185 F-12, C-T2) — no touches taken
+	# by the rows, folds on its own.
 	var drop := UiTaskDropDown.new()
 	holder = _host(drop)
 	var more := [0]
 	drop.more_pressed.connect(func(): more[0] += 1)
 	var folded := [0]
 	drop.folded.connect(func(): folded[0] += 1)
-	drop.open([{"title": "Build Cottage", "state": UiTaskRow.State.DONE}, {"title": "Till your yard", "state": UiTaskRow.State.CURRENT},
+	drop.open([{"title": "Build Cottage", "state": UiTaskRow.State.DONE}, {"title": "Till your whole yard", "state": UiTaskRow.State.CURRENT},
 		{"title": "Sow Carrot Seeds", "state": UiTaskRow.State.TODO}, {"title": "Harvest a carrot", "state": UiTaskRow.State.TODO}], true)
 	await process_frame
-	_check(drop.rows.size() == 3 and drop.more != null and drop.more.title == "More…", "three rows then More…")
+	_check(drop.rows.size() == 2 and drop.more != null and drop.more.title == "More…" and drop.get_child_count() == 3,
+		"two rows round the current one, then More… as the third")
 	_check(drop.rows.all(func(r: UiTaskRow): return r.mouse_filter == Control.MOUSE_FILTER_IGNORE) and drop.mouse_filter == Control.MOUSE_FILTER_IGNORE,
 		"rows let touches through to the scene")
 	_check(drop.rows[0].look == UiTaskRow.Look.GLASS and drop.rows[0].pill().get_theme_stylebox(&"panel").bg_color == UiTokens.COLOR_GLASS_FILL_STRONG,
 		"glass rows")
-	_check(drop.rows[0].size.x < drop.rows[2].size.x, "a glass pill hugs its text")
+	_check(drop.rows[0].size.x < drop.rows[1].size.x, "a glass pill hugs its text")
 	drop.more.pressed.emit()
 	await create_timer(0.3).timeout
 	_check(more[0] == 1 and not drop.showing and not drop.visible and folded[0] == 1, "More… asks for the phone and folds")
@@ -314,7 +316,8 @@ func _scene() -> void:
 	var farming := await _open()
 	_check(not farming.farm.is_empty(), "the save is read")
 	var button: UiTaskButton = farming.task_button
-	_check(button.get_parent() == scene._header and button.get_index() < farming.energy_chip.get_index(), "the task button sits in the top bar before Energy")
+	_check(button.get_parent() == scene._header and button.get_index() > farming.energy_chip.get_index() \
+		and button.get_index() == scene._coins_capsule.get_index() - 1, "the task button sits in the top bar before the coins (C-186)")
 	_check(button.visible and farming.phone_button.visible, "task and phone buttons show once the save is read")
 	_check(Tasks.current(farming.farm, farming.server_now()) == "build", "first visit: Build Cottage is current")
 	_check(button.badge and farming.phone_button.badge, "a task not seen yet marks both buttons")
@@ -327,7 +330,7 @@ func _scene() -> void:
 	button.pressed.emit()
 	await process_frame
 	var drop: UiTaskDropDown = farming.drop_down
-	_check(drop.showing and drop.rows.size() == 3 and drop.more != null, "the task button drops three rows and More…")
+	_check(drop.showing and drop.rows.size() == 2 and drop.more != null, "the task button drops two rows and More… (three in all)")
 	_check(drop.rows[0].title == "Build Cottage" and drop.rows[0].state == UiTaskRow.State.CURRENT, "the current task leads on a first visit")
 	_check(not button.badge and not farming.phone_button.badge, "seeing the task clears both dots")
 	_check(not farming._tip.visible, "the tip card steps aside for the drop-down")

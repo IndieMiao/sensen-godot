@@ -31,9 +31,15 @@ var _cell_m := 1.0
 var _soil := {}     ## DRY / WET -> MultiMeshInstance3D
 var _stages: Array[MultiMeshInstance3D] = []
 var _counts := {}
+## C-186 MS-07 (C-185 §3.2): cells popping after a reply — cell -> {kind: &"soil" | &"plant", t: seconds}.
+var _pops := {}
+## Where the last sync drew each cell: cell -> [layer, index, turned] for the soil block and the plant.
+var _soil_at := {}
+var _plant_at := {}
 
 ## `point`: grid cell -> its centre on the ground (FarmWalk.point); `cell_m`: one cell's edge in metres.
 func _init(point: Callable, cell_m: float) -> void:
+	set_process(false)
 	_point = point
 	_cell_m = cell_m
 	# One opaque collar/clod batch. Instance tint follows the soil state, not a
@@ -67,6 +73,8 @@ static func stage_of(crop: Dictionary, now_ms: int) -> int:
 
 ## `soil`: tilled cell key -> DRY or WET; `crops`: the save's crops (cell key -> {crop, planted_at, ripe_at}).
 func sync(soil: Dictionary, crops: Dictionary, now_ms: int) -> void:
+	_soil_at = {}
+	_plant_at = {}
 	var blocks := {DRY: [], WET: []}
 	var stages: Array = []
 	for stage in STAGES.size(): stages.append([])
@@ -93,11 +101,47 @@ func counts() -> Dictionary:
 
 func _fill(layer: MultiMeshInstance3D, cells: Array, turn: bool) -> void:
 	layer.multimesh.instance_count = cells.size()
+	var where := _plant_at if turn else _soil_at if layer in _soil.values() else {}
 	for i in cells.size():
 		var cell: Vector2i = cells[i]
-		# Plants face one of two ways per cell, keeping seed rows on the soil's ridges.
-		var basis := Basis(Vector3.UP, PI) if turn and posmod(cell.x * 7 + cell.y * 11, 2) == 1 else Basis.IDENTITY
-		layer.multimesh.set_instance_transform(i, Transform3D(basis.scaled(Vector3.ONE * _cell_m), _point.call(cell)))
+		layer.multimesh.set_instance_transform(i, _transform(cell, turn, Vector3.ONE))
+		if layer != _contact: where[cell] = [layer, i, turn]
+	for cell: Vector2i in _pops: _apply_pop(cell)
+
+## The instance transform of `cell`, its local scale `s` from its base (soil from the ground, a plant from its root).
+func _transform(cell: Vector2i, turn: bool, s: Vector3) -> Transform3D:
+	# Plants face one of two ways per cell, keeping seed rows on the soil's ridges.
+	var basis := Basis(Vector3.UP, PI) if turn and posmod(cell.x * 7 + cell.y * 11, 2) == 1 else Basis.IDENTITY
+	return Transform3D(basis.scaled(s * _cell_m), _point.call(cell))
+
+## MS-07: tilled soil springs up from 0.85 high (160), a sown seedling grows 0 → 1 from its root (200), both back-out.
+## Reduced motion: nothing moves (the new state simply shows).
+func pop(cell: Vector2i, kind: StringName) -> void:
+	if UiMotion.reduced: return
+	_pops[cell] = {"kind": kind, "t": 0.0}
+	set_process(true)
+	_apply_pop(cell)
+
+func _process(delta: float) -> void:
+	for cell: Vector2i in _pops.keys():
+		_pops[cell].t += delta
+		_apply_pop(cell)
+		var ms := UiTokens.MOTION_DURATION_QUICK_MS if _pops[cell].kind == &"soil" else UiTokens.MOTION_DURATION_BASE_MS
+		if float(_pops[cell].t) * 1000.0 >= ms: _pops.erase(cell)
+	if _pops.is_empty(): set_process(false)
+
+func _apply_pop(cell: Vector2i) -> void:
+	var p: Dictionary = _pops[cell]
+	var soil: bool = p.kind == &"soil"
+	var at = (_soil_at if soil else _plant_at).get(cell)
+	if at == null: return
+	var ms := UiTokens.MOTION_DURATION_QUICK_MS if soil else UiTokens.MOTION_DURATION_BASE_MS
+	var k := clampf(float(p.t) * 1000.0 / ms, 0.0, 1.0)
+	var c := 1.70158   # back-out (the `pop` easing)
+	var e := 1.0 + (c + 1.0) * pow(k - 1.0, 3.0) + c * pow(k - 1.0, 2.0)
+	var s := Vector3(1.0, lerpf(0.85, 1.0, e), 1.0) if soil else Vector3.ONE * maxf(0.001, e)
+	var layer: MultiMeshInstance3D = at[0]
+	if int(at[1]) < layer.multimesh.instance_count: layer.multimesh.set_instance_transform(int(at[1]), _transform(cell, bool(at[2]), s))
 
 func _layer(mesh: Mesh) -> MultiMeshInstance3D:
 	var layer := MultiMeshInstance3D.new()

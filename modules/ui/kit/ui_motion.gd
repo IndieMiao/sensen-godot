@@ -137,6 +137,12 @@ static func roll(l: Label, from: float, to: float, fmt := "%d", bump: Control = 
 	else: flash(l, UiTokens.COLOR_HUD_ENERGY_LOW)
 	return tw
 
+## Whether a roll() is still counting on `l`.
+static func rolling(l: Object) -> bool:
+	if l == null or not l.has_meta(&"_ui_roll"): return false
+	var tw = l.get_meta(&"_ui_roll")
+	return tw is Tween and (tw as Tween).is_valid() and (tw as Tween).is_running()
+
 ## The landing bump (MS-04 / MS-03): 1 → `motion/scale/landBump` → 1 in 200 (pop), pivot at the centre.
 static func land(c: Control) -> void:
 	if c == null or not c.is_inside_tree() or reduced: return

@@ -216,10 +216,10 @@ func _first_visit() -> void:
 	# C-151: the one-off grant (the well blueprint and the pail) comes with the first-entry gift.
 	_check(farming.last_gains == {"hoe_starter": 1, "seed_carrot": 3, "blueprint_cottage": 1, "blueprint_well": 1, "pail": 1},
 		"the gift is announced item by item, the blueprints and the pail too: %s" % [farming.last_gains])
-	# Floats stack at most UiMotion.FLOAT_STACK_MAX lines (the motion rule); every item still flies into the bag.
-	_check(_floats(farming) == ["+1 Starter Hoe", "+3 Carrot Seeds", "+1 Cottage Blueprint", "+1 Well Blueprint"].slice(0, UiMotion.FLOAT_STACK_MAX),
-		"one float per gift item, as many as stack: %s" % [_floats(farming)])
-	_check(_flights(farming) == 5, "each gift item flies into the bag")
+	# Floats stack at most four lines; a fifth kind joins the newest line (C-185 MS-06); every item still flies (at most five).
+	_check(_floats(farming) == ["+1 Starter Hoe", "+3 Carrot Seeds", "+1 Cottage Blueprint", "+1 Well Blueprint · +1 Pail"],
+		"one float per gift item, the fifth merged into the fourth: %s" % [_floats(farming)])
+	_check(_flights(farming) == 5, "each gift item flies to the quick bar")
 	_check(not farming._toast.current_text().begins_with("Received"), "no gift toast")
 	_check(not scene._hint.visible, "no preview hint on one's own farm")
 	_check(_tip(farming) == "Pick a spot in your yard and press Till.", "the guide's card teaches tilling once the house stands (C-35): " + _tip(farming))
@@ -230,19 +230,23 @@ func _first_visit() -> void:
 	await _profile_from_avatar(farming)
 	farming._tip.tapped.emit()
 	_check(_tip(farming) == "", "a tap closes the card")
-	_check(farming._bar.visible and _bar_counts(farming) == {"hoe_starter": 1, "pail": 1, "seed_carrot": 3, "blueprint_cottage": 1, "blueprint_well": 1},
-		"quick bar shows hoe, pail, seeds and the blueprints")
-	_check(farming._bar.slots.map(func(slot): return slot.id) == ["hoe_starter", "pail", "seed_carrot", "blueprint_cottage", "blueprint_well"],
+	# C-186 (C-185 §3.1 D): the seeds sit on the Seeds end, the four middle slots hold the rest in bag order.
+	_check(farming._bar.visible and _bar_counts(farming) == {"hoe_starter": 1, "pail": 1, "blueprint_cottage": 1, "blueprint_well": 1},
+		"quick bar shows hoe, pail and the blueprints")
+	_check(farming._bar.slots.map(func(slot): return slot.id) == ["hoe_starter", "pail", "blueprint_cottage", "blueprint_well"],
 		"the tools first, the pail beside the hoe (C-151)")
-	_check(farming._bar.slots[3].icon == load("res://modules/dynamic_farm/parcel_items.gd").icon_of("blueprint_cottage"), "the blueprint has the parcel adapter's placeholder icon (C-59)")
-	_check(farming._bar.slots[0].icon == UiArt.item("row_tool") and farming._bar.slots[2].icon == UiArt.item("seed_carrot"),
+	_check(farming._bar.seeds_item.get("id") == "seed_carrot" and farming._bar.seeds_end().visible, "the Seeds end shows the carrot seeds")
+	_check(farming._bar.slots[2].icon == load("res://modules/dynamic_farm/parcel_items.gd").icon_of("blueprint_cottage"), "the blueprint has the parcel adapter's placeholder icon (C-59)")
+	_check(farming._bar.slots[0].icon == UiArt.item("row_tool") and farming._bar.seeds_item.icon == UiArt.item("seed_carrot"),
 		"the hoe and the seeds show C-86's v3 item art (C-105)")
 	_check(farming._bar.slots[1].icon == load("res://modules/dynamic_farm/parcel_items.gd").icon_of("pail") and farming._bar.slots[1].icon != null,
 		"the pail has its icon (C-151)")
-	_check(farming._bar.bag_icon == UiArt.SYS_BAG and (scene._coins_capsule as UiGlassCapsule).icon == UiArt.COIN,
+	_check(farming._bar.bag_icon == UiArt.SYS_BAG and scene._coins_icon.texture == UiArt.COIN,
 		"the Bag end and the coins capsule show the v3 bag and coin (C-105)")
 	_check(scene._coins_capsule.visible and scene._coins.text == "0", "the top bar shows the parcel's coins, 0 on a new parcel (C-59)")
 	scene._on_farm_changed(farming.farm.merged({"coins": 12}, true))
+	_check(UiMotion.rolling(scene._coins), "the coins roll to the new number (C-186 MS-03)")
+	await create_timer(0.5).timeout
 	_check(scene._coins.text == "12", "the coins follow the save")
 	scene._on_farm_changed(farming.farm)
 	await _held(farming)
@@ -300,8 +304,10 @@ func _first_visit() -> void:
 	_check(seen.moved < 0.01 and seen.clips.has("labour_sow"), "already beside it: no walk, the sow clip")
 	var crop: Dictionary = farming.farm.crops.get(ParcelFarm.key(cell), {})
 	_check(ParcelFarm.is_dry(crop) and crop.get("ripe_at") == ParcelFarm.NEVER and farming.farm.bag.seed_carrot == 2, "sown: dry, not counting time (C-151), one seed used")
+	await create_timer(0.5).timeout   # C-186 MS-03: the chip's number rolls
 	_check(farming.energy_value() == 193 and scene._header.get_node("Energy").value_label.text == "193/200", "clear 2 + till 2 + sow 3: the top bar's chip reads 193/200")
-	_check(_bar_counts(farming).get("seed_carrot") == 2, "the quick bar's seed count follows at once")
+	# C-186 (C-185 §3.1 D): the seeds sit on the Seeds end (icon and word, no count); the middle slots do not hold them.
+	_check(farming._bar.seeds_item.get("id") == "seed_carrot" and not _bar_counts(farming).has("seed_carrot"), "the Seeds end keeps the seeds")
 	_check(farming._crop_art.counts().stages == [0, 1, 0, 0, 0, 0, 0], "C-138: the sown carrot shows its sowing stage at once")
 	_check(not farming.wet_soil_preview and farming._crop_art.counts().soil == {"dry": 1, "wet": 0}, "C-138: no watering yet, the soil is dry")
 	farming.wet_soil_preview = true
@@ -399,16 +405,17 @@ func _reopen() -> void:
 	_check(flaky.covered_at_call and not farming._cover.visible, "covered while entering, uncovered with the save applied")
 	_check(farming.farm.bag.get("seed_carrot") == 1 and farming.farm.bag.get("hoe_starter") == 1, "reopening grants nothing more")
 	_check(farming.last_gains.is_empty() and _floats(farming).is_empty(), "no second gift announced")
-	_check(_bar_counts(farming) == {"hoe_starter": 1, "pail": 1, "seed_carrot": 1, "crop_carrot": 1, "blueprint_cottage": 1}, "the quick bar matches the save")
+	_check(_bar_counts(farming) == {"hoe_starter": 1, "pail": 1, "crop_carrot": 1, "blueprint_cottage": 1} \
+		and farming._bar.seeds_item.get("id") == "seed_carrot", "the quick bar matches the save")
 	var names: Array = farming._bar.cells().slice(0, 4).map(func(c): return str(c.get("_name").text).replace("\n", " "))
-	_check(names == ["Starter Hoe", "Pail", "Carrot Seeds", "Carrot"], "quick bar names stay English: %s" % [names])
+	_check(names == ["Starter Hoe", "Pail", "Carrot", "Cottage Blueprint"], "quick bar names stay English: %s" % [names])
 	scene.suspend()
 	_check(TranslationServer.get_locale() == "zh_CN", "suspended, the locale is unchanged")
 	scene.resume()
 	await process_frame
 	_check(TranslationServer.get_locale() == "zh_CN", "resumed, the locale is still unchanged")
 	names = farming._bar.cells().slice(0, 4).map(func(c): return str(c.get("_name").text).replace("\n", " "))
-	_check(names == ["Starter Hoe", "Pail", "Carrot Seeds", "Carrot"], "resumed, quick bar names stay English: %s" % [names])
+	_check(names == ["Starter Hoe", "Pail", "Carrot", "Cottage Blueprint"], "resumed, quick bar names stay English: %s" % [names])
 	_check(farming.farm.cleared.size() == 1 and _obstacle_instances(farming) == farming._core_plan.layout.size() - 1, "the cleared obstacle stays gone")
 	_check(farming._crop_art.counts().soil == {"dry": 0, "wet": 1}, "tilled soil is still drawn, wet where watered")
 	var key: Array
@@ -432,8 +439,9 @@ func _profile_from_avatar(farming: Node) -> void:
 	_check(avatar != null and avatar.get_script() == load("res://scenes/ui_kit/ui_hud_avatar.gd") and avatar.get_index() == 1 and avatar.size == Vector2(52, 52), "the top bar's avatar: Ø52, after Back")
 	var head: Rect2 = scene._header.get_global_rect()
 	var place: Rect2 = scene._place_chip.get_global_rect()
-	_check(is_equal_approx(place.position.x, 12.0) and place.position.y >= head.end.y and place.end.x <= farming._ui.get_global_rect().end.x - 12.0,
-		"the place capsule is row 2, 12 in: %s under %s" % [place, head])
+	# C-186 (C-185 §3.1 B): one line, under the coins at the right, 12 in.
+	_check(is_equal_approx(place.end.x, farming._ui.get_global_rect().end.x - 12.0) and place.position.y >= head.end.y and place.position.x >= 12.0,
+		"the place bar is row 2, 12 in from the right: %s under %s" % [place, head])
 	_check(scene._title.custom_minimum_size.x > 0.0 and place.size.x < farming._ui.size.x - 24.0, "as wide as its lines: %s" % place)
 	avatar.pressed.emit()
 	await process_frame
@@ -470,8 +478,10 @@ func _full_bag(farming: Node) -> void:
 	await process_frame
 	var screen: Rect2 = farming._ui.get_global_rect()
 	var ids: Array = farming.bag_ids()
-	_check(ids.size() == 9 and farming._bar.slots.size() == UiQuickBar.SLOTS, "9 kinds of items: the quick bar shows %d (%s)" % [farming._bar.slots.size(), ids])
+	_check(ids.size() == 9 and farming._bar.slots.size() == farming._bar.slot_count and farming._bar.slot_count == 4,
+		"9 kinds of items: the quick bar shows %d (%s)" % [farming._bar.slots.size(), ids])
 	_check(screen.encloses(farming._bar.get_global_rect()), "the quick bar stays on screen: %s in %s" % [farming._bar.get_global_rect(), screen])
+	await create_timer(0.5).timeout   # MS-03: the coins roll up to 1234
 	_check(screen.encloses(scene._header.get_global_rect()) and scene._coins.text == "1234", "the top bar with 1234 coins stays on screen: %s" % scene._header.get_global_rect())
 	farming.open_bag()
 	await process_frame
@@ -501,7 +511,8 @@ func _energy_short_and_rest() -> void:
 	store.now_ms = func() -> int: return int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
 	var farming := await _open(store)
 	var chip: UiEnergyChip = scene._header.get_node_or_null("Energy")
-	_check(chip != null and chip.visible and chip.get_index() == scene._coins_capsule.get_index() - 1, "the top bar shows P0's Energy chip before the coins")
+	_check(chip != null and chip.visible and chip.get_index() == scene._avatar.get_index() + 1 and chip.clay,
+		"the top bar shows the clay Energy capsule on the avatar's right (C-186)")
 	_check(chip.value_label.text == "1/200" and chip.regen_text().begins_with("+1 in "), "the chip: 1/200, +1 in m:ss: %s %s" % [chip.value_label.text, chip.regen_text()])
 	var screen: Rect2 = farming._ui.get_global_rect()
 	_check(screen.encloses(scene._header.get_global_rect()), "the top bar with the chip stays on screen: %s" % scene._header.get_global_rect())
@@ -565,7 +576,7 @@ func _floats(farming: Node) -> Array:
 	return farming._ui.get_children().filter(func(n): return n is UiGainFloat).map(func(n): return n.text)
 
 func _flights(farming: Node) -> int:
-	return farming._ui.get_children().filter(func(n): return n is UiItemFly).size()
+	return farming._ui.get_children().filter(func(n): return n is UiRewardFly).size()
 
 ## id -> quantity on the quick bar.
 func _bar_counts(farming: Node) -> Dictionary:

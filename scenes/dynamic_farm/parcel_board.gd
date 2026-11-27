@@ -14,6 +14,11 @@ extends UiDrawer
 ## A delivery's slot shows its new request at once (refilled on delivery); the coins float up from where its key was.
 ## Numbers are the rules' (`requests`, assets/farm/data/dynamic_farm.json) and the save's board (ParcelFarm); keys only
 ## report (`command_requested`), the town sends them. The clock is the server's (`now_ms`, from the town).
+## C-186 (C-185 §3.6 / MS-16): a Coins row under the title (what the parcel has; the delivery's coins land there); each
+## request sits on a raised white row (radius 16, no edge) with its status as a tag, Deliver the primary key and Track the
+## secondary one. A delivery: its needs shrink away (160, 40 apart), the row stamps `Done` (1.3 → 1), `+N` rises from the
+## key and coins fly to the Coins row (bump + roll); the Done row holds 600, folds (200) and the list comes back with the
+## new request fading in from y+16 (260); `Requests today` rolls. A tap on a grey key shakes it and flashes its short need.
 
 signal command_requested(command: Dictionary)
 ## A slot's refill time came while the drawer is open: the town reads the save again (the server draws the request).
@@ -33,7 +38,7 @@ const COPY := {"title": "Request Board", "loading": "…", "unreachable": "Could
 	"effect": "Bring the required %s to the Request Board.", "delivery": "Delivery", "slot": "%s board slot",
 	"available": "Available in", "drop": "Drop request", "back": "Back", "drop_effect": "Dropping removes tracking and delays the next request.",
 	"after_drop": "Next request after drop", "stay": "Your %s stay in your bag.", "keep": "Keep tracking", "dropped": "Dropped",
-	"remain": "Your %s remain in your bag.", "close": "Close", "float": "+%d coins"}
+	"remain": "Your %s remain in your bag.", "close": "Close", "float": "+%d coins", "done": "Done"}
 const TITLES := {"fresh_greens": "Fresh Greens", "timber_run": "Timber Run", "stone_order": "Stone Order", "egg_basket": "Egg Basket", "fresh_milk": "Fresh Milk"}
 const SLOT_NAMES := ["First", "Second", "Third", "Fourth"]
 
@@ -49,6 +54,13 @@ var page_box: VBoxContainer
 ## Request id → its UiBoardCard on the list (tests and the coins float read them).
 var cards := {}
 var _fact_values: Array[Label] = []
+var coins: UiFactRow
+## A delivery is being shown (C-186 MS-16): refresh() keeps the farm and leaves the page as drawn until it ends.
+var hold := false
+var _coins_rolling := false
+var _today_held := -1   # `Requests today` as drawn when the delivery went out (it rolls on from there)
+## Request id → the card data last drawn (the Done row redraws from it).
+var _shown := {}
 var _key := 0
 var _due := -1
 var _tick := 0.0
@@ -66,6 +78,10 @@ func _init(farm_: Dictionary = {}) -> void:
 	close.pressed.connect(func(): close_requested.emit())
 	head.add_child(close)
 	body.add_child(head)
+	coins = UiFactRow.new("Coins", "0")
+	coins.name = "Coins"
+	coins.icon = UiArt.COIN
+	body.add_child(coins)
 	var gap := Control.new()
 	gap.custom_minimum_size.y = _GAP
 	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -149,6 +165,10 @@ static func noun_of(item: String) -> String:
 ## the dropped page stays until Close).
 func refresh(farm_: Dictionary) -> void:
 	farm = farm_
+	var drawn := coins._value.text
+	coins.value = str(int(farm.get("coins", 0)))
+	if _coins_rolling or UiMotion.rolling(coins._value): coins._value.text = drawn
+	if hold: return
 	if page in ["request", "drop"] and ParcelFarm.request_slot(farm, int(focus.get("id", 0))).is_empty(): page = "list"
 	_draw_page(true)
 
@@ -181,13 +201,117 @@ func back_to_list() -> void:
 	focus = {}
 	_draw_page(true)
 
-## The coins of a delivery float up from where its key was (BOARD-DONE: no result card).
-func float_coins(coins: int, at: Vector2) -> void:
-	if coins <= 0 or not is_inside_tree(): return
-	var f := UiFloatText.new(COPY.float % coins, UiFloatText.Tone.COINS, UiArt.COIN)
+## The coins of a delivery float up from where its key was (BOARD-DONE: no result card): the v3 float (C-185 R-02).
+func float_coins(coins_: int, at: Vector2) -> void:
+	if coins_ <= 0 or not is_inside_tree(): return
+	var host := get_parent() as Control
+	if host == null: return
+	var f := UiGainFloat.new(COPY.float % coins_, UiGainFloat.Tone.COINS, UiArt.COIN)
+	f.name = "DeliveryFloat"
 	f.theme = UiKit.theme()
-	get_parent().add_child(f)
-	f.play(at - (get_parent() as Control).global_position if get_parent() is Control else at)
+	host.add_child(f)
+	f.play(at - host.global_position - Vector2(0, UiTokens.SPACE_S5))
+
+## A delivery is going out: the list stays as drawn (and its `Requests today` count is kept) until it is shown.
+func hold_for_delivery() -> void:
+	_today_held = _today_done()
+	hold = true
+
+## MS-16: request `id` was delivered for `after - before` coins from its key at `at`. The float and the coins flight
+## start at once; the row's needs shrink away, it stamps Done, holds, folds, and the list comes back with the new request.
+## Reduced: the coins count up (at once) and the list is redrawn straight away.
+func celebrate_delivery(id: int, before: int, after: int, at: Vector2) -> void:
+	var today_before := _today_held if _today_held >= 0 else _today_done()
+	_today_held = -1
+	if at != Vector2.INF: float_coins(after - before, at)
+	_coins_rolling = true
+	coins.value = str(after)
+	coins._value.text = str(before)   # the row's value is the new sum; its number counts up to it as the coins land
+	fly_coins(after - before, at if at != Vector2.INF else coins.get_global_rect().get_center(), coins._icon, func():
+		_coins_rolling = false
+		UiMotion.roll(coins._value, float(before), float(int(farm.get("coins", after))), "%d", coins._icon))
+	var c: UiBoardCard = cards.get(id)
+	if UiMotion.reduced or c == null or not is_instance_valid(c) or not c.is_visible_in_tree() or not _shown.has(id):
+		release(today_before)
+		return
+	var tiles := c.need_tiles()
+	for i in tiles.size():
+		var tile := tiles[i] as Control
+		tile.pivot_offset = tile.size * 0.5
+		var tw := UiMotion.tween(tile, UiTokens.MOTION_EASING_EXIT)
+		tw.tween_interval(UiKit.secs(UiTokens.MOTION_STAGGER_MS_LIST * i))
+		tw.tween_property(tile, ^"scale", Vector2.ZERO, UiKit.secs(UiTokens.MOTION_DURATION_QUICK_MS))
+		tw.parallel().tween_property(tile, ^"modulate:a", 0.0, UiKit.secs(UiTokens.MOTION_DURATION_QUICK_MS))
+	await _wait(UiTokens.MOTION_DURATION_QUICK_MS + UiTokens.MOTION_STAGGER_MS_LIST * maxi(0, tiles.size() - 1))
+	if not _still(c): return
+	var done: Dictionary = (_shown[id] as Dictionary).duplicate()
+	done.done = true
+	done.status = COPY.done
+	done["status_tone"] = "done"
+	c.show_request(done)
+	var stamp := c.status_label()
+	stamp.pivot_offset = stamp.size * 0.5
+	stamp.scale = Vector2.ONE * UiTokens.MOTION_SCALE_DONE_STAMP
+	UiMotion.tween(stamp, UiTokens.MOTION_EASING_POP).tween_property(stamp, ^"scale", Vector2.ONE, UiKit.secs(UiTokens.MOTION_DURATION_BASE_MS))
+	await _wait(UiTokens.MOTION_DURATION_DONE_HOLD_MS)
+	if not _still(c): return
+	var row := c.get_parent() as Control
+	if row != null:
+		row.pivot_offset = Vector2(row.size.x * 0.5, 0.0)
+		var fold := UiMotion.tween(row, UiTokens.MOTION_EASING_EXIT)
+		fold.tween_property(row, ^"scale:y", 0.0, UiKit.secs(UiTokens.MOTION_DURATION_BASE_MS))
+		fold.parallel().tween_property(row, ^"modulate:a", 0.0, UiKit.secs(UiTokens.MOTION_DURATION_BASE_MS))
+		await fold.finished
+	if not _still(c): return
+	release(today_before)
+
+## The delivery shown (or refused): the page follows the farm again; new rows fade in from y+16 (260) and `Requests
+## today` rolls from `today_before`.
+func release(today_before := -1) -> void:
+	hold = false
+	_today_held = -1
+	var before_ids := cards.keys()
+	_draw_page(true)
+	if page != "list": return
+	if today_before >= 0 and not _fact_values.is_empty():
+		var q: Dictionary = ParcelFarm.rules().get("requests", {})
+		UiMotion.roll(_fact_values[0], float(today_before), float(_today_done()), "%d/" + str(int(q.get("daily_max", 0))))
+	if UiMotion.reduced: return
+	for id in cards:
+		if id in before_ids: continue
+		var row := (cards[id] as Control).get_parent() as Control
+		if row == null: continue
+		row.modulate.a = 0.0
+		_rise.call_deferred(row)
+
+func _rise(row: Control) -> void:
+	if not is_instance_valid(row) or not row.is_inside_tree(): return
+	var home := row.position.y
+	row.position.y = home + UiTokens.MOTION_OFFSET_BOARD_ENTER
+	var tw := UiMotion.tween(row, UiTokens.MOTION_EASING_STANDARD)
+	tw.tween_property(row, ^"position:y", home, UiKit.secs(UiTokens.MOTION_DURATION_MODERATE_MS))
+	tw.parallel().tween_property(row, ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_MODERATE_MS))
+
+func _today_done() -> int:
+	if farm.is_empty(): return 0
+	return int(ParcelFarm.board_today(ParcelFarm.rules(), farm, int(now_ms.call())).done)
+
+func _still(c) -> bool: return is_inside_tree() and is_instance_valid(c) and hold
+
+func _wait(ms: float) -> void:
+	await get_tree().create_timer(UiKit.secs(ms), true).timeout
+
+## MS-02: a grey key shakes and the row's first short need flashes `action/danger` (120); the key already says why.
+func refuse(c: UiBoardCard) -> void:
+	UiMotion.shake(c.command_button())
+	for t in c.need_tiles():
+		var tile := t as UiNeedTile
+		if tile == null or tile.state() != UiNeedTile.State.SHORT: continue
+		tile.modulate = UiTokens.COLOR_ACTION_DANGER
+		var tw := UiMotion.tween(tile, UiTokens.MOTION_EASING_LINEAR)
+		tw.tween_interval(UiKit.secs(UiTokens.MOTION_DURATION_FAST_MS))
+		tw.tween_callback(func(): tile.modulate = Color.WHITE)
+		break
 
 ## Where request `id`'s key is on screen (Vector2.INF when it is not on the list).
 func key_point(id: int) -> Vector2:
@@ -198,7 +322,7 @@ func _process(dt: float) -> void:
 	_tick += dt
 	if _tick < 1.0: return
 	_tick = 0.0
-	if page == "list" and not farm.is_empty(): _draw_page(false)
+	if page == "list" and not farm.is_empty() and not hold: _draw_page(false)
 	if _due > 0 and int(now_ms.call()) >= _due:
 		_due = -1
 		refill_due.emit()
@@ -227,6 +351,7 @@ func _draw_page(force: bool) -> void:
 func _clear() -> void:
 	_key = 0
 	cards = {}
+	_shown = {}
 	_fact_values = []
 	for c in page_box.get_children():
 		page_box.remove_child(c)
@@ -242,13 +367,23 @@ func _list(m: Dictionary) -> void:
 	for d: Dictionary in m.cards:
 		var c := UiBoardCard.new()
 		c.name = "Request_%d" % int(d.id)
-		c.show_request(d)
+		var shown := d.duplicate()
+		shown["status_tone"] = "ready" if d.status == COPY.ready else ("tracked" if d.status == COPY.tracked else "open")
+		c.show_request(shown)
+		# C-185 §3.6: Deliver is the v3 primary key, Track the secondary one; a gap stays grey on the key (LOCK-10).
+		c.command_button().kind = UiCommandButton.Kind.SECONDARY if d.command == COPY.track else UiCommandButton.Kind.PRIMARY
 		var cmd: Dictionary = d.cmd
 		var id := int(d.id)
 		c.command_pressed.connect(func(): if not cmd.is_empty(): command_requested.emit(cmd))
+		c.unavailable_pressed.connect(func(_r: String): refuse(c))
 		c.info_pressed.connect(func(): open_request(id))
-		page_box.add_child(c)
+		var row := PanelContainer.new()
+		row.name = "Row_%d" % id
+		row.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE_RAISED, UiTokens.RADIUS_LG).with_margins(12, 10, 12, 12))
+		row.add_child(c)
+		page_box.add_child(row)
 		cards[id] = c
+		_shown[id] = shown
 
 func _request_page(rules: Dictionary, now: int) -> void:
 	var sl := ParcelFarm.request_slot(farm, int(focus.get("id", 0)))

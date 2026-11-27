@@ -135,20 +135,31 @@
                   ],
                   "children": [
                     {
-                      "type": "TextureRect",
+                      "type": "Control",
                       "rect": [
                         10,
                         239,
-                        20,
-                        20
+                        24,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            10,
+                            239,
+                            24,
+                            24
+                          ]
+                        }
                       ]
                     },
                     {
                       "type": "Label",
                       "rect": [
-                        38,
+                        42,
                         239,
-                        182,
+                        178,
                         38
                       ],
                       "variation": "C14XB",
@@ -188,20 +199,31 @@
                   ],
                   "children": [
                     {
-                      "type": "TextureRect",
+                      "type": "Control",
                       "rect": [
                         10,
                         307,
-                        20,
-                        20
+                        24,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            10,
+                            307,
+                            24,
+                            24
+                          ]
+                        }
                       ]
                     },
                     {
                       "type": "Label",
                       "rect": [
-                        38,
+                        42,
                         307,
-                        182,
+                        178,
                         38
                       ],
                       "variation": "C14XB",
@@ -241,20 +263,31 @@
                   ],
                   "children": [
                     {
-                      "type": "TextureRect",
+                      "type": "Control",
                       "rect": [
                         10,
                         375,
-                        20,
-                        20
+                        24,
+                        24
+                      ],
+                      "children": [
+                        {
+                          "type": "TextureRect",
+                          "rect": [
+                            10,
+                            375,
+                            24,
+                            24
+                          ]
+                        }
                       ]
                     },
                     {
                       "type": "Label",
                       "rect": [
-                        38,
+                        42,
                         375,
-                        182,
+                        178,
                         38
                       ],
                       "variation": "C14XB",
@@ -274,9 +307,9 @@
                     {
                       "type": "Label",
                       "rect": [
-                        38,
+                        42,
                         417,
-                        182,
+                        178,
                         18
                       ],
                       "variation": "C12XB",

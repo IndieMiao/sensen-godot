@@ -805,6 +805,11 @@
       "value": "#2B3A1A",
       "use": "场景侧键（Build 等）收获组绿色药丸上的深绿字（6.0:1）",
       "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "upgrade/glow": {
+      "value": "#FFF5C738",
+      "use": "升级卡背后光芒（MS-17）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
     }
   },
   "colorInheritedFromV2": {
@@ -1352,6 +1357,21 @@
     "badge/newDot": {
       "value": 8,
       "use": "背包“新获得”点",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "guide/font": {
+      "value": 13,
+      "use": "引导条字号（粗体白字）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/regenFont": {
+      "value": 9,
+      "use": "体力胶囊回复时间字号",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/placeFont": {
+      "value": 13,
+      "use": "位置条地址字号",
       "source": "C-185 D-489 §5（所有者 Q-307 验收）"
     }
   },

@@ -62,8 +62,9 @@ const PAIL_MOTIONS := {"fill": "draw", "water": "pour"}
 const LOAD_LIMIT_S := 15.0
 ## One frame adds at most this much to the loading time: the first frame after a stall is not seconds of loading.
 const LOAD_FRAME_CAP_S := 0.25
-## The top bar's second row, the place capsule (two 13 / 12 lines and its 4 + 4): what it is drawn at, give or take.
-const PLACE_ROW_H := 36.0
+## The top bar's second row, the one-line place bar (C-186, C-185 §3.1 B): its drawn height.
+const PLACE_ROW_H := float(UiTokens.SIZE_HUD_PLACE_H)
+const PIN_ICON := preload("res://assets/ui/icons/lucide/map-pin.svg")
 
 var _args := {}
 var _data := {}
@@ -89,13 +90,14 @@ var _title: Label
 var _status: Label
 var _coins_capsule: PanelContainer
 ## The top bar's second row: the parcel's name over its status (C-108).
-var _place_chip: UiGlassCapsule
+var _place_chip: PanelContainer
 ## The HUD avatar (C-H1): the profile (C-108).
 var _avatar: UiHudAvatar
 ## The profile and the pages opened from it, over the parcel (parcel_profile.gd), else null.
 var _profile: Control
 var _profile_layer: CanvasLayer
 var _coins: Label
+var _coins_icon: TextureRect
 var _movement := Vector2.ZERO
 var _focus := Vector3.ZERO
 var _zoom := 1.0
@@ -234,15 +236,17 @@ func _ready() -> void:
 		_farming.state_changed.connect(_on_farm_changed)
 		_farming.place_side_button(_build)
 		# C-148: the parcel's Energy in the top bar, P0's chip just before the coins.
+		# C-186 (C-185 §3.1 A, attachment-1820): the clay Energy capsule hangs on the avatar's right.
 		_header.add_child(_farming.energy_chip)
-		_header.move_child(_farming.energy_chip, _coins_capsule.get_index())
-		# C-107: the task button (C-H3) beside the Energy chip, before it.
+		_header.move_child(_farming.energy_chip, _avatar.get_index() + 1)
+		# C-107: the task button (C-H3), a clay disc since C-186, just before the coins.
 		_header.add_child(_farming.task_button)
-		_header.move_child(_farming.task_button, _farming.energy_chip.get_index())
+		_header.move_child(_farming.task_button, _coins_capsule.get_index())
+		UiClay.round_button(_farming.task_button)
 		_farming.tip_top = top_bar_bottom() + UiTokens.SPACE_S5
 		_farming.bar_bottom = top_bar_bottom()
+	# C-186 (C-185 §3.1 B, 6 item 1 by the owner's attachment-1820): the address alone; the cell counts were for us.
 	_title.text = _data.address if not _data.address.is_empty() else _data.name
-	_status.text = "Core %d · Walk-only %d" % [_data.counts.core,_data.counts.extension]
 	_fit_place_chip()
 	_summary = {"schema":4,"dataset":_data.dataset_version,"block_id":_data.block_id,
 		"core_cells":_data.counts.core,"extension_cells":_data.counts.extension,
@@ -270,7 +274,13 @@ func _ready() -> void:
 ## Every save reply (ParcelFarming): the buildings as they stand, the Build key while a blueprint waits.
 func _on_farm_changed(farm: Dictionary) -> void:
 	if _failed: return
-	_coins.text = str(int(farm.get("coins", 0)))
+	var coins := int(farm.get("coins", 0))
+	# MS-03: the number rolls to the new value (rising pops the coin, falling flashes) once the capsule has shown one.
+	if _coins_capsule.visible and _coins.text.is_valid_int() and int(_coins.text) != coins:
+		if not (UiMotion.rolling(_coins) and int(_coins.get_meta(&"_roll_to", coins)) == coins):
+			_coins.set_meta(&"_roll_to", coins)
+			UiMotion.roll(_coins, int(_coins.text), coins, "%d", _coins_icon)
+	elif not UiMotion.rolling(_coins): _coins.text = str(coins)
 	_coins_capsule.visible = true
 	_sync_buildings(farm)
 	_ground_paint.update(farm)
@@ -797,8 +807,10 @@ func _build_ui() -> void:
 	back.name = "Back"
 	back.tooltip_text = "Back"
 	back.pressed.connect(_request_back)
+	UiClay.round_button(back)   # C-186: a cream clay disc (C-185 §3.1 B)
 	_header.add_child(back)
 	_avatar = UiHudAvatar.new()
+	_avatar.clay = true   # C-186: the cream clay rounded square, no empty ring (F-02)
 	_avatar.pressed.connect(open_profile)
 	_header.add_child(_avatar)
 	var spacer := Control.new()
@@ -806,28 +818,66 @@ func _build_ui() -> void:
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_header.add_child(spacer)
-	# One's own parcel: its coins (C-59, apart from the main farm's) in the v3 coin capsule, at the right.
-	_coins_capsule = UiGlassCapsule.coins(UiArt.COIN)
+	# One's own parcel: its coins (C-59, apart from the main farm's), since C-186 a cream clay capsule with the big coin
+	# pressed on its left end (C-185 §3.1 A, attachment-1820), at the right.
+	_coins_capsule = PanelContainer.new()
 	_coins_capsule.name = "Coins"
+	_coins_capsule.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_coins_capsule.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var coin_box := UiClay.face(UiTokens.SIZE_HUD_CLAY_RADIUS)
+	coin_box.content_margin_left = 2.0
+	coin_box.content_margin_right = 12.0
+	coin_box.content_margin_top = 2.0
+	coin_box.content_margin_bottom = 2.0
+	_coins_capsule.add_theme_stylebox_override(&"panel", coin_box)
+	_coins_capsule.custom_minimum_size = Vector2(64, 32)
 	_coins_capsule.visible = false
-	_coins = (_coins_capsule as UiGlassCapsule).label()
-	_coins.text = "0"
+	var coin_row := HBoxContainer.new()
+	coin_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	coin_row.add_theme_constant_override(&"separation", UiTokens.SPACE_S2)
+	_coins_capsule.add_child(coin_row)
+	_coins_icon = UiKit.icon(UiArt.COIN, 28.0)
+	_coins_icon.name = "Coin"
+	_coins_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	coin_row.add_child(_coins_icon)
+	_coins = UiKit.label("0", UiTokens.STYLE_C14_XB, UiTokens.COLOR_HUD_CLAY_INK)
+	_coins.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_coins.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_coins.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	coin_row.add_child(_coins)
 	_header.add_child(_coins_capsule)
-	_place_chip = UiGlassCapsule.new()
+	# Row 2 (C-186, C-185 §3.1 B): the address on one line in dark glass with the red pin, under the coins at the right;
+	# no › (tapping it does nothing).
+	_place_chip = PanelContainer.new()
 	_place_chip.name = "Place"
 	_place_chip.theme = UiKit.theme()
-	_place_chip.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
-	_place_chip.position = Vector2(UiTokens.SIZE_SCREEN_EDGE, _header.offset_bottom + UiTokens.SPACE_S2)
+	_place_chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_place_chip.add_theme_stylebox_override(&"panel",
+		UiClay.padded(UiClay.glass_dark(UiTokens.SIZE_HUD_PLACE_H * 0.5), UiTokens.SPACE_S4, 0.0))
+	_place_chip.custom_minimum_size.y = UiTokens.SIZE_HUD_PLACE_H
+	_place_chip.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_place_chip.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_place_chip.offset_top = _header.offset_bottom + UiTokens.SPACE_S2
+	_place_chip.offset_bottom = _place_chip.offset_top + UiTokens.SIZE_HUD_PLACE_H
+	_place_chip.offset_right = -UiTokens.SIZE_SCREEN_EDGE
 	_canvas.add_child(_place_chip)
-	_title = _place_chip.label()
-	_title.theme_type_variation = UiTokens.STYLE_TYPE_LABEL_ON_DARK
-	# The capsule is as wide as its longer line, up to the screen less its sides; past that its lines cut with …
-	_title.custom_minimum_size.x = 0
-	_place_chip.text = "Dynamic farm"
-	_place_chip.detail = "Loading preview…"
-	_status = _place_chip.detail_label()
+	var place_row := HBoxContainer.new()
+	place_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	place_row.add_theme_constant_override(&"separation", UiTokens.SPACE_S2)
+	_place_chip.add_child(place_row)
+	var pin := UiKit.icon(PIN_ICON, UiTokens.SIZE_HUD_PLACE_PIN)
+	pin.name = "Pin"
+	pin.modulate = UiTokens.COLOR_HUD_PIN
+	pin.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	place_row.add_child(pin)
+	_title = UiKit.label("Dynamic farm", UiTokens.STYLE_TYPE_LABEL_ON_DARK)
+	_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_title.add_theme_font_override(&"font", UiKit.font(&"extrabold"))
+	_title.add_theme_font_size_override(&"font_size", UiTokens.SIZE_HUD_PLACE_FONT)
 	_title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_title.custom_minimum_size.x = 0
+	place_row.add_child(_title)
+	_status = _title   # one line since C-186 (no separate status line)
 	_fit_place_chip()
 	_controls.top_exclusion_y = top_bar_bottom()
 	_hint = UiKit.label("Art preview · Walk and explore", UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
@@ -843,6 +893,7 @@ func _build_ui() -> void:
 	_build.theme = UiKit.theme()
 	# 180 × 48; ParcelFarming places it beside the action key (place_side_button), clear of the key and quick bar.
 	_build.custom_minimum_size = Vector2(180, 48)
+	_build.clay = true   # C-186: the clay side key beside the clay action key (C-185 §3.1 E)
 	_build.visible = false
 	_build.activated.connect(begin_placement)
 	_build.unavailable_pressed.connect(func(reason: String): if _farming != null: _farming.show_notice(reason))
@@ -853,15 +904,15 @@ func _build_ui() -> void:
 func _fit_place_chip() -> void:
 	if _place_chip == null or not is_inside_tree(): return
 	var widest := 0.0
-	for l: Label in [_title, _status]:
-		if not l.visible or l.text.is_empty(): continue
-		var font := l.get_theme_font(&"font")
-		widest = maxf(widest, font.get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.get_theme_font_size(&"font_size")).x)
+	if not _title.text.is_empty():
+		var font := _title.get_theme_font(&"font")
+		widest = font.get_string_size(_title.text, HORIZONTAL_ALIGNMENT_LEFT, -1, _title.get_theme_font_size(&"font_size")).x
 	var box := _place_chip.get_theme_stylebox(&"panel")
 	var sides := box.get_margin(SIDE_LEFT) + box.get_margin(SIDE_RIGHT) if box != null else 0.0
+	sides += UiTokens.SIZE_HUD_PLACE_PIN + UiTokens.SPACE_S2
 	var room := get_viewport().get_visible_rect().size.x - UiTokens.SIZE_SCREEN_EDGE * 2.0 - sides
 	_title.custom_minimum_size.x = ceilf(minf(widest, maxf(0.0, room)))
-	_place_chip.size = Vector2.ZERO
+	_place_chip.offset_left = _place_chip.offset_right - _place_chip.get_combined_minimum_size().x
 
 ## Where the top bar ends (its second row's bottom, a 34 two-line capsule), in canvas units: the world's touches start
 ## under it and the farming tip sits under it.

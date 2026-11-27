@@ -26,6 +26,10 @@ const _SHADOW_OFFSET := Vector2(0, 6)
 const DEFAULT_ICON := preload("res://assets/ui/kit_icons/sprout.svg")
 
 var tip := "": set = set_tip
+## C-186 (C-185 §3.1 C, F-03): the farm's guide bar — the place chip's dark glass, radius 18, no shadow, 13 bold white
+## text after a green dot, 50 high (was the 62 cream card). Content and when it shows are unchanged.
+var glass := false
+var _dot: Control
 var _icon: TextureRect
 var _text: Label
 var _down_at := Vector2.INF
@@ -56,6 +60,26 @@ func _init() -> void:
 	_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(_text)
+
+## Turns the card into the farm's dark glass guide bar (see `glass`).
+func set_glass() -> void:
+	glass = true
+	var box := UiClay.padded(UiClay.glass_dark(UiTokens.SIZE_GUIDE_RADIUS), _PAD_X, 8.0)
+	add_theme_stylebox_override(&"panel", box)
+	custom_minimum_size = Vector2(WIDTH, UiTokens.SIZE_GUIDE_H)
+	_icon.visible = false
+	_dot = Control.new()
+	_dot.name = "Dot"
+	_dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_dot.custom_minimum_size = Vector2.ONE * UiTokens.SIZE_GUIDE_DOT
+	_dot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_dot.draw.connect(func(): _dot.draw_circle(_dot.size * 0.5, UiTokens.SIZE_GUIDE_DOT * 0.5, UiTokens.COLOR_ACTION_PRIMARY, true, -1.0, true))
+	_icon.get_parent().add_child(_dot)
+	_icon.get_parent().move_child(_dot, 0)
+	_text.add_theme_color_override(&"font_color", UiTokens.COLOR_TEXT_ON_DARK)
+	_text.add_theme_font_override(&"font", UiKit.font(&"extrabold"))
+	_text.add_theme_font_size_override(&"font_size", UiTokens.SIZE_GUIDE_FONT)
+	reset_size()
 
 ## The sentence and its icon (null = the main's default sprout).
 func show_tip(text: String, icon: Texture2D = null) -> void:

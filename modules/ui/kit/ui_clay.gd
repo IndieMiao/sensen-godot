@@ -50,6 +50,22 @@ static func frost_slot(radius: float) -> StyleBoxFlat:
 	b.anti_aliasing = true
 	return b
 
+## A Ø36 cream clay disc (`hud/clay/button`) centred in a 44 hit-area Button (the farm's Back and task buttons,
+## C-185 §3.1 B); pressed flattens it (M-01 scales on top). A UiGlassButton's glyph turns `hud/clay/ink`.
+static func round_button(b: Button) -> void:
+	var d := float(UiTokens.SIZE_HUD_CLAY_BUTTON)
+	var inset := (float(UiTokens.SIZE_TOUCH_MIN) - d) * 0.5
+	var up := face(d * 0.5)
+	var down := face_pressed(d * 0.5)
+	for box: StyleBoxFlat in [up, down]:
+		box.expand_margin_left = -inset
+		box.expand_margin_right = -inset
+		box.expand_margin_top = -inset
+		box.expand_margin_bottom = -inset
+	for st in [&"normal", &"hover", &"focus", &"disabled"]: b.add_theme_stylebox_override(st, up)
+	for st in [&"pressed", &"hover_pressed"]: b.add_theme_stylebox_override(st, down)
+	if b is UiGlassButton: (b as UiGlassButton).ink = UiTokens.COLOR_HUD_CLAY_INK
+
 ## A content margin on every side of `b`, returned for chaining.
 static func padded(b: StyleBox, h: float, v: float) -> StyleBox:
 	b.content_margin_left = h

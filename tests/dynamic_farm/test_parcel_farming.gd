@@ -773,13 +773,15 @@ func _upgrade_sheet() -> void:
 	_check(m.tiles == [{"id": "wood", "name": "Timber", "have": 2, "need": 6}, {"id": "stone", "name": "Stone", "have": 9, "need": 4},
 		{"id": "coins", "name": "Coins", "have": 12, "need": 100}], "sheet: Timber, Stone, then Coins, have / need")
 	_check(m.reason == "Need 4 more Timber", "sheet: the first gap on the key, materials first: " + str(m.reason))
-	_check(m.changes == [{"icon": "energy", "text": "Max Energy 210", "note": "now 200"}], "sheet: Lv2 adds Max Energy only")
+	var rows := func(changes: Array) -> Array: return changes.map(func(c): return {"icon": c.icon, "text": c.text, "note": c.note})
+	_check(rows.call(m.changes) == [{"icon": "energy", "text": "Max Energy 210", "note": "now 200"}], "sheet: Lv2 adds Max Energy only")
+	_check(m.changes[0].get("from") == 200 and m.changes[0].get("to") == 210, "sheet: the level card's `200 → 210` numbers (C-186)")
 	farm.bag.wood = 6
 	_check(Upgrade.model(rules, farm).reason == "Need 88 more coins", "sheet: then the coins")
 	farm.coins = 100
 	_check(Upgrade.model(rules, farm).reason == "", "sheet: enough, the key can go")
 	farm.level = 2
-	_check(Upgrade.model(rules, farm).changes == [{"icon": "energy", "text": "Max Energy 220", "note": "now 210"},
+	_check(rows.call(Upgrade.model(rules, farm).changes) == [{"icon": "energy", "text": "Max Energy 220", "note": "now 210"},
 		{"icon": "water", "text": "Wells 2", "note": "now 1"}], "sheet: Lv3 adds a well")
 	farm.level = 5
 	var top: Dictionary = Upgrade.model(rules, farm)
