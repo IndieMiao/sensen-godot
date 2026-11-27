@@ -3,6 +3,7 @@ extends SceneTree
 ## C-31 server, the client-only spatial rules and the local save standing in for the server.
 ## C-138: the carrot's seven stages and the dry / wet soil blocks (ParcelCropArt).
 ## C-141: crop sway on the stage layers: the sway material, ripe sway on the mature stage only, shakes kept across redraws.
+## C-208: the soil and plant layers drawn in chunks the camera can cull, every instance where one batch drew it.
 ## C-148: Energy, P0's numbers, the same cases as the server (fixtures/energy_cases.json), the key's price and Rest.
 ## C-151: watering, the same cases as the server (fixtures/watering_cases.json), the keys at the well and on dry crops.
 ## C-152: farm levels, the same cases as the server (fixtures/level_cases.json), Scott's upgrade sheet and the Build key.
@@ -37,6 +38,7 @@ func _run() -> void:
 	_crop_stages()
 	_crop_art()
 	_crop_sway()
+	_crop_chunks()
 	_energy()
 	_energy_cases()
 	_energy_space()
@@ -487,10 +489,10 @@ func _crop_art() -> void:
 	_check(art.counts() == {"soil": {"dry": 4, "wet": 0}, "stages": [1, 1, 1, 0, 0, 0, 1]}, "art: four dry blocks, tilled / sowing (not watered) / emergence / mature: %s" % [art.counts()])
 	art.sync({"1,1": CropArt.WET, "2,1": CropArt.WET, "3,1": CropArt.DRY}, crops, T0 + 13000)
 	_check(art.counts().soil == {"dry": 1, "wet": 2}, "art: wet blocks are drawn as wet")
-	var dry: MultiMeshInstance3D = art._soil[CropArt.DRY]
-	var wet: MultiMeshInstance3D = art._soil[CropArt.WET]
-	_check(dry.multimesh.instance_count == 1 and wet.multimesh.instance_count == 2, "art: one block per tilled cell")
-	var block := dry.multimesh.mesh.get_aabb()
+	var dry: CropArt.Layer = art._soil[CropArt.DRY]
+	var wet: CropArt.Layer = art._soil[CropArt.WET]
+	_check(dry.count() == 1 and wet.count() == 2, "art: one block per tilled cell")
+	var block := dry.mesh.get_aabb()
 	_check(block.size.x <= 1.0 and block.size.z <= 1.0 and block.size.x >= 0.9, "art: a block covers one cell and no more: %s" % [block.size])
 	_check(CropArt.SOIL_COLORS.wet.get_luminance() < CropArt.SOIL_COLORS.dry.get_luminance(), "art: wet soil is darker")
 	art.sync({}, {}, T0)
@@ -505,19 +507,19 @@ func _crop_sway() -> void:
 	var layers: Array = art._stages
 	var shaded := true
 	for stage in range(1, layers.size()):
-		var layer: MultiMeshInstance3D = layers[stage]
+		var layer: CropArt.Layer = layers[stage]
 		var mat := layer.material_override as ShaderMaterial
-		var painted := layer.multimesh.mesh.surface_get_material(0) as StandardMaterial3D
-		var box := layer.multimesh.mesh.get_aabb()
-		shaded = shaded and mat != null and mat.shader == CropArt.SWAY_SHADER and layer.multimesh.use_custom_data \
+		var painted := layer.mesh.surface_get_material(0) as StandardMaterial3D
+		var box := layer.mesh.get_aabb()
+		shaded = shaded and mat != null and mat.shader == CropArt.SWAY_SHADER and layer.custom \
 			and mat.get_shader_parameter(&"albedo_tex") == painted.albedo_texture and painted.albedo_texture != null \
 			and is_equal_approx(mat.get_shader_parameter(&"roughness"), painted.roughness) \
 			and is_equal_approx(mat.get_shader_parameter(&"plant_base"), box.position.y) and is_equal_approx(mat.get_shader_parameter(&"plant_top"), box.end.y) \
 			and art.ripe_layer(stage) == (stage == CropArt.MATURE) and bool(mat.get_shader_parameter(&"sway_enabled"))
 	_check(shaded, "sway: six plant layers on the sway shader with their atlas, mesh height and ripe flag (mature only)")
 	var soil_plain := true
-	for layer: MultiMeshInstance3D in [art._soil[CropArt.DRY], art._soil[CropArt.WET], art._contact]:
-		soil_plain = soil_plain and not layer.material_override is ShaderMaterial and not layer.multimesh.use_custom_data
+	for layer: CropArt.Layer in [art._soil[CropArt.DRY], art._soil[CropArt.WET], art._contact]:
+		soil_plain = soil_plain and not layer.material_override is ShaderMaterial and not layer.custom
 	_check(soil_plain, "sway: soil blocks and collars keep their materials")
 	var ripe := {"crop": "crop_carrot", "planted_at": T0 - 60000, "ripe_at": T0}
 	var young := {"crop": "crop_carrot", "planted_at": T0, "ripe_at": T0 + 60000}
@@ -546,13 +548,82 @@ func _crop_sway() -> void:
 	_crop_sway_late(art, soil, {"1,1": ripe, "2,1": young})
 	art.free()
 
+## C-208: a field of 10 × 9 cells (chunks of 4 × 4, those on its edges partly filled) draws every soil block, collar
+## and plant once, in the batch of its own chunk; every batch keeps the layer's material and mesh, casts no shadow and
+## grows its box by the margin. A shake reaches the plant's own batch; a smaller field empties the chunks it left and
+## hides them.
+func _crop_chunks() -> void:
+	var art := CropArt.new(func(cell: Vector2i) -> Vector3: return Vector3(cell.x * 0.8, 0, -cell.y * 0.8), 0.8)
+	var soil := {}
+	var crops := {}
+	for y in range(2, 11):
+		for x in range(3, 13):
+			var key := ParcelFarm.key(Vector2i(x, y))
+			soil[key] = CropArt.WET if (x + y) % 3 == 0 else CropArt.DRY
+			# Bare, sowing, emergence (13 s of 60 in) and mature cells side by side.
+			match posmod(x, 4):
+				1: crops[key] = {"crop": "crop_carrot", "planted_at": T0, "ripe_at": ParcelFarm.NEVER, "watered_at": null}
+				2: crops[key] = {"crop": "crop_carrot", "planted_at": T0, "ripe_at": T0 + 60000}
+				3: crops[key] = {"crop": "crop_carrot", "planted_at": T0 - 60000, "ripe_at": T0}
+	art.sync(soil, crops, T0 + 13000)
+	_check(art.counts() == {"soil": {"dry": 60, "wet": 30}, "stages": [27, 18, 18, 0, 0, 0, 27]}, "chunks: 90 cells drawn: %s" % [art.counts()])
+	var layers: Array = [art._contact, art._soil[CropArt.DRY], art._soil[CropArt.WET]] + art._stages.slice(1)
+	var kept := true
+	for layer: CropArt.Layer in layers:
+		for chunk: Vector2i in layer.chunks:
+			var batch: MultiMeshInstance3D = layer.chunks[chunk]
+			kept = kept and batch.get_parent() == layer and batch.multimesh.mesh == layer.mesh and batch.material_override == layer.material_override \
+				and batch.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF and is_equal_approx(batch.extra_cull_margin, 0.2) \
+				and batch.multimesh.use_custom_data == layer.custom and batch.multimesh.use_colors == (layer == art._contact) and batch.transform == Transform3D.IDENTITY
+	# Where each cell went (the headless renderer keeps no instance transforms to read back; _fill writes each one
+	# with _transform(cell), as before C-208).
+	var placed := true
+	var slots := {}
+	for where: Dictionary in [art._collar_at, art._soil_at, art._plant_at]:
+		for cell: Vector2i in where:
+			var at: Array = where[cell]
+			var layer: CropArt.Layer = at[3]
+			placed = placed and at[0] == layer.chunks.get(CropArt.chunk_of(cell)) and int(at[1]) < (at[0] as MultiMeshInstance3D).multimesh.instance_count \
+				and bool(at[2]) == (layer in art._stages) and not slots.has([at[0], at[1]])
+			slots[[at[0], at[1]]] = true
+	var drawn := {}
+	for layer: CropArt.Layer in layers: drawn[layer] = layer.count()
+	_check(kept, "chunks: every batch keeps its layer's mesh, material, data and origin, casts no shadow, grows its box 0.2 m")
+	_check(placed and slots.size() == 90 + 90 + 63, "chunks: every collar, soil block and plant has its own instance in its own chunk")
+	_check(drawn.get(art._contact) == 90 and drawn.get(art._soil[CropArt.DRY]) == 60 and drawn.get(art._soil[CropArt.WET]) == 30
+		and drawn.get(art._stages[1]) == 18 and drawn.get(art._stages[2]) == 18 and drawn.get(art._stages[CropArt.MATURE]) == 27,
+		"chunks: each collar, soil block and plant drawn once")
+	_check(art._contact.chunks.size() == 12 and CropArt.chunk_of(Vector2i(-1, -2)) == Vector2i(-1, -1) and CropArt.chunk_of(Vector2i(4, 3)) == Vector2i(1, 0),
+		"chunks: 10 × 9 cells from (3, 2) fall in 4 × 3 chunks of 4, negative cells round down")
+	var cell := Vector2i(7, 5)
+	var at: Array = art._plant_at[cell]
+	_check(at[3] == art._stages[CropArt.MATURE] and at[0] == art._stages[CropArt.MATURE].chunks[CropArt.chunk_of(cell)],
+		"chunks: a ripe plant is found in its own chunk's batch")
+	var wet_collar: Array = art._collar_at[Vector2i(3, 3)]
+	var dry_collar: Array = art._collar_at[Vector2i(4, 3)]
+	_check(art._soil_at[Vector2i(3, 3)][3] == art._soil[CropArt.WET] and art._soil_at[Vector2i(4, 3)][3] == art._soil[CropArt.DRY]
+		and wet_collar[3] == art._contact and dry_collar[0] == art._contact.chunks[Vector2i(1, 0)], "chunks: soil and collars are found in their chunks")
+	art.shake(cell, Vector2(1, 0))
+	_check(not art.shake_of(cell).is_empty() and art.shake_data(cell).r == 1.0, "chunks: a plant in any chunk takes a shake")
+	art.sync({"4,4": CropArt.DRY}, {}, T0)
+	var emptied := true
+	for layer: CropArt.Layer in layers:
+		for chunk: Vector2i in layer.chunks:
+			var batch: MultiMeshInstance3D = layer.chunks[chunk]
+			var used: bool = layer == art._contact or layer == art._soil[CropArt.DRY]
+			emptied = emptied and (batch.multimesh.instance_count == 1 and batch.visible if used and chunk == Vector2i(1, 1)
+				else batch.multimesh.instance_count == 0 and not batch.visible)
+	_check(emptied, "chunks: a smaller field leaves the other chunks empty and hidden")
+	_check(not art._plant_at.has(cell), "chunks: a plant no longer drawn is not tracked")
+	art.free()
+
 ## V-652: Compatibility (GLES3) keeps MultiMesh custom data as truncated half floats (PackedByteArray.encode_half
 ## truncates the same way). However long the scene has run, the stored trigger time survives that and the shader's
 ## wrapped shake clock puts the first peak where it belongs; a shake over is written still without waiting for a redraw.
 func _crop_sway_late(art: CropArt, soil: Dictionary, crops: Dictionary) -> void:
 	var half := PackedByteArray()
 	half.resize(2)
-	var mat := (art._stages[CropArt.MATURE] as MultiMeshInstance3D).material_override as ShaderMaterial
+	var mat := art._stages[CropArt.MATURE].material_override as ShaderMaterial
 	_check(is_equal_approx(mat.get_shader_parameter(&"shake_wrap"), CropArt.SHAKE_WRAP_S) and is_equal_approx(mat.get_shader_parameter(&"shake_len"), CropArt.SHAKE_S),
 		"sway late: the shader wraps and ends shakes on the art's numbers")
 	var exact := true
@@ -596,9 +667,9 @@ func _crop_art_motion() -> void:
 		art.wet_in(cell)
 		var block := art.get_node_or_null(^"WetFade") as MeshInstance3D
 		var drops := art.get_node_or_null(^"WaterDrops") as CPUParticles3D
-		var wet: MultiMeshInstance3D = art._soil[CropArt.WET]
+		var wet: CropArt.Layer = art._soil[CropArt.WET]
 		if reduced:
-			_check(block == null and drops == null and art.wetting().is_empty() and wet.multimesh.instance_count == 1,
+			_check(block == null and drops == null and art.wetting().is_empty() and wet.count() == 1,
 				"reduced: the watered soil is simply wet")
 		else:
 			_check(block != null and drops != null and drops.amount == UiTokens.MOTION_LIMIT_WATER_DROPS and art.wetting() == [cell],
