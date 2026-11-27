@@ -18,8 +18,9 @@ tools/android/run_test.sh com.sensen.journeycombatqa -- node path/to/scenario.mj
 tools/android/run_test.sh --clean-all
 ```
 
-The default target is `emulator-5560`; set `--serial`, `JOURNEY_SERIAL` or `DEV`
-for another authorized device. `ADB` selects the adb executable. The scenario
+The target is `--serial`, else `JOURNEY_SERIAL`, `DEV`, then the Run's own device
+(see below), else `emulator-5560`. `--device` picks the Run's physical device
+(`CARDIGAN_DEVICE_SERIAL`). `ADB` selects the adb executable. The scenario
 inherits `JOURNEY_SERIAL` and `JOURNEY_PACKAGE`. Build and install the APK before
 starting the session. Use one session for the entire multi-step test, rather
 than restarting the app for individual taps.
@@ -30,6 +31,38 @@ Cleanup failure makes an otherwise successful run fail. SIGKILL and host failure
 cannot run shell traps; the next session's pre-launch stop handles that residue.
 
 Verify runner behavior with `node --test tools/android/run_test.test.mjs`.
+
+## adb port and device serial in a Cardigan Run (C-212)
+
+A machine with per-Run adb slots gives each Run its own adb server and devices through these variables.
+The scripts read them and fall back to the old defaults when they are not set, so manual runs are unchanged:
+
+| Variable | Meaning |
+| --- | --- |
+| `ANDROID_ADB_SERVER_PORT` | the Run's adb server port (adb itself reads it too) |
+| `ANDROID_SERIAL` | the Run's device (adb itself uses it when no `-s` is given) |
+| `CARDIGAN_EMULATOR_SERIAL` | the Run's emulator, `emulator-<port>` |
+| `CARDIGAN_EMULATOR_PORT` | the console port to start that emulator on (`emulator -port …`) |
+| `CARDIGAN_DEVICE_SERIAL` | the physical device the Run holds |
+
+- adb port: `build_worker_apk.sh` uses `ANDROID_ADB_SERVER_PORT`, else **5137** (until the slots are on, the
+  workers' shared server); it refuses 5037 and anything that is not a port. `dynamic_farm/crash_repro.sh` takes
+  it as the `--port` default. `gather_qa_apk.sh` already passed it on with the same fallback. The scripts below run `adb`
+  without `-P` (`android_p0.sh` unless `ADB_PORT` is set), so adb uses the variable itself.
+- Serial, any device (`run_test.sh`, `tools/dev/online_android_qa.mjs`, `tools/p0/android_p0.sh`,
+  `--serial` default of `crash_repro.sh`): the script's own option or variable, then `ANDROID_SERIAL`,
+  `CARDIGAN_EMULATOR_SERIAL`, `CARDIGAN_DEVICE_SERIAL`, then the old default (`emulator-5560`, `emulator-5570` in
+  P0). `run_test.sh --device` takes `CARDIGAN_DEVICE_SERIAL` and fails when it is not set.
+- Serial, emulator only (`tools/dev/combat_emulator_qa.mjs`, `combat_latency_emulator_qa.mjs`,
+  `movement_emulator_qa.mjs`): `JOURNEY_SERIAL`, then `CARDIGAN_EMULATOR_SERIAL`, then `emulator-5560`.
+  `farm_pond_removal_android_qa.py` accepts any `emulator-*` session, no longer only `emulator-5580`.
+- Scenarios started by `run_test.sh` use the `JOURNEY_SERIAL` it exports, so they follow the same order.
+
+Scripts with their own private adb server and SDK for a laptop or gs66 (`pond_art_adb.sh`,
+`start_pond_art_emulator.sh`, `tools/dev/pond_art_godot.sh` on 5041; `tools/dev/basic_room/adb.sh` on 5061;
+`tools/p0/build_demo_apk.sh`, `play_aab.py` and `start_emulator.sh`) keep their ports: they never use 5137, and
+are not for Cardigan Runs. In a Run, start an emulator with `-port "$CARDIGAN_EMULATOR_PORT"` and never kill the
+Run's adb server yourself; the host closes it when the Run ends.
 
 Background CPU measurements and limitations are recorded in
 [`docs/qa/android-background-cpu-2026-09-15.md`](../../docs/qa/android-background-cpu-2026-09-15.md).
@@ -121,6 +154,9 @@ endpoint, and enable TCP mode again. This does not configure persistent/root
 settings or require changing the game or its data.
 
 ## Linux x86_64 emulator (gs66)
+
+A manual setup on gs66 with a fixed private port (5071) and emulator (`emulator-5594`); a Cardigan Run uses its own
+adb port and emulator instead (see "adb port and device serial" above).
 
 Verified on 2026-10-10 on gs66-ubuntu (SGODOT-276): Pixel_API_36, Android 16 x86_64, P0 QA package. Mapbox
 (Core Maps 11.29) and LiveKit load from `lib/x86_64`, the map renders, and the app reaches a local P0 server.
@@ -295,7 +331,8 @@ choose a production signing identity, install an app or authorize publication.
    The script stages committed game sources in a disposable project, generates
    one non-runnable, `package/signed=false` APK preset, prepares the Gradle template + native
    plugins, then imports and exports **release** serially in a fresh portable
-   editor. It fixes ADB to 5137, disables editor ADB shutdown and needs no
+   editor. It points ADB at `ANDROID_ADB_SERVER_PORT` (default 5137, see "adb port and device serial"
+   above), disables editor ADB shutdown and needs no
    device or emulator. Gradle may need to download build dependencies; there
    is no artifact upload step in the build script.
 

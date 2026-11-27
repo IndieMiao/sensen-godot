@@ -13,8 +13,9 @@ async function scenario(t,args,extra={}){
   const dir=await mkdtemp(path.join(tmpdir(),'sensen-android-runner-'));
   t.after(()=>rm(dir,{recursive:true,force:true}));
   const log=path.join(dir,'adb.jsonl');
-  const child=spawn('bash',[path.join(here,'run_test.sh'),...args],{
-    env:{...process.env,ADB:fake,FAKE_ADB_LOG:log,JOURNEY_SERIAL:'emulator-5560',...extra},stdio:['ignore','pipe','pipe']});
+  // An undefined value in extra removes that variable from the runner's environment.
+  const env=Object.fromEntries(Object.entries({...process.env,ADB:fake,FAKE_ADB_LOG:log,JOURNEY_SERIAL:'emulator-5560',...extra}).filter(([,v])=>v!==undefined));
+  const child=spawn('bash',[path.join(here,'run_test.sh'),...args],{env,stdio:['ignore','pipe','pipe']});
   let output='';child.stdout.on('data',s=>output+=s);child.stderr.on('data',s=>output+=s);
   const finished=new Promise((resolve,reject)=>{child.on('error',reject);child.on('exit',(code,signal)=>resolve({code,signal}));});
   t.after(()=>{if(child.exitCode===null&&child.signalCode===null)child.kill('SIGKILL');});
@@ -31,6 +32,33 @@ test('clean launch and normal completion preserve explicit arguments and device'
   assert.ok(rows.every(r=>r[0]==='-s'&&r[1]==='emulator-5558'));
   assert.ok(s.output().includes('com.sensen.test two words'));
   assert.ok(rows.findIndex(r=>r[4]==='force-stop')<rows.findIndex(r=>r[4]==='start'));
+});
+const hostSerials={JOURNEY_SERIAL:undefined,DEV:undefined,ANDROID_SERIAL:undefined,CARDIGAN_EMULATOR_SERIAL:undefined,CARDIGAN_DEVICE_SERIAL:undefined};
+for(const [name,set,expected] of [
+  ['an explicit JOURNEY_SERIAL wins over the host serials',{JOURNEY_SERIAL:'emulator-5558',ANDROID_SERIAL:'emulator-5600',CARDIGAN_EMULATOR_SERIAL:'emulator-5602'},'emulator-5558'],
+  ['DEV wins over the host serials',{DEV:'emulator-5562',ANDROID_SERIAL:'emulator-5600'},'emulator-5562'],
+  ['ANDROID_SERIAL comes before the Cardigan serials',{ANDROID_SERIAL:'emulator-5600',CARDIGAN_EMULATOR_SERIAL:'emulator-5602',CARDIGAN_DEVICE_SERIAL:'R5CT000'},'emulator-5600'],
+  ['CARDIGAN_EMULATOR_SERIAL comes before the device',{CARDIGAN_EMULATOR_SERIAL:'emulator-5602',CARDIGAN_DEVICE_SERIAL:'R5CT000'},'emulator-5602'],
+  ['CARDIGAN_DEVICE_SERIAL alone selects the device',{CARDIGAN_DEVICE_SERIAL:'R5CT000'},'R5CT000'],
+  ['without any serial the local default stays emulator-5560',{},'emulator-5560'],
+]){
+  test(`serial: ${name}`,async t=>{
+    const s=await scenario(t,command('console.log("ON",process.env.JOURNEY_SERIAL)'),{...hostSerials,...set});
+    assert.equal((await s.finished).code,0,s.output());
+    const rows=await s.rows();assert.ok(rows.length>0&&rows.every(r=>r[0]==='-s'&&r[1]===expected),JSON.stringify(rows));
+    assert.ok(s.output().includes(`ON ${expected}`),s.output());
+  });
+}
+test('--device selects CARDIGAN_DEVICE_SERIAL over every other serial and --serial still overrides it',async t=>{
+  const set={...hostSerials,JOURNEY_SERIAL:'emulator-5558',ANDROID_SERIAL:'emulator-5600',CARDIGAN_DEVICE_SERIAL:'R5CT000'};
+  for(const [args,expected] of [[['--device'],'R5CT000'],[['--device','--serial','emulator-5604'],'emulator-5604']]){
+    const s=await scenario(t,[...args,...command('process.exit(0)')],set);
+    assert.equal((await s.finished).code,0,s.output());
+    assert.ok((await s.rows()).every(r=>r[1]===expected));
+  }
+  const s=await scenario(t,['--device',...command('process.exit(0)')],{...hostSerials,ANDROID_SERIAL:'emulator-5600'});
+  assert.equal((await s.finished).code,2,s.output());assert.deepEqual(await s.rows(),[]);
+  assert.ok(s.output().includes('CARDIGAN_DEVICE_SERIAL is not set'));
 });
 test('test failure propagates its exit code and stops the app',async t=>{
   const s=await scenario(t,command('process.exit(17)'));
