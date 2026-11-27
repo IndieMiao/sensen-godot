@@ -1100,7 +1100,7 @@ func suspend() -> void:
 func _suspend_map(committing_preview: bool) -> void:
 	_suspended = true
 	_presentation_epoch += 1
-	if _travel != null and not committing_preview: _travel.reset() # a walk left for the background is called off
+	if _travel != null and not committing_preview: _travel.reset() # a walk (or its arrival) left for the background is called off
 	if _camera != null: _camera.stop()
 	get_viewport().transparent_bg = false
 	if _bridge != null: _bridge.set_map_occlusion_color(OCCLUSION_COLOR)
