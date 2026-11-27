@@ -208,6 +208,9 @@ func _top_bar() -> HBoxContainer:
 	title.name = "Title"
 	title.theme_type_variation = UiTokens.STYLE_TYPE_LABEL_ON_DARK
 	chip.detail_label().name = "City"
+	# Two lines trim with … by default, which leaves a label no width of its own: the room's two short lines show whole.
+	title.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+	chip.detail_label().text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	bar.add_child(chip)
 	return bar
 

@@ -64,6 +64,8 @@ const LOAD_LIMIT_S := 15.0
 const LOAD_FRAME_CAP_S := 0.25
 ## The top bar's second row, the one-line place bar (C-186, C-185 §3.1 B): its drawn height.
 const PLACE_ROW_H := float(UiTokens.SIZE_HUD_PLACE_H)
+## C-186: ‹ and the task button take 40 wide in the clay row (Ø36 discs, 44 high), so the row keeps in 360.
+const HUD_BUTTON_W := 40.0
 const PIN_ICON := preload("res://assets/ui/icons/lucide/map-pin.svg")
 
 var _args := {}
@@ -242,7 +244,7 @@ func _ready() -> void:
 		# C-107: the task button (C-H3), a clay disc since C-186, just before the coins.
 		_header.add_child(_farming.task_button)
 		_header.move_child(_farming.task_button, _coins_capsule.get_index())
-		UiClay.round_button(_farming.task_button)
+		UiClay.round_button(_farming.task_button, HUD_BUTTON_W)
 		_farming.tip_top = top_bar_bottom() + UiTokens.SPACE_S5
 		_farming.bar_bottom = top_bar_bottom()
 	# C-186 (C-185 §3.1 B, 6 item 1 by the owner's attachment-1820): the address alone; the cell counts were for us.
@@ -795,10 +797,11 @@ func _build_ui() -> void:
 	_header = HBoxContainer.new()
 	_header.name = "TopBar"
 	_header.theme = UiKit.theme()
-	_header.add_theme_constant_override(&"separation", UiTokens.SPACE_S3)
+	# C-186: the clay row (‹, avatar, Energy, tasks, coins) is 4 apart (S2) so it keeps inside a 360 screen (C-185 fig-03).
+	_header.add_theme_constant_override(&"separation", UiTokens.SPACE_S2)
 	_header.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	_header.offset_left = UiTokens.SIZE_SCREEN_EDGE - (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5
-	_header.offset_right = -UiTokens.SIZE_SCREEN_EDGE
+	_header.offset_left = UiTokens.SIZE_SCREEN_EDGE - (HUD_BUTTON_W - UiTokens.SIZE_HUD_CLAY_BUTTON) * 0.5
+	_header.offset_right = -UiTokens.SPACE_S4   # C-186: the coins capsule's clay edge 8 from the side
 	_header.offset_top = UiTokens.SIZE_SCREEN_SAFE_INSET + _safe_top()
 	_header.offset_bottom = _header.offset_top + UiTokens.SIZE_HUD_AVATAR_V3
 	_header.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -807,7 +810,7 @@ func _build_ui() -> void:
 	back.name = "Back"
 	back.tooltip_text = "Back"
 	back.pressed.connect(_request_back)
-	UiClay.round_button(back)   # C-186: a cream clay disc (C-185 §3.1 B)
+	UiClay.round_button(back, HUD_BUTTON_W)   # C-186: a cream clay disc (C-185 §3.1 B)
 	_header.add_child(back)
 	_avatar = UiHudAvatar.new()
 	_avatar.clay = true   # C-186: the cream clay rounded square, no empty ring (F-02)
@@ -826,17 +829,17 @@ func _build_ui() -> void:
 	_coins_capsule.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var coin_box := UiClay.face(UiTokens.SIZE_HUD_CLAY_RADIUS)
 	coin_box.content_margin_left = 2.0
-	coin_box.content_margin_right = 12.0
+	coin_box.content_margin_right = 10.0
 	coin_box.content_margin_top = 2.0
 	coin_box.content_margin_bottom = 2.0
 	_coins_capsule.add_theme_stylebox_override(&"panel", coin_box)
-	_coins_capsule.custom_minimum_size = Vector2(64, 32)
+	_coins_capsule.custom_minimum_size = Vector2(56, 32)
 	_coins_capsule.visible = false
 	var coin_row := HBoxContainer.new()
 	coin_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	coin_row.add_theme_constant_override(&"separation", UiTokens.SPACE_S2)
 	_coins_capsule.add_child(coin_row)
-	_coins_icon = UiKit.icon(UiArt.COIN, 28.0)
+	_coins_icon = UiKit.icon(UiArt.COIN, 26.0)
 	_coins_icon.name = "Coin"
 	_coins_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	coin_row.add_child(_coins_icon)

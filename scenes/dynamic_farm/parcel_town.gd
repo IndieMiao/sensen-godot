@@ -529,7 +529,7 @@ func buy(item: String, count: int) -> Dictionary:
 	var result := await _send({"type": "buy", "item": item, "count": count})
 	if result.get("ok", false):
 		if counter != null and is_instance_valid(counter): counter.roll_coins(before)
-		toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(item), count], ToastLayer.Severity.SUCCESS)
+		toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(item), count], ToastLayer.Severity.SUCCESS, "", 0.0, ParcelItems.icon_of(item))
 	return result
 
 ## C-181: the economy's blueprints with a price in coins this farm has not bought yet, in the rules' order.
@@ -568,7 +568,7 @@ func claim_seed_aid() -> Dictionary:
 	_adopt(result)
 	if not result.get("ok", false): return result
 	aid_given = {"item": aid.item, "amount": int(aid.amount)}
-	toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(str(aid.item)), int(aid.amount)], ToastLayer.Severity.SUCCESS)
+	toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(str(aid.item)), int(aid.amount)], ToastLayer.Severity.SUCCESS, "", 0.0, ParcelItems.icon_of(str(aid.item)))
 	if card != null and is_instance_valid(card): _greet()
 	return result
 
@@ -578,7 +578,7 @@ func claim_blueprint(id := BLUEPRINT) -> Dictionary:
 	var rule: Dictionary = ParcelFarm.rules().economy.blueprints[id]
 	var result := await _send({"type": "claim_blueprint", "blueprint": id})
 	if result.get("ok", false):
-		toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(str(rule.item)), int(rule.amount)], ToastLayer.Severity.SUCCESS)
+		toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(str(rule.item)), int(rule.amount)], ToastLayer.Severity.SUCCESS, "", 0.0, ParcelItems.icon_of(str(rule.item)))
 	_greet()
 	return result
 

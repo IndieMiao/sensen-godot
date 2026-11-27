@@ -132,8 +132,8 @@ func _build_clay() -> void:
 		link.name = "Link%d" % k
 		link.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		link.add_theme_stylebox_override(&"panel", UiClay.face(2.0))
-		link.size = Vector2(UiTokens.SPACE_S3 + 6.0, 6.0)
-		link.position = Vector2(-UiTokens.SPACE_S3 - 3.0, margin_y() + 9.0 + 16.0 * k)
+		link.size = Vector2(UiTokens.SPACE_S2 + 8.0, 6.0)
+		link.position = Vector2(-UiTokens.SPACE_S2 - 4.0, margin_y() + 9.0 + 16.0 * k)
 		add_child(link)
 	var bg := Panel.new()
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
