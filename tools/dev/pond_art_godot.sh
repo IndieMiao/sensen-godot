@@ -4,4 +4,5 @@
 set -euo pipefail
 export ADB_SERVER_SOCKET="tcp:localhost:${POND_ADB_PORT:-5041}"
 export ANDROID_ADB_SERVER_PORT="${POND_ADB_PORT:-5041}"
+python3 -I "$(dirname "$0")/../godot_keep_adb_settings.py" "${GODOT_BIN:-godot}"  # C-210
 exec "${GODOT_BIN:-godot}" "$@"

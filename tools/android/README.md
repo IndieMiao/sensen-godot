@@ -34,6 +34,40 @@ Verify runner behavior with `node --test tools/android/run_test.test.mjs`.
 Background CPU measurements and limitations are recorded in
 [`docs/qa/android-background-cpu-2026-09-15.md`](../../docs/qa/android-background-cpu-2026-09-15.md).
 
+## Godot editor runs and the shared adb server (C-210)
+
+Godot's editor setting `export/android/shutdown_adb_on_exit` defaults to `true`. Every editor-mode
+run (`--import`, `--export-*`, `--editor`; an iOS export too) of a project with a runnable Android
+preset then ends with `adb kill-server`. Its adb is `$ANDROID_HOME/platform-tools/adb` unless the
+settings name another SDK, and it honours `ANDROID_ADB_SERVER_PORT`, so on the Cardigan workers it
+stops the shared server on **5137** (on mac-mini that drops the owner's tablet and every session's
+emulator). The hosts set the key to `false` in the account's settings, but a run under a private
+`HOME` reads other settings (on Linux also a private `XDG_CONFIG_HOME`; macOS reads
+`$HOME/Library/Application Support/Godot` whatever `XDG_*` says), where the default applies.
+Script-mode runs (`--script`, running a scene, gdUnit, `tools/ci/dynamic_farm_tests.sh`) open no
+editor settings and never call adb.
+
+Before an editor-mode run, with the same environment and Godot binary, run
+
+```sh
+python3 -I tools/godot_keep_adb_settings.py "$GODOT_BIN"   # default: $GODOT_BIN, else godot on PATH
+```
+
+It sets the key to `false` in the settings that Godot will read when they are private (creating
+them if needed), and never writes the account's own settings or a self-contained Godot's; there it
+only prints a note when the key is not `false`. Do this for any manual `HOME=... godot --import`
+or export as well. Repository scripts already do it:
+
+- `tools/run_tests.sh` (`--ci-import` and the local import), `tools/dev/pond_art_godot.sh` (so
+  `open_pond_art.command`), `tools/dev/open_basic_room.sh`, `tools/dev/open_landmark_art.command`,
+  `tools/dev/run_journey.mjs` (the `open_*.command` playtests), `tools/ios/setup_ios_g3.sh`;
+- `tools/android/build_worker_apk.sh` and `tools/dev/dynamic_farm/gather_qa_apk.sh` run a portable
+  editor copy whose own settings say `false`; `tools/p0/build_demo_apk.sh`, `android_p0.sh` and
+  `play_aab.py` do the same through `tools/p0/godot_keep_adb.sh`.
+
+Tests: `python3 -m unittest tools/test_godot_keep_adb_settings.py` (its last case runs the real
+Godot against a stub adb: without the helper the import calls `kill-server`, with it it does not).
+
 ## Test build version
 
 Android test builds take `version/name` and `version/code` from the `Android`
@@ -109,8 +143,9 @@ adb -P 5071 -s emulator-5594 shell settings put secure immersive_mode_confirmati
 ```
 
 Record the qemu PID. Stop the emulator with `adb -P 5071 -s emulator-5594 emu kill` (its data is kept), then
-`adb -P 5071 kill-server`. Godot's Android export stops "its" adb server on exit, so restart the private one
-after every export, with `ADB_LOCAL_TRANSPORT_MAX_PORT=5553` set again.
+`adb -P 5071 kill-server`. Godot's Android export stops "its" adb server on exit unless its editor settings say
+otherwise (see "Godot editor runs and the shared adb server" above); if it did, restart the private one with
+`ADB_LOCAL_TRANSPORT_MAX_PORT=5553` set again.
 
 **QA package.** The P0 presets build arm64 only. For the emulator, export `Android P0` with `x86_64` turned on
 in a temporary copy of `export_presets.cfg`, and restore the file afterwards, as `tools/p0/build_demo_apk.sh`
