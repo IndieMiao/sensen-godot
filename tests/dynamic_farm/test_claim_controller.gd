@@ -326,9 +326,9 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 		[claimed.merged({"buildings": [coop], "bag": {"crop_carrot": 1}}, true), page.PICK_HOME],
 		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"egg": 1}}, true), "Tap Washington Square to sell your egg."],
 		[claimed.merged({"buildings": [coop], "drop_seq": 1}, true), "Enter my farm and gather Timber and Stone."],
-		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4}, "coins": 35}, true), "Enter my farm and grow carrots to sell."],
-		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4, "crop_carrot": 2}, "coins": 35}, true), "Tap Washington Square to sell carrots and eggs."],
-		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4}, "coins": 40}, true), "Tap Washington Square to upgrade your farm."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4}, "coins": 95}, true), "Enter my farm and grow carrots to sell."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4, "crop_carrot": 2}, "coins": 95}, true), "Tap Washington Square to sell carrots and eggs."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4}, "coins": 100}, true), "Tap Washington Square to upgrade your farm."],
 		[claimed.merged({"buildings": [coop], "drop_seq": 1, "level": 2}, true), page.PICK_HOME]]
 	for row: Array in lines:
 		var save: Dictionary = carrot.duplicate(true)
