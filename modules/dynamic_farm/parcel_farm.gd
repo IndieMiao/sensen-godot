@@ -48,6 +48,8 @@ extends RefCounted
 ## footprint that are not the building's, rects [x, z, width, depth] in its own unturned frame (as `livestock.spots`:
 ## origin at the rear-left corner, z toward the entry), turning with it. A building placed keeps a copy (`cutouts`, as it
 ## keeps its width and depth); other buildings, tilling and crops may use those cells.
+## C-209: a building placed before its type had cutouts (C-192's 8×6 barn) is taken down when the save is read, its
+## blueprint, materials and drops given back (`retire_draft_buildings`); no save field is added.
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
 const STATE_VERSION := 1
 const MAX_COORD := 1024
@@ -752,11 +754,13 @@ static func settle_board(rule_set: Dictionary, state: Dictionary, now: int) -> v
 		if i < int(q.slots) or b.slots[i].req != null: kept.append(b.slots[i])
 	b.slots = kept
 
-## The farm as the server reads it out (routes farmView): a copy with the board settled to `now`.
+## The farm as the server reads it out (routes farmView): a copy with the board settled to `now` and a building from
+## before its type's cutouts taken down (C-209).
 static func view(rule_set: Dictionary, state: Dictionary, now: int) -> Dictionary:
 	var out := state.duplicate(true)
 	if not out.has("board"): out.board = empty_board()
 	if not out.has("requests_done"): out.requests_done = 0
+	retire_draft_buildings(rule_set, out)
 	settle_board(rule_set, out, now)
 	return out
 
@@ -858,6 +862,32 @@ static func grant(rule_set: Dictionary, state: Dictionary, now: int) -> Variant:
 		next.grants[id] = now
 	return {"state": next, "gift": gift} if not gift.is_empty() else null
 
+## C-209 (server farm.ts retireDraftBuildings): a building placed before its type had `cutouts` (C-192's 8×6 barn) would
+## show the new model over its neighbours, so it is taken down when the save is read and the player places it anew: its
+## blueprint and the rules' materials (what placing it again takes) go back into the bag, its animals go with it (a new
+## one has the rules'), and its drops, laid or not, go into the bag as their product. `drop_seq` stays. Changes `state`
+## in place (a copy with `buildings` and `drops`); true when one was taken down.
+static func retire_draft_buildings(rule_set: Dictionary, state: Dictionary) -> bool:
+	var gone := {}
+	for b: Dictionary in buildings_of(state):
+		var rule = rule_set.get("buildings", {}).get(str(b.type))
+		if rule is Dictionary and not cutouts_of(rule).is_empty() and cutouts_of(b).is_empty(): gone[int(b.id)] = rule
+	if gone.is_empty(): return false
+	for id: int in gone:
+		var back := {gone[id].blueprint: 1}
+		back.merge(gone[id].get("materials", {}))
+		for item: String in back: state.bag[item] = int(state.bag.get(item, 0)) + int(back[item])
+	for d: Dictionary in state.get("drops", []):
+		if gone.has(int(d.building)): state.bag[d.item] = int(state.bag.get(d.item, 0)) + int(d.amount)
+	state.drops = state.get("drops", []).filter(func(d: Dictionary): return not gone.has(int(d.building)))
+	state.buildings = buildings_of(state).filter(func(b: Dictionary): return not gone.has(int(b.id)))
+	state.house = home_of(state.buildings)
+	return true
+
+## A rules entry's or a saved building's `cutouts` (C-202), [] without.
+static func cutouts_of(entry: Dictionary) -> Array:
+	return entry.get("cutouts", []) if entry.get("cutouts") is Array else []
+
 ## A footprint's size: `base` is width × depth unturned; a quarter or three-quarter turn swaps them.
 static func turned(base: Vector2i, rotation: int) -> Vector2i:
 	return Vector2i(base.y, base.x) if rotation % 2 else base
@@ -924,6 +954,7 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 		if not next.has(field): next[field] = blank[field]
 	next.level = farm_level(next)
 	next.buildings = buildings_of(next).duplicate(true)
+	retire_draft_buildings(rule_set, next)
 	settle_energy(rule_set, next, now)
 	settle_board(rule_set, next, now)   # C-191: before the first command and again after the batch
 	for index in commands.size():

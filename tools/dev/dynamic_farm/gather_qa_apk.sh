@@ -91,12 +91,14 @@ for key in ('network/base_url', 'network/mobile_base_url'):
     one(rf'^{key}="[^"]+"$', f'{key}="http://127.0.0.1:9"')
 path.write_text(text)
 PY
+# Not runnable (C-210): an editor with a runnable Android preset polls `adb devices`, which starts the
+# shared adb server under this staging HOME (wrong keys, devices unauthorized) whenever it is down.
 cat > "$p/export_presets.cfg" <<CFG
 [preset.0]
 
 name="Android QA"
 platform="Android"
-runnable=true
+runnable=false
 advanced_options=false
 dedicated_server=false
 custom_features=""

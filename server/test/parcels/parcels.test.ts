@@ -289,6 +289,28 @@ for (const [name, enabled, makeStores] of makers) {
       expect((await enter(app, ada)).json()).toMatchObject({ gift: {}, parcel: { farm_version: 4, farm: { bag: { hoe_starter: 1, seed_carrot: 2, pail: 1 } } } });
     });
 
+    it('C-209 an 8×6 barn built before its cutout reads as taken down and given back; the next entry writes that once; the 11×6 goes down where it stood', async () => {
+      // Built and fed under C-192's rules (8×6, no cutout); the materials and carrots come as a one-off grant there.
+      const { cutouts: _cutouts, ...barn } = rules.buildings.barn;
+      const old = await appFor(stores, { rules: { ...rules, buildings: { ...rules.buildings, barn: { ...barn, width: 8 } },
+        grants: { ...rules.grants, c192: { blueprint_barn: 1, wood: 20, stone: 10, crop_carrot: 2 } } } });
+      const ada = await account(old, 'Ada');
+      await claim(old, ada, A);
+      await enter(old, ada);
+      expect((await command(old, ada, 1, [{ type: 'place_building', building: 'barn', x: 20, y: 20, rotation: 0 }, { type: 'feed', building: 1 }])).statusCode).toBe(200);
+      expect((await mine(old, ada)).farm).toMatchObject({ buildings: [{ type: 'barn', width: 8 }], drops: [{ id: 1, item: 'milk' }] });
+      await old.close();
+      const read = await mine(app, ada);
+      expect(read).toMatchObject({ farm_version: 2, farm: { buildings: [], drops: [], drop_seq: 1, bag: { ...FIRST_BAG, blueprint_barn: 1, wood: 20, stone: 10, milk: 1 } } });
+      const results = await Promise.all(Array.from({ length: 4 }, () => enter(app, ada)));
+      expect(results.map(r => [r.json().gift, r.json().parcel.farm.bag])).toEqual(Array(4).fill([{}, read.farm.bag]));
+      expect(await mine(app, ada)).toEqual({ ...read, farm_version: 3 });
+      const placed = await command(app, ada, 3, [{ type: 'place_building', building: 'barn', x: 20, y: 20, rotation: 0 }]);
+      expect(placed.json().parcel).toMatchObject({ farm_version: 4, farm: { buildings: [{ id: 1, type: 'barn', width: 11, cutouts: [[0, 0, 2, 2]] }],
+        bag: { ...FIRST_BAG, milk: 1 } } });
+      expect((await enter(app, ada)).json().parcel.farm_version).toBe(4);
+    });
+
     it('C-136 an r4 claim entered by an r6 client moves to r6 once: cells cleared, crops back as seeds, house back as its blueprint', async () => {
       const ada = await account(app, 'Ada');
       const before = await r4Farm(app, ada);

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONTENT_DIR } from '../../src/domain/content.js';
 import { applyFarmCommands, emptyFarm, grant, MAX_BATCH, MAX_BUY_COUNT, MAX_COINS, MAX_SELL_COUNT, NEVER, parseCell, parseFarmCommands, rebaseFarm,
-  welcome, withEconomy, type FarmCommand, type ParcelFarmState } from '../../src/parcels/farm.js';
+  retireDraftBuildings, welcome, withEconomy, type FarmCommand, type ParcelFarmState } from '../../src/parcels/farm.js';
 import { maxEnergy } from '../../src/parcels/energy.js';
 import { emptyBoard } from '../../src/parcels/requests.js';
 import { buildingMax, communityOf, isNewerDataset, loadParcelRules, nextFarmLevel, parseParcelRules } from '../../src/parcels/rules.js';
@@ -1165,6 +1165,68 @@ describe('sheep pen, wool and its unlock (C-182)', () => {
     expect(moved.drops).toEqual([]);
     expect(moved.bag).toMatchObject({ wool: 1, wild_herb: 6, blueprint_sheep_pen: 1, wood: 5, stone: 3 });
     expect(moved.blueprints_claimed.sheep_pen).toBe(T0);
+  });
+});
+
+/**
+ * C-209：SEN-C-192 时期盖下的 8×6 牛棚（存档里没有 cutouts）读档时拆掉，蓝图、材料和它的奶（下没下都算）进背包，按新占地重新摆。
+ * 旧存档用当时的规则（8×6、没有缺口）真的盖、真的喂出来。
+ */
+describe('an old 8×6 barn from before its cutout is taken down and given back (C-209)', () => {
+  const { cutouts: _cutouts, ...barn } = rules.buildings.barn;
+  const c192 = { ...rules, buildings: { ...rules.buildings, barn: { ...barn, width: 8 } } };
+  const LAY = 900_000;
+  /** C-192 的规则下：小屋、井、8×6 牛棚（id 3），喂过两次，一份奶已经下了、一份还没下；背包里剩 4 木材、4 石头、2 根胡萝卜。 */
+  const old = (): ParcelFarmState => {
+    const s = grant(rules, welcomed(), T0)!.state;
+    s.coins = 650;
+    s.level = 2;
+    s.bag = { ...s.bag, wood: 24, stone: 14, crop_carrot: 6 };
+    const built = applyFarmCommands(c192, s, [{ type: 'place_house', x: 2, y: 2 }, { type: 'place_building', building: 'well', ...WELL_AT, rotation: 0 },
+      { type: 'claim_blueprint', blueprint: 'barn' }, { type: 'place_building', building: 'barn', x: 20, y: 20, rotation: 0 }, { type: 'feed', building: 3 }], T0);
+    if (!built.ok) throw new Error(built.code);
+    const fed = applyFarmCommands(c192, built.state, [{ type: 'feed', building: 3 }], T0 + LAY);
+    if (!fed.ok) throw new Error(fed.code);
+    expect(fed.state.buildings[2]).toMatchObject({ type: 'barn', width: 8, depth: 6 });
+    expect(fed.state.buildings[2].cutouts).toBeUndefined();
+    return fed.state;
+  };
+
+  it('takes the barn down: its blueprint, 20 Timber and 10 Stone back, both milks (laid or not) in the bag; the rest stays', () => {
+    const saved = old();
+    const frozen = structuredClone(saved);
+    const s = withEconomy(saved);
+    expect(retireDraftBuildings(rules, s)).toBe(true);
+    expect(s.buildings.map(b => b.type)).toEqual(['cottage', 'well']);
+    expect(s.house).toEqual(frozen.house);
+    expect(s.drops).toEqual([]);
+    expect(s.drop_seq).toBe(2);
+    expect(s.bag).toEqual({ ...frozen.bag, blueprint_barn: 1, wood: 24, stone: 14, milk: 2 });
+    expect({ ...s, buildings: frozen.buildings, drops: frozen.drops, bag: frozen.bag }).toEqual(withEconomy(frozen));
+    expect(saved).toEqual(frozen);
+    // Once only: the save as written back has nothing more to take down.
+    expect(retireDraftBuildings(rules, s)).toBe(false);
+  });
+
+  it('every command batch sees it gone first: the 11×6 goes down where it stood and its cows eat; the old milk is not on the ground', () => {
+    const s = run(old(), [{ type: 'place_building', building: 'barn', x: 20, y: 20, rotation: 1 }, { type: 'feed', building: 3 }], T0 + LAY);
+    expect(s.buildings[2]).toMatchObject({ id: 3, type: 'barn', width: 11, depth: 6, rotation: 1, cutouts: [[0, 0, 2, 2]], animals: ['cow', 'cow'] });
+    expect(s.drops).toEqual([expect.objectContaining({ id: 3, building: 3, animal: 0 })]);
+    expect(s.bag).toMatchObject({ wood: 4, stone: 4, milk: 2 });
+    expect(s.bag.crop_carrot).toBeUndefined();
+    expect(applyFarmCommands(rules, old(), [{ type: 'pick_up', drop: 1 }], T0 + LAY)).toEqual({ ok: false, index: 0, code: 'NO_DROP', detail: { drop: 1 } });
+  });
+
+  it('leaves alone a barn placed with its cutout, every other type, and everything under rules without cutouts', () => {
+    const s = withEconomy(old());
+    const kept = structuredClone(s);
+    expect(retireDraftBuildings(c192, s)).toBe(false);
+    expect(s).toEqual(kept);
+    expect(retireDraftBuildings(rules, s)).toBe(true);
+    const placed = run(s, [{ type: 'place_building', building: 'barn', x: 20, y: 20, rotation: 0 }]);
+    const again = structuredClone(placed);
+    expect(retireDraftBuildings(rules, placed)).toBe(false);
+    expect(placed).toEqual(again);
   });
 });
 

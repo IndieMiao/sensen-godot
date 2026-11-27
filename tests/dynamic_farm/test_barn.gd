@@ -6,6 +6,7 @@ extends SceneTree
 ## keep to the open floor and step away from the player, milk given while away lies there, milk due appears, a laid one is reported in reach.
 ## C-202: SEN-C-179's final yard (cow_barn.tscn): 11×6 less the rear-left 2×2 (the rules' `cutouts`, free for anything
 ## else), the gate x 5–7 of the front, the trough left of it filled from its right end, its parts where the scene puts them.
+## C-209: a C-192 8×6 barn (no cutouts) in an old save is taken down and given back when read, as the server reads it.
 ##   godot --headless --path "$QA" --script res://tests/dynamic_farm/test_barn.gd
 const Data = preload("res://modules/dynamic_farm/farm_data.gd")
 const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
@@ -17,6 +18,7 @@ const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
 const Space = preload("res://modules/dynamic_farm/parcel_space.gd")
 const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
 const Shade = preload("res://modules/dynamic_farm/farm_shade.gd")
+const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const T0 := 1795406400000
 const BODY := 0.3
 const BASE := Vector2i(11, 6)
@@ -39,6 +41,7 @@ func _run() -> void:
 	_rules()
 	_cases()
 	_saves()
+	_draft_barn()
 	_layout()
 	_walls()
 	_entry()
@@ -141,6 +144,55 @@ func _saves() -> void:
 	richer.coins = 610
 	var bought := ParcelFarm.apply(rules, richer, [{"type": "claim_blueprint", "blueprint": "barn"}], T0)
 	_check(bought.ok and bought.state.coins == 10 and bought.state.bag.blueprint_barn == 1, "saves: at level 2 Scott sells it the barn blueprint")
+
+## C-209: a C-192 8×6 barn (no cutouts) reads as taken down, as the server reads it (routes farmView): its blueprint,
+## 20 Timber and 10 Stone and both milks (laid or not) in the bag, the coop and its egg left; the local store's entry
+## writes that once; the 11×6 then goes down where it stood. A barn placed with its cutout stays.
+func _draft_barn() -> void:
+	var rules := ParcelFarm.rules()
+	var old := {"v": 1, "buildings": [
+		{"id": 1, "type": "cottage", "model": "cottage", "x": 2, "y": 2, "width": 3, "depth": 3, "rotation": 0, "built_at": T0},
+		{"id": 2, "type": "barn", "model": "cow_barn", "x": 20, "y": 20, "width": 8, "depth": 6, "rotation": 0, "built_at": T0, "animals": ["cow", "cow"]},
+		{"id": 3, "type": "coop", "model": "chicken_yard", "x": 6, "y": 10, "width": 7, "depth": 5, "rotation": 0, "built_at": T0,
+			"animals": ["hen_white", "hen_brown", "hen_white"]}],
+		"house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {"crop_carrot": 2, "wood": 4, "stone": 2}, "welcomed_at": T0, "coins": 40,
+		"sales": 2, "gathered": {}, "blueprints_claimed": {"barn": T0}, "grants": {"watering": T0}, "level": 2, "drop_seq": 6, "drops": [
+		{"id": 4, "item": "milk", "amount": 1, "building": 2, "animal": 0, "spot": 1, "ready_at": T0 - 1000},
+		{"id": 5, "item": "milk", "amount": 1, "building": 2, "animal": 1, "spot": 3, "ready_at": T0 + 600000},
+		{"id": 6, "item": "egg", "amount": 1, "building": 3, "animal": 0, "spot": 2, "ready_at": T0}]}
+	var read := ParcelFarm.normalize(old)
+	var frozen := JSON.stringify(read, "", true)
+	var seen := ParcelFarm.view(rules, read, T0)
+	_check(seen.buildings.map(func(b): return b.type) == ["cottage", "coop"] and seen.house == read.house,
+		"draft barn: read with the old 8×6 barn taken down, the cottage and the coop standing")
+	_check(seen.bag == {"crop_carrot": 2, "wood": 24, "stone": 12, "blueprint_barn": 1, "milk": 2},
+		"draft barn: its blueprint, 20 Timber, 10 Stone and both milks (laid or on its way) in the bag")
+	_check(seen.drops.map(func(d): return d.id) == [6] and seen.drop_seq == 6, "draft barn: the coop's egg stays, drop ids go on")
+	_check(JSON.stringify(read, "", true) == frozen, "draft barn: reading does not change the save")
+	var placed := ParcelFarm.apply(rules, read, [{"type": "place_building", "building": "barn", "x": 20, "y": 20, "rotation": 0},
+		{"type": "feed", "building": 4}], T0)
+	_check(placed.ok and placed.state.buildings[2].width == 11 and placed.state.buildings[2].cutouts == CUT
+		and placed.state.buildings[2].animals == ["cow", "cow"] and placed.state.bag.get("wood") == 4 and placed.state.bag.get("stone") == 2
+		and placed.state.bag.get("milk") == 2 and placed.state.drops.size() == 2 and placed.state.drops[1].building == 4,
+		"draft barn: the 11×6 goes down where it stood with the Timber and Stone given back, and its cows eat")
+	var gone := ParcelFarm.apply(rules, read, [{"type": "pick_up", "drop": 4}], T0)
+	_check(not gone.ok and gone.code == "NO_DROP", "draft barn: its milk is in the bag, not on the ground")
+	var cut := read.duplicate(true)
+	cut.buildings[1].width = 11
+	cut.buildings[1].cutouts = CUT
+	var kept := ParcelFarm.view(rules, cut, T0)
+	_check(kept.buildings.size() == 3 and kept.drops.size() == 3 and kept.bag == read.bag, "draft barn: a barn placed with its cutout stays")
+	var dir := "user://test_barn_%d" % Time.get_ticks_usec()
+	var store := LocalStore.new("p-D", dir)
+	store.now_ms = func() -> int: return T0
+	store._save(read, 5)
+	var entered := store.enter()
+	_check(entered.ok and not entered.granted and entered.gift.is_empty() and entered.farm_version == 6 and entered.farm.bag == seen.bag
+		and entered.farm.buildings.size() == 2, "draft barn: the local store's entry writes it taken down")
+	var twice := store.enter()
+	_check(twice.farm_version == 6 and twice.farm.bag == seen.bag and store.read().farm.bag == seen.bag, "draft barn: given back once only")
+	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
+	DirAccess.remove_absolute(dir)
 
 ## The art file: the fence leaves the entry open and runs round the cutout; walls are the runs and the parts; the
 ## feeder and milk spots inside.

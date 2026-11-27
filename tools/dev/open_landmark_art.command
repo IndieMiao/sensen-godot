@@ -1,6 +1,7 @@
 #!/bin/zsh
 set -eu
 cd "${0:A:h}/../.."
+python3 -I tools/godot_keep_adb_settings.py godot  # the editor import below keeps the shared adb server (C-210)
 godot --headless --path . --script tools/dev/prepare_landmark_preview.gd > /tmp/sensen-landmark-prepare.log 2>&1
 preview_folder="output/griffith-rebuild-2026-09-23/project"
 preset_file="$preview_folder/export_presets.cfg"

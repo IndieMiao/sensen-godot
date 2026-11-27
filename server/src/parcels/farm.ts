@@ -53,6 +53,9 @@
  *
  * 种子兜底（C-197，见 seed_aid.ts）：没钱、没种子、没作物时，在 Jasmine 那里 claim_seed_aid，每个玩家日送一次种子；
  * seed_aid_day 记最近一次送的玩家日，也是 v1 上追加的字段：旧存档没有时按没送过读。换数据集不动它。
+ *
+ * 旧牛棚（C-209）：C-202 之前盖的 8×6 牛棚（存档里没有 cutouts）读档时拆掉，蓝图、材料和它的奶退进背包，玩家按新占地重新摆
+ * （见 retireDraftBuildings）。不加字段，版本号不变。
  */
 import { dayKey, energyCost, maxEnergy, nextRollover, nextTickIn, settleEnergy, spendEnergy, type EnergyState } from './energy.js';
 import { boardOf, emptyBoard, requestCommand, settleBoard, type BoardState } from './requests.js';
@@ -301,6 +304,29 @@ export function rebaseFarm(rules: ParcelRules, state: ParcelFarmState, now: numb
   return s;
 }
 
+/**
+ * C-209：C-202 之前盖下的建筑，规则里这一类现在写了缺口、它自己没有（SEN-C-192 时期 8×6 的牛棚），按现在的规则会画成新模型、
+ * 伸到旁边的地和建筑上。读档时拆掉它，东西退给玩家，玩家按新占地重新摆：退一张它的蓝图和盖它要的材料（按现在的规则，重新盖正好够）；
+ * 它的动物跟着拆掉，重新盖时照规则带上；它地上的掉落物不论下没下都按产物进背包，喂过的不白喂。掉落物编号不回退。
+ * 读档、命令、进入都先过一遍（结果不随时间变，读出来的就是写回去的）；就地修改 s（withEconomy 之后的副本），拆了返回 true。
+ */
+export function retireDraftBuildings(rules: ParcelRules, s: ParcelFarmState): boolean {
+  const draft = (b: BuildingState): boolean => Object.hasOwn(rules.buildings, b.type) && Boolean(rules.buildings[b.type].cutouts?.length)
+    && !b.cutouts?.length;
+  const gone = s.buildings.filter(draft);
+  if (!gone.length) return false;
+  for (const b of gone) {
+    const rule = rules.buildings[b.type];
+    for (const [item, n] of Object.entries({ [rule.blueprint]: 1, ...rule.materials })) s.bag[item] = (s.bag[item] ?? 0) + n;
+    for (const d of s.drops.filter(x => x.building === b.id)) s.bag[d.item] = (s.bag[d.item] ?? 0) + d.amount;
+  }
+  const ids = new Set(gone.map(b => b.id));
+  s.drops = s.drops.filter(d => !ids.has(d.building));
+  s.buildings = s.buildings.filter(b => !ids.has(b.id));
+  s.house = homeOf(s.buildings);
+  return true;
+}
+
 const coord = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 0 && (v as number) < MAX_COORD;
 
 /** "x,y" 的规范写法（无前导零、无空格）才收，避免同一格两种写法各占一行。 */
@@ -436,6 +462,7 @@ function overlapped(s: ParcelFarmState, cells: string[]): string[] {
  */
 export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, commands: FarmCommand[], now: number, ctx?: FarmContext): FarmOutcome {
   const s = withEconomy(state);
+  retireDraftBuildings(rules, s);
   const eco = rules.economy;
   settleEnergy(rules, s, now);
   settleBoard(rules, s, now);
