@@ -1,7 +1,7 @@
 /**
  * 驿站委托板（C-191，0.4.6）：照搬 P0 系统委托板。抽单、交单（扣物品、加金币）、交完补位、放弃后补位、过期换单、
- * 每天 6 单和完成奖 100 的上限；物品不够时不能交，存档不变；累计单数存档。数值是作者默认值（SEN-C-191#6），
- * 最终以 SEN-C-189 评审为准。
+ * 每天 6 单和完成奖 100 的上限；物品不够时不能交，存档不变；累计单数存档。报酬和每单件数按所有者 SEN-Q-281
+ * （采纳 SEN-C-189 第 4.1 节，C-197）：售价 × 件数 + 完成奖，件数和完成奖按物品、按农场 3 级及以下 / 4 级起分档。
  */
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -42,22 +42,37 @@ const stocked = (s: ParcelFarmState, ...slots: number[]): ParcelFarmState => {
   return out;
 };
 const deliver = (id: number): FarmCommand => ({ type: 'deliver_request', request: id });
+/** SEN-Q-281 的分档：物品 → [3 级及以下件数, 4 级起件数, 完成奖]。 */
+const Q281: Record<string, [[number, number], [number, number], number]> = {
+  crop_carrot: [[3, 5], [5, 8], 10], wood: [[4, 6], [6, 10], 10], stone: [[4, 6], [6, 10], 10],
+  egg: [[2, 3], [3, 5], 20], milk: [[1, 2], [2, 3], 20], wool: [[1, 2], [2, 3], 20],
+};
+/** 这件物品在 level 级时一单的件数范围和完成奖。 */
+const band = (item: string, level: number): [number, number, number] => {
+  const [low, high, bonus] = Q281[item];
+  return [...(level >= 4 ? high : low), bonus];
+};
 /** 盖好的鸡场（建筑 2），出鸡蛋单要它。 */
 const withCoop = (s: ParcelFarmState): ParcelFarmState =>
   ({ ...structuredClone(s), buildings: [...s.buildings, { id: 2, type: 'coop', model: 'chicken_yard', x: 10, y: 10, width: 7, depth: 5, rotation: 0, built_at: T0, animals: ['hen_white'] }] });
 
 describe('dynamic_farm.json requests (C-191)', () => {
-  it('ships the author defaults awaiting the owner: 2 slots, at once / 8 h / 72 h, 6 a day, bonus 100, floor 80%, P0 tiers', () => {
+  it('ships SEN-Q-281: 2 slots, at once / 8 h / 72 h, 6 a day, bonus 100 a day, Jasmine\'s price × count + bonus, count by item', () => {
+    const tiers = ([low, high, bonus]: (typeof Q281)[string]) => [{ level: 1, qty: low, bonus }, { level: 4, qty: high, bonus }];
     expect(rules.requests).toEqual({
       slots: 2, done_refill_seconds: 0, drop_refill_seconds: 8 * 3600, expire_seconds: 72 * 3600, daily_max: 6, daily_bonus_max: 100,
-      floor_percent: 80,
-      tiers: [{ level: 1, qty: [2, 3], bonus: 10 }, { level: 4, qty: [4, 6], bonus: 20 }, { level: 7, qty: [6, 10], bonus: 40 }],
+      floor_percent: 100,
+      tiers: tiers(Q281.crop_carrot),
+      item_tiers: Object.fromEntries(Object.entries(Q281).map(([item, b]) => [item, tiers(b)])),
       templates: { fresh_greens: { item: 'crop_carrot' }, timber_run: { item: 'wood' }, stone_order: { item: 'stone' },
         egg_basket: { item: 'egg', building: 'coop' } },
     });
-    // 地板价 = Jasmine 的售价 × 80% 向下取整：胡萝卜 12 → 9、木材 2 → 1、石头 2 → 1、鸡蛋 20 → 16。
-    expect(['crop_carrot', 'wood', 'stone', 'egg'].map(i => floorPrice(rules, i))).toEqual([9, 1, 1, 16]);
-    expect([1, 3, 4, 5, 6, 7, 99].map(l => tierFor(rules.requests!, l).bonus)).toEqual([10, 10, 20, 20, 20, 40, 40]);
+    // 不再打折：一件的价就是 Jasmine 的售价（胡萝卜 12、木材 2、石头 2、鸡蛋 20）。
+    expect(['crop_carrot', 'wood', 'stone', 'egg'].map(i => floorPrice(rules, i))).toEqual([12, 2, 2, 20]);
+    // 每种单子按它要的物品分档，3 级及以下一档、4 级起一档，再高也不变。
+    const at = (template: string, level: number) => { const x = tierFor(rules.requests!, level, template); return [...x.qty, x.bonus]; };
+    for (const [template, item] of [['fresh_greens', 'crop_carrot'], ['timber_run', 'wood'], ['stone_order', 'stone'], ['egg_basket', 'egg']])
+      for (const level of [1, 3, 4, 5, 7, 99]) expect(at(template, level)).toEqual(band(item, level));
   });
 
   it('refuses malformed request rules at load time; rules without requests have no board', () => {
@@ -77,6 +92,13 @@ describe('dynamic_farm.json requests (C-191)', () => {
     expect(bad({ templates: { x: { item: 'seed_carrot' } } })).toThrow();   // Jasmine 不收的东西不能出单
     expect(bad({ templates: { x: { item: 'egg', building: 'barn' } } })).toThrow();   // 没有这类建筑
     expect(bad({ templates: { x: { item: 'egg', tiers: [{ level: 2, qty: [1, 2], bonus: 20 }] } } })).toThrow();   // 模板自己的分档也从 1 级起
+    expect(bad({ item_tiers: [] })).toThrow();
+    expect(bad({ item_tiers: { egg: [] } })).toThrow();
+    expect(bad({ item_tiers: { egg: [{ level: 1, qty: [3, 2], bonus: 20 }] } })).toThrow();   // 按物品的分档同样的边界
+    expect(bad({ item_tiers: { 'Egg!': [{ level: 1, qty: [1, 2], bonus: 20 }] } })).toThrow();
+    // 按物品的分档可以写还没上线、Jasmine 还不收的物品（羊毛等羊圈上线）；没有 item_tiers 也行。
+    expect(() => parseParcelRules({ ...rules, requests: { ...q, item_tiers: { future_item: [{ level: 1, qty: [1, 1], bonus: 0 }] } } })).not.toThrow();
+    expect(() => parseParcelRules({ ...rules, requests: { ...q, item_tiers: undefined } })).not.toThrow();
     const none = parseParcelRules({ ...structuredClone(rules), requests: undefined });
     const s = view(welcomed(), T0, none);
     expect(s.board.slots).toEqual([]);
@@ -105,9 +127,10 @@ describe('drawing requests (C-191)', () => {
     expect(s.board.seq).toBe(2);
     expect(a.template).not.toBe(b.template);
     for (const r of [a, b]) {
-      expect(r).toMatchObject({ status: 'open', drawn_at: T0, bonus: 10 });
-      expect(r.qty).toBeGreaterThanOrEqual(2);
-      expect(r.qty).toBeLessThanOrEqual(3);
+      const [lo, hi, bonus] = band(r.item, 1);
+      expect(r).toMatchObject({ status: 'open', drawn_at: T0, bonus });
+      expect(r.qty).toBeGreaterThanOrEqual(lo);
+      expect(r.qty).toBeLessThanOrEqual(hi);
       expect(rules.requests!.templates[r.template].item).toBe(r.item);
     }
   });
@@ -138,19 +161,41 @@ describe('drawing requests (C-191)', () => {
     expect(kinds(withCoop(welcomed()))).toEqual(['crop_carrot', 'egg', 'stone', 'wood']);
   });
 
-  it('quantity and completion bonus follow the farm level when drawn: Lv1–3 2–3 and +10, Lv4–6 4–6 and +20', () => {
-    for (const [level, lo, hi, bonus] of [[1, 2, 3, 10], [3, 2, 3, 10], [4, 4, 6, 20], [5, 4, 6, 20]]) {
-      const qty = new Set<number>();
-      let t = T0, x = view({ ...welcomed(), level }, t);
-      for (let n = 0; n < 20; n++) {
+  it('count and completion bonus follow the item and the farm level when drawn (SEN-Q-281): Lv3 and below one band, Lv4 on the other', () => {
+    for (const level of [1, 3, 4, 5, 7]) {
+      const qty: Record<string, Set<number>> = {};
+      let t = T0, x = view({ ...withCoop(welcomed()), level }, t);
+      for (let n = 0; n < 60; n++) {
         for (const r of reqs(x)) {
-          qty.add(r!.qty);
-          expect(r!.bonus).toBe(bonus);
+          (qty[r!.item] ??= new Set()).add(r!.qty);
+          expect(r!.bonus).toBe(band(r!.item, level)[2]);
         }
         x = view(run(x, [{ type: 'drop_request', request: req(x, 0).id }, { type: 'drop_request', request: req(x, 1).id }], t), t += 8 * H);
       }
-      expect([...qty].sort()).toEqual(Array.from({ length: hi - lo + 1 }, (_, i) => lo + i));
+      // 每种都抽到过，件数恰好铺满这一档的范围。
+      expect(Object.keys(qty).sort()).toEqual(['crop_carrot', 'egg', 'stone', 'wood']);
+      for (const [item, seen] of Object.entries(qty)) {
+        const [lo, hi] = band(item, level);
+        expect([...seen].sort((p, q) => p - q), `${item} Lv${level}`).toEqual(Array.from({ length: hi - lo + 1 }, (_, i) => lo + i));
+      }
     }
+  });
+
+  it('a milk (or any later) template follows its item\'s tiers with no other change: 1–2 for +20, from Lv4 2–3', () => {
+    // C-192 的牛奶单合并进来时只加一行模板（和奶的售价）；这里用没有牛棚限定的同样一行代替。
+    const raw = structuredClone(rules);
+    raw.economy.sell_prices.milk = 45;
+    raw.requests!.templates = { fresh_milk: { item: 'milk' } };
+    const milk = parseParcelRules(raw);
+    expect(tierFor(milk.requests!, 3, 'fresh_milk')).toEqual({ level: 1, qty: [1, 2], bonus: 20 });
+    expect(tierFor(milk.requests!, 4, 'fresh_milk')).toEqual({ level: 4, qty: [2, 3], bonus: 20 });
+    const s = view({ ...welcomed(), level: 4 }, T0, milk);
+    const r = req(s, 0);
+    expect(r).toMatchObject({ item: 'milk', bonus: 20 });
+    expect([2, 3]).toContain(r.qty);
+    // 交单：45 × 件数 + 20。
+    const out = run(stocked(s, 0), [deliver(r.id)], T0 + 1000, milk);
+    expect(out.coins).toBe(45 * r.qty + 20);
   });
 });
 
@@ -172,14 +217,15 @@ describe('delivering (C-191)', () => {
     expect(view(JSON.parse(JSON.stringify(s1)), T0 + 2 * H)).toEqual(s1);
   });
 
-  it('a carrot request: 3 carrots pay 3 × 9 + 10 = 37; an egg request: 2 eggs pay 2 × 16 + 10 = 42', () => {
+  it('a carrot request: 3 carrots pay 3 × 12 + 10 = 46; an egg request: 2 eggs pay 2 × 20 + 20 = 60 (never less than selling them)', () => {
     const s = view(withCoop(welcomed()), T0);
     s.board.slots[0].req = { id: 1, template: 'fresh_greens', item: 'crop_carrot', qty: 3, bonus: 10, drawn_at: T0, status: 'open' };
-    s.board.slots[1].req = { id: 2, template: 'egg_basket', item: 'egg', qty: 2, bonus: 10, drawn_at: T0, status: 'accepted' };
+    s.board.slots[1].req = { id: 2, template: 'egg_basket', item: 'egg', qty: 2, bonus: 20, drawn_at: T0, status: 'accepted' };
     s.bag.crop_carrot = 4;
     s.bag.egg = 2;
     const out = run(s, [deliver(1), deliver(2)], T0 + 1000);
-    expect(out.coins).toBe(37 + 42);
+    expect(out.coins).toBe(46 + 60);
+    expect(out.board).toMatchObject({ done_today: 2, bonus_today: 30 });
     expect(out.bag).toMatchObject({ crop_carrot: 1 });
     expect(out.bag.egg).toBeUndefined();
     expect(out.requests_done).toBe(2);
@@ -224,40 +270,52 @@ describe('delivering (C-191)', () => {
     expect(next.requests_done).toBe(7);
   });
 
-  it('completion bonuses stop at 100 a day: at Lv4 (+20 each) the sixth pays its floor only; the next day the bonus is back', () => {
-    let s = view({ ...welcomed(), level: 4 }, T0), t = T0;
+  it('completion bonuses stop at 100 a day: with +20 each the sixth pays its price only; the next day the bonus is back', () => {
+    // 现在只有蛋（还有以后的奶、羊毛）是 +20；这里让每种单子都 +20，看上限。
+    const all20 = parseParcelRules({ ...structuredClone(rules), requests: { ...rules.requests!, item_tiers: undefined,
+      tiers: [{ level: 1, qty: [2, 3], bonus: 20 }] } });
+    let s = view({ ...welcomed(), level: 4 }, T0, all20), t = T0;
     const paid: number[] = [];
     for (let n = 0; n < 6; n++) {
       const r = req(s, 0), before = s.coins;
-      s = run(stocked(s, 0), [deliver(r.id)], t += 60_000);
-      paid.push(s.coins - before - floorPrice(rules, r.item) * r.qty);
+      s = run(stocked(s, 0), [deliver(r.id)], t += 60_000, all20);
+      paid.push(s.coins - before - floorPrice(all20, r.item) * r.qty);
     }
     expect(paid).toEqual([20, 20, 20, 20, 20, 0]);
     expect(s.board.bonus_today).toBe(100);
     const r = req(s, 0), before = s.coins;
-    s = run(stocked(s, 0), [deliver(r.id)], nextRollover(rules, t));
-    expect(s.coins - before).toBe(floorPrice(rules, r.item) * r.qty + 20);
+    s = run(stocked(s, 0), [deliver(r.id)], nextRollover(rules, t), all20);
+    expect(s.coins - before).toBe(floorPrice(all20, r.item) * r.qty + 20);
   });
 
-  it('a template with its own tiers draws its own count and bonus; the others keep the shared tiers', () => {
+  it('a template with its own tiers draws its own count and bonus; the others keep their item\'s tiers', () => {
     const own = parseParcelRules({ ...structuredClone(rules), requests: { ...rules.requests!, templates: {
       ...rules.requests!.templates, egg_basket: { item: 'egg', building: 'coop', tiers: [{ level: 1, qty: [1, 1], bonus: 20 }, { level: 4, qty: [3, 3], bonus: 25 }] },
     } } });
     expect(tierFor(own.requests!, 1, 'egg_basket')).toEqual({ level: 1, qty: [1, 1], bonus: 20 });
     expect(tierFor(own.requests!, 5, 'egg_basket')).toEqual({ level: 4, qty: [3, 3], bonus: 25 });
-    expect(tierFor(own.requests!, 5, 'fresh_greens')).toEqual(rules.requests!.tiers[1]);
+    expect(tierFor(own.requests!, 5, 'fresh_greens')).toEqual(rules.requests!.item_tiers!.crop_carrot[1]);
+    // 物品没有自己的分档时用公共的。
+    const shared = parseParcelRules({ ...structuredClone(rules), requests: { ...rules.requests!, item_tiers: { egg: rules.requests!.item_tiers!.egg } } });
+    expect(tierFor(shared.requests!, 5, 'timber_run')).toEqual(rules.requests!.tiers[1]);
+    expect(tierFor(shared.requests!, 5, 'egg_basket')).toEqual(rules.requests!.item_tiers!.egg[1]);
     let t = T0, x = view(withCoop(welcomed()), t, own);
     for (let n = 0; n < 20; n++) {
       for (const r of reqs(x)) {
         if (r!.item === 'egg') expect([r!.qty, r!.bonus]).toEqual([1, 20]);
-        else expect([[2, 10], [3, 10]]).toContainEqual([r!.qty, r!.bonus]);
+        else {
+          const [lo, hi, bonus] = band(r!.item, 1);
+          expect(r!.bonus).toBe(bonus);
+          expect(r!.qty >= lo && r!.qty <= hi).toBe(true);
+        }
       }
       x = view(run(x, [{ type: 'drop_request', request: req(x, 0).id }, { type: 'drop_request', request: req(x, 1).id }], t, own), t += 8 * H, own);
     }
   });
 
   it('a bonus partly left pays what is left: 40-coin requests pay 40, 40, 20, then 0', () => {
-    const big = parseParcelRules({ ...structuredClone(rules), requests: { ...rules.requests!, tiers: [{ level: 1, qty: [2, 2], bonus: 40 }] } });
+    const big = parseParcelRules({ ...structuredClone(rules), requests: { ...rules.requests!, item_tiers: undefined,
+      tiers: [{ level: 1, qty: [2, 2], bonus: 40 }] } });
     let s = view(welcomed(), T0, big), t = T0;
     const paid: number[] = [];
     for (let n = 0; n < 4; n++) {
