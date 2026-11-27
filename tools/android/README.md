@@ -47,6 +47,12 @@ emulator). The hosts set the key to `false` in the account's settings, but a run
 Script-mode runs (`--script`, running a scene, gdUnit, `tools/ci/dynamic_farm_tests.sh`) open no
 editor settings and never call adb.
 
+The same runnable preset also makes the editor poll `adb devices` every few seconds, whatever the
+key says. While the shared server is up that is only a client call; if it is down at that moment,
+adb starts a new one under the run's `HOME`, with that `HOME`'s adb keys, and the devices show as
+`unauthorized` (SEN-C-186#16). Presets a script generates for its own staging project are therefore
+not runnable (a command-line export does not need it): then the editor makes no adb call at all.
+
 Before an editor-mode run, with the same environment and Godot binary, run
 
 ```sh
@@ -62,8 +68,14 @@ or export as well. Repository scripts already do it:
   `open_pond_art.command`), `tools/dev/open_basic_room.sh`, `tools/dev/open_landmark_art.command`,
   `tools/dev/run_journey.mjs` (the `open_*.command` playtests), `tools/ios/setup_ios_g3.sh`;
 - `tools/android/build_worker_apk.sh` and `tools/dev/dynamic_farm/gather_qa_apk.sh` run a portable
-  editor copy whose own settings say `false`; `tools/p0/build_demo_apk.sh`, `android_p0.sh` and
-  `play_aab.py` do the same through `tools/p0/godot_keep_adb.sh`.
+  editor copy whose own settings say `false`, with a generated non-runnable preset (so no adb call);
+  `tools/dev/basic_room/prepare_basic_room.py` also generates a non-runnable preset;
+  `tools/p0/build_demo_apk.sh`, `android_p0.sh` and `play_aab.py` use a portable copy whose settings
+  say `false` through `tools/p0/godot_keep_adb.sh`.
+
+The repository's own `export_presets.cfg` keeps its runnable presets, so an import or export of the
+game project still polls `adb devices`: keep the shared server running, and if it is down, let the
+host's own account restart it rather than a run under a private `HOME`.
 
 Tests: `python3 -m unittest tools/test_godot_keep_adb_settings.py` (its last case runs the real
 Godot against a stub adb: without the helper the import calls `kill-server`, with it it does not).

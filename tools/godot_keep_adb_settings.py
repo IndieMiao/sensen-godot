@@ -8,7 +8,9 @@ adb honours $ANDROID_ADB_SERVER_PORT, so on the Cardigan workers it stops the sh
 (mac-mini: the owner's tablet and every session's emulator). The hosts set the key to false in the
 account's settings, but a run under a private HOME (or private XDG_CONFIG_HOME on Linux) reads other
 settings: fresh ones, where the default applies. Script-mode runs (--script, running a scene) open no
-editor settings and never call adb.
+editor settings and never call adb. The key does not stop the editor from polling `adb devices` while a
+runnable Android preset exists, which starts a server under the run's HOME if the shared one is down;
+staging projects a script generates should use non-runnable presets (see tools/android/README.md).
 
 Run this right before an editor-mode run, with the same environment and Godot binary:
 
