@@ -377,7 +377,7 @@ func _barn_blueprint() -> void:
 	town.close()
 	await process_frame
 
-## C-182: the sheep pen's blueprint, beside the barn's. Locked (secondary, a tap says why, the store refuses) while the
+## C-182: the sheep pen's blueprint, beside the barn's. Locked (secondary, a tap shakes the key, the store refuses) while the
 ## farm has delivered fewer than 15 requests (`Need N more requests`, the server's first check) or is below level 3
 ## (`Farm Lv3 needed`), then short of coins; with all three the primary key takes 1,200 and gives the blueprint once.
 func _sheep_pen_blueprint() -> void:
@@ -393,7 +393,8 @@ func _sheep_pen_blueprint() -> void:
 		and town.keys.upgrade.kind == UiCommandButton.Kind.PRIMARY,
 		"no request delivered, level 1, 5,000 coins: the key reads `Need 15 more requests` first, secondary; Upgrade Farm primary")
 	town.keys.buy_sheep_pen.unavailable_pressed.emit(town.keys.buy_sheep_pen.reason)
-	_check(town.toast.current_text() == "Need 15 more requests", "a tap on it says why")
+	_check(town.toast.current_text() != "Need 15 more requests" and town.keys.buy_sheep_pen.has_meta(&"_ui_shake"),
+		"a tap on it shakes the key; the key already says why, so no repeat toast (C-185 MS-02)")
 	var locked: Dictionary = await town.claim_blueprint("sheep_pen")
 	_check(not locked.ok and locked.code == "CONDITION_NOT_MET" and locked.get("detail", {}) == {"requests_done": 0, "min_requests": 15} \
 		and store.read().farm.coins == 5000 and not store.read().farm.bag.has("blueprint_sheep_pen"),
