@@ -1,0 +1,37 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cow_barn/yard_perimeter.glb" id="Perimeter"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cow_barn/hay_shed.glb" id="LoadedHayShelter"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cow_barn/hay_rack.glb" id="SlattedHayRack"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cow_barn/water_trough.glb" id="WaterTrough"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cow_barn/feed_trough.glb" id="CattleFeeder"]
+
+[node name="CattleYard" type="Node3D"]
+metadata/footprint_cells = Vector2i(11, 6)
+metadata/unoccupied_corner = Rect2i(0, 0, 2, 2)
+metadata/placement_origin = "Rear-left grid origin, +X right, +Z to gate; 1 U = 1 parcel cell. Scale once by cell_m."
+metadata/gate_clear_width_u = 1.875
+
+[node name="Perimeter" parent="." instance=ExtResource("Perimeter")]
+position = Vector3(0, 0, 0)
+
+[node name="LoadedHayShelter" parent="." instance=ExtResource("LoadedHayShelter")]
+position = Vector3(8, 0, 1)
+
+[node name="SlattedHayRack" parent="." instance=ExtResource("SlattedHayRack")]
+position = Vector3(1.5, 0, 3.5)
+
+[node name="WaterTrough" parent="." instance=ExtResource("WaterTrough")]
+position = Vector3(10.5, 0, 5)
+
+[node name="CattleFeeder" parent="." instance=ExtResource("CattleFeeder")]
+position = Vector3(4, 0, 5.5)
+
+[node name="Entry" type="Marker3D" parent="."]
+position = Vector3(6, 0, 6)
+
+[node name="Refill" type="Marker3D" parent="."]
+position = Vector3(5.5, 0, 5.5)
+
+[node name="EatingEdge" type="Marker3D" parent="."]
+position = Vector3(4, 0, 4.5)
