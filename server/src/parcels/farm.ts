@@ -40,6 +40,7 @@
  * 牛棚（C-181，0.4.6）：照鸡场，是又一类养殖建筑（barn），盖的时候除蓝图外扣 materials（木材、石头）；喂一次扣 livestock.feed_amount
  * 个饲料（2 根胡萝卜），一次仍只产一份（牛奶）。牛棚蓝图在 Scott 处花金币买：economy.blueprints 里带 coins 的蓝图，claim_blueprint
  * 时扣这么多金币，不够整批拒绝（NOT_ENOUGH_COINS），只能买一次（同 blueprints_claimed）。不加存档字段，版本号不变。
+ * C-192（SEN-Q-282）：蓝图 600 金币，还要农场到 min_level 级（2 级），不到报 CONDITION_NOT_MET {level, min_level}；地上最多 2 份奶。
  *
  * 驿站委托板（C-191，照搬 P0 系统委托板，见 requests.ts）：board 存两格单子和今天交了几单、发了多少完成奖，requests_done
  * 是累计交了几单（羊圈解锁要用）。接单、交单、放弃（accept_request / deliver_request / drop_request）不花体力，“人在驿站”由客户端限定。
@@ -574,6 +575,9 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         if (!rule) return fail('UNKNOWN_BLUEPRINT');
         if (Object.hasOwn(s.blueprints_claimed, c.blueprint)) return fail('BLUEPRINT_CLAIMED');
         if (s.sales < rule.min_sales) return fail('CONDITION_NOT_MET', { sales: s.sales, min_sales: rule.min_sales });
+        // C-192（SEN-Q-282）：牛棚蓝图要农场 2 级才能买。
+        const minLevel = rule.min_level ?? 1;
+        if (s.level < minLevel) return fail('CONDITION_NOT_MET', { level: s.level, min_level: minLevel });
         // C-181：带售价的蓝图（牛棚）要花金币买；单价只看服务端配置。
         const price = rule.coins ?? 0;
         if (s.coins < price) return fail('NOT_ENOUGH_COINS', { coins: s.coins, need: price });

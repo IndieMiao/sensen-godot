@@ -14,8 +14,9 @@ extends SceneTree
 ## C-152: at Lv1 one well stands, a spare well blueprint offers nothing; at Lv3 the Build key offers the second and the
 ## Energy chip tops at 220. C-171: beside the coop's feeder a tapped cell with a step to do keeps its key (the well's Fill, a
 ## free cell's Till); untapped, or tapped on a cell with nothing to do, the key feeds. C-192: at the barn's feeder the key
-## shows whole: `Need 2 more Carrot` too wide for it reads `Need 2 more` (the tap's toast keeps the sentence), `Pick up milk
-## first` fits; milk laid while the app was closed is picked up on the first walk up to it after a cold start.
+## shows whole: `Need 2 more Carrot` too wide for it reads `Need 2 more` (the tap's toast keeps the sentence); with the
+## ground full (2, SEN-Q-282) it reads `Cows are fed` while neither milk is given yet and `Pick up milk first` once they
+## lie there; milk laid while the app was closed is picked up on the first walk up to it after a cold start.
 ## Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
@@ -1108,33 +1109,41 @@ func _barn_key_and_cold_milk() -> void:
 	await process_frame
 	_check(farming._toast.current_text() == "Need 2 more Carrot" and farming.farm_version == version and not farming.busy,
 		"its tap toasts the whole `Need 2 more Carrot` and sends nothing (%s)" % farming._toast.current_text())
-	# The ground full (four milks on their way) with carrots in the bag: `Pick up milk first` fits as it is.
+	# The ground full (C-192, SEN-Q-282: two, one per cow) with carrots in the bag. On spots away from the feeder, so standing
+	# there picks nothing up. Neither given yet, there is nothing to pick up: `Cows are fed`.
 	var full: Dictionary = farming.farm.duplicate(true)
 	full.bag.crop_carrot = 2
 	var due: int = int(Time.get_unix_time_from_system() * 1000.0) + shift[0] + 900000
 	full.drops = []
-	for i in 4: full.drops.append({"id": i + 1, "item": "milk", "amount": 1, "building": int(barn.id), "animal": i % 2, "spot": [0, 2, 3, 5][i],
+	for i in 2: full.drops.append({"id": i + 1, "item": "milk", "amount": 1, "building": int(barn.id), "animal": i, "spot": [3, 4][i],
 		"ready_at": due})
-	full.drop_seq = 4
+	full.drop_seq = 2
 	store._save(full, farming.farm_version + 1)
 	scene.queue_free()
 	await process_frame
 	farming = await _open(store)
-	_check(await to_feeder.call(farming) and [farming._key.verb, farming._key.cost] == ["Feed", "Pick up milk first"]
-		and UiSceneAction.cost_fits(farming._key.cost), "four milks on the ground: `Pick up milk first`, whole (%s)" % farming._key.cost)
-	farming._key.pressed_down.emit()
-	await process_frame
-	_check(farming._toast.current_text() == "Pick up milk first", "its tap toasts it")
-	# The app closed until the milk is due, then opened cold: the first walk up to a milk picks it up.
+	_check(await to_feeder.call(farming) and [farming._key.verb, farming._key.cost] == ["Feed", "Cows are fed"]
+		and UiSceneAction.cost_fits(farming._key.cost), "two milks on their way: `Cows are fed`, whole (%s)" % farming._key.cost)
+	# Both given (the app closed until then): `Pick up milk first` fits as it is.
 	scene.queue_free()
 	await process_frame
 	shift[0] += 960000
+	farming = await _open(store)
+	_check(await to_feeder.call(farming) and [farming._key.verb, farming._key.cost] == ["Feed", "Pick up milk first"]
+		and UiSceneAction.cost_fits(farming._key.cost), "two milks on the ground: `Pick up milk first`, whole (%s)" % farming._key.cost)
+	_check(farming.farm.drops.size() == 2, "standing at the feeder picks neither up")
+	farming._key.pressed_down.emit()
+	await process_frame
+	_check(farming._toast.current_text() == "Pick up milk first", "its tap toasts it")
+	# Opened cold again with the milk laid: the first walk up to a milk picks it up.
+	scene.queue_free()
+	await process_frame
 	farming = await _open(store)
 	deadline = Time.get_ticks_msec() + 30000
 	while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
 	var lv = farming.livestock
 	var laid: Array = lv.snapshot().values()[0].drops
-	_check(laid.size() == 4, "after a cold start the four milks lie on the ground (%s)" % [laid])
+	_check(laid.size() == 2, "after a cold start the two milks lie on the ground (%s)" % [laid])
 	var id: int = laid[0] if not laid.is_empty() else -1
 	var milk = lv.drop_position(id)
 	var stand = null

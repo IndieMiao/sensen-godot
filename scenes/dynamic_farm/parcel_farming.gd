@@ -499,8 +499,15 @@ func _feed_action(near: Dictionary) -> Dictionary:
 			text = str(copy.get("fed", "Hens are fed"))
 			short = str(copy.get("fed_short", ""))
 		"GROUND_FULL":
-			text = str(copy.get("full", "Pick up eggs first"))
-			short = str(copy.get("full_short", ""))
+			# C-192: with as many on the ground as animals (the barn's 2, SEN-Q-282) the ground fills before every animal
+			# is waiting, so while none of them is given yet there is nothing to pick up: the key says they are fed.
+			var now := server_now()
+			if ParcelFarm.drops_in(farm, int(b.id)).any(func(d: Dictionary): return int(d.ready_at) <= now):
+				text = str(copy.get("full", "Pick up eggs first"))
+				short = str(copy.get("full_short", ""))
+			else:
+				text = str(copy.get("fed", "Hens are fed"))
+				short = str(copy.get("fed_short", ""))
 		"NOT_LIVESTOCK": text = "That didn't work."
 	return {"verb": "feed", "refusal": refusal, "refusal_text": text, "key_text": key_copy(text, short),
 		"feed_item": str(rule.get("feed", "")),

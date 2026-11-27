@@ -180,9 +180,9 @@ describe('parcel economy (C-58)', () => {
     expect(rules.economy.gather.respawn_seconds).toBe(24 * 3600);
     expect(Object.fromEntries(Object.entries(rules.economy.gather.sources).map(([k, v]) => [k, [v.item, v.amount]])))
       .toEqual({ tree: ['wood', 1], flower: ['wild_herb', 1], rock: ['stone', 1] });
-    // C-181: the barn's blueprint is bought at Scott's for 150 coins, no sale needed.
+    // C-181: the barn's blueprint is bought at Scott's, no sale needed: 600 coins from farm level 2 (C-192, SEN-Q-282).
     expect(rules.economy.blueprints).toEqual({ coop: { item: 'blueprint_coop', amount: 1, min_sales: 1 },
-      barn: { item: 'blueprint_barn', amount: 1, min_sales: 0, coins: 150 } });
+      barn: { item: 'blueprint_barn', amount: 1, min_sales: 0, min_level: 2, coins: 600 } });
     // Coins start at 0, separate from the main farm.
     expect(emptyFarm()).toMatchObject({ coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} });
   });
@@ -704,7 +704,7 @@ describe('coop, feeding and drops (C-154)', () => {
     expect(withEconomy(s).drops).toEqual([]);
     const fed = run(s, [feed()], T0 + 1000);
     expect(fed.bag.crop_carrot).toBe(4);
-    expect(fed.energy!.value).toBe(199);
+    expect(fed.energy!.value).toBe(maxEnergy(rules, s) - 1); // 209 at level 2
     expect(fed.drops).toEqual([{ id: 1, item: 'egg', amount: 1, building: 1, animal: 0, spot: expect.any(Number), ready_at: T0 + 1000 + LAY }]);
     expect(fed.drop_seq).toBe(1);
     // Before it is laid it cannot be picked up.
@@ -790,8 +790,8 @@ describe('C-154 the client runs the same coop cases (shared fixture)', () => {
 });
 
 /**
- * C-181（0.4.6）：牛棚。照鸡场：在 Scott 处花 150 金币买蓝图（第一次用金币买蓝图），盖的时候再扣 20 木材 + 10 石头，整块摆放、四个朝向；
- * 喂 2 根胡萝卜（1 体力），15 分钟后产 1 份牛奶，掉在地上走近捡；牛奶卖 45。数值是作者默认值，待所有者在 SEN-C-181 确认。
+ * C-181（0.4.6）：牛棚。照鸡场：在 Scott 处花 600 金币买蓝图（第一次用金币买蓝图，农场 2 级起），盖的时候再扣 20 木材 + 10 石头，整块摆放、
+ * 四个朝向；喂 2 根胡萝卜（1 体力），15 分钟后产 1 份牛奶，掉在地上走近捡，地上最多 2 份；牛奶卖 45。数值是所有者在 SEN-Q-282 定的（C-192）。
  */
 describe('barn, milk and the bought blueprint (C-181)', () => {
   const barnAt = (x: number, y: number, rotation = 0): FarmCommand => ({ type: 'place_building', building: 'barn', x, y, rotation });
@@ -800,22 +800,23 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
   const pick = (drop: number): FarmCommand => ({ type: 'pick_up', drop });
   const LAY = 900_000;
   const tryIt = (state: ParcelFarmState, commands: FarmCommand[], now = T0) => applyFarmCommands(rules, state, commands, now);
-  /** 首次进入后有 200 金币、24 木材、14 石头、6 根胡萝卜。 */
+  /** 首次进入后农场 2 级，有 650 金币、24 木材、14 石头、6 根胡萝卜。 */
   const rich = (): ParcelFarmState => {
     const s = welcomed();
-    s.coins = 200;
+    s.coins = 650;
+    s.level = 2;
     s.bag = { ...s.bag, wood: 24, stone: 14, crop_carrot: 6 };
     return s;
   };
   const withBarn = (rotation = 0) => run(rich(), [buy, barnAt(20, 20, rotation)]);
 
-  it('ships the author defaults awaiting the owner: 150 coins, 20 Timber + 10 Stone, 2 cows, 2 carrots give a milk in 15 min, 4 on the ground, 45 coins', () => {
+  it('ships the owner\'s numbers (SEN-Q-282): 600 coins from farm level 2, 20 Timber + 10 Stone, 2 cows, 2 carrots give a milk in 15 min, 2 on the ground, 45 coins', () => {
     const { livestock, ...barn } = rules.buildings.barn;
     expect(barn).toEqual({ model: 'cow_barn', blueprint: 'blueprint_barn', width: 8, depth: 6, max: 1, materials: { wood: 20, stone: 10 } });
     expect(livestock).toMatchObject({ animals: ['cow', 'cow'], feed: 'crop_carrot', feed_amount: 2, product: 'milk', amount: 1,
-      produce_seconds: 900, max_ground: 4 });
+      produce_seconds: 900, max_ground: 2 });
     expect(livestock!.spots.length).toBeGreaterThanOrEqual(livestock!.max_ground);
-    expect(rules.economy.blueprints.barn).toEqual({ item: 'blueprint_barn', amount: 1, min_sales: 0, coins: 150 });
+    expect(rules.economy.blueprints.barn).toEqual({ item: 'blueprint_barn', amount: 1, min_sales: 0, min_level: 2, coins: 600 });
     expect(rules.economy.sell_prices.milk).toBe(45);
     // The coop's blueprint stays Scott's free one after the first sale; its hens still eat one carrot.
     expect(rules.economy.blueprints.coop).toEqual({ item: 'blueprint_coop', amount: 1, min_sales: 1 });
@@ -828,25 +829,37 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
     expect(blueprint(150)).not.toThrow();
     expect(blueprint(0)).not.toThrow();
     for (const bad of [-1, 1.5, '150', 100_001]) expect(blueprint(bad)).toThrow();
+    const level = (min_level: unknown) => () => parseParcelRules({ ...rules, economy: { ...rules.economy,
+      blueprints: { ...rules.economy.blueprints, barn: { ...rules.economy.blueprints.barn, min_level } } } });
+    expect(level(1)).not.toThrow();
+    expect(level(99)).not.toThrow();
+    for (const bad of [0, 100, 1.5, '2', null]) expect(level(bad)).toThrow();
     const portion = (feed_amount: unknown) => () => parseParcelRules({ ...rules, buildings: { ...rules.buildings,
       barn: { ...rules.buildings.barn, livestock: { ...rules.buildings.barn.livestock!, feed_amount } } } });
     expect(portion(2)).not.toThrow();
     for (const bad of [0, 100, 1.5, '2']) expect(portion(bad)).toThrow();
   });
 
-  it('buying the blueprint takes 150 coins once, with no sale needed; short of coins nothing changes', () => {
+  it('buying the blueprint takes 600 coins once, from farm level 2, with no sale needed; short of coins or below level 2 nothing changes', () => {
     const s = welcomed();
-    s.coins = 150;
+    s.coins = 600;
+    s.level = 2;
     const bought = run(s, [buy]);
     expect(bought.coins).toBe(0);
     expect(bought.bag.blueprint_barn).toBe(1);
     expect(bought.blueprints_claimed.barn).toBe(T0);
     expect(bought.sales).toBe(0);
     expect(tryIt({ ...bought, coins: 999 }, [buy])).toEqual({ ok: false, index: 0, code: 'BLUEPRINT_CLAIMED' });
-    const poor = { ...s, coins: 149 };
+    const poor = { ...s, coins: 599 };
     const frozen = structuredClone(poor);
-    expect(tryIt(poor, [buy])).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH_COINS', detail: { coins: 149, need: 150 } });
+    expect(tryIt(poor, [buy])).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH_COINS', detail: { coins: 599, need: 600 } });
     expect(poor).toEqual(frozen);
+    // C-192（SEN-Q-282）：等级不够不能买，金币再多也不行，存档不变；升到 2 级就能买，3 级也能。
+    const low = { ...s, coins: 999, level: 1 };
+    const lowFrozen = structuredClone(low);
+    expect(tryIt(low, [buy])).toEqual({ ok: false, index: 0, code: 'CONDITION_NOT_MET', detail: { level: 1, min_level: 2 } });
+    expect(low).toEqual(lowFrozen);
+    expect(run({ ...s, level: 3 }, [buy]).bag.blueprint_barn).toBe(1);
   });
 
   it('building needs the blueprint, 20 Timber and 10 Stone; short of any, nothing changes and the blueprint stays', () => {
@@ -902,7 +915,7 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
     expect(run(s, [{ type: 'till', cell: '0,0' }], T0 + 3 * 86_400_000).drops).toEqual([]);
     const fed = run(s, [feed()], T0 + 1000);
     expect(fed.bag.crop_carrot).toBe(4);
-    expect(fed.energy!.value).toBe(199);
+    expect(fed.energy!.value).toBe(maxEnergy(rules, s) - 1); // 209 at level 2
     expect(fed.drops).toEqual([{ id: 1, item: 'milk', amount: 1, building: 1, animal: 0, spot: expect.any(Number), ready_at: T0 + 1000 + LAY }]);
     expect(tryIt(fed, [pick(1)], T0 + LAY)).toEqual({ ok: false, index: 0, code: 'NOT_READY', detail: { ready_at: T0 + 1000 + LAY } });
     const picked = run(fed, [pick(1)], T0 + 1000 + LAY);
@@ -913,22 +926,26 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
     expect(run(picked, [{ type: 'sell', item: 'milk', count: 1 }])).toMatchObject({ coins: 50 + 45 });
   });
 
-  it('each cow waits for one milk; at four on the ground no more feeding; the milk survives a JSON round trip', () => {
+  it('each cow waits for one milk; at two on the ground no more feeding until one is picked up; the milk survives a JSON round trip', () => {
     let s = withBarn();
     s.bag.crop_carrot = 20;
     s = run(s, [feed(), feed()]);
     expect(s.drops.map(d => d.animal)).toEqual([0, 1]);
-    expect(tryIt(s, [feed()])).toEqual({ ok: false, index: 0, code: 'ANIMALS_FED', detail: { next_at: T0 + LAY } });
-    s = run(s, [feed(), feed()], T0 + LAY);
-    expect(new Set(s.drops.map(d => d.spot)).size).toBe(4);
-    expect(tryIt(s, [feed()], T0 + 3 * LAY)).toEqual({ ok: false, index: 0, code: 'GROUND_FULL', detail: { max: 4 } });
-    expect(s.bag.crop_carrot).toBe(12);
+    expect(new Set(s.drops.map(d => d.spot)).size).toBe(2);
+    // C-192（SEN-Q-282）：地上最多 2 份（含没下的），两头牛都喂过就满了，下好之后也要先捡。
+    expect(tryIt(s, [feed()])).toEqual({ ok: false, index: 0, code: 'GROUND_FULL', detail: { max: 2 } });
+    expect(tryIt(s, [feed()], T0 + 3 * LAY)).toEqual({ ok: false, index: 0, code: 'GROUND_FULL', detail: { max: 2 } });
+    expect(s.bag.crop_carrot).toBe(16);
     const reread = withEconomy(JSON.parse(JSON.stringify(s)));
     expect(reread).toEqual(s);
-    expect(run(reread, [pick(1), pick(2)], T0 + LAY).bag.milk).toBe(2);
+    const one = run(reread, [pick(1)], T0 + LAY);
+    expect(one.bag.milk).toBe(1);
+    const again = run(one, [feed()], T0 + LAY);
+    expect(again.drops.map(d => [d.id, d.animal])).toEqual([[2, 1], [3, 0]]);
+    expect(tryIt(again, [feed()], T0 + LAY)).toMatchObject({ ok: false, code: 'GROUND_FULL' });
   });
 
-  it('an older save (coop, eggs, claimed coop blueprint) reads and plays as before; Scott still sells it the barn blueprint', () => {
+  it('an older save (coop, eggs, claimed coop blueprint) reads and plays as before; Scott sells it the barn blueprint once at level 2', () => {
     const old = { v: 1, buildings: [{ id: 1, type: 'coop', model: 'chicken_yard', x: 6, y: 6, width: 7, depth: 5, rotation: 0, built_at: T0,
       animals: ['hen_white', 'hen_brown', 'hen_white'] }], house: null, cleared: [], tilled: [], crops: {},
       bag: { crop_carrot: 3 }, welcomed_at: T0, coins: 160, sales: 3, gathered: {}, blueprints_claimed: { coop: T0 },
@@ -938,7 +955,9 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
     // A hen still eats one carrot.
     expect(run(old, [{ type: 'feed', building: 1 }]).bag.crop_carrot).toBe(2);
     expect(run(old, [pick(4)]).bag.egg).toBe(1);
-    expect(run(old, [buy])).toMatchObject({ coins: 10, bag: { crop_carrot: 3, blueprint_barn: 1 } });
+    // Read as level 1 (no level in the save): the barn blueprint waits for level 2 (C-192, SEN-Q-282).
+    expect(tryIt(old, [buy])).toEqual({ ok: false, index: 0, code: 'CONDITION_NOT_MET', detail: { level: 1, min_level: 2 } });
+    expect(run({ ...old, coins: 610, level: 2 }, [buy])).toMatchObject({ coins: 10, bag: { crop_carrot: 3, blueprint_barn: 1 } });
     expect(old).toEqual(frozen);
   });
 

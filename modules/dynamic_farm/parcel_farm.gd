@@ -251,9 +251,11 @@ static func _parse_economy(raw: Variant) -> Dictionary:
 		for id in raw.blueprints:
 			var rule = raw.blueprints[id]
 			if id is String and rule is Dictionary and rule.get("item") is String and whole_in(rule.get("amount"), 1, 99) \
-					and whole_in(rule.get("min_sales"), 0, 1000) and (not rule.has("coins") or whole_in(rule.coins, 0, 100000)):
+					and whole_in(rule.get("min_sales"), 0, 1000) and (not rule.has("coins") or whole_in(rule.coins, 0, 100000)) \
+					and (not rule.has("min_level") or whole_in(rule.min_level, 1, MAX_FARM_LEVEL)):
+				# C-192 (SEN-Q-282): `min_level`, the farm level a blueprint is sold from (the barn's 2), defaults to 1.
 				out.blueprints[id] = {"item": rule.item, "amount": int(rule.amount), "min_sales": int(rule.min_sales),
-					"coins": int(rule.get("coins", 0))}
+					"min_level": int(rule.get("min_level", 1)), "coins": int(rule.get("coins", 0))}
 	return out
 
 ## C-148 `energy` with the server's bounds (energy.ts parseEnergyRules), integers made ints; {} when out of them.
@@ -963,6 +965,10 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				elif int(next.sales) < int(rule.min_sales):
 					failure = "CONDITION_NOT_MET"
 					detail = {"sales": next.sales, "min_sales": rule.min_sales}
+				elif farm_level(next) < int(rule.get("min_level", 1)):
+					# C-192 (SEN-Q-282): the barn's blueprint is sold from farm level 2.
+					failure = "CONDITION_NOT_MET"
+					detail = {"level": farm_level(next), "min_level": int(rule.min_level)}
 				elif int(next.coins) < int(rule.get("coins", 0)):
 					# C-181: a priced blueprint (the barn's) is bought.
 					failure = "NOT_ENOUGH_COINS"

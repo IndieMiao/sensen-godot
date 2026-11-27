@@ -54,7 +54,7 @@
         "product": "milk",
         "amount": 1,
         "produce_seconds": 900,
-        "max_ground": 4,
+        "max_ground": 2,
         "spots": [[2.6, 2.4], [4.2, 2.8], [3.4, 4.2], [5.6, 3.4], [6.9, 4.4], [1.9, 4.9]]
       }
     },
@@ -198,7 +198,8 @@
         "item": "blueprint_barn",
         "amount": 1,
         "min_sales": 0,
-        "coins": 150
+        "min_level": 2,
+        "coins": 600
       }
     }
   },

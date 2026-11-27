@@ -608,10 +608,12 @@ for (const [name, enabled, makeStores] of makers) {
     });
 
     it('C-181 barn over HTTP: the blueprint bought with coins, built with materials, two carrots give one milk that stays through re-entry and is picked once', async () => {
-      // The shipped numbers (150 coins, 20 Timber + 10 Stone) are farm.test.ts's; here only the price and materials are scaled down to
-      // what a fresh farm reaches over HTTP: the blueprint 2 coins (one Timber sold), 1 Timber to build. Feed (2 carrots) and timing are the shipped ones.
+      // The shipped numbers (600 coins from farm level 2, 20 Timber + 10 Stone; SEN-Q-282) are farm.test.ts's; here only the price, level
+      // and materials are scaled down to what a fresh farm reaches over HTTP: the blueprint 2 coins (one Timber sold) at level 1, 1 Timber
+      // to build. Feed (2 carrots) and timing are the shipped ones.
       const cheap = structuredClone(rules);
       cheap.economy.blueprints.barn.coins = 2;
+      cheap.economy.blueprints.barn.min_level = 1;
       cheap.buildings.barn.materials = { wood: 1 };
       const barnApp = await appFor(stores, { rules: cheap });
       try {

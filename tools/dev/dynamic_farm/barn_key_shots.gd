@@ -1,7 +1,8 @@
 extends SceneTree
 ## Barn feeder key captures (C-192) on C-34's local save, not the server: the main key by the barn's feeder with no
-## carrots (`Feed` over `Need 2 more`, the tap's toast `Need 2 more Carrot`) and with four milks on the ground (`Pick up
-## milk first`), each as the whole screen after the tap and the key enlarged. Scripted state; not touch or device evidence.
+## carrots (`Feed` over `Need 2 more`, the tap's toast `Need 2 more Carrot`), with the ground full (2, SEN-Q-282) of milk
+## on its way (`Cows are fed`) and of milk given (`Pick up milk first`), each as the whole screen after the tap and the key
+## enlarged. Scripted state; not touch or device evidence.
 ##   godot --path "$QA" --script res://tools/dev/dynamic_farm/barn_key_shots.gd -- <farm.json> <out>
 ## With --headless it prints the same key texts without images. The save lives in <out>/save and is removed first.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
@@ -55,17 +56,19 @@ func _run() -> void:
 	for i in 90: await process_frame   # the gain float and the labour clip settle
 	await _to_feeder(farming)
 	await _tap_and_shoot(farming, "need_2_more")
-	var full: Dictionary = farming.farm.duplicate(true)
-	full.bag.crop_carrot = 2
-	full.drops = []
-	var due := int(Time.get_unix_time_from_system() * 1000.0) + 900000
-	for i in 4: full.drops.append({"id": i + 1, "item": "milk", "amount": 1, "building": int(barn.id), "animal": i % 2, "spot": [0, 2, 3, 5][i],
-		"ready_at": due})
-	full.drop_seq = 4
-	store._save(full, farming.farm_version + 1)
-	farming = await _reopen()
-	await _to_feeder(farming)
-	await _tap_and_shoot(farming, "pick_up_milk_first")
+	# Two milks (one per cow) on spots away from the feeder, so standing there picks neither up: on their way, then given.
+	var t := int(Time.get_unix_time_from_system() * 1000.0)
+	for shot: Array in [["cows_are_fed", t + 900000], ["pick_up_milk_first", t - 1000]]:
+		var full: Dictionary = farming.farm.duplicate(true)
+		full.bag.crop_carrot = 2
+		full.drops = []
+		for i in 2: full.drops.append({"id": i + 1, "item": "milk", "amount": 1, "building": int(barn.id), "animal": i, "spot": [3, 4][i],
+			"ready_at": shot[1]})
+		full.drop_seq = 2
+		store._save(full, farming.farm_version + 1)
+		farming = await _reopen()
+		await _to_feeder(farming)
+		await _tap_and_shoot(farming, shot[0])
 	var file := FileAccess.open(out.path_join("report.json"), FileAccess.WRITE)
 	file.store_string(JSON.stringify(report, "  "))
 	file.close()

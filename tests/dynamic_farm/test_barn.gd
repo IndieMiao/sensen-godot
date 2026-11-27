@@ -55,10 +55,11 @@ func _rules() -> void:
 		"barn: 8×6, one per parcel, its blueprint and 20 Timber + 10 Stone")
 	var l: Dictionary = barn.livestock
 	_check(l.animals == ["cow", "cow"] and l.feed == "crop_carrot" and l.feed_amount == 2 and l.product == "milk" and l.amount == 1 \
-		and l.produce_seconds == 900 and l.max_ground == 4 and l.spots.size() >= 4, "barn: two cows, 2 carrots give a milk in 15 min, 4 on the ground")
+		and l.produce_seconds == 900 and l.max_ground == 2 and l.spots.size() >= 2, "barn: two cows, 2 carrots give a milk in 15 min, 2 on the ground (SEN-Q-282)")
 	_check(rules.buildings.coop.livestock.feed_amount == 1, "coop: a hen still eats one carrot (feed_amount defaults to 1)")
-	_check(rules.economy.blueprints.barn == {"item": "blueprint_barn", "amount": 1, "min_sales": 0, "coins": 150}
-		and rules.economy.blueprints.coop.coins == 0, "Scott: the barn blueprint 150 coins, the coop's still free")
+	_check(rules.economy.blueprints.barn == {"item": "blueprint_barn", "amount": 1, "min_sales": 0, "min_level": 2, "coins": 600}
+		and rules.economy.blueprints.coop.coins == 0 and rules.economy.blueprints.coop.min_level == 1,
+		"Scott: the barn blueprint 600 coins from farm level 2 (SEN-Q-282), the coop's still free at any level")
 	_check(rules.economy.sell_prices.milk == 45 and rules.energy.costs.feed == 1, "milk sells for 45; feeding 1 Energy")
 	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH))
 	var bad := func(change: Callable) -> bool:
@@ -75,6 +76,13 @@ func _rules() -> void:
 		return ParcelFarm.parse_rules(copy).economy.blueprints
 	_check(not priced.call(-1).has("barn") and not priced.call(100001).has("barn") and priced.call(0).barn.coins == 0,
 		"rules: a blueprint priced out of 0–100000 is left out, as the server refuses it")
+	var leveled := func(level) -> Dictionary:
+		var copy: Dictionary = raw.duplicate(true)
+		copy.economy.blueprints.barn.min_level = level
+		return ParcelFarm.parse_rules(copy).economy.blueprints
+	_check(not leveled.call(0).has("barn") and not leveled.call(100).has("barn") and not leveled.call(1.5).has("barn")
+		and leveled.call(1).barn.min_level == 1 and leveled.call(99).barn.min_level == 99,
+		"rules: a blueprint level out of 1–99 is left out, as the server refuses it (C-192)")
 
 func _cases() -> void:
 	var rules := ParcelFarm.rules()
@@ -109,8 +117,14 @@ func _saves() -> void:
 	_check(read.drops.size() == 1 and read.drop_seq == 4 and read.bag == {"crop_carrot": 3} and read.coins == 160, "saves: a coop save reads as it was")
 	var fed_hen := ParcelFarm.apply(rules, read, [{"type": "feed", "building": 1}], T0)
 	_check(fed_hen.ok and fed_hen.state.bag.crop_carrot == 2, "saves: a hen still eats one carrot")
-	var bought := ParcelFarm.apply(rules, read, [{"type": "claim_blueprint", "blueprint": "barn"}], T0)
-	_check(bought.ok and bought.state.coins == 10 and bought.state.bag.blueprint_barn == 1, "saves: Scott sells it the barn blueprint")
+	var low := ParcelFarm.apply(rules, read, [{"type": "claim_blueprint", "blueprint": "barn"}], T0)
+	_check(not low.ok and low.code == "CONDITION_NOT_MET" and low.get("detail", {}) == {"level": 1, "min_level": 2},
+		"saves: read as level 1, the barn blueprint waits for level 2 (C-192)")
+	var richer := read.duplicate(true)
+	richer.level = 2
+	richer.coins = 610
+	var bought := ParcelFarm.apply(rules, richer, [{"type": "claim_blueprint", "blueprint": "barn"}], T0)
+	_check(bought.ok and bought.state.coins == 10 and bought.state.bag.blueprint_barn == 1, "saves: at level 2 Scott sells it the barn blueprint")
 
 ## The art file: the fence leaves the entry open; walls are the runs and the parts; the feeder and milk spots inside.
 func _layout() -> void:
