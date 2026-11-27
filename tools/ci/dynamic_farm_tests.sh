@@ -41,7 +41,8 @@ SUMMARY_CHECKS=(BUILDING_FIT_TESTS DYNAMIC_BANK_TESTS DYNAMIC_LOWER_BANK_TESTS D
   DYNAMIC_CORE_OBSTACLE_TESTS DYNAMIC_EDGE_DECOR_TESTS DYNAMIC_EDGE_TESTS ISLAND_EXTERIOR
   DYNAMIC_OUTER_GROVE_TESTS DYNAMIC_PALETTE_TESTS DYNAMIC_PROP_PROXY_TESTS
   DYNAMIC_SLOPE_MATERIAL_TESTS DYNAMIC_WALK_TESTS OUTER_GATHER OUTER_GATHER_SCENE PARCEL_FARMING
-  PARCEL_FARMING_SCENE PARCEL_FARMING_SERVER PARCEL_TOWN PARCEL_OUTPOST DYNAMIC_HOUSE_TESTS COOP_TESTS BARN_TESTS PARCEL_PHONE PARCEL_BOARD)
+  PARCEL_FARMING_SCENE PARCEL_FARMING_SERVER PARCEL_TOWN PARCEL_OUTPOST DYNAMIC_HOUSE_TESTS COOP_TESTS BARN_TESTS PARCEL_PHONE PARCEL_BOARD
+  MAP_TRAVEL)
 #   "<PREFIX> passed/total"
 SUMMARY_RATIO=("DYNAMIC ENGLISH UI" "DYNAMIC MAP OCCLUSION" "DYNAMIC ROOT BACK" "PREVIEW HOST"
   "DYNAMIC READ RETRIES" "DYNAMIC HTTPS RETRIES" "DYNAMIC RETRY CANCEL REENTRY"
@@ -99,6 +100,28 @@ start_https_fixture() {
   printf '%s\n' "https://127.0.0.1:$(cat "$port_file")" "$tls/trusted.pem" "$tls/other.pem"
 }
 
+#   limited SECONDS COMMAND...: COMMAND under a time limit, as `timeout --kill-after=10`:
+# TERM at the limit and exit 124, KILL 10 s later and exit 137. GNU timeout when
+# there is one, else Homebrew's gtimeout, else perl (macOS ships neither timeout).
+limited() {
+  if command -v timeout >/dev/null; then timeout --kill-after=10 "$@"; return; fi
+  if command -v gtimeout >/dev/null; then gtimeout --kill-after=10 "$@"; return; fi
+  perl -MPOSIX=WNOHANG -MTime::HiRes=sleep,time -e '
+    my ($limit, @cmd) = @ARGV;
+    defined(my $pid = fork) or die "fork: $!\n";
+    if (!$pid) { exec { $cmd[0] } @cmd; exit 127 }
+    my ($end, $termed) = (time + $limit, 0);
+    while (waitpid($pid, WNOHANG) == 0) {
+      if (time >= $end) {
+        if ($termed) { kill "KILL", $pid; waitpid($pid, 0); exit 137 }
+        kill "TERM", $pid; $termed = 1; $end = time + 10;
+      }
+      sleep 0.1;
+    }
+    exit 124 if $termed;
+    exit(($? & 127) ? 128 + ($? & 127) : $? >> 8);' "$@"
+}
+
 stop_https_fixture() {
   if [[ -n $fixture_pid ]]; then kill "$fixture_pid" 2>/dev/null; wait "$fixture_pid" 2>/dev/null; fixture_pid=; fi
 }
@@ -133,7 +156,7 @@ run_one() {
       fi
       return
     fi
-    mapfile -t args <"$work/https_args"
+    while IFS= read -r line; do args+=("$line"); done <"$work/https_args" # no mapfile in macOS's bash 3.2
   else
     args=("${parcels[@]}")
   fi
@@ -141,7 +164,7 @@ run_one() {
   remaining=$((total_limit - (SECONDS - run_start)))
   file_limit=$((limit < remaining ? limit : remaining > 0 ? remaining : 1))
   start=$SECONDS
-  timeout --kill-after=10 "$file_limit" "$GODOT_BIN" --headless --path . \
+  limited "$file_limit" "$GODOT_BIN" --headless --path . \
     --script "res://$dir/$name.gd" -- "${args[@]}" >"$log" 2>&1
   rc=$?
   local seconds=$((SECONDS - start))

@@ -380,10 +380,18 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	await process_frame
 	(entry.card.find_child("Primary", true, false) as UiCommandButton).activated.emit()
 	await process_frame
+	# C-188: Go walks the avatar to the pin first (a tap skips the walk); the room opens once the iris has closed on it.
+	check(router.opened.is_empty() and page._travel.heading(page.TOWN), "Go walks the avatar to the pin before the room opens")
+	page._on_map_tap(Vector2(0.5, 0.5))
+	var until := Time.get_ticks_msec() + 3000
+	while router.opened.is_empty() and Time.get_ticks_msec() < until: await process_frame
 	var opened: Array = router.opened.back() if not router.opened.is_empty() else ["", {}]
 	check(opened[0] == "res://scenes/dynamic_farm/parcel_outpost.tscn" and str(opened[1].get("parcel_id")) == home
 		and opened[1].get("store") != null and opened[1].store.block_id == home and not entry.is_open(),
 		"Go opens the 3D room with the home's parcel save")
+	until = Time.get_ticks_msec() + 3000
+	while page._traveling() and Time.get_ticks_msec() < until: await process_frame # this router never opens it: the iris opens again
+	check(not page._traveling() and page._travel.at == page.MapTravel.HOME, "the room did not open: the avatar is back home")
 	RouterFixture.restore(root, router, real_router)
 	page._bridge = null
 	ProjectSettings.set_setting(LOCAL_SAVE, null)

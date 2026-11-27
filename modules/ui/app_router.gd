@@ -175,6 +175,7 @@ func _load_with_feedback(scene_path: String, args := {}) -> PackedScene:
 		var Overlay := preload("res://modules/ui/loading_overlay.gd")
 		_loading = Overlay.new()
 		_loading.english = args.get(Overlay.ENGLISH_UI) == true
+		if args.get(Overlay.BACKDROP) is Color: _loading.backdrop = args[Overlay.BACKDROP]
 	add_child(_loading)
 	await _render_frame()
 	# Compatibility (OpenGL ES: a phone or emulator without Vulkan): there 0.3.3's threaded loads never finished — every

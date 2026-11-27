@@ -17,6 +17,9 @@ extends Control
 ## C-128 (0.4.4): a round profile key at the left, level with the locate key, opens the main farm's profile over the
 ## map, and from it Settings and the dressing room (parcel_profile.gd).
 ## C-106: the UI v3 look of the owner-approved C-85 page ⑤ (map_ui.gd); states, actions and lines are unchanged.
+## C-188 (owner on Q-283, after C-187's design D-437): the player's avatar stands on the map (map_travel.gd) and walks a
+## curved route from home to the Washington Square pin on Go, and back home on Enter my farm; an iris closes on the place
+## before its scene opens and opens from it on the way back. Preview in 3D keeps its plain cut (C-188#13).
 ## C-146 (owner 11-25: "移除游客模式, 必须要注册/有账号才能玩"): no guest entry. A package that signs in
 ## (`sensen/dynamic_farm/account_restore`: the internal and release packages) opens the map only with an account: without
 ## one the sign-in panel stands over an empty screen with no way past it (no ✕) until the player signs in or signs up;
@@ -36,6 +39,9 @@ const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
 ## The 3D space the Washington Square pin opens (C-115).
 const ROOM := "res://scenes/dynamic_farm/parcel_outpost.tscn"
 const TownEntry := preload("res://scenes/dynamic_farm/town_entry.gd")
+const MapTravel := preload("res://scenes/dynamic_farm/map_travel.gd")
+## The Washington Square pin's place in the avatar's trips (C-188).
+const TOWN := "town"
 const PROFILE := "res://scenes/dynamic_farm/parcel_profile.gd"
 const LocalFarmStore := preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const RemoteFarmStore := preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
@@ -132,6 +138,15 @@ var _home: Button
 var _locate: Button
 var _bottom: VBoxContainer
 var _entry: Control # The Washington Square pin and its place card (TownEntry).
+## The avatar and its trips (C-188, map_travel.gd); the parcel card hidden while a trip has taken it away; the farm read
+## for Enter my farm, opened once the iris has closed on home; a farm read whose trip was cancelled (Back), not opened;
+## the place whose scene is open (the iris opens from it on the way back); the scene a trip preloads (T-02).
+var _travel: Control
+var _travel_card := false
+var _farm_waiting := {}
+var _drop_farm := false
+var _inside := ""
+var _preloading := ""
 var _profile_button: Button
 ## The profile and the pages opened from it, over the map (parcel_profile.gd), else null.
 var _profile: Control
@@ -363,10 +378,18 @@ func _build_ui() -> void:
 	_entry = TownEntry.new(); _entry.visible = false; _hud.add_child(_entry); _hud.move_child(_entry, 0)
 	_entry.go_requested.connect(_open_town)
 	_entry.card_changed.connect(_on_entry_card)
+	# Over the pins, under the panels and keys; its iris over everything (added last below).
+	_travel = MapTravel.new(); _hud.add_child(_travel); _hud.move_child(_travel, 1)
+	_travel.fade_in.assign([_top])
+	_travel.closed.connect(_travel_closed)
+	_travel.cancelled.connect(_travel_cancelled)
+	_travel.card_gone.connect(_travel_card_gone)
+	_travel.settled.connect(_render)
 	_confirm = _dialog("ClaimConfirm", CLAIM_ASK, CLAIM_NOTE, UiArt.hero("parcel"),
 		[["Claim", UiTokens.BUTTON_CMD_PRIMARY, _claim_selection], ["Cancel", UiTokens.BUTTON_CMD_SECONDARY, _cancel_claim]], _cancel_claim)
 	_sign_out_confirm = _dialog("SignOutConfirm", SIGN_OUT_ASK, "", null,
 		[["Sign out", UiTokens.BUTTON_CMD_DESTRUCTIVE, _sign_out], ["Cancel", UiTokens.BUTTON_CMD_SECONDARY, _cancel_sign_out]], _cancel_sign_out)
+	_hud.add_child(_travel.make_iris())
 	_area_timer = Timer.new(); _area_timer.one_shot = true; _area_timer.timeout.connect(_refresh_area); add_child(_area_timer)
 	for node in [_bottom, _hud]: node.item_rect_changed.connect(_place_locate)
 	_hud.resized.connect(_place_locate)
@@ -508,9 +531,10 @@ func _render() -> void:
 		if _area_generation != _selector.generation:
 			_area_generation = _selector.generation; _area_timer.start(0.1)
 	var state: String = _claims.status(id)
-	var idle: bool = not _selector.busy and _selector.map_ready and not _opening and not _claims.busy
+	var idle: bool = not _selector.busy and _selector.map_ready and not _opening and not _claims.busy and not _traveling()
 	_open.disabled = not idle or id.is_empty()
-	_camera.input_enabled = not _selector.busy and not _opening and not _claims.busy and _profile == null and not _gated
+	# A trip keeps the map draggable (D-437 §5) while its farm loads: a tap skips the walk instead of picking.
+	_camera.input_enabled = (not _selector.busy or _traveling()) and not _opening and not _claims.busy and _profile == null and not _gated
 	_render_card(id, state)
 	var claimable: bool = state == "none" and _claims.mine_known and not _claims.has_home() and _claims.in_zone(id)
 	if not claimable or not idle: _confirm.hide()
@@ -519,9 +543,15 @@ func _render() -> void:
 	_open.visible = state != "mine"
 	_reselect.visible = state == "mine" and _claims.can_give_up(); _reselect.disabled = not idle
 	_home.visible = _claims.has_home() and not (_entry != null and _entry.is_open())
-	_home.disabled = _selector.manifest.is_empty() or _opening
+	_home.disabled = _selector.manifest.is_empty() or _opening or _traveling()
 	_locate.disabled = _home.disabled
 	_render_entry()
+	_render_travel()
+	if not _selector.busy:
+		_drop_farm = false
+		# Enter my farm's read failed (its card says so): the trip home is called off.
+		if _travel != null and _travel.heading(MapTravel.HOME) and _travel.phase != MapTravel.Phase.CLOSED and _farm_waiting.is_empty():
+			_travel.cancel.call_deferred(false)
 	if _own_farm_entry() and _claims.has_home(): _read_farm()
 	if _selector._options.is_empty(): _choices.hide()
 	_render_feedback(id)
@@ -530,7 +560,7 @@ func _render() -> void:
 ## The card for the selected parcel (or the list of overlapping ones): name, counts, whose it is and the next step.
 func _render_card(id: String, state: String) -> void:
 	var claiming: bool = _claims.busy and _claims.message == CLAIMING
-	_card.visible = (not id.is_empty() or _choices.visible) and not claiming
+	_card.visible = (not id.is_empty() or _choices.visible) and not claiming and not _travel_card
 	var mine := state == "mine"
 	_card_tag.text = HOME_TAG if mine else PARCEL_TAG
 	_card_hero.texture = UiArt.hero("home" if mine else "parcel")
@@ -633,7 +663,7 @@ func _frame_home(fly := false) -> bool:
 	return true
 
 func _go_home() -> void:
-	if _selector == null or _selector.manifest.is_empty() or _opening: return
+	if _selector == null or _selector.manifest.is_empty() or _opening or _traveling(): return
 	if not _frame_home(true): return
 	# A home claimed on an earlier release opens in that release's farm (Q-172), which the map's release may not draw.
 	if not _own_farm_entry(): return
@@ -647,7 +677,7 @@ func _home_release() -> String:
 ## The locate key: back to the player, who lives at their home; without a home, back to the starter zone (C-130) or the
 ## dataset's area.
 func _locate_player() -> void:
-	if _selector == null or _selector.manifest.is_empty() or _opening: return
+	if _selector == null or _selector.manifest.is_empty() or _opening or _traveling(): return
 	if not _frame_home(true): _reset_area(true)
 
 ## The account chip at the top right (C-110, C-85 ⑤ D): signed in, the avatar and the name (a tap asks to sign out);
@@ -655,7 +685,7 @@ func _locate_player() -> void:
 ## Development builds on the in-memory claim stand-in have no account and hide it.
 func _render_account() -> void:
 	if _account_button == null: return
-	_profile_button.disabled = _opening or _profile != null or _profile_waiting or (_selector != null and _selector.busy)
+	_profile_button.disabled = _opening or _profile != null or _profile_waiting or (_selector != null and _selector.busy) or _traveling()
 	var net := get_node_or_null("/root/Net")
 	var shown := net != null and not _fake_claims()
 	_account_button.visible = shown
@@ -665,7 +695,7 @@ func _render_account() -> void:
 	var waiting := _restoring or _signing_out
 	var text := BUSY_DOTS if waiting else _account_name(net.account) if signed_in else "Sign in"
 	_style_account(signed_in or waiting, text)
-	_account_button.disabled = waiting or _opening or (_claims != null and _claims.busy)
+	_account_button.disabled = waiting or _opening or (_claims != null and _claims.busy) or _traveling()
 	if not signed_in or waiting: _sign_out_confirm.hide()
 	_account_toast.visible = signed_in and not _restoring and not str(net.restore_error).is_empty()
 
@@ -785,7 +815,7 @@ func _show_candidates(rows: Array) -> void:
 
 ## The default area: the server's starter zone when it has one on (C-130), else the dataset's centre.
 func _reset_area(fly := false) -> void:
-	if _selector == null or _selector.busy or _selector.manifest.is_empty() or _opening: return
+	if _selector == null or _selector.busy or _selector.manifest.is_empty() or _opening or (fly and _traveling()): return
 	var native: Dictionary = _selector.manifest.native_map
 	var center: Array = native.center
 	var level := clampf(float(native.get("initial_zoom", 17.5)), 13, 21)
@@ -807,9 +837,13 @@ func _preview() -> void:
 		_entering = ""; _selector.open_farm()
 
 func _enter_farm() -> void:
-	if _selector != null and not _opening:
+	if _selector != null and not _opening and not _traveling():
 		_entering = str(_selector.selection.get("block_id", ""))
-		_selector.open_farm(_home_release() if _claims != null and _claims.status(_entering) == "mine" else "")
+		var mine: bool = _claims != null and _claims.status(_entering) == "mine"
+		_selector.open_farm(_home_release() if mine else "")
+		# C-188: the avatar walks home meanwhile (or stays there) and the iris closes on it once the farm is read.
+		if mine and _selector.busy and _travel != null and _own_farm_entry() and _travel.depart(MapTravel.HOME, _card):
+			_travel.hold = true; _preload_scene(HOST); _render()
 
 func _claim_selection() -> void:
 	_confirm.hide()
@@ -840,6 +874,9 @@ func _render_entry() -> void:
 ## A tap on the map: the Washington Square pin first (farm-dev's city map takes a pin's tap before the ground), else the
 ## building under it.
 func _on_map_tap(point: Vector2) -> void:
+	if _traveling(): # a tap while walking skips to the end (C-188, D-437 ④); nothing is picked meanwhile
+		if _travel.walking(): _travel.skip()
+		return
 	if _entry != null and _entry.visible and not _opening and _entry.hit(point * _camera.size):
 		_entry.open_card(); return
 	_selector.tap(point, _camera.zoom)
@@ -858,12 +895,92 @@ func _on_entry_card(open: bool) -> void:
 
 ## Go on the Washington Square card: the 3D room above the map (AppRouter, as "Enter my farm"), trading through the home's
 ## parcel save. Back or the room's door returns here; the map then reads the save again for the guide's line.
+## C-188: the avatar walks there first (map_travel.gd) while the room loads; the room opens once the iris has closed.
 func _open_town() -> void:
-	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _opening or _profile != null: return
-	var home: Dictionary = _claims.mine
+	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _opening or _profile != null or _traveling(): return
+	var card: Control = _entry.card if _entry.is_open() else null
+	if _travel != null and _travel.depart(TOWN, card, card.get_node_or_null("Sheet") if card != null else null):
+		_preload_scene(ROOM); _render(); return
 	_entry.close_card()
+	await _enter_town()
+
+func _enter_town() -> void:
+	if _claims == null or not _claims.has_home(): _travel_back(); return
+	var home: Dictionary = _claims.mine
 	await _open_scene(ROOM, {"store": _farm_store(str(home.parcel_id), str(home.get("dataset_version", ""))),
 		"parcel_id": str(home.parcel_id), "return_context": {"center": Array(_camera.center), "zoom": _camera.zoom}})
+
+func _traveling() -> bool:
+	return _travel != null and _travel.busy()
+
+## The avatar's places (home's point, the Washington Square pin) and whether it shows: a package that enters its own farm,
+## with a home. A new home (or none) puts it at home.
+func _render_travel() -> void:
+	if _travel == null: return
+	_travel.camera = _camera
+	var places := {}
+	var center = _claims.mine.get("center") if _claims != null and _claims.has_home() else null
+	if Geo.valid_point(center): places[MapTravel.HOME] = {"geo": center, "pin": null}
+	if _entry != null and _entry.visible: places[TOWN] = {"geo": [TownEntry.LON, TownEntry.LAT], "pin": _entry}
+	_travel.places = places
+	var parcel := str(_claims.mine.get("parcel_id", "")) if places.has(MapTravel.HOME) else ""
+	if parcel != MapTravel.home_parcel:
+		MapTravel.home_parcel = parcel; MapTravel.at = MapTravel.HOME
+	_travel.shown = _own_farm_entry() and places.has(MapTravel.HOME)
+
+## The card faded out as the trip set off: the place card closes, the parcel card steps aside until the trip is over.
+func _travel_card_gone() -> void:
+	if _travel.destination() == TOWN: _entry.close_card()
+	else: _travel_card = true; _render()
+
+## The iris has closed on the place: its scene opens (the farm once read).
+func _travel_closed(place: String) -> void:
+	if place == TOWN: await _enter_town()
+	elif not _farm_waiting.is_empty():
+		var farm := _farm_waiting; _farm_waiting = {}
+		await _open_farm_scene(farm)
+
+## Back while walking, or the farm read failed: the avatar is back where it left; the scene's preload is dropped.
+func _travel_cancelled(_place: String) -> void:
+	_drop_preload()
+	if _travel.destination() == MapTravel.HOME and _farm_waiting.is_empty() and _selector != null and _selector.busy: _drop_farm = true
+	_farm_waiting = {}; _entering = ""
+	_show_card()
+
+## The place could not open (or the map came back): the iris opens from it and the avatar goes back where it left.
+func _travel_back() -> void:
+	if _travel == null or _travel.phase != MapTravel.Phase.CLOSED: return
+	_drop_preload()
+	_travel.come_back(_travel.destination(), _travel.origin())
+	_show_card()
+
+func _show_card() -> void:
+	_travel_card = false
+	if _card != null: _card.modulate.a = 1.0
+	_render()
+
+## T-02: the scene a trip goes to starts loading on the loader's thread as it sets off. Not where AppRouter loads on the
+## main thread (sync_loads: the Compatibility renderer, whose threaded loads never finish).
+func _preload_scene(path: String) -> void:
+	var router := get_node_or_null("/root/AppRouter")
+	if router == null or router.get("sync_loads") == true or not _preloading.is_empty(): return
+	if ResourceLoader.load_threaded_request(path, "PackedScene") == OK: _preloading = path
+
+## The preloaded scene when it is ready, else null; one still loading (or failed) is left to AppRouter to take (C-125).
+func _take_preload(path: String) -> PackedScene:
+	if _preloading.is_empty() or _preloading != path: return null
+	_preloading = ""
+	if ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_LOADED:
+		return ResourceLoader.load_threaded_get(path) as PackedScene
+	var router := get_node_or_null("/root/AppRouter")
+	if router != null and router.has_method("adopt_threaded_load"): router.adopt_threaded_load(path)
+	return null
+
+func _drop_preload() -> void:
+	if not _preloading.is_empty(): _take_preload(_preloading)
+
+func _exit_tree() -> void:
+	_drop_preload()
 
 ## The map has no player of its own, so after a cold start nothing had loaded the saved outfit and the profile's figure
 ## stayed blank ~3 s on its first open (C-133): its parts start loading on the loader's threads as the map opens.
@@ -932,6 +1049,14 @@ static func area_bbox(camera: Control) -> Array:
 
 func _open_host(farm: Dictionary) -> void:
 	if _leaving or _suspended or _opening: return
+	if _drop_farm: _drop_farm = false; _render(); return # its trip was cancelled with Back (C-188)
+	# C-188: on the way home the farm opens once the iris has closed on it.
+	if _travel != null and _travel.heading(MapTravel.HOME) and _travel.phase != MapTravel.Phase.CLOSED:
+		_farm_waiting = farm; _travel.hold = false; return
+	await _open_farm_scene(farm)
+
+func _open_farm_scene(farm: Dictionary) -> void:
+	if _leaving or _suspended or _opening: _travel_back(); return
 	# Only the player's own parcel, opened from "Enter my farm", in a package with `own_farm` is farmable.
 	var own: bool = _own_farm_entry() and _entering == str(farm.block_id) and _claims != null and _claims.status(_entering) == "mine"
 	_entering = ""
@@ -940,21 +1065,32 @@ func _open_host(farm: Dictionary) -> void:
 
 ## Opens a 3D scene above the map through AppRouter: the parcel (dynamic_farm_host) or the Washington Square room. The map's
 ## occlusion colour is set first; the map goes opaque only once the router really pushes the scene (suspend).
+## C-188: after a trip (the iris closed on `place`) a scene preloaded in time is pushed at once; else its loading layer
+## stands on the iris's colour. Back on the map the iris opens from the place (resume); a scene that never opened sends
+## the avatar back where it left.
 func _open_scene(path: String, args: Dictionary) -> void:
+	var place: String = _travel.destination() if _travel != null and _travel.phase == MapTravel.Phase.CLOSED else ""
 	if _bridge == null or not _bridge.supports_surface_opacity() or not _bridge.set_map_occlusion_color(OCCLUSION_COLOR):
-		_render()
+		_travel_back(); _render()
 		_set_hint("Use the latest Dynamic Farm preview build."); return
 	var router := get_node_or_null("/root/AppRouter")
 	if router == null or not router.has_method("open_instance"):
+		_travel_back()
 		_set_hint("This preview is missing its scene router."); return
 	_opening = true; _render()
 	var english_args := args.duplicate()
 	english_args[LoadingLayer.ENGLISH_UI] = true # its loading layer in English as well (C-144)
-	await router.open_instance(path, english_args)
+	_inside = place
+	var packed := _take_preload(path) if not place.is_empty() else null
+	if packed != null and router.has_method("push_packed") and router.push_packed(packed, english_args) != null: pass
+	else:
+		if not place.is_empty(): english_args[LoadingLayer.BACKDROP] = Color(OCCLUSION_COLOR)
+		await router.open_instance(path, english_args)
 	_opening = false
 	if not _suspended:
 		# Loading cancelled/failed before a host became top, or Back already returned here.
 		_restore_surface_mode()
+		_inside = ""; _travel_back()
 		_render()
 
 func suspend() -> void:
@@ -964,6 +1100,7 @@ func suspend() -> void:
 func _suspend_map(committing_preview: bool) -> void:
 	_suspended = true
 	_presentation_epoch += 1
+	if _travel != null and not committing_preview: _travel.reset() # a walk (or its arrival) left for the background is called off
 	if _camera != null: _camera.stop()
 	get_viewport().transparent_bg = false
 	if _bridge != null: _bridge.set_map_occlusion_color(OCCLUSION_COLOR)
@@ -980,6 +1117,9 @@ func resume() -> void:
 	if _gated: return # Back to the sign-in panel; the map loads once someone signs in (C-146).
 	_hud.visible = _profile == null # Back from the dressing room: the profile is still over the map.
 	_farm_fresh = false # Back from the parcel: its save has moved on.
+	# C-188 (R-01..R-03): back from a trip's scene the iris opens from its place, where the avatar now stands.
+	if _travel != null and not _inside.is_empty():
+		_travel.come_back(_inside, _inside); _inside = ""; _show_card()
 	_presentation_epoch += 1
 	if _bridge != null:
 		get_viewport().transparent_bg = true
@@ -1012,6 +1152,7 @@ func _record_presentation(stage: String, epoch: int) -> void:
 
 func _leave() -> void:
 	if _leaving or _opening: return
+	if _traveling(): _travel.cancel(); return # Back while walking calls the trip off (C-188); later it waits
 	_leaving = true
 	suspend()
 	_finish_leave.call_deferred()
@@ -1034,6 +1175,8 @@ func is_back_navigation_locked() -> bool:
 	if is_instance_valid(_profile):
 		_profile.back()
 		return true
+	if _traveling(): # Back while walking calls the trip off (C-188); past the arrival it waits for the scene
+		_travel.cancel(); return true
 	if _entry != null and _entry.is_open():
 		_entry.close_card(); return true
 	_leave(); return true

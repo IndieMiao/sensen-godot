@@ -8,8 +8,11 @@ extends RefCounted
 ## Positions in the file are in cells (1 U = one tilled cell edge, C-134 attachment-1195) in a building's own unturned
 ## frame: origin at the footprint's rear-left corner, x to the right, z toward the entry (the front, the model's +Z).
 ## FarmBuilding puts a model's pivot on the footprint's middle, so `model_point` shifts by half the footprint.
+## C-202: a building's `cutouts` (the rules' rects of its footprint that are not its own, ParcelFarm.own_cells: the
+## barn's rear-left 2×2) bend the fence round them and keep the animals out of them; `[]` is the plain rectangle.
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
 const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
+const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const ART_PATH := "res://assets/farm/data/dynamic_farm_art.json"
 ## Placeholder ground sits just above the farm ground so the two never fight.
 const GROUND_LIFT := 0.004
@@ -77,15 +80,18 @@ static func local_point(model: Vector3, base: Vector2i, cell_m: float) -> Vector
 static func _vec(raw: Variant, fallback := Vector2.ZERO) -> Vector2:
 	return Vector2(float(raw[0]), float(raw[1])) if raw is Array and raw.size() == 2 else fallback
 
-## The type's parts: [{id, center: Vector2, size: Vector2, height, round, feeder, model, color}], centres and sizes in
-## cells.
+## The type's parts: [{id, center: Vector2, size: Vector2, height, round, feeder, model, color, refill, eat}], centres
+## and sizes in cells. A feeder may say where the player stands to fill it (`refill`) and where an animal stands to eat
+## at it (`eat`, C-202: the barn's trough is filled from its right end, the cows eat along its back); null when not said.
 static func parts(type: String) -> Array:
 	var out := []
 	for p in building_art(type).get("parts", []):
 		if not p is Dictionary: continue
 		out.append({"id": str(p.get("id", "")), "center": _vec(p.get("center")), "size": _vec(p.get("size"), Vector2.ONE),
 			"height": float(p.get("height", 0.5)), "round": bool(p.get("round", false)), "feeder": bool(p.get("feeder", false)),
-			"model": str(p.get("model", "")), "color": Color.from_string(str(p.get("color", "#9b7a55")), Color(0.6, 0.48, 0.33))})
+			"model": str(p.get("model", "")), "color": Color.from_string(str(p.get("color", "#9b7a55")), Color(0.6, 0.48, 0.33)),
+			"refill": _vec(p.refill) if p.get("refill") is Array and p.refill.size() == 2 else null,
+			"eat": _vec(p.eat) if p.get("eat") is Array and p.eat.size() == 2 else null})
 	return out
 
 ## Cells outside the footprint the type's art needs kept (`keep_clear`, rects [x, z, width, depth] in cells of the
@@ -106,8 +112,9 @@ static func keep_clear(type: String, base: Vector2i) -> Array:
 	return out
 
 ## The fence's runs along the footprint's edge, openings left out: [{from: Vector2, to: Vector2, open_from: bool,
-## open_to: bool}] in cells; `open_*` says that end stops at an opening.
-static func fence_runs(type: String, base: Vector2i) -> Array:
+## open_to: bool}] in cells; `open_*` says that end stops at an opening. The four sides come first (back, front, left,
+## right; openings are on them), each only where the footprint reaches it, then the edges round the cutouts (C-202).
+static func fence_runs(type: String, base: Vector2i, cutouts := []) -> Array:
 	var fence = building_art(type).get("fence")
 	if not fence is Dictionary: return []
 	var gaps := {}
@@ -116,24 +123,56 @@ static func fence_runs(type: String, base: Vector2i) -> Array:
 		if o is Dictionary and gaps.has(str(o.get("side", ""))): gaps[o.side].append(Vector2(float(o.get("from", 0)), float(o.get("to", 0))))
 	var w := float(base.x)
 	var d := float(base.y)
-	var sides := {"back": [Vector2(0, 0), Vector2(w, 0)], "front": [Vector2(0, d), Vector2(w, d)],
-		"left": [Vector2(0, 0), Vector2(0, d)], "right": [Vector2(w, 0), Vector2(w, d)]}
+	var sides := {"back": Vector2(0, 0), "front": Vector2(0, d), "left": Vector2(0, 0), "right": Vector2(w, 0)}
+	var edges := _edges(base, cutouts)
 	var runs := []
 	for side: String in SIDES:
-		var a: Vector2 = sides[side][0]
-		var b: Vector2 = sides[side][1]
+		var a: Vector2 = sides[side]
 		var along := 0 if side in ["back", "front"] else 1
 		var cuts: Array = gaps[side].duplicate()
 		cuts.sort_custom(func(p: Vector2, q: Vector2): return p.x < q.x)
-		var start := a[along]
-		var after_cut := false
-		for cut: Vector2 in cuts:
-			if cut.x > start: runs.append(_run(a, along, start, cut.x, after_cut, true))
-			if cut.y >= start:
-				start = cut.y
-				after_cut = true
-		if b[along] > start: runs.append(_run(a, along, start, b[along], after_cut, false))
+		for span: Vector2 in edges.get([along, a[1 - along]], []):
+			var start := span.x
+			var after_cut := false
+			for cut: Vector2 in cuts:
+				if cut.y <= span.x or cut.x >= span.y: continue
+				if cut.x > start: runs.append(_run(a, along, start, cut.x, after_cut, true))
+				if cut.y >= start:
+					start = cut.y
+					after_cut = true
+			if span.y > start: runs.append(_run(a, along, start, span.y, after_cut, false))
+		edges.erase([along, a[1 - along]])
+	for line: Array in edges:
+		var a := Vector2.ZERO
+		a[1 - int(line[0])] = float(line[1])
+		for span: Vector2 in edges[line]: runs.append(_run(a, int(line[0]), span.x, span.y, false, false))
 	return runs
+
+## The footprint's outline (its own cells, `cutouts` left out) as straight edges: {[along, at]: [Vector2(from, to)]},
+## `along` 0 for an edge along x at z = `at`, 1 along z at x = `at`; joined where they meet, low to high.
+static func _edges(base: Vector2i, cutouts: Array) -> Dictionary:
+	var own := {}
+	for cell: Vector2i in ParcelFarm.own_cells(base, cutouts): own[cell] = true
+	var units := {}
+	for cell: Vector2i in own:
+		for side: Array in [[Vector2i(0, -1), 0, cell.y, cell.x], [Vector2i(0, 1), 0, cell.y + 1, cell.x],
+				[Vector2i(-1, 0), 1, cell.x, cell.y], [Vector2i(1, 0), 1, cell.x + 1, cell.y]]:
+			if own.has(cell + side[0]): continue
+			var line := [side[1], side[2]]
+			if not units.has(line): units[line] = []
+			units[line].append(int(side[3]))
+	var out := {}
+	var lines := units.keys()
+	lines.sort()
+	for line: Array in lines:
+		var at: Array = units[line]
+		at.sort()
+		var spans: Array[Vector2] = []
+		for x: int in at:
+			if not spans.is_empty() and is_equal_approx(spans[-1].y, float(x)): spans[-1].y = float(x + 1)
+			else: spans.append(Vector2(x, x + 1))
+		out[[int(line[0]), float(line[1])]] = spans
+	return out
 
 static func _run(a: Vector2, along: int, from: float, to: float, open_from: bool, open_to: bool) -> Dictionary:
 	var p := a
@@ -165,14 +204,14 @@ static func entry_pullback(type: String, cell_m: float) -> float:
 ## Walls the player stops at, as FarmPropProxy profiles in the model's frame: every fence run and every part (a round
 ## one as a cylinder). The entry is the fence's opening; a run's wall stops short of it by `entry_pullback` so the
 ## player's centre passes `entry_clear_m` wide (C-154#89).
-static func profiles(type: String, base: Vector2i, cell_m: float) -> Array:
+static func profiles(type: String, base: Vector2i, cell_m: float, cutouts := []) -> Array:
 	var out := []
 	var fence = building_art(type).get("fence")
 	if fence is Dictionary:
 		var t := float(fence.get("thickness", 0.125))
 		var h := float(fence.get("height", 0.75))
 		var pull := entry_pullback(type, cell_m)
-		for run: Dictionary in fence_runs(type, base):
+		for run: Dictionary in fence_runs(type, base, cutouts):
 			var along := 0 if is_equal_approx(run.from.y, run.to.y) else 1
 			var axis := Vector2.ZERO
 			axis[along] = 1.0
@@ -197,20 +236,35 @@ static func profiles(type: String, base: Vector2i, cell_m: float) -> Array:
 	return out
 
 ## The walls at a placed building: one FarmPropProxy per profile, in scene space.
-static func proxies(type: String, base: Vector2i, cell_m: float, at: Transform3D) -> Array:
+static func proxies(type: String, base: Vector2i, cell_m: float, at: Transform3D, cutouts := []) -> Array:
 	var out := []
-	for profile: Dictionary in profiles(type, base, cell_m): out.append(Proxy.new(profile, at, 1.0))
+	for profile: Dictionary in profiles(type, base, cell_m, cutouts): out.append(Proxy.new(profile, at, 1.0))
 	return out
 
 ## Feeder centres in the building's own frame (cells).
 static func feeders(type: String) -> Array:
 	return parts(type).filter(func(p): return p.feeder).map(func(p): return p.center)
 
-## Where animals may not stand, in cells: every part grown by `radius`, and the fence's inside band.
-static func blocked_rects(type: String, radius: float) -> Array:
+## Where an animal stands to eat at each feeder (its `eat`), or null where the feeder does not say: [Vector2 | null],
+## in the order of `feeders`.
+static func eat_points(type: String) -> Array:
+	return parts(type).filter(func(p): return p.feeder).map(func(p): return p.eat)
+
+## Where the player stands to fill each feeder (its `refill`), or null where it does not say: [Vector2 | null], in the
+## order of `feeders`.
+static func refill_points(type: String) -> Array:
+	return parts(type).filter(func(p): return p.feeder).map(func(p): return p.refill)
+
+## Where animals may not stand, in cells: every part grown by `radius`, and each cutout (C-202) grown by the fence's
+## half thickness and `radius` (the fence runs round it).
+static func blocked_rects(type: String, radius: float, cutouts := []) -> Array:
 	var out := []
 	for p: Dictionary in parts(type):
 		out.append(Rect2(p.center - p.size * 0.5, p.size).grow(radius))
+	var fence = building_art(type).get("fence")
+	var t := float(fence.get("thickness", 0.125)) * 0.5 if fence is Dictionary else 0.0
+	for r in cutouts:
+		if r is Array and r.size() == 4: out.append(Rect2(float(r[0]), float(r[1]), float(r[2]), float(r[3])).grow(t + radius))
 	return out
 
 ## The open floor inside the fence for an animal of `radius` (cells).

@@ -513,7 +513,7 @@ func _feed_action(near: Dictionary) -> Dictionary:
 	return {"verb": "feed", "refusal": refusal, "refusal_text": text, "key_text": key_copy(text, short),
 		"feed_item": str(rule.get("feed", "")),
 		"command": {"type": "feed", "building": int(b.id)} if refusal.is_empty() else {}, "feeder": near.point,
-		"approach": bool(near.get("approach", false))}
+		"stand": near.get("stand"), "approach": bool(near.get("approach", false))}
 
 ## The main key's second line for `text`: itself when it shows whole on the key, else `short` (when there is one).
 static func key_copy(text: String, short: String) -> String:
@@ -531,13 +531,15 @@ func feed_gap(rule: Dictionary, have: int, short := false) -> String:
 
 ## One feed press (C-154): the feeder is already in reach, so the player faces it and plays the labour clip while
 ## the command goes out; the fed hen then comes to peck (ParcelLivestock). C-175: offered for a tapped coop floor cell,
-## the player first walks up beside the feeder (as `work` does).
+## the player first walks up beside the feeder (as `work` does); C-202: to where the feeder is filled from, when its art
+## says (`stand`, the barn trough's right end).
 func feed(action: Dictionary) -> Dictionary:
 	if _body == null: return await send(action.command)
 	var cells: Array[Vector2i] = [_walk.cell_at(action.feeder)]
 	if action.get("approach", false):
 		busy = true
-		var reached: String = await _body.approach(cells)
+		var stand = action.get("stand")
+		var reached: String = await _body.approach(cells, {_walk.cell_at(stand): 0.0} if stand is Vector3 else {})
 		if not is_inside_tree(): return {"ok": false, "code": "LEFT"}
 		if reached != "ok":
 			busy = false

@@ -446,7 +446,7 @@ func _build_building(building: Dictionary) -> void:
 	var model := Building.model(type, base, _walk.cell_m)
 	if model != null: node.add_child(model)
 	add_child(node)
-	var proxies := Building.proxies(_walk, type, at, base, turns)
+	var proxies := Building.proxies(_walk, type, at, base, turns, Building.cutouts_of(building))
 	var wires := []
 	for proxy in proxies:
 		_walk.add_prop(proxy)
@@ -634,12 +634,13 @@ func show_house() -> void:
 ## Walks the player beside `cells` (8 neighbours, sides preferred) and turns them to face the
 ## cells, along a route around everything the walker collides with (C-73). Returns "ok" there,
 ## "unreachable" when no route exists or the walk stalls, "cancelled" when the stick or a pause
-## ends it first. Already within reach, it only turns.
-func approach(cells: Array) -> String:
+## ends it first. Already within reach, it only turns. `stands` ({cell: extra cost}, C-202: the barn
+## trough's filling spot) replaces the cells beside them as where to stand.
+func approach(cells: Array, stands := {}) -> String:
 	if _walk == null or cells.is_empty(): return "unreachable"
 	if not _route.is_empty(): _end_route("cancelled")
 	_paths.forget()
-	var goals: Dictionary = _paths.stand_cells(cells)
+	var goals: Dictionary = stands if not stands.is_empty() else _paths.stand_cells(cells)
 	if goals.has(_walk.cell_at(_walk.position)) or _within_reach(cells):
 		_face_cells(cells)
 		return "ok"

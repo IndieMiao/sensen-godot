@@ -35,6 +35,9 @@ var pin: UiMapDestination
 var card: Control
 var _focus_tween: Tween
 var _safe_bottom := 0.0
+## C-188's trip (map_travel.gd): the pin floats up this much while the avatar walks to it (T-07).
+var travel_lift := 0.0
+var _travel_pop := 1.0
 
 func _ready() -> void:
 	name = "TownEntry"
@@ -55,7 +58,7 @@ func place() -> void:
 	if pin == null: return
 	var at := screen_point()
 	pin.visible = visible and at != Vector2.INF and Rect2(Vector2.ZERO, size).grow(UiMapDestination.DISC).has_point(at)
-	if pin.visible: pin.position = at - pin.anchor_offset()
+	if pin.visible: pin.position = at - pin.anchor_offset() - Vector2(0, travel_lift)
 
 func screen_point() -> Vector2:
 	if camera == null or not camera.has_method("geo_screen"): return Vector2.INF
@@ -128,6 +131,15 @@ func close_card() -> void:
 	card = null
 	_animate_focus(1.0, FOCUS_OUT_S)
 	card_changed.emit(false)
+
+## C-188: the trip's pose for the pin: `lift` px up (the destination's float) and `pop` × its size (the arrival's pop).
+func set_travel_pose(lift: float, pop: float) -> void:
+	travel_lift = lift
+	if pop != 1.0 or _travel_pop != 1.0:
+		_travel_pop = pop
+		if _focus_tween: _focus_tween.kill()
+		pin.focus = pop
+	place()
 
 func _animate_focus(to: float, seconds: float) -> void:
 	if _focus_tween: _focus_tween.kill()

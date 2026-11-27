@@ -1,0 +1,60 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/sheep_pen/BD-06.glb" id="BD-06"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/sheep_pen/CS-07.glb" id="CS-07"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/sheep_pen/HF-01.glb" id="HF-01"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/sheep_pen/TP-08A.glb" id="TP-08A"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/sheep_pen/Gate.glb" id="Gate"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/sheep_pen/YardGround.glb" id="YardGround"]
+[ext_resource type="ArrayMesh" path="res://assets/dynamic_farm/sheep_pen/FencePost.res" id="FencePost"]
+[ext_resource type="ArrayMesh" path="res://assets/dynamic_farm/sheep_pen/FenceRail.res" id="FenceRail"]
+
+[sub_resource type="MultiMesh" id="Posts"]
+transform_format = 1
+instance_count = 24
+mesh = ExtResource("FencePost")
+buffer = PackedFloat32Array(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 3, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 4, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 5, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 6, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 6, 1, 0, 0, 2, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 0, 1, 0, 0, 0, 0, 1, 6, 1, 0, 0, 3, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 3, 0, 1, 0, 0, 0, 0, 1, 6, 1, 0, 0, 4, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 4, 0, 1, 0, 0, 0, 0, 1, 6, 1, 0, 0, 5, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 5, 0, 1, 0, 0, 0, 0, 1, 6, 1, 0, 0, 6, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 6, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 6, 0, 1, 0, 0, 0, 0, 1, 2, 1, 0, 0, 6, 0, 1, 0, 0, 0, 0, 1, 3, 1, 0, 0, 6, 0, 1, 0, 0, 0, 0, 1, 4, 1, 0, 0, 6, 0, 1, 0, 0, 0, 0, 1, 5, 1, 0, 0, 6, 0, 1, 0, 0, 0, 0, 1, 6)
+
+[sub_resource type="MultiMesh" id="Rails"]
+transform_format = 1
+instance_count = 46
+mesh = ExtResource("FenceRail")
+buffer = PackedFloat32Array(1, 0, 0, 0.5, 0, 1, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 0.5, 0, 1, 0, 0.25, 0, 0, 1, 6, 0, 0, 1, 0, 0, 1, 0, 0.25, -1, 0, 0, 0.5, 0, 0, 1, 6, 0, 1, 0, 0.25, -1, 0, 0, 0.5, 1, 0, 0, 0.5, 0, 1, 0, 0.5, 0, 0, 1, 0, 1, 0, 0, 0.5, 0, 1, 0, 0.5, 0, 0, 1, 6, 0, 0, 1, 0, 0, 1, 0, 0.5, -1, 0, 0, 0.5, 0, 0, 1, 6, 0, 1, 0, 0.5, -1, 0, 0, 0.5, 1, 0, 0, 1.5, 0, 1, 0, 0.25, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0.25, -1, 0, 0, 1.5, 0, 0, 1, 6, 0, 1, 0, 0.25, -1, 0, 0, 1.5, 1, 0, 0, 1.5, 0, 1, 0, 0.5, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0.5, -1, 0, 0, 1.5, 0, 0, 1, 6, 0, 1, 0, 0.5, -1, 0, 0, 1.5, 1, 0, 0, 2.5, 0, 1, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 2.5, 0, 1, 0, 0.25, 0, 0, 1, 6, 0, 0, 1, 0, 0, 1, 0, 0.25, -1, 0, 0, 2.5, 0, 0, 1, 6, 0, 1, 0, 0.25, -1, 0, 0, 2.5, 1, 0, 0, 2.5, 0, 1, 0, 0.5, 0, 0, 1, 0, 1, 0, 0, 2.5, 0, 1, 0, 0.5, 0, 0, 1, 6, 0, 0, 1, 0, 0, 1, 0, 0.5, -1, 0, 0, 2.5, 0, 0, 1, 6, 0, 1, 0, 0.5, -1, 0, 0, 2.5, 1, 0, 0, 3.5, 0, 1, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 3.5, 0, 1, 0, 0.25, 0, 0, 1, 6, 0, 0, 1, 0, 0, 1, 0, 0.25, -1, 0, 0, 3.5, 0, 0, 1, 6, 0, 1, 0, 0.25, -1, 0, 0, 3.5, 1, 0, 0, 3.5, 0, 1, 0, 0.5, 0, 0, 1, 0, 1, 0, 0, 3.5, 0, 1, 0, 0.5, 0, 0, 1, 6, 0, 0, 1, 0, 0, 1, 0, 0.5, -1, 0, 0, 3.5, 0, 0, 1, 6, 0, 1, 0, 0.5, -1, 0, 0, 3.5, 1, 0, 0, 4.5, 0, 1, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 4.5, 0, 1, 0, 0.25, 0, 0, 1, 6, 0, 0, 1, 0, 0, 1, 0, 0.25, -1, 0, 0, 4.5, 0, 0, 1, 6, 0, 1, 0, 0.25, -1, 0, 0, 4.5, 1, 0, 0, 4.5, 0, 1, 0, 0.5, 0, 0, 1, 0, 1, 0, 0, 4.5, 0, 1, 0, 0.5, 0, 0, 1, 6, 0, 0, 1, 0, 0, 1, 0, 0.5, -1, 0, 0, 4.5, 0, 0, 1, 6, 0, 1, 0, 0.5, -1, 0, 0, 4.5, 1, 0, 0, 5.5, 0, 1, 0, 0.25, 0, 0, 1, 0, 1, 0, 0, 5.5, 0, 1, 0, 0.25, 0, 0, 1, 6, 0, 0, 1, 0, 0, 1, 0, 0.25, -1, 0, 0, 5.5, 0, 0, 1, 6, 0, 1, 0, 0.25, -1, 0, 0, 5.5, 1, 0, 0, 5.5, 0, 1, 0, 0.5, 0, 0, 1, 0, 1, 0, 0, 5.5, 0, 1, 0, 0.5, 0, 0, 1, 6, 0, 0, 1, 0, 0, 1, 0, 0.5, -1, 0, 0, 5.5, 0, 0, 1, 6, 0, 1, 0, 0.5, -1, 0, 0, 5.5)
+
+[node name="SheepPen" type="Node3D"]
+metadata/footprint_cells = Vector2i(6, 6)
+metadata/placement_origin = "Rear-left post; +X right, +Z to front. Scale by farm cell_m once."
+metadata/entry = Vector2(1.5, 6)
+metadata/gate_clear_u = 0.875
+metadata/keep_clear_cell = Vector2i(1, 6)
+metadata/refill = Vector2(1.5, 2.5)
+metadata/eat = Vector2(0.5, 3.5)
+
+[node name="Posts" type="MultiMeshInstance3D" parent="."]
+multimesh = SubResource("Posts")
+
+[node name="Rails" type="MultiMeshInstance3D" parent="."]
+multimesh = SubResource("Rails")
+
+[node name="Earth" parent="." instance=ExtResource("YardGround")]
+position = Vector3(0, 0, 0)
+
+[node name="SheepShelter" parent="." instance=ExtResource("BD-06")]
+position = Vector3(4.5, 0, 0.25)
+
+[node name="LongWaterTrough" parent="." instance=ExtResource("CS-07")]
+position = Vector3(0.5, 0, 1.03)
+
+[node name="HayFeeder" parent="." instance=ExtResource("HF-01")]
+position = Vector3(0.5, 0, 2.5)
+
+[node name="BoundBaleA" parent="." instance=ExtResource("TP-08A")]
+position = Vector3(4.5, 0, 2.49)
+
+[node name="BoundBaleB" parent="." instance=ExtResource("TP-08A")]
+position = Vector3(5.46, 0, 2.49)
+rotation = Vector3(0, 3.14159, 0)
+
+[node name="OpenGate" parent="." instance=ExtResource("Gate")]
+position = Vector3(1.01, 0, 5.94)
+rotation = Vector3(0, 3.14159265, 0)

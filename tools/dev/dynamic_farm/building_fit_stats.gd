@@ -1,8 +1,8 @@
 extends SceneTree
 ## C-193: which claimable parcels can hold the coop, the barn and the sheep pen with the yard cleared.
 ## The judgement is building_fit.gd's (the game's placement rule, yard cleared, all four turns; see there).
-## Shapes: the coop with its real art (7×5 and its kept cells); the barn as C-192's draft art (8×6, the cell outside
-## its entry, f000a009); plain W×D sizes 5×3–10×8 with one walkable cell outside the front middle (the sheep pen's
+## Shapes: the coop with its real art (7×5 and its kept cells); the barn with its real art (C-202: 11×6 less the
+## rear-left 2×2, the two cells outside its gate) and as C-192's draft (barn_8x6: the cell outside its entry); plain W×D sizes 5×3–10×8 with one walkable cell outside the front middle (the sheep pen's
 ## size is not set yet); and, in order, cottage → coop → barn → pen 8×6 each at the first passing spot (a greedy lower
 ## bound on all fitting together). How to fetch a dataset and rerun: docs/plans/C-193.md.
 ##   godot --headless --path "$QA" --script res://tools/dev/dynamic_farm/building_fit_stats.gd -- <out.json> <list.txt>
@@ -20,7 +20,7 @@ func _run() -> void:
 		quit(2)
 		return
 	var shapes := Fit.shapes()
-	var order := [Fit.cottage(), shapes.coop, shapes.barn_8x6, shapes.plain_8x6]
+	var order := [Fit.cottage(), shapes.coop, shapes.barn, shapes.plain_8x6]
 	var rows := []
 	var started := Time.get_ticks_msec()
 	for line in FileAccess.get_file_as_string(args[1]).split("\n", false):
