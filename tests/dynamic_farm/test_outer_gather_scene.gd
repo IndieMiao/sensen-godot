@@ -116,16 +116,21 @@ func _key(farming: Node) -> Array:
 ## test_parcel_farming_scene: the rig's animations while busy, the distance walked and whether
 ## the farm changed while the clip was still playing.
 func _press(farming: Node) -> Dictionary:
-	var seen := {"clips": {}, "moved": 0.0, "early": false}
+	var seen := {"clips": {}, "moved": 0.0, "early": false, "shook": false}
 	var start: Vector3 = scene._walk.position
 	var version: int = farming.farm_version
 	var player := scene._rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
+	# MS-08 (C-211): the object a gather press picks rocks on its batch instance, then stands as it was.
+	var target := -1
+	if farming.current.get("verb") == "gather" and str(farming.current.get("refusal", "")) == "":
+		target = int(farming.gatherables[farming.current.object].index)
 	farming._key.pressed_down.emit()
 	await process_frame
 	var deadline := Time.get_ticks_msec() + 30000
 	while farming.busy and Time.get_ticks_msec() < deadline:
 		if player != null: seen.clips[player.current_animation] = true
 		if scene._labour_left > 0.0 and farming.farm_version != version: seen.early = true
+		if target >= 0 and farming.shaking == target and not farming._outer_instance(target).is_empty(): seen.shook = true
 		await process_frame
 	_check(not farming.busy, "a press finishes")
 	for i in 2: await process_frame
@@ -182,6 +187,16 @@ func _first_visit() -> Dictionary:
 		var seen := await _press(farming)
 		_check(seen.clips.has("labour_harvest") and not seen.early and seen.moved < 0.01,
 			"gathering a %s: no walk, the harvest clip, the result as it ends (%s)" % [kind, seen])
+		_check(seen.shook, "the %s rocks as it is pressed (MS-08)" % kind)
+		var fading: Array = farming._outer_root.get_children().filter(func(b): return str(b.name).begins_with("GatheredFading"))
+		if farming._outer_layout[farming.gatherables[index].index].solid:
+			var m: ShaderMaterial = (fading[0] as GeometryInstance3D).material_override if not fading.is_empty() else null
+			_check(m != null and m != farming._spent_material and float(m.get_shader_parameter(&"amount")) < 1.0,
+				"the picked %s fades into the grey on its own material (MS-08)" % kind)
+			await create_timer(0.4).timeout
+			_check(m != null and is_equal_approx(float(m.get_shader_parameter(&"amount")), 1.0), "…all grey after 300 ms (%s)" % kind)
+		else:
+			_check(fading.is_empty(), "a picked flower is hidden, nothing fades (%s)" % kind)
 		_check(int(farming.farm.bag.get(ITEMS[kind][0], 0)) == had + 1, "one %s in the bag" % ITEMS[kind][0])
 		_check(farming.energy_value() == energy_had - 2, "gathering a %s costs 2 Energy (C-148)" % kind)
 		_check(farming.last_gains == {ITEMS[kind][0]: 1} and ("+1 " + ITEMS[kind][1]) in _floats(farming),

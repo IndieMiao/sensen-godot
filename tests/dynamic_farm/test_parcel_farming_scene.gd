@@ -241,8 +241,8 @@ func _first_visit() -> void:
 		"the hoe and the seeds show C-86's v3 item art (C-105)")
 	_check(farming._bar.slots[1].icon == load("res://modules/dynamic_farm/parcel_items.gd").icon_of("pail") and farming._bar.slots[1].icon != null,
 		"the pail has its icon (C-151)")
-	_check(farming._bar.bag_icon == UiArt.SYS_BAG and scene._coins_icon.texture == UiArt.COIN,
-		"the Bag end and the coins capsule show the v3 bag and coin (C-105)")
+	_check(farming._bar.bag_icon == UiArt.bag_end() and farming._bar.bag_icon != UiArt.SYS_BAG and scene._coins_icon.texture == UiArt.COIN,
+		"the Bag end shows the v3 bag coloured (C-211), the coins capsule the v3 coin (C-105)")
 	_check(scene._coins_capsule.visible and scene._coins.text == "0", "the top bar shows the parcel's coins, 0 on a new parcel (C-59)")
 	scene._on_farm_changed(farming.farm.merged({"coins": 12}, true))
 	_check(UiMotion.rolling(scene._coins), "the coins roll to the new number (C-186 MS-03)")
@@ -445,15 +445,25 @@ func _profile_from_avatar(farming: Node) -> void:
 	_check(scene._title.custom_minimum_size.x > 0.0 and place.size.x < farming._ui.size.x - 24.0, "as wide as its lines: %s" % place)
 	avatar.pressed.emit()
 	await process_frame
-	_check(scene.profile_open() and not scene._canvas.visible and scene._controls.process_mode == Node.PROCESS_MODE_DISABLED,
-		"the avatar opens the profile; the parcel's HUD hides and its touches stop")
+	# MS-21 (C-211): the profile fades in over the parcel (160); its touches stop at once, the HUD goes once covered.
+	_check(scene.profile_open() and scene._profile.modulate.a < 1.0 and scene._canvas.visible
+		and scene._controls.process_mode == Node.PROCESS_MODE_DISABLED, "the avatar opens the profile fading in over the HUD; touches stop")
+	await create_timer(0.3).timeout
+	_check(scene.profile_open() and is_equal_approx(scene._profile.modulate.a, 1.0) and not scene._canvas.visible,
+		"faded in, the parcel's HUD hides")
 	var page: Control = scene._profile.top()
 	_check(page.get_script() == load("res://scenes/dynamic_farm/parcel_profile_page.gd") and page.farm_card != null, "the profile shows My farm")
 	var expected: String = scene._data.address if not str(scene._data.get("address", "")).is_empty() else str(scene._data.get("name", ""))
 	_check(page.farm_card.find_child("FarmName", true, false).text == expected, "its card is this parcel: %s" % expected)
+	var leaving: Control = scene._profile
 	_check(scene.close_modal() and not scene.profile_open(), "Android Back closes the profile")
 	await process_frame
 	_check(scene._canvas.visible and scene._controls.process_mode == Node.PROCESS_MODE_INHERIT, "the HUD and touches come back")
+	_check(is_instance_valid(leaving) and leaving.modulate.a < 1.0 and leaving.mouse_filter == Control.MOUSE_FILTER_IGNORE,
+		"the profile fades out over the parcel (MS-21), taking no touches")
+	_check(scene.open_profile() == null, "a new profile waits for the one fading out (its pages and locale still there)")
+	await create_timer(0.3).timeout
+	_check(not is_instance_valid(leaving) and scene.get_node_or_null(^"ProfileLayer") == null, "faded out, it and its layer are gone")
 	avatar.pressed.emit()
 	await process_frame
 	scene._profile.top().farm_pressed.emit()

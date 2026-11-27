@@ -141,8 +141,24 @@ func _market() -> void:
 	await town.sell("crop_carrot", 1)
 	_check(town.farm.coins == 12 and town.farm.bag.crop_carrot == 2 and counter.coins.value == "12", "selling one carrot: +12 coins")
 	_check(counter.keeper_bar.line == "Thanks! +12 coins", "Jasmine thanks")
+	var sheet_at: int = counter.sheet.get_index()
 	await town.sell("crop_carrot", 2)
 	_check(town.farm.coins == 36 and not town.farm.bag.has("crop_carrot") and counter.sellable() == ["wood"], "Sell All: 36 coins, no carrots left")
+	# C-211 MS-15: the sold-out card folds away in its place (clipped, shrinking), the carrot's grid icon fades.
+	var fold: Control = counter._fold
+	var ghost: Control = counter.find_child("SoldGhost", true, false)
+	_check(fold != null and fold.clip_contents and counter.sheet.get_parent() == fold and fold.get_index() == sheet_at
+		and ghost != null, "sold out: the card folds in its place, the carrot's icon fades")
+	await process_frame
+	_check(is_instance_valid(ghost) and ghost.size.x <= 64.0 and ghost.global_position.y > counter.sheet.get_global_rect().position.y,
+		"…the icon where its cell was, not stretched over the drawer (%s)" % (ghost.get_global_rect() if is_instance_valid(ghost) else Rect2()))
+	await create_timer(0.1).timeout
+	_check(is_instance_valid(fold) and fold.custom_minimum_size.y < counter.sheet.size.y and fold.custom_minimum_size.y > 0.0,
+		"…folding (%.0f of %.0f)" % [fold.custom_minimum_size.y, counter.sheet.size.y])
+	await create_timer(0.25).timeout
+	_check(counter._fold == null and not counter.sheet.is_open() and counter.sheet.get_parent() == counter.body
+		and counter.sheet.get_index() == sheet_at and counter.sheet.modulate.a == 1.0 and counter.find_child("SoldGhost", true, false) == null,
+		"folded: the card is closed, back in its place for the next pick")
 	var again: Dictionary = store.read()
 	_check(again.farm.coins == 36 and again.farm.sales == 2 and not again.farm.bag.has("crop_carrot"), "coins and bag are saved")
 	town.stack.close_drawer()
@@ -180,6 +196,10 @@ func _buy() -> void:
 	_check(bought[0] == {item = "seed_carrot", qty = 2}, "Buy reports the item and the count")
 	_check(town.farm.coins == 6 and town.farm.bag.seed_carrot == 2 and counter.coins.value == "6", "buying 2: −18 coins, +2 seeds")
 	_check(town.toast.current_text() == "Received Carrot Seeds ×2", "the toast says what came in")
+	var bag_line: Label = counter.row_of("seed_carrot")._effect
+	_check(UiMotion.rolling(bag_line), "the row's `Bag ×N` rolls up (C-211 MS-15)")
+	await create_timer(0.5).timeout
+	_check(bag_line.text == "Bag ×2", "…to Bag ×2")
 	row = counter.row_of("seed_carrot")
 	_check(row.spec().facts[0] == "Bag ×2" and row.buy.is_unavailable() and row.buy.reason == "Need 3 more coins", "6 coins: grey again, 3 short")
 	var refused: Dictionary = await town.buy("seed_carrot", 1)
@@ -300,8 +320,14 @@ func _level_card_first_frame() -> void:
 		_check(card.modulate.a == 0.0 and scrim.modulate.a == 0.0 and (glow == null or glow.modulate.a == 0.0),
 			"%s: before the first frame the card, its light and the scrim are all transparent" % tag)
 		await process_frame
-		var centre := (layer.size - card.size) * 0.5 + Vector2(0, UiRewardMoment.HERO_OVER * 0.5)
-		_check(card.position.is_equal_approx(centre) and card.position != Vector2.ZERO, "%s: then the card is centred (%s)" % [tag, card.position])
+		var place: Vector2 = Town.level_card_place(layer.size, card.size)
+		_check(card.position.is_equal_approx(place) and card.position != Vector2.ZERO, "%s: then the card is in its place (%s)" % [tag, card.position])
+		# C-211 (C-186#82): centred across, its middle at 42 % of the height (figure 6), above the screen's middle.
+		_check(is_equal_approx(card.position.x, (layer.size.x - card.size.x) * 0.5)
+			and is_equal_approx(card.position.y + card.size.y * 0.5, layer.size.y * UiTokens.SIZE_LEVEL_CARD_CENTRE_Y)
+			and card.position.y + card.size.y * 0.5 < layer.size.y * 0.5 and card.position.y >= UiRewardMoment.HERO_OVER,
+			"%s: centred across, its middle at %.0f %% of the height, its hero on screen (%s of %s)" % [tag,
+			UiTokens.SIZE_LEVEL_CARD_CENTRE_Y * 100.0, card.get_rect(), layer.size])
 		_check(card.modulate.a < 0.5 and scrim.modulate.a < 0.5, "%s: and fades in from there (card %.2f, scrim %.2f)" % [tag, card.modulate.a, scrim.modulate.a])
 		for i in 30: await process_frame
 		_check(is_equal_approx(card.modulate.a, 1.0) and is_equal_approx(scrim.modulate.a, 1.0) and (glow == null or is_equal_approx(glow.modulate.a, 1.0)),
