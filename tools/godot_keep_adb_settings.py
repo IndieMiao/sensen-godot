@@ -25,14 +25,19 @@ It finds the settings file that Godot will read (as Godot's EditorPaths do) and:
   * the account's own settings, or a self-contained Godot's settings: never written; a note on
     stderr if the key is not false there.
 When $HOME/.android is not $SENSEN_ADB_KEY_DIR (default: the account's ~/.android) it also makes
-$HOME/.android/adbkey and adbkey.pub symlinks to the files there, replacing private ones; the key directory
-itself is never written. SENSEN_ADB_KEY_DIR=none turns this off; a note on stderr if it has no keys.
+$HOME/.android/adbkey and adbkey.pub symlinks to the files there; a private key file they replace is kept
+beside them as <name>.<sha256 prefix>.bak (C-217). The key directory itself is never written.
+SENSEN_ADB_KEY_DIR=none turns this off. Only a note on stderr, and the caller goes on, when the key directory
+has no keys (links made there earlier are removed, so adb cannot create keys in it through them), when
+$HOME/.android or $HOME belongs to another user (sudo keeping someone's HOME), or when it cannot be written.
 Exit status 0 unless Godot or its settings cannot be read, in which case nothing is written.
 """
+import hashlib
 import os
 import platform
 import pwd
 import re
+import secrets
 import shutil
 import subprocess
 import sys
@@ -119,35 +124,95 @@ def ensure(binary, env, account_home, system, log=sys.stderr):
     at = lines.index('[resource]') + 1
     lines[at:at] = [f'{KEY} = false']
     directory.mkdir(parents=True, exist_ok=True)
-    tmp = target.with_name(target.name + '.tmp')
-    tmp.write_text('\n'.join(lines) + '\n')
-    os.replace(tmp, target)
+    tmp = target.with_name(f'{target.name}.{secrets.token_hex(6)}.tmp')  # another run may write the same file
+    try:
+        tmp.write_text('\n'.join(lines) + '\n')
+        os.replace(tmp, target)
+    finally:
+        tmp.unlink(missing_ok=True)
     print(f'godot_keep_adb_settings: {KEY} = false in {target}', file=log)
     return 'written'
 
 
+def owner(path):
+    try:
+        return os.stat(path).st_uid
+    except OSError:
+        return None
+
+
+def replace_with_link(path, to):
+    """Points path at to, through a temporary link of its own name (another run may link the same directory)."""
+    while True:
+        tmp = path.with_name(f'{path.name}.{secrets.token_hex(6)}.tmp')
+        try:
+            tmp.symlink_to(to)
+            break
+        except FileExistsError:
+            continue
+    try:
+        os.replace(tmp, path)
+    finally:
+        tmp.unlink(missing_ok=True)
+
+
+def back_up(path):
+    """Keeps a private key file (not a link) as a hard link <name>.<sha256 prefix>.bak; returns its name or None."""
+    try:
+        if path.is_symlink() or not path.is_file():
+            return None
+        backup = path.with_name(f'{path.name}.{hashlib.sha256(path.read_bytes()).hexdigest()[:12]}.bak')
+        os.link(path, backup, follow_symlinks=False)
+    except FileExistsError:
+        pass  # the same key was kept before
+    except FileNotFoundError:
+        return None  # another run replaced it first, and kept it
+    return backup.name
+
+
 def link_adb_keys(env, account_home, log=sys.stderr):
-    """Returns 'linked', 'ok', 'not_private', 'off' or 'no_keys' (the latter with a note on log)."""
+    """Returns 'linked', 'ok', 'not_private', 'off', 'no_keys', 'not_owner' or 'failed'. The last three only print
+    a note on log: this step never stops the caller, and it never writes the key directory."""
     source = env.get('SENSEN_ADB_KEY_DIR') or str(Path(account_home) / '.android')
     if source == 'none':
         return 'off'
-    directory = Path(env.get('HOME') or account_home) / '.android'  # adb falls back to the passwd entry too
-    if same_path(directory, source):
+    home = Path(env.get('HOME') or account_home)  # adb falls back to the passwd entry too
+    directory = home / '.android'
+    if same_path(directory, source) or same_path(directory, Path(account_home) / '.android'):
         return 'not_private'
     source = Path(os.path.realpath(source))
-    if not all((source / name).is_file() for name in ADB_KEYS):
-        print(f'godot_keep_adb_settings: note: no adbkey and adbkey.pub in {source}; an adb server started '
-              f'under HOME={directory.parent} uses keys of its own', file=log)
-        return 'no_keys'
-    if all(os.path.islink(directory / name) and os.readlink(directory / name) == str(source / name) for name in ADB_KEYS):
-        return 'ok'
-    directory.mkdir(mode=0o750, parents=True, exist_ok=True)
-    for name in ADB_KEYS:
-        tmp = directory / f'{name}.tmp'
-        tmp.unlink(missing_ok=True)
-        tmp.symlink_to(source / name)
-        os.replace(tmp, directory / name)
-    print(f'godot_keep_adb_settings: {directory}/adbkey and adbkey.pub link to {source}', file=log)
+    unkeyed = f'an adb server started under HOME={home} uses keys of its own'
+    uid = owner(directory)
+    uid = owner(home) if uid is None else uid
+    if uid not in (None, os.getuid()):
+        print(f'godot_keep_adb_settings: note: {directory} belongs to uid {uid}, not to this user; its adb keys are '
+              f'left alone, and {unkeyed}', file=log)
+        return 'not_owner'
+    try:
+        if not all((source / name).is_file() for name in ADB_KEYS):
+            # Links made while the keys were there now dangle; adb would create new keys through them, in source.
+            ours = [directory / name for name in ADB_KEYS
+                    if os.path.islink(directory / name) and os.readlink(directory / name) == str(source / name)]
+            for link in ours:
+                link.unlink()
+            removed = f' (removed {" and ".join(link.name for link in ours)}, which linked there)' if ours else ''
+            print(f'godot_keep_adb_settings: note: no adbkey and adbkey.pub in {source}{removed}; {unkeyed}', file=log)
+            return 'no_keys'
+        if all(os.path.islink(directory / name) and os.readlink(directory / name) == str(source / name)
+               for name in ADB_KEYS):
+            return 'ok'
+        directory.mkdir(mode=0o750, parents=True, exist_ok=True)
+        kept = []
+        for name in ADB_KEYS:
+            if backup := back_up(directory / name):
+                kept.append(backup)
+            replace_with_link(directory / name, source / name)
+    except OSError as error:
+        print(f'godot_keep_adb_settings: note: cannot link the adb keys in {directory} to {source} ({error}); '
+              f'{unkeyed}', file=log)
+        return 'failed'
+    kept = f'; the previous ones are kept as {" and ".join(kept)}' if kept else ''
+    print(f'godot_keep_adb_settings: {directory}/adbkey and adbkey.pub link to {source}{kept}', file=log)
     return 'linked'
 
 
