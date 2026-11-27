@@ -20,10 +20,12 @@ const CARROT := "crop_carrot"
 const DRY := "dry"
 const WET := "wet"
 ## Multipliers on the same painted earth.
-const SOIL_COLORS := {DRY: Color.WHITE, WET: Color(0.66, 0.61, 0.59)}
+const SOIL_COLORS := {DRY: Color.WHITE, WET: Color(0.56, 0.51, 0.49)}
 ## Mesh names in stage order. Stage zero uses the soil layer, never a second copy.
 const PLANTS := [&"Sowing", &"Emergence", &"LeafGrowth", &"Shoulders", &"Thickening", &"Maturity"]
 
+const Kit = preload("res://modules/dynamic_farm/parcel_fieldkit.gd")
+var _contact: MultiMeshInstance3D
 var _point: Callable
 var _cell_m := 1.0
 var _soil := {}     ## DRY / WET -> MultiMeshInstance3D
@@ -34,12 +36,19 @@ var _counts := {}
 func _init(point: Callable, cell_m: float) -> void:
 	_point = point
 	_cell_m = cell_m
+	# One opaque collar/clod batch. Instance tint follows the soil state, not a
+	# transparent decal hidden under the existing soil mesh.
+	_contact = _layer(Kit.mesh("BedFoot"))
+	_contact.multimesh.use_colors = true
+	_contact.material_override = Kit.Art.material()
 	var library := GARDEN.instantiate()
 	var earth := (library.get_node("Tilled") as MeshInstance3D).mesh
 	_soil[DRY] = _layer(earth)
 	_soil[WET] = _layer(earth)
 	var wet := earth.surface_get_material(0).duplicate() as StandardMaterial3D
 	wet.albedo_color = SOIL_COLORS[WET]
+	wet.roughness = 0.36
+	wet.metallic_specular = 0.48
 	_soil[WET].material_override = wet
 	_stages.append(null)
 	for plant: StringName in PLANTS:
@@ -68,6 +77,10 @@ func sync(soil: Dictionary, crops: Dictionary, now_ms: int) -> void:
 		var crop = crops.get(key)
 		var stage := stage_of(crop, now_ms) if crop is Dictionary and crop.get("crop") == CARROT else 0
 		stages[stage].append(cell)
+	var collars: Array = blocks[DRY] + blocks[WET]
+	_fill(_contact, collars, false)
+	for i in collars.size():
+		_contact.multimesh.set_instance_color(i, Color.WHITE if i < blocks[DRY].size() else Color(0.41, 0.34, 0.27))
 	for state: String in blocks:
 		_fill(_soil[state], blocks[state], false)
 	for stage in stages.size():
@@ -88,6 +101,8 @@ func _fill(layer: MultiMeshInstance3D, cells: Array, turn: bool) -> void:
 
 func _layer(mesh: Mesh) -> MultiMeshInstance3D:
 	var layer := MultiMeshInstance3D.new()
+	# Earth and carrot rows receive the sun; the shared pad supplies contact.
+	layer.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	layer.multimesh = MultiMesh.new()
 	layer.multimesh.transform_format = MultiMesh.TRANSFORM_3D
 	layer.multimesh.mesh = mesh

@@ -13,7 +13,10 @@ extends SceneTree
 ## three cells from one pail (wet soil, growing from then), Pail empty for the fourth until the pail is filled again.
 ## C-152: at Lv1 one well stands, a spare well blueprint offers nothing; at Lv3 the Build key offers the second and the
 ## Energy chip tops at 220. C-171: beside the coop's feeder a tapped cell with a step to do keeps its key (the well's Fill, a
-## free cell's Till); untapped, or tapped on a cell with nothing to do, the key feeds.
+## free cell's Till); untapped, or tapped on a cell with nothing to do, the key feeds. C-192: at the barn's feeder the key
+## shows whole: `Need 2 more Carrot` too wide for it reads `Need 2 more` (the tap's toast keeps the sentence); with the
+## ground full (2, SEN-Q-282) it reads `Cows are fed` while neither milk is given yet and `Pick up milk first` once they
+## lie there; milk laid while the app was closed is picked up on the first walk up to it after a cold start.
 ## Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
@@ -101,6 +104,7 @@ func _run() -> void:
 	await _watering_loop()
 	await _level_wells()
 	await _feeder_yields_to_tapped_cell()
+	await _barn_key_and_cold_milk()
 	await _older_dataset_claim()
 	await _release_named_on_enter()
 	for name in DirAccess.get_files_at(dir): DirAccess.remove_absolute(dir.path_join(name))
@@ -1040,6 +1044,127 @@ func _feeder_yields_to_tapped_cell() -> void:
 	await process_frame
 	for name in DirAccess.get_files_at(feed_dir): DirAccess.remove_absolute(feed_dir.path_join(name))
 	DirAccess.remove_absolute(feed_dir)
+
+## C-192: the barn's feeder key with its reasons shown whole, and milk laid while the app was closed picked up on the
+## first walk up to it once the scene is opened again (the cold start of V-594, C-192#61).
+func _barn_key_and_cold_milk() -> void:
+	var data: Dictionary = scene_data()
+	var house_at := _free_block(data)
+	var now: int = int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
+	var cottage := {"model": "cottage", "x": house_at.x, "y": house_at.y, "width": 3, "depth": 3, "rotation": 0, "built_at": 0}
+	var seeded := ParcelFarm.empty_state()
+	seeded.buildings = [cottage.merged({"id": 1, "type": "cottage"})]
+	seeded.house = cottage
+	seeded.welcomed_at = now - 8 * 86400000
+	seeded.bag = {"hoe_starter": 1, "blueprint_barn": 1, "crop_carrot": 2, "wood": 20, "stone": 10}
+	var barn_dir := dir + "_barn"
+	var store := LocalStore.new(raw.block_id, barn_dir)
+	store.now_ms = func() -> int: return int(Time.get_unix_time_from_system() * 1000.0) + shift[0]
+	DirAccess.make_dir_recursive_absolute(barn_dir)
+	store._save(seeded, 3)
+	var farming := await _open(store)
+	var cleared := {}
+	for anchor: Vector2i in farming._obstacles.values(): cleared[ParcelFarm.key(anchor)] = true
+	seeded.cleared = cleared.keys()
+	store._save(seeded, 4)
+	scene.queue_free()
+	await process_frame
+	farming = await _open(store)
+	var obstacles: Dictionary = farming.obstacle_cells()
+	var at = Building.nearest(scene._data, data.spawn, Vector2i(8, 6), Building.blocked(obstacles, farming.farm), farming.protected_path(),
+		scene._walk_blocked(obstacles), 0, "barn")
+	var placed: Dictionary = await farming.send({"type": "place_building", "building": "barn", "x": at.x, "y": at.y, "rotation": 0}) \
+		if at != null else {}
+	_check(placed.get("ok", false), "the barn stands (%s)" % [placed.get("code", "no room")])
+	if not placed.get("ok", false): return
+	var barn: Dictionary = ParcelFarm.buildings_of(farming.farm).filter(func(b): return b.type == "barn")[0]
+	var to_feeder := func(opened: Node) -> bool:
+		var wait := Time.get_ticks_msec() + 30000
+		while (opened.busy or not opened.loaded()) and Time.get_ticks_msec() < wait: await process_frame
+		if opened.livestock._yards.is_empty(): return false
+		var stand = null
+		for p: Vector3 in opened.livestock._yards.values()[0].feeder_points:
+			for r in [0.5, 0.7, 0.9]:
+				for k in 16:
+					var q: Vector3 = p + Vector3(r, 0, 0).rotated(Vector3.UP, k * TAU / 16)
+					if stand == null and scene._walk.clear_position(q): stand = q
+		if stand == null: return false
+		scene._walk.position = stand
+		scene._actor.position = stand
+		opened.picked = null
+		await process_frame
+		await process_frame
+		return true
+	_check(await to_feeder.call(farming) and [farming._key.verb, farming._key.cost] == ["Feed", "1 Energy"], "by the barn's feeder: Feed")
+	farming._key.pressed_down.emit()
+	var deadline := Time.get_ticks_msec() + 30000
+	while farming.busy and Time.get_ticks_msec() < deadline: await process_frame
+	await process_frame
+	_check(int(farming.farm.bag.get("crop_carrot", 0)) == 0 and farming.farm.drops.size() == 1, "Feed takes the two carrots for one milk")
+	_check([farming._key.verb, farming._key.cost, farming._key.state] == ["Feed", "Need 2 more", UiSceneAction.State.UNAVAILABLE]
+		and not UiSceneAction.cost_fits("Need 2 more Carrot") and UiSceneAction.cost_fits(farming._key.cost),
+		"no carrots: the key reads `Need 2 more` whole, not a clipped `Need 2 more Carrot` (%s)" % farming._key.cost)
+	var version: int = farming.farm_version
+	farming._key.pressed_down.emit()
+	await process_frame
+	_check(farming._toast.current_text() == "Need 2 more Carrot" and farming.farm_version == version and not farming.busy,
+		"its tap toasts the whole `Need 2 more Carrot` and sends nothing (%s)" % farming._toast.current_text())
+	# The ground full (C-192, SEN-Q-282: two, one per cow) with carrots in the bag. On spots away from the feeder, so standing
+	# there picks nothing up. Neither given yet, there is nothing to pick up: `Cows are fed`.
+	var full: Dictionary = farming.farm.duplicate(true)
+	full.bag.crop_carrot = 2
+	var due: int = int(Time.get_unix_time_from_system() * 1000.0) + shift[0] + 900000
+	full.drops = []
+	for i in 2: full.drops.append({"id": i + 1, "item": "milk", "amount": 1, "building": int(barn.id), "animal": i, "spot": [3, 4][i],
+		"ready_at": due})
+	full.drop_seq = 2
+	store._save(full, farming.farm_version + 1)
+	scene.queue_free()
+	await process_frame
+	farming = await _open(store)
+	_check(await to_feeder.call(farming) and [farming._key.verb, farming._key.cost] == ["Feed", "Cows are fed"]
+		and UiSceneAction.cost_fits(farming._key.cost), "two milks on their way: `Cows are fed`, whole (%s)" % farming._key.cost)
+	# Both given (the app closed until then): `Pick up milk first` fits as it is.
+	scene.queue_free()
+	await process_frame
+	shift[0] += 960000
+	farming = await _open(store)
+	_check(await to_feeder.call(farming) and [farming._key.verb, farming._key.cost] == ["Feed", "Pick up milk first"]
+		and UiSceneAction.cost_fits(farming._key.cost), "two milks on the ground: `Pick up milk first`, whole (%s)" % farming._key.cost)
+	_check(farming.farm.drops.size() == 2, "standing at the feeder picks neither up")
+	farming._key.pressed_down.emit()
+	await process_frame
+	_check(farming._toast.current_text() == "Pick up milk first", "its tap toasts it")
+	# Opened cold again with the milk laid: the first walk up to a milk picks it up.
+	scene.queue_free()
+	await process_frame
+	farming = await _open(store)
+	deadline = Time.get_ticks_msec() + 30000
+	while (farming.busy or not farming.loaded()) and Time.get_ticks_msec() < deadline: await process_frame
+	var lv = farming.livestock
+	var laid: Array = lv.snapshot().values()[0].drops
+	_check(laid.size() == 2, "after a cold start the two milks lie on the ground (%s)" % [laid])
+	var id: int = laid[0] if not laid.is_empty() else -1
+	var milk = lv.drop_position(id)
+	var stand = null
+	if milk is Vector3:
+		for r in [0.4, 0.5, 0.6]:
+			for k in 16:
+				var q: Vector3 = milk + Vector3(r, 0, 0).rotated(Vector3.UP, k * TAU / 16)
+				if stand == null and scene._walk.clear_position(q): stand = q
+	_check(stand != null, "a clear spot within reach of the milk")
+	if stand == null: return
+	scene._walk.position = stand
+	scene._actor.position = stand
+	deadline = Time.get_ticks_msec() + 5000
+	while Time.get_ticks_msec() < deadline and (farming.busy or farming.farm.drops.any(func(d): return int(d.id) == id)):
+		await process_frame
+	_check(not farming.farm.drops.any(func(d): return int(d.id) == id) and int(farming.farm.bag.get("milk", 0)) >= 1,
+		"walking up to it once picks it up (bag milk %d)" % int(farming.farm.bag.get("milk", 0)))
+	scene.queue_free()
+	await process_frame
+	for name in DirAccess.get_files_at(barn_dir): DirAccess.remove_absolute(barn_dir.path_join(name))
+	DirAccess.remove_absolute(barn_dir)
 
 ## `n` free core cells side by side along x, or [].
 func _free_row(data: Dictionary, farming: Node, n: int) -> Array:

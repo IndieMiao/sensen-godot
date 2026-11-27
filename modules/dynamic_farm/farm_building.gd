@@ -13,6 +13,7 @@ extends RefCounted
 ## three-quarter turn swapping width and depth. The server checks only buildings, tilled cells and crops (C-31).
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
+const Kit = preload("res://modules/dynamic_farm/parcel_fieldkit.gd")
 const Art = preload("res://modules/farm/farm_art.gd")
 ## C-154: a type the art file (`assets/farm/data/dynamic_farm_art.json`) describes, such as the coop, takes its name,
 ## model, fence and parts from there (FarmLivestock) instead of KINDS.
@@ -48,7 +49,18 @@ static func kind(type: String) -> Dictionary:
 ## The type's model in its own frame (pivot on the footprint's middle, +Z the front), or null without art here.
 static func model(type: String, base: Vector2i, cell_m: float) -> Node3D:
 	var k := kind(type)
-	if k.get("asset") is String: return Art.instance(k.asset)
+	if k.get("asset") is String:
+		var standing := Art.instance(k.asset)
+		# Keep the exact authored doors, shutters, winch and stone courses. Only
+		# the loose dressing is joined into a single additional opaque surface.
+		if type in ["well", "cottage"]:
+			var dressing := MeshInstance3D.new()
+			dressing.name = "FootprintProps"
+			dressing.mesh = Kit.mesh("WellPails" if type == "well" else "CottageSill")
+			dressing.material_override = Art.material()
+			dressing.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			standing.add_child(dressing)
+		return standing
 	if k.get("livestock", false): return Livestock.model(type, base, cell_m)
 	return null
 

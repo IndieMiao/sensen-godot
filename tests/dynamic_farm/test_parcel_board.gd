@@ -58,11 +58,13 @@ func _rules() -> void:
 		"egg": band.call([2, 3], [3, 5], 20), "milk": band.call([1, 2], [2, 3], 20), "wool": band.call([1, 2], [2, 3], 20)},
 		"rules: SEN-Q-281's counts and bonuses by item (%s)" % [q.item_tiers])
 	_check(q.tiers == band.call([3, 5], [5, 8], 10), "rules: the shared tiers (for an item with none of its own)")
-	_check(q.templates.keys() == ["fresh_greens", "timber_run", "stone_order", "egg_basket"] and q.templates.egg_basket == {"item": "egg", "building": "coop"},
-		"rules: carrots, timber, stone, and eggs with a coop, in the file's order")
+	_check(q.templates.keys() == ["fresh_greens", "timber_run", "stone_order", "egg_basket", "fresh_milk"] and q.templates.egg_basket == {"item": "egg", "building": "coop"}
+		and q.templates.fresh_milk == {"item": "milk", "building": "barn"},
+		"rules: carrots, timber, stone, eggs with a coop and milk with a barn (C-192), in the file's order")
 	var rules := ParcelFarm.rules()
-	_check(["crop_carrot", "wood", "stone", "egg"].map(func(i): return ParcelFarm.floor_price(rules, i)) == [12, 2, 2, 20], "prices 12 / 2 / 2 / 20, Jasmine's own")
-	for pair in [["fresh_greens", "crop_carrot"], ["timber_run", "wood"], ["stone_order", "stone"], ["egg_basket", "egg"]]:
+	_check(["crop_carrot", "wood", "stone", "egg", "milk"].map(func(i): return ParcelFarm.floor_price(rules, i)) == [12, 2, 2, 20, 45],
+		"prices 12 / 2 / 2 / 20 / 45, Jasmine's own")
+	for pair in [["fresh_greens", "crop_carrot"], ["timber_run", "wood"], ["stone_order", "stone"], ["egg_basket", "egg"], ["fresh_milk", "milk"]]:
 		for level in [1, 3, 4, 7]:
 			_check(ParcelFarm.tier_for(rules, level, pair[0]) == q.item_tiers[pair[1]][0 if level < 4 else 1], "rules: %s at Lv%d by its item" % [pair[0], level])
 	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH))
@@ -76,7 +78,7 @@ func _rules() -> void:
 	_check(bad.call(func(r): r.tiers = [{"level": 2, "qty": [2, 3], "bonus": 10}]), "rules: tiers not from Lv1 refused")
 	_check(bad.call(func(r): r.tiers = [{"level": 1, "qty": [3, 2], "bonus": 10}]), "rules: a count range upside down refused")
 	_check(bad.call(func(r): r.templates = {"x": {"item": "seed_carrot"}}), "rules: an item Jasmine does not buy refused")
-	_check(bad.call(func(r): r.templates = {"x": {"item": "egg", "building": "barn"}}), "rules: an unknown building refused")
+	_check(bad.call(func(r): r.templates = {"x": {"item": "egg", "building": "pen"}}), "rules: an unknown building refused")
 	_check(bad.call(func(r): r.templates.egg_basket.tiers = [{"level": 2, "qty": [1, 2], "bonus": 20}]), "rules: a template's own tiers from Lv1 too")
 	_check(bad.call(func(r): r.item_tiers = []), "rules: item tiers not a map refused")
 	_check(bad.call(func(r): r.item_tiers.egg = [{"level": 1, "qty": [3, 2], "bonus": 20}]), "rules: an item's count range upside down refused")
@@ -168,6 +170,16 @@ func _model() -> void:
 	var eggs: Dictionary = m.cards[1]
 	_check(eggs.title == "Egg Basket" and eggs.status == "Tracked" and eggs.command == "Deliver" and eggs.reason == "Need 2 more Eggs"
 		and eggs.cmd.is_empty() and eggs.reward == "60 coins", "model: tracked eggs, none in the bag: the gap on the key (%s)" % [eggs])
+	# C-192: milk with a barn, drawn and named as the eggs: `Fresh Milk`, `2 Milk` (milk does not take an s).
+	var milk_farm := _board_farm({"milk": 1})
+	milk_farm.buildings.append({"id": 3, "type": "barn", "model": "cow_barn", "x": 20, "y": 10, "width": 8, "depth": 6, "rotation": 0,
+		"built_at": T0, "animals": ["cow", "cow"]})
+	_check(ParcelFarm.eligible_templates(rules, milk_farm).has("fresh_milk") and not ParcelFarm.eligible_templates(rules, _board_farm({})).has("fresh_milk"),
+		"rules: milk is drawn only with a barn")
+	milk_farm.board.slots[1].req = {"id": 2, "template": "fresh_milk", "item": "milk", "qty": 3, "bonus": 10, "drawn_at": T0, "status": "accepted"}
+	var milk: Dictionary = Board.model(rules, milk_farm, T0 + H).cards[1]
+	_check(milk.title == "Fresh Milk" and milk.facts == ["3 Milk"] and milk.reason == "Need 2 more Milk" and Board.noun_of("milk") == "milk",
+		"model: a tracked milk request (%s)" % [milk])
 	var open := _board_farm({})
 	open.board.slots[1].req.status = "open"
 	var o: Dictionary = Board.model(rules, open, T0 + H).cards[1]

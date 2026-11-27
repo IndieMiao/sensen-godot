@@ -9,6 +9,8 @@ signal approach_finished(result: String)
 
 const Data = preload("res://modules/dynamic_farm/farm_data.gd")
 const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
+const Fieldkit = preload("res://modules/dynamic_farm/parcel_fieldkit.gd")
+const GroundPaint = preload("res://modules/dynamic_farm/parcel_ground_paint.gd")
 const Ground = preload("res://modules/dynamic_farm/farm_mesh.gd")
 const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
 const Shade = preload("res://modules/dynamic_farm/farm_shade.gd")
@@ -66,6 +68,8 @@ const PLACE_ROW_H := 36.0
 var _args := {}
 var _data := {}
 var _walk: RefCounted
+var _ground_paint: GroundPaint
+var _placement_grid: Array[Node] = []
 var _ground: Node3D
 var _props: Node3D
 var _plan := {}
@@ -159,6 +163,12 @@ func _ready() -> void:
 	_ground = Ground.build(_data,_walk,_plan.recipe,true,Shade.can_widen(_plan,_data,_walk),
 		1.0 if bool(_args.get("original_slope_material",false)) else 0.65)
 	add_child(_ground)
+	_ground_paint = GroundPaint.new(_data)
+	for chunk: Dictionary in _ground.get_meta("shade_chunks"):
+		for part: MeshInstance3D in chunk.meshes:
+			part.material_override.set_shader_parameter("field_mask", _ground_paint.texture)
+	_placement_grid = _ground.find_children("CoreGrid_*", "MeshInstance3D", false, false)
+	add_child(Fieldkit.meadow(_data, _walk))
 	var art := Scenery.build(_plan,_walk,_plan.recipe)
 	if not art.ok:
 		_fail(art.error)
@@ -263,6 +273,7 @@ func _on_farm_changed(farm: Dictionary) -> void:
 	_coins.text = str(int(farm.get("coins", 0)))
 	_coins_capsule.visible = true
 	_sync_buildings(farm)
+	_ground_paint.update(farm)
 	_refresh_build()
 
 ## The saved buildings (ParcelFarm.buildings_of), or [] without the owner's farm.
@@ -287,6 +298,21 @@ func _refresh_build() -> void:
 	_build_type = build_choice() if _placement == null else ""
 	_build.visible = _build_type != ""
 	if _build.visible: _build.label = "Build %s" % Building.kind(_build_type).name
+	_build.reason = build_gap(_build_type) if _build.visible else ""
+
+## C-181: the first material the type's `materials` (the barn's 20 Timber, 10 Stone) still lacks, as P0's `Need N more
+## Timber`; "" when the bag has them all (the key places, and the server takes them with the blueprint).
+func build_gap(type: String) -> String:
+	if _farming == null or type.is_empty(): return ""
+	var bag: Dictionary = _farming.farm.get("bag", {})
+	var needs: Dictionary = ParcelFarm.rules().buildings[type].get("materials", {})
+	for item: String in needs:
+		var short := int(needs[item]) - int(bag.get(item, 0))
+		if short > 0: return "Need %d more %s" % [short, _farming.item_name(item)]
+	return ""
+
+func _show_placement_grid(shown: bool) -> void:
+	for part: MeshInstance3D in _placement_grid: part.visible = shown
 
 func begin_placement() -> void:
 	if not _build.visible: return
@@ -306,6 +332,7 @@ func begin_placement() -> void:
 	var start = Building.start_spot(_data, _walk.cell_at(_actor.position), base, taken, path, walk_blocked, type, obstacles,
 		cleared.taken, cleared.walk_blocked)
 	_placement = Placement.new()
+	_show_placement_grid(true)
 	add_child(_placement)
 	_placement.setup(type, base, _data, _walk, _camera, _canvas, taken, path, walk_blocked,
 		start.at if start != null else _walk.cell_at(_actor.position) - Building.middle(base), cleared,
@@ -330,6 +357,7 @@ func end_placement() -> void:
 	if _placement == null: return
 	_placement.queue_free()
 	_placement = null
+	_show_placement_grid(false)
 	_sending = false
 	_farming.held = false
 	_controls.process_mode = Node.PROCESS_MODE_INHERIT
@@ -436,7 +464,39 @@ func _step_out(from: Vector3) -> Vector3:
 			if _walk.clear_position(p): return p
 	return _walk.point(_data.spawn)
 
+# For the parcel's opaque silhouettes use two coverage samples instead of four;
+# never raise a player's lower setting. This is viewport-local, not a project
+# default. Multiple previews in one viewport release the original setting last.
+const PARCEL_AA_LEASE := &"sensen_dynamic_farm_aa_lease"
+var _aa_view: Viewport
+
+func _take_parcel_aa() -> void:
+	if is_instance_valid(_aa_view): return
+	var view := get_viewport()
+	if view.has_meta(PARCEL_AA_LEASE):
+		view.get_meta(PARCEL_AA_LEASE).users += 1
+	elif view.msaa_3d > Viewport.MSAA_2X:
+		view.set_meta(PARCEL_AA_LEASE, {"original": view.msaa_3d, "users": 1})
+		view.msaa_3d = Viewport.MSAA_2X
+	else:
+		return
+	_aa_view = view
+
+func _exit_tree() -> void:
+	_release_parcel_aa()
+
+func _release_parcel_aa() -> void:
+	if not is_instance_valid(_aa_view) or not _aa_view.has_meta(PARCEL_AA_LEASE): return
+	var lease: Dictionary = _aa_view.get_meta(PARCEL_AA_LEASE)
+	lease.users -= 1
+	if lease.users == 0:
+		if _aa_view.msaa_3d == Viewport.MSAA_2X:
+			_aa_view.msaa_3d = lease.original
+		_aa_view.remove_meta(PARCEL_AA_LEASE)
+	_aa_view = null
+
 func _setup_world() -> void:
+	_take_parcel_aa()
 	var env := Environment.new()
 	_clouds = ShaderMaterial.new()
 	_clouds.shader = SKY_SHADER
@@ -446,21 +506,21 @@ func _setup_world() -> void:
 	env.background_mode = Environment.BG_SKY
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.84,0.88,0.90)
+	env.ambient_light_color = Color(0.90,0.88,0.84)
 	env.ambient_light_energy = 0.42
 	_environment = WorldEnvironment.new()
 	_environment.environment = env
 	add_child(_environment)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Shade.SUN_DEGREES
-	sun.light_color = Color(1,0.95,0.84)
-	sun.light_energy = 1.12
+	sun.light_color = Color(1.0,0.905,0.755)
+	sun.light_energy = 1.16
 	sun.shadow_enabled = RenderingServer.get_current_rendering_method() != "gl_compatibility"
-	sun.shadow_opacity = 0.58
+	sun.shadow_opacity = 0.64
 	sun.shadow_bias = 0.1
 	sun.shadow_normal_bias = 1.0
 	sun.shadow_blur = 1.4
-	sun.directional_shadow_max_distance = 0.0
+	sun.directional_shadow_max_distance = 30.0
 	sun.directional_shadow_fade_start = 1.0
 	sun.directional_shadow_pancake_size = 4.0
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
@@ -785,6 +845,7 @@ func _build_ui() -> void:
 	_build.custom_minimum_size = Vector2(180, 48)
 	_build.visible = false
 	_build.activated.connect(begin_placement)
+	_build.unavailable_pressed.connect(func(reason: String): if _farming != null: _farming.show_notice(reason))
 	_canvas.add_child(_build)
 
 ## The place capsule as wide as its longer line (name or status), at most the screen less its 12 sides; past that
@@ -916,6 +977,8 @@ static func _crop_name(id: String) -> String:
 	return n if n != "" else id.trim_prefix("crop_").capitalize()
 
 func suspend() -> void:
+	if _suspended: return
+	_release_parcel_aa()
 	_suspended = true
 	end_placement()
 	if not _route.is_empty(): _end_route("cancelled")
@@ -932,6 +995,8 @@ func suspend() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 
 func resume() -> void:
+	if not _suspended: return
+	if _environment != null: _take_parcel_aa()
 	process_mode = Node.PROCESS_MODE_INHERIT
 	_suspended = false
 	_back_sent = false

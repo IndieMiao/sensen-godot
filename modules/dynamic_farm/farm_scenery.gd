@@ -8,6 +8,7 @@ const RECIPE_PATH := "res://assets/dynamic_farm/499-art-recipe.json"
 const INVENTORY_PATH := "res://assets/dynamic_farm/499-art-inventory.json"
 const Proxy = preload("res://modules/dynamic_farm/farm_prop_proxy.gd")
 const Palette = preload("res://modules/dynamic_farm/farm_palette.gd")
+const Kit = preload("res://modules/dynamic_farm/parcel_fieldkit.gd")
 const CHUNK_CELLS := 32
 
 ## xorshift32: fixed integer operations, seeded with the first 32 bits of the recipe SHA256.
@@ -135,18 +136,30 @@ static func build(planned: Dictionary, walk: RefCounted, recipe: Variant = null,
 	for item: Dictionary in planned.layout:
 		var p: Vector3 = item.transform.origin
 		var variant := Palette.pick(palette, item.asset, p)
+		var replacement: String = Kit.TYPES.get(item.asset, "") if variant >= 0 else ""
 		var key := batch_key(palette, item.asset, p, cell_m)
-		if not batches.has(key): batches[key] = {"asset":item.asset,"variant":variant,"shadow":item.shadow,"transforms":[]}
+		# New shapes share a batch across colourways; per-instance autumn tint costs no draw.
+		if replacement != "": key = "%s:%d:%d" % [replacement,floori(p.x/(64*cell_m)),floori(p.z/(64*cell_m))]
+		if not batches.has(key): batches[key] = {"asset":item.asset,"variant":variant,"shadow":item.shadow and item.role == "tree","transforms":[],"tints":[],"replacement":replacement}
 		batches[key].transforms.append(item.transform)
-		triangles += item.triangles
+		if replacement != "":
+			var tint := Color.WHITE
+			if replacement in ["Linden", "OrchardElm"]:
+				tint = [Color(0.82,1,0.86),Color.WHITE,Color(1.04,0.87,0.66),Color(1.08,0.54,0.35)][clampi(variant,0,3)]
+			batches[key].tints.append(tint)
 		unique[item.asset] = item.triangles
 	for key: String in batches:
 		var batch: Dictionary = batches[key]
-		var mesh := Palette.mesh(palette, batch.asset, batch.variant)
+		var mesh := Kit.mesh(batch.replacement) if batch.replacement != "" else Palette.mesh(palette, batch.asset, batch.variant)
 		if mesh == null:
 			root.free()
 			return {"ok":false,"error":"A farm scenery asset could not be loaded."}
-		var node := Art.batch(batch.asset,batch.transforms,batch.shadow)
+		if batch.replacement != "":
+			var n: int = mesh.surface_get_array_index_len(0) if mesh is ArrayMesh else 0
+			if n <= 0: n = mesh.surface_get_array_len(0)
+			unique[batch.asset] = n / 3
+		triangles += unique[batch.asset] * batch.transforms.size()
+		var node := Art.batch(batch.asset,batch.transforms,batch.shadow,PackedColorArray(batch.tints))
 		node.multimesh.mesh = mesh
 		root.add_child(node)
 	# Bind final rendered instances, after budget pruning. All layers go through
