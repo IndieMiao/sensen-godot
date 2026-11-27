@@ -319,6 +319,8 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	# C-175: past the first sale, 0.4.5's steps (the coop, its egg, Scott's upgrade); those done on the parcel say PICK_HOME.
 	var coop := {"id": 2, "type": "coop", "model": "chicken_yard", "x": 20, "y": 20, "width": 7, "depth": 5, "rotation": 0, "built_at": 1}
 	var claimed := {"sales": 1, "bag": {}, "blueprints_claimed": {"coop": 1}}
+	var barn := {"id": 3, "type": "barn", "model": "cow_barn", "x": 30, "y": 20, "width": 11, "depth": 6, "rotation": 0, "built_at": 1}
+	var pen := {"id": 4, "type": "sheep_pen", "model": "sheep_pen", "x": 30, "y": 30, "width": 6, "depth": 6, "rotation": 0, "built_at": 1}
 	var lines := [[{}, "Tap Washington Square to sell your carrot."],
 		[{"sales": 1, "bag": {}}, "Tap Washington Square to get your coop blueprint."],
 		[claimed.merged({"bag": {"blueprint_coop": 1}}, true), page.PICK_HOME],
@@ -329,7 +331,17 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4}, "coins": 95}, true), "Enter my farm and grow carrots to sell."],
 		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4, "crop_carrot": 2}, "coins": 95}, true), "Tap Washington Square to sell carrots and eggs."],
 		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4}, "coins": 100}, true), "Tap Washington Square to upgrade your farm."],
-		[claimed.merged({"buildings": [coop], "drop_seq": 1, "level": 2}, true), page.PICK_HOME]]
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "level": 2}, true), "Tap Washington Square to deliver a request at the Request Board."],
+		# C-190: 0.4.6 past the upgrade: the barn's coins and blueprint, its Timber and Stone; the sheep pen's requests, Lv3, coins.
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "level": 2, "requests_done": 1, "coins": 599}, true), "Tap Washington Square to deliver requests and sell."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "level": 2, "requests_done": 1, "coins": 600}, true), "Tap Washington Square to buy the Barn Blueprint."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "level": 2, "requests_done": 1, "bag": {"blueprint_barn": 1}}, true), "Enter my farm and gather Timber and Stone."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "level": 2, "requests_done": 1, "bag": {"blueprint_barn": 1, "wood": 20, "stone": 10}}, true), page.PICK_HOME],
+		[claimed.merged({"buildings": [coop, barn], "drop_seq": 1, "level": 2, "requests_done": 1}, true), "Tap Washington Square to deliver requests at the Request Board."],
+		[claimed.merged({"buildings": [coop, barn], "drop_seq": 1, "level": 2, "requests_done": 15}, true), "Enter my farm and gather Timber and Stone."],
+		[claimed.merged({"buildings": [coop, barn], "drop_seq": 1, "level": 3, "requests_done": 15, "coins": 1199}, true), "Tap Washington Square to deliver requests and sell."],
+		[claimed.merged({"buildings": [coop, barn], "drop_seq": 1, "level": 3, "requests_done": 15, "coins": 1200}, true), "Tap Washington Square to buy the Sheep Pen Blueprint."],
+		[claimed.merged({"buildings": [coop, barn, pen], "drop_seq": 1, "level": 3, "requests_done": 15}, true), page.PICK_HOME]]
 	for row: Array in lines:
 		var save: Dictionary = carrot.duplicate(true)
 		save.merge(row[0], true)

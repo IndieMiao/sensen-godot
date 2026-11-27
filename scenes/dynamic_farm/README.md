@@ -190,6 +190,15 @@ holds Lv2's Timber and Stone, `upgrade` (at Scott's) after; nothing once the far
 the phone's task rows follow (`ParcelTasks`: GET STARTED, TOWN, YOUR FARM). A tap on the coop's floor offers the
 nearest feeder's Feed and walks there on the press. Copy: `docs/plans/C-175.md`.
 
+0.4.6 (C-190, the run-through of 0.4.6's content) goes on past Lv1: no request delivered yet -> `request` (the Request
+Board in Washington Square); then the barn: short of its 600 coins -> `barn_coins`, else `barn_blueprint` (Scott), the
+blueprint in the bag -> `gather_barn` until its Timber and Stone are there, then `barn` (Build Barn); then the sheep pen,
+with `feed_cows` first whenever the cows give nothing and the bag holds their 2 carrots: short of 15 requests ->
+`pen_requests`, below Lv3 -> the upgrade's steps, short of 1,200 coins -> `pen_coins`, else `pen_blueprint`, then
+`gather_pen` / `sheep_pen`; a pen with no wool from it yet -> `gather_herbs` / `feed_sheep`; nothing once there is wool.
+Sold wool leaves no trace, so the parcel drops that step once the device saw every row done. The phone adds REQUESTS &
+ANIMALS (`Deliver a request`, `Build the Barn`, `Build the Sheep Pen`, `Feed the sheep`). Copy: `docs/plans/C-190.md`.
+
 ## Washington Square room (C-115)
 
 The owner on C-103#17: no place icons on the map, one fixed 3D space entry in San Francisco, its look and interaction

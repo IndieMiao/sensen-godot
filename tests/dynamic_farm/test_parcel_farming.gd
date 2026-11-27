@@ -419,11 +419,13 @@ func _guide() -> void:
 	materials.coins = int(price.coins)
 	_check(Guide.step(materials, now) == "upgrade", "guide: Timber and Stone for Lv2 -> Scott's upgrade")
 	var upgraded := ParcelFarm.apply(rules, materials, [{"type": "upgrade_farm"}], now)
-	_check(upgraded.ok and Guide.step(upgraded.state, now) == "" and Guide.stage(upgraded.state, now) == "", "guide: upgraded -> nothing left")
+	_check(upgraded.ok and Guide.step(upgraded.state, now) == "request" and Guide.stage(upgraded.state, now) == "request",
+		"guide: upgraded -> on to 0.4.6's first request (C-190)")
 	var again: Dictionary = upgraded.state.duplicate(true)
 	again.drops = [{"id": 9, "item": "egg", "amount": 1, "building": 3, "animal": 0, "spot": 0, "ready_at": now}]
 	again.drop_seq = 9
-	_check(Guide.stage(again, now) == "", "guide: eggs on an upgraded farm do not bring the egg step back")
+	_check(Guide.stage(again, now) == "request", "guide: eggs on an upgraded farm do not bring the egg step back")
+	_guide_046(upgraded.state, now)
 	var early: Dictionary = materials.duplicate(true)
 	early.buildings = early.buildings.filter(func(b): return b.type != "coop")
 	early.bag.blueprint_coop = 1
@@ -435,12 +437,101 @@ func _guide() -> void:
 	unclaimed.bag.erase("crop_carrot")
 	_check(Guide.step(unclaimed, now) == "blueprint", "guide: sold, the blueprint not taken -> Scott")
 	for key: String in ["build", "till", "sow", "well", "water", "water_pail", "harvest", "sell", "blueprint", "coop", "feed",
-			"buy_seeds", "egg", "sell_egg", "gather_upgrade", "upgrade", "sell_for_coins", "earn_coins"]:
+			"buy_seeds", "egg", "sell_egg", "gather_upgrade", "upgrade", "sell_for_coins", "earn_coins", "request", "barn_coins",
+			"barn_blueprint", "gather_barn", "barn", "feed_cows", "pen_requests", "pen_coins", "pen_blueprint", "gather_pen",
+			"sheep_pen", "gather_herbs", "feed_sheep"]:
 		_check(not Guide.text(key).is_empty(), "guide: copy for " + key)
-	for key: String in ["sell", "blueprint", "buy_seeds", "sell_egg", "gather_upgrade", "upgrade", "sell_for_coins", "earn_coins"]:
+	for key: String in ["sell", "blueprint", "buy_seeds", "sell_egg", "gather_upgrade", "upgrade", "sell_for_coins", "earn_coins",
+			"request", "barn_coins", "barn_blueprint", "gather_barn", "pen_requests", "pen_coins", "pen_blueprint", "gather_pen"]:
 		_check(not Guide.map_text(key).is_empty(), "guide: the map's line for " + key)
-	for key: String in ["build", "till", "sow", "well", "water", "water_pail", "harvest", "coop", "feed", "egg", ""]:
+	for key: String in ["build", "till", "sow", "well", "water", "water_pail", "harvest", "coop", "feed", "egg", "barn", "feed_cows",
+			"sheep_pen", "gather_herbs", "feed_sheep", ""]:
 		_check(Guide.map_text(key).is_empty(), "guide: no map line for '%s' (taught on the parcel)" % key)
+
+## C-190 (0.4.6 run-through): past the Lv2 upgrade the guide asks for a first request at the Request Board, the barn
+## (Scott's 600-coin blueprint, its Timber and Stone, Build Barn), its cows fed while the sheep pen waits on 15 requests,
+## Lv3 and 1,200 coins, the pen built and its sheep fed with Wild Herb; then nothing, and once this device saw that,
+## selling the wool does not bring feeding back.
+func _guide_046(lv2: Dictionary, now: int) -> void:
+	var rules := ParcelFarm.rules()
+	var state: Dictionary = lv2.duplicate(true)
+	state.requests_done = 1
+	state.coins = 599
+	_check(Guide.stage(state, now) == "barn" and Guide.step(state, now) == "barn_coins", "guide 0.4.6: a request delivered, 599 coins -> save up for the barn")
+	state.coins = 600
+	_check(Guide.step(state, now) == "barn_blueprint", "guide 0.4.6: 600 coins at Lv2 -> Scott's Barn Blueprint")
+	var lv1: Dictionary = state.duplicate(true)
+	lv1.level = 1
+	lv1.requests_done = 0
+	_check(Guide.stage(lv1, now) == "upgrade", "guide 0.4.6: Lv1 still upgrades first")
+	var bought := ParcelFarm.apply(rules, state, [{"type": "claim_blueprint", "blueprint": "barn"}], now)
+	_check(bought.ok and bought.state.coins == 0, "guide 0.4.6: Scott sells the barn's blueprint (%s)" % bought.get("code", ""))
+	if not bought.ok: return
+	state = bought.state
+	_check(Guide.stage(state, now) == "barn" and Guide.step(state, now) == "gather_barn", "guide 0.4.6: blueprint, no Timber and Stone -> gather them")
+	state.bag.wood = 20
+	state.bag.stone = 10
+	_check(Guide.step(state, now) == "barn", "guide 0.4.6: blueprint and materials -> Build Barn")
+	state.bag.crop_carrot = 2
+	var built := ParcelFarm.apply(rules, state, [{"type": "place_building", "building": "barn", "x": 20, "y": 20, "rotation": 0}], now)
+	_check(built.ok, "guide 0.4.6: the barn goes down (%s)" % built.get("code", ""))
+	if not built.ok: return
+	state = built.state
+	var barn_id := int(state.buildings.back().id)
+	_check(Guide.stage(state, now) == "sheep_pen" and Guide.step(state, now) == "feed_cows", "guide 0.4.6: a barn and 2 carrots -> feed the cows")
+	var fed := ParcelFarm.apply(rules, state, [{"type": "feed", "building": barn_id}], now)
+	_check(fed.ok, "guide 0.4.6: the cows eat (%s)" % fed.get("code", ""))
+	if not fed.ok: return
+	state = fed.state
+	state.bag.crop_carrot = 2
+	_check(Guide.step(state, now) == "pen_requests", "guide 0.4.6: a cow giving milk, 1 request of 15 -> more requests")
+	_check(Guide.TIPS.feed_cows.contains("Feed") and Guide.TIPS.pen_requests.contains("Request Board"), "guide 0.4.6: the lines name the key and the board")
+	state.drops = []
+	state.bag.crop_carrot = 1
+	_check(Guide.step(state, now) == "pen_requests", "guide 0.4.6: one carrot is not a feed (2) -> the pen's next need")
+	state.requests_done = 15
+	_check(Guide.step(state, now) == "gather_upgrade", "guide 0.4.6: 15 requests at Lv2 -> Lv3's Timber and Stone")
+	state.level = 3
+	state.coins = 1199
+	_check(Guide.step(state, now) == "pen_coins", "guide 0.4.6: Lv3, 1,199 coins -> save up for the pen")
+	state.coins = 1200
+	_check(Guide.step(state, now) == "pen_blueprint", "guide 0.4.6: 1,200 coins -> Scott's Sheep Pen Blueprint")
+	var pen_bought := ParcelFarm.apply(rules, state, [{"type": "claim_blueprint", "blueprint": "sheep_pen"}], now)
+	_check(pen_bought.ok, "guide 0.4.6: Scott sells the pen's blueprint (%s)" % pen_bought.get("code", ""))
+	if not pen_bought.ok: return
+	state = pen_bought.state
+	_check(Guide.step(state, now) == "gather_pen", "guide 0.4.6: the pen's blueprint, short of materials -> gather them")
+	state.bag.wood = 15
+	state.bag.stone = 15
+	_check(Guide.stage(state, now) == "sheep_pen" and Guide.step(state, now) == "sheep_pen", "guide 0.4.6: blueprint and materials -> Build Sheep Pen")
+	var penned := ParcelFarm.apply(rules, state, [{"type": "place_building", "building": "sheep_pen", "x": 20, "y": 30, "rotation": 0}], now)
+	_check(penned.ok, "guide 0.4.6: the pen goes down (%s)" % penned.get("code", ""))
+	if not penned.ok: return
+	state = penned.state
+	var pen_id := int(state.buildings.back().id)
+	_check(Guide.stage(state, now) == "feed_sheep" and Guide.step(state, now) == "gather_herbs", "guide 0.4.6: a pen, no herbs -> gather Wild Herb")
+	state.bag.wild_herb = 3
+	_check(Guide.step(state, now) == "feed_sheep", "guide 0.4.6: 3 Wild Herb -> feed the sheep")
+	var sheep_fed := ParcelFarm.apply(rules, state, [{"type": "feed", "building": pen_id}], now)
+	_check(sheep_fed.ok, "guide 0.4.6: the sheep eat (%s)" % sheep_fed.get("code", ""))
+	if not sheep_fed.ok: return
+	state = sheep_fed.state
+	_check(Guide.stage(state, now) == "" and Guide.step(state, now) == "", "guide 0.4.6: the sheep fed -> nothing left")
+	state.drops = []
+	state.bag.wool = 1
+	_check(Guide.stage(state, now) == "", "guide 0.4.6: wool in the bag -> nothing left")
+	state.bag.erase("wool")
+	state.bag.wild_herb = 3
+	_check(Guide.stage(state, now) == "feed_sheep" and Guide.step(state, now) == "feed_sheep", "guide 0.4.6: the wool sold -> the save asks for feeding again")
+	_check(Guide.step(state, now, true) == "", "guide 0.4.6: ... which a device that saw every row done does not show")
+	state.crops = {"10,10": {"crop": "crop_carrot", "planted_at": now - 120000, "ripe_at": now - 60000}}
+	_check(Guide.step(state, now, true) == "harvest", "guide 0.4.6: a ripe carrot still asks for Harvest past the rows")
+	# Rules without the 0.4.6 content skip it.
+	var bare := rules.duplicate(true)
+	bare.requests = {}
+	bare.economy.blueprints.erase("barn")
+	bare.economy.blueprints.erase("sheep_pen")
+	_check(Guide._stage_past_upgrade(lv2, bare) == "", "guide 0.4.6: no board, barn or pen in the rules -> nothing past the upgrade")
 
 ## C-138: a sown carrot goes through stages 1..6 (stage 0 is tilled soil with nothing sown). Sowing to root thickening
 ## take a fifth of the growing time each; maturity starts exactly when the carrot ripens (Harvest opens).

@@ -5,13 +5,15 @@ extends RefCounted
 ## Jasmine and Scott's coop blueprint (C-61). C-175 (0.4.5): C-61's two gathering rows gave way to YOUR FARM, 0.4.5's
 ## content after the blueprint: build the coop, feed a hen, sell an egg, upgrade the farm (gathering is part of that
 ## last one). No new step, reward or number: a row is done once the guide has moved past it. English only, as the
-## parcel's UI; the new rows' copy is for PM to finalise (C-45).
+## parcel's UI; the new rows' copy is for PM to finalise (C-45). C-190 (0.4.6) adds REQUESTS & ANIMALS: the first
+## delivered request, the barn, the sheep pen and feeding its sheep.
 
 const Guide = preload("res://modules/dynamic_farm/parcel_guide.gd")
 
 const GET_STARTED := "GET STARTED"
 const TOWN := "TOWN"
 const YOUR_FARM := "YOUR FARM"
+const ANIMALS := "REQUESTS & ANIMALS"
 ## In the guide's order. Titles of the design's rows (C-85 ⑧-B); C-175's four rows follow its milestones.
 const TASKS := [
 	{"key": "build", "group": GET_STARTED, "title": "Build Cottage"},
@@ -24,6 +26,10 @@ const TASKS := [
 	{"key": "feed", "group": YOUR_FARM, "title": "Feed a hen"},
 	{"key": "sell_egg", "group": YOUR_FARM, "title": "Sell an egg"},
 	{"key": "upgrade", "group": YOUR_FARM, "title": "Upgrade your farm"},
+	{"key": "request", "group": ANIMALS, "title": "Deliver a request"},
+	{"key": "barn", "group": ANIMALS, "title": "Build the Barn"},
+	{"key": "sheep_pen", "group": ANIMALS, "title": "Build the Sheep Pen"},
+	{"key": "feed_sheep", "group": ANIMALS, "title": "Feed the sheep"},
 ]
 
 static func keys() -> Array:
@@ -33,13 +39,14 @@ static func keys() -> Array:
 ## milestone (ParcelGuide.stage; a carrot growing or sown dry waits on Harvest, a hen still to lay waits on Sell an egg).
 ## `reached` is the rows this device last counted done on the parcel: feeding again after selling the first egg sends
 ## the milestone back to Sell an egg, which the save cannot tell from the first egg, so a parcel that already got past
-## it keeps the row done.
+## it keeps the row done. Feeding the sheep (C-190) is the same once their wool is sold.
 static func done_count(farm: Dictionary, now_ms: int, reached := 0) -> int:
 	if farm.is_empty(): return 0
 	var order := keys()
 	var stage := Guide.stage(farm, now_ms)
 	if stage.is_empty(): return TASKS.size()
 	if stage == "sell_egg" and reached > order.find(stage): return order.find("upgrade")
+	if stage == "feed_sheep" and reached > order.find(stage): return TASKS.size()
 	return order.find(stage)
 
 ## The rows for `farm`: [{key, group, title, state: "done" | "current" | "todo"}].

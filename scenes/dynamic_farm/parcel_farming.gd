@@ -1441,7 +1441,8 @@ func _place_bar() -> void:
 ## the next step; finishing the step moves it on.
 func _refresh_tip() -> void:
 	if _tip == null: return
-	var step := "" if unavailable else Guide.step(farm, server_now())
+	# C-190: past every task row on this device, the sheep's feeding is not taught again once their wool was sold.
+	var step := "" if unavailable else Guide.step(farm, server_now(), Tasks.done_count(farm, server_now(), _reached()) >= Tasks.TASKS.size())
 	var was_visible := _tip.visible
 	var changed := step != tip_step
 	if changed:
