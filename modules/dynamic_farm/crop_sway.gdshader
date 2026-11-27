@@ -1,6 +1,7 @@
 // Carrots shaken by a passing player and ripe ones swaying (C-141, the design owner-confirmed on C-140:
 // attachment-1069, SEN-Q-321). A vertex bend only: no physics, no extra nodes or draws.
-// One material per plant stage layer of ParcelCropArt (C-139's painted carrot meshes, one MultiMesh per stage).
+// One material per plant stage layer of ParcelCropArt (C-139's painted carrot meshes; one MultiMesh per stage and 4 × 4
+// cell chunk since C-208, every chunk at the layer's origin, so MODEL_MATRIX is the plant's own placement).
 // Mesh local space: the plant stands on y = plant_base .. plant_top; instance transform = a turn about Y × the cell's
 // scale, origin on the ground. INSTANCE_CUSTOM: xy = push direction (world XZ; its length is the stage's amplitude
 // factor, 0 = no shake), z = trigger time on shake_clock (s), w unused. GLES3 keeps custom data as truncated half

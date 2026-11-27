@@ -14,6 +14,9 @@ extends Node3D
 ## C-141: the plant stages draw with crop_sway.gdshader (the C-140 design, SEN-Q-321): a plant the walking player
 ## brushes shakes and settles in about a second (shake()), ripe ones sway softly. Each plant layer keeps its draw;
 ## per plant only a push direction and trigger time ride in the MultiMesh custom data.
+## C-208: every layer (collars, a soil state, a plant stage) is cut into CHUNK × CHUNK cell chunks, one MultiMesh each.
+## A single MultiMesh for the parcel is culled as a whole, so a field full of carrots drew every plant on or off
+## screen; now the chunks off screen are not drawn. On screen the same meshes draw at the same transforms.
 
 const GARDEN = preload("res://assets/dynamic_farm/kitchen_garden/carrot_stages.glb")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -46,26 +49,75 @@ const COLLAR_WET := Color(0.41, 0.34, 0.27)
 ## MS-07 water drops: a splash this colour, sized to the cell, gone in half a second.
 const DROP_COLOR := Color(0.62, 0.82, 0.97, 0.9)
 const DROP_LIFE_S := 0.5
-var _contact: MultiMeshInstance3D
+## C-208: a layer's chunk is CHUNK × CHUNK cells. Smaller chunks cull closer to the view's edge but add draws: at the
+## game camera 4 draws about 45 % of a 14 × 60 field (one cell chunks 35 %), some 26 chunks a layer.
+const CHUNK := 4
+## A chunk's box grows by this much (cells): a shaken or swaying plant leans up to about 0.17 of a cell past its own
+## box, a popping one overshoots it by about a tenth, so a plant next to the view's edge is never culled early.
+const CULL_MARGIN_CELLS := 0.25
+
+## One drawn layer cut into chunks (C-208): one MultiMeshInstance3D per chunk of cells, created as cells reach it.
+## `material_override` reaches every chunk, `visible` hides the layer.
+class Layer extends Node3D:
+	var mesh: Mesh
+	var custom := false
+	var colors := false
+	var margin := 0.0
+	var material_override: Material:
+		set(value):
+			material_override = value
+			for batch: MultiMeshInstance3D in chunks.values(): batch.material_override = value
+	## Chunk -> its MultiMeshInstance3D, in the order they were made.
+	var chunks := {}
+
+	func _init(layer_mesh: Mesh, custom_data: bool, cull_margin: float) -> void:
+		mesh = layer_mesh
+		custom = custom_data
+		margin = cull_margin
+
+	## The chunk's batch, made on first use. Every chunk keeps the layer's origin, so instance transforms and the
+	## shader's MODEL_MATRIX are what one batch had.
+	func part(chunk: Vector2i) -> MultiMeshInstance3D:
+		if chunks.has(chunk): return chunks[chunk]
+		var batch := MultiMeshInstance3D.new()
+		batch.name = "Chunk_%d_%d" % [chunk.x, chunk.y]
+		# Earth and carrot rows receive the sun; the shared pad supplies contact.
+		batch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		batch.extra_cull_margin = margin
+		batch.material_override = material_override
+		batch.multimesh = MultiMesh.new()
+		batch.multimesh.transform_format = MultiMesh.TRANSFORM_3D
+		batch.multimesh.use_custom_data = custom
+		batch.multimesh.use_colors = colors
+		batch.multimesh.mesh = mesh
+		add_child(batch)
+		chunks[chunk] = batch
+		return batch
+
+	## Instances drawn over all chunks.
+	func count() -> int:
+		var total := 0
+		for batch: MultiMeshInstance3D in chunks.values(): total += batch.multimesh.instance_count
+		return total
+
+var _contact: Layer
 var _point: Callable
 var _cell_m := 1.0
-var _soil := {}     ## DRY / WET -> MultiMeshInstance3D
-var _stages: Array[MultiMeshInstance3D] = []
+var _soil := {}     ## DRY / WET -> Layer
+var _stages: Array[Layer] = []
 var _counts := {}
-## Crop sway (C-141): the clock the shader and the trigger times share, on or off, live shakes (cell -> {push, at})
-## and where the last sync drew each planted cell (cell -> Vector2i(stage, instance)).
+## Crop sway (C-141): the clock the shader and the trigger times share, on or off, live shakes (cell -> {push, at}).
 var clock := 0.0
 var sway := true
 var _shakes := {}
-var _slots := {}
 ## Each plant stage's sway material (index = stage; none for stage 0), the layer's material_override.
 var _materials: Array[ShaderMaterial] = []
 ## C-186 MS-07 (C-185 §3.2): cells popping after a reply — cell -> {kind: &"soil" | &"plant", t: seconds}.
 var _pops := {}
-## Where the last sync drew each cell: cell -> [layer, index, turned] for the soil block and the plant.
+## Where the last sync drew each cell: cell -> [chunk batch, index, turned, layer] for the soil block, the plant and
+## the collar.
 var _soil_at := {}
 var _plant_at := {}
-## Cell -> its collar's index in the contact batch.
 var _collar_at := {}
 ## C-211 MS-07: cells just watered, their soil turning from dry to wet — cell -> {t: seconds, node: the cell's own
 ## soil block, material: its dry → wet material}. The wet batch leaves such a cell out until it is done.
@@ -81,8 +133,7 @@ func _init(point: Callable, cell_m: float) -> void:
 	_cell_m = cell_m
 	# One opaque collar/clod batch. Instance tint follows the soil state, not a
 	# transparent decal hidden under the existing soil mesh.
-	_contact = _layer(Kit.mesh("BedFoot"))
-	_contact.multimesh.use_colors = true
+	_contact = _layer(Kit.mesh("BedFoot"), false, true)
 	_contact.material_override = Kit.Art.material()
 	var library := GARDEN.instantiate()
 	var earth := (library.get_node("Tilled") as MeshInstance3D).mesh
@@ -118,8 +169,6 @@ static func stage_of(crop: Dictionary, now_ms: int) -> int:
 
 ## `soil`: tilled cell key -> DRY or WET; `crops`: the save's crops (cell key -> {crop, planted_at, ripe_at}).
 func sync(soil: Dictionary, crops: Dictionary, now_ms: int) -> void:
-	_soil_at = {}
-	_plant_at = {}
 	var blocks := {DRY: [], WET: []}
 	var stages: Array = []
 	for stage in STAGES.size(): stages.append([])
@@ -130,40 +179,50 @@ func sync(soil: Dictionary, crops: Dictionary, now_ms: int) -> void:
 		var crop = crops.get(key)
 		var stage := stage_of(crop, now_ms) if crop is Dictionary and crop.get("crop") == CARROT else 0
 		stages[stage].append(cell)
-	var collars: Array = blocks[DRY] + blocks[WET]
-	_fill(_contact, collars, false)
-	_collar_at = {}
-	for i in collars.size():
-		_collar_at[collars[i]] = i
-		_contact.multimesh.set_instance_color(i, COLLAR_DRY if i < blocks[DRY].size() else COLLAR_WET)
+	_soil_at = {}
 	for state: String in blocks:
-		_fill(_soil[state], blocks[state], false)
-	_slots.clear()
+		_soil_at.merge(_fill(_soil[state], blocks[state], false))
+	_collar_at = _fill(_contact, blocks[DRY] + blocks[WET], false)
+	for cell: Vector2i in _collar_at: _collar_color(cell, COLLAR_WET if _soil_at[cell][3] == _soil[WET] else COLLAR_DRY)
 	for key in _shakes.keys():
 		if clock - float(_shakes[key].at) >= SHAKE_S: _shakes.erase(key)
 	for cell: Vector2i in _wets.keys():
 		if not cell in blocks[WET]: _end_wet(cell)
 	for cell: Vector2i in _wets: _apply_wet(cell)
+	_plant_at = {}
 	for stage in stages.size():
 		if _stages[stage] == null: continue
-		_fill(_stages[stage], stages[stage], true)
-		for i in stages[stage].size():
-			_slots[stages[stage][i]] = Vector2i(stage, i)
-			_write_shake(stage, i, stages[stage][i])
+		_plant_at.merge(_fill(_stages[stage], stages[stage], true))
+	for cell: Vector2i in _plant_at: _write_shake(cell)
+	for cell: Vector2i in _pops: _apply_pop(cell)
 	_counts = {"soil": {DRY: blocks[DRY].size(), WET: blocks[WET].size()}, "stages": stages.map(func(cells): return cells.size())}
 
 ## What the last sync drew: {"soil": {dry, wet}, "stages": [cells per stage 0..6]}.
 func counts() -> Dictionary:
 	return _counts.duplicate(true)
 
-func _fill(layer: MultiMeshInstance3D, cells: Array, turn: bool) -> void:
-	layer.multimesh.instance_count = cells.size()
-	var where := _plant_at if turn else _soil_at if layer in _soil.values() else {}
-	for i in cells.size():
-		var cell: Vector2i = cells[i]
-		layer.multimesh.set_instance_transform(i, _transform(cell, turn, Vector3.ONE))
-		if layer != _contact: where[cell] = [layer, i, turn]
-	for cell: Vector2i in _pops: _apply_pop(cell)
+## Draws `cells` on `layer`, each in its chunk; returns where: cell -> [chunk batch, index, turned, layer].
+func _fill(layer: Layer, cells: Array, turn: bool) -> Dictionary:
+	var by_chunk := {}
+	for cell: Vector2i in cells: (by_chunk.get_or_add(chunk_of(cell), []) as Array).append(cell)
+	var where := {}
+	for chunk: Vector2i in layer.chunks:
+		if not by_chunk.has(chunk):
+			layer.chunks[chunk].multimesh.instance_count = 0
+			layer.chunks[chunk].visible = false
+	for chunk: Vector2i in by_chunk:
+		var part := layer.part(chunk)
+		var inside: Array = by_chunk[chunk]
+		part.multimesh.instance_count = inside.size()
+		part.visible = true
+		for i in inside.size():
+			part.multimesh.set_instance_transform(i, _transform(inside[i], turn, Vector3.ONE))
+			where[inside[i]] = [part, i, turn, layer]
+	return where
+
+## The chunk a cell is drawn in (C-208).
+static func chunk_of(cell: Vector2i) -> Vector2i:
+	return Vector2i(floori(float(cell.x) / CHUNK), floori(float(cell.y) / CHUNK))
 
 ## The instance transform of `cell`, its local scale `s` from its base (soil from the ground, a plant from its root).
 func _transform(cell: Vector2i, turn: bool, s: Vector3) -> Transform3D:
@@ -217,7 +276,7 @@ static func _ball(color: Color) -> SphereMesh:
 ## MS-07 (C-211): a watered cell's soil turns from dry to wet over `motion/duration/wetFade` (300, standard), and
 ## `motion/limit/waterDrops` drops splash off it. Reduced: the soil is simply wet (nothing fades or splashes).
 func wet_in(cell: Vector2i) -> void:
-	if UiMotion.reduced or not is_inside_tree() or not _soil_at.has(cell) or _soil_at[cell][0] != _soil[WET]: return
+	if UiMotion.reduced or not is_inside_tree() or not _soil_at.has(cell) or _soil_at[cell][3] != _soil[WET]: return
 	_end_wet(cell)
 	var block := MeshInstance3D.new()
 	block.name = "WetFade"
@@ -268,8 +327,7 @@ func _apply_wet(cell: Vector2i) -> void:
 	var at = _soil_at.get(cell)
 	if at != null and int(at[1]) < (at[0] as MultiMeshInstance3D).multimesh.instance_count:
 		(at[0] as MultiMeshInstance3D).multimesh.set_instance_transform(int(at[1]), _transform(cell, false, Vector3.ONE * 0.001))
-	if _collar_at.has(cell) and int(_collar_at[cell]) < _contact.multimesh.instance_count:
-		_contact.multimesh.set_instance_color(int(_collar_at[cell]), COLLAR_DRY.lerp(COLLAR_WET, e))
+	_collar_color(cell, COLLAR_DRY.lerp(COLLAR_WET, e))
 
 ## The fade is over: its block goes and the wet batch draws the cell again.
 func _end_wet(cell: Vector2i) -> void:
@@ -280,8 +338,12 @@ func _end_wet(cell: Vector2i) -> void:
 	var at = _soil_at.get(cell)
 	if at != null and int(at[1]) < (at[0] as MultiMeshInstance3D).multimesh.instance_count:
 		(at[0] as MultiMeshInstance3D).multimesh.set_instance_transform(int(at[1]), _transform(cell, false, Vector3.ONE))
-	if _collar_at.has(cell) and int(_collar_at[cell]) < _contact.multimesh.instance_count and at != null and at[0] == _soil[WET]:
-		_contact.multimesh.set_instance_color(int(_collar_at[cell]), COLLAR_WET)
+	if at != null and at[3] == _soil[WET]: _collar_color(cell, COLLAR_WET)
+
+func _collar_color(cell: Vector2i, color: Color) -> void:
+	var at = _collar_at.get(cell)
+	if at != null and int(at[1]) < (at[0] as MultiMeshInstance3D).multimesh.instance_count:
+		(at[0] as MultiMeshInstance3D).multimesh.set_instance_color(int(at[1]), color)
 
 func _process(delta: float) -> void:
 	for cell: Vector2i in _pops.keys():
@@ -308,24 +370,18 @@ func _apply_pop(cell: Vector2i) -> void:
 	var layer: MultiMeshInstance3D = at[0]
 	if int(at[1]) < layer.multimesh.instance_count: layer.multimesh.set_instance_transform(int(at[1]), _transform(cell, bool(at[2]), s))
 
-func _layer(mesh: Mesh, custom := false) -> MultiMeshInstance3D:
-	var layer := MultiMeshInstance3D.new()
-	# Earth and carrot rows receive the sun; the shared pad supplies contact.
-	layer.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	layer.multimesh = MultiMesh.new()
-	layer.multimesh.transform_format = MultiMesh.TRANSFORM_3D
-	layer.multimesh.use_custom_data = custom
-	layer.multimesh.mesh = mesh
+func _layer(mesh: Mesh, custom := false, colors := false) -> Layer:
+	var layer := Layer.new(mesh, custom, CULL_MARGIN_CELLS * _cell_m)
+	layer.colors = colors
 	add_child(layer)
 	return layer
 
 ## Shake the plant drawn on `cell` (C-141): `push` is the world XZ direction away from the player, its length the
 ## stage's amplitude factor. It starts at the current clock; a plant with nothing drawn there is left alone.
 func shake(cell: Vector2i, push: Vector2) -> void:
-	if not _slots.has(cell): return
+	if not _plant_at.has(cell): return
 	_shakes[cell] = {"push": push, "at": clock}
-	var slot: Vector2i = _slots[cell]
-	_write_shake(slot.x, slot.y, cell)
+	_write_shake(cell)
 
 ## Advance the sway's clock (s); the shader reads it every frame. Shakes over by now are dropped and their plants
 ## written still, so a stale trigger time can never come round again on the wrapping shake clock.
@@ -339,9 +395,7 @@ func set_clock(seconds: float) -> void:
 	for cell in _shakes.keys():
 		if clock - float(_shakes[cell].at) < SHAKE_S: continue
 		_shakes.erase(cell)
-		if _slots.has(cell):
-			var slot: Vector2i = _slots[cell]
-			_write_shake(slot.x, slot.y, cell)
+		_write_shake(cell)
 
 ## A trigger time as the shader stores it: on the SHAKE_STEP_S grid (rounded down, so the shake never starts late)
 ## and wrapped to the shake clock; exact in the half floats GLES3 keeps custom data in.
@@ -355,7 +409,8 @@ func set_sway(on: bool) -> void:
 	for stage in _stages.size():
 		if _stages[stage] == null: continue
 		_materials[stage].set_shader_parameter(&"sway_enabled", on)
-		for i in _stages[stage].multimesh.instance_count: _stages[stage].multimesh.set_instance_custom_data(i, Color(0, 0, 0, 0))
+		for part: MultiMeshInstance3D in _stages[stage].chunks.values():
+			for i in part.multimesh.instance_count: part.multimesh.set_instance_custom_data(i, Color(0, 0, 0, 0))
 
 ## The live shake of `cell` ({push, at}), else an empty dictionary.
 func shake_of(cell: Vector2i) -> Dictionary:
@@ -366,8 +421,9 @@ func ripe_layer(stage: int) -> bool:
 	return _materials[stage] != null and bool(_materials[stage].get_shader_parameter(&"ripe"))
 
 ## Every instance is written each sync: resizing a MultiMesh does not promise zeroed custom data.
-func _write_shake(stage: int, index: int, cell: Vector2i) -> void:
-	_stages[stage].multimesh.set_instance_custom_data(index, shake_data(cell))
+func _write_shake(cell: Vector2i) -> void:
+	var at = _plant_at.get(cell)
+	if at != null: (at[0] as MultiMeshInstance3D).multimesh.set_instance_custom_data(int(at[1]), shake_data(cell))
 
 ## The custom data `cell`'s plant carries: push direction and stamped trigger time while it shakes, else zero.
 func shake_data(cell: Vector2i) -> Color:
