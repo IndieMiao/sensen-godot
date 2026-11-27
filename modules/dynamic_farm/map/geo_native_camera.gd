@@ -110,6 +110,9 @@ func _fly_step(t:float,flight:RefCounted,lon:float,lat:float,level:float) -> voi
 	center=PackedFloat64Array([lon,lat] if t>=1.0 else [p.y,p.x]);zoom=level if t>=1.0 else p.z;_changed()
 func flying() -> bool:
 	return _motion!=null and _motion.is_running()
+## A finger on the map, its inertia, or a zoom or flight under way (C-188: the avatar's idle float holds still meanwhile).
+func moving() -> bool:
+	return not _touches.is_empty() or _fling!=Vector2.ZERO or _zoom_vel!=0.0 or flying()
 ## Ends a gesture, its inertia and any zoom or flight in progress (a new touch, leaving the map).
 func stop() -> void:
 	_fling=Vector2.ZERO;_zoom_vel=0.0

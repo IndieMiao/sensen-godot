@@ -8,6 +8,10 @@ const ENGLISH_UI := "english_ui"
 ## English only (C-144): the dynamic farm's scenes show no 中文 (English-only UI copy), while the main farm keeps its
 ## translated layer. Set before the layer enters the tree (AppRouter, from open_instance's english_ui).
 var english := false
+## open_instance's args key: a Color the layer stands on instead of its paper and map picture (C-188: the dynamic farm map's
+## iris colour, so a scene still loading after the trip's iris has closed shows Loading on the same colour).
+const BACKDROP := "loading_backdrop"
+var backdrop := Color.TRANSPARENT
 
 func _ready() -> void:
 	layer = 120
@@ -15,7 +19,7 @@ func _ready() -> void:
 	GameUi.register_modal(self)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	var background := ColorRect.new()
-	background.color = GameUi.PAPER
+	background.color = backdrop if backdrop.a > 0.0 else GameUi.PAPER
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	background.theme = GameUi.theme()
 	add_child(background)
@@ -26,6 +30,7 @@ func _ready() -> void:
 	scenery.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	scenery.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	scenery.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scenery.visible = backdrop.a <= 0.0
 	background.add_child(scenery)
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
