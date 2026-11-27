@@ -43,7 +43,7 @@ describe('dynamic_farm.json', () => {
     // (more wells come with farm levels, SEN-C-152).
     expect(rules.buildings.cottage).toEqual({ model: 'cottage', blueprint: 'blueprint_cottage', width: 3, depth: 3, max: 1 });
     expect(rules.buildings.well).toEqual({ model: 'well', blueprint: 'blueprint_well', width: 1, depth: 1, max: 1 });
-    expect(Object.keys(rules.buildings)).toEqual(['cottage', 'coop', 'barn', 'well']); // C-181: the 8×6 barn (its own describe)
+    expect(Object.keys(rules.buildings)).toEqual(['cottage', 'coop', 'barn', 'well']); // C-181: the barn (its own describe; C-202: 11×6 less a 2×2)
     // C-151 (owner SEN-C-137#6, #15): a pail holds 3 waterings, filled at a well; every farm gets one well blueprint and one pail, once.
     expect(rules.watering).toEqual({ well: 'well', pail: 'pail', pail_uses: 3 });
     expect(rules.grants).toEqual({ watering: { blueprint_well: 1, pail: 1 } });
@@ -813,7 +813,8 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
 
   it('ships the owner\'s numbers (SEN-Q-282): 600 coins from farm level 2, 20 Timber + 10 Stone, 2 cows, 2 carrots give a milk in 15 min, 2 on the ground, 45 coins', () => {
     const { livestock, ...barn } = rules.buildings.barn;
-    expect(barn).toEqual({ model: 'cow_barn', blueprint: 'blueprint_barn', width: 8, depth: 6, max: 1, materials: { wood: 20, stone: 10 } });
+    // C-202: SEN-C-179's yard, 11×6 less its rear-left 2×2 (owner SEN-Q-300).
+    expect(barn).toEqual({ model: 'cow_barn', blueprint: 'blueprint_barn', width: 11, depth: 6, cutouts: [[0, 0, 2, 2]], max: 1, materials: { wood: 20, stone: 10 } });
     expect(livestock).toMatchObject({ animals: ['cow', 'cow'], feed: 'crop_carrot', feed_amount: 2, product: 'milk', amount: 1,
       produce_seconds: 900, max_ground: 2 });
     expect(livestock!.spots.length).toBeGreaterThanOrEqual(livestock!.max_ground);
@@ -839,6 +840,15 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
       barn: { ...rules.buildings.barn, livestock: { ...rules.buildings.barn.livestock!, feed_amount } } } });
     expect(portion(2)).not.toThrow();
     for (const bad of [0, 100, 1.5, '2']) expect(portion(bad)).toThrow();
+    // C-202: cutouts are whole-cell rects inside the footprint that leave some of it; no milk spot inside one.
+    const cut = (cutouts: unknown) => () => parseParcelRules({ ...rules, buildings: { ...rules.buildings, barn: { ...rules.buildings.barn, cutouts } } });
+    expect(cut([[0, 0, 2, 2]])).not.toThrow();
+    expect(cut([])).not.toThrow();
+    expect(cut([[9, 4, 2, 2], [0, 0, 1, 6]])).not.toThrow();
+    for (const bad of [[[0, 0, 0, 2]], [[10, 0, 2, 1]], [[0, 5, 1, 2]], [[-1, 0, 1, 1]], [[0, 0, 1.5, 1]], [[0, 0, 11, 6]], [[0, 0, 2]], {}, '0,0,2,2',
+      Array.from({ length: 9 }, () => [0, 0, 1, 1])]) expect(cut(bad)).toThrow();
+    expect(() => parseParcelRules({ ...rules, buildings: { ...rules.buildings, barn: { ...rules.buildings.barn,
+      livestock: { ...rules.buildings.barn.livestock!, spots: [[1, 1], ...rules.buildings.barn.livestock!.spots] } } } })).toThrow(/spots/);
   });
 
   it('buying the blueprint takes 600 coins once, from farm level 2, with no sale needed; short of coins or below level 2 nothing changes', () => {
@@ -878,14 +888,18 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
     expect(built.coins).toBe(50);
   });
 
-  it('places the 8×6 barn in any of four turns with its two cows, off other buildings, tilled cells and crops', () => {
+  it('places the 11×6 barn less its rear-left 2×2 in any of four turns with its two cows, off other buildings, tilled cells and crops', () => {
     for (const rotation of [0, 1, 2, 3]) {
       const s = withBarn(rotation);
-      expect(s.buildings).toEqual([{ id: 1, type: 'barn', model: 'cow_barn', x: 20, y: 20, width: 8, depth: 6, rotation, built_at: T0, animals: ['cow', 'cow'] }]);
-      // Turned a quarter it is 6 wide and 8 deep.
-      const [inside, outside] = rotation % 2 ? ['25,27', '26,20'] : ['27,25', '20,26'];
+      expect(s.buildings).toEqual([{ id: 1, type: 'barn', model: 'cow_barn', x: 20, y: 20, width: 11, depth: 6, rotation, built_at: T0,
+        animals: ['cow', 'cow'], cutouts: [[0, 0, 2, 2]] }]);
+      // Turned a quarter it is 6 wide and 11 deep; the cutout turns with it (unturned the entry row is the lowest y, so
+      // the rear-left corner is the lowest x, highest y).
+      const [inside, outside] = rotation % 2 ? ['23,30', '26,20'] : ['30,25', '31,20'];
+      const corner = ['20,25', '20,20', '30,20', '25,30'][rotation];
       expect(tryIt(s, [{ type: 'till', cell: inside }])).toMatchObject({ ok: false, code: 'CELL_OCCUPIED' });
       expect(tryIt(s, [{ type: 'till', cell: outside }]).ok).toBe(true);
+      expect(tryIt(s, [{ type: 'till', cell: corner }]).ok).toBe(true);
     }
     const s = run(rich(), [buy, { type: 'place_house', x: 10, y: 10 }, { type: 'till', cell: '40,40' }, { type: 'sow', cell: '40,40', crop: 'crop_carrot' }]);
     const frozen = structuredClone(s);

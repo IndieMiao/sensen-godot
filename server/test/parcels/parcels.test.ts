@@ -631,7 +631,7 @@ for (const [name, enabled, makeStores] of makers) {
         expect(built.statusCode).toBe(200);
         const givenAt = T0 + 60_000 + 900_000;
         expect(built.json().parcel.farm).toMatchObject({ coins: 0, blueprints_claimed: { barn: T0 + 60_000 }, drop_seq: 1,
-          buildings: [{ type: 'well' }, { id: 2, type: 'barn', width: 8, depth: 6, rotation: 1, animals: ['cow', 'cow'] }],
+          buildings: [{ type: 'well' }, { id: 2, type: 'barn', width: 11, depth: 6, rotation: 1, animals: ['cow', 'cow'], cutouts: [[0, 0, 2, 2]] }],
           drops: [{ id: 1, item: 'milk', amount: 1, building: 2, animal: 0, ready_at: givenAt }] });
         expect(built.json().parcel.farm.bag).toEqual({ hoe_starter: 1, seed_carrot: 1, blueprint_cottage: 1, pail: 1 });
         v += 1;
