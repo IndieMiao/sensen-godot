@@ -94,7 +94,10 @@ see-through model (its middle cell under the finger); its cells fill green or re
 cells round it, and the protected path's cells in reach show sand. The bottom is the shared `UiPlaceBar`
 (`Cancel · Rotate · Build`, the three-key bar P0's Decorate uses); Rotate turns the preview a quarter in place
 (0, 90, 180, 270°, the owner's SEN-C-134#22 question 3), a turn swapping the footprint's width and depth; the reason a
-spot is refused shows above the bar. The preview starts unturned on the valid spot nearest the player. Build sends
+spot is refused shows above the bar. The preview starts unturned on the valid spot nearest the player, else turned (C-175). A fresh yard often has no room
+for the 7×5 coop until some trees, bushes, rocks and weeds are cleared: with no valid spot the preview starts on the one
+needing the fewest of them cleared (`FarmBuilding.start_spot`), and a spot refused only for core obstacles reads
+`Clear the plants and rocks here first` instead of `Space taken`. Build sends
 `place_building` (type, cell, turn) through `ParcelFarming.send`; it stands at once (no construction time). A refused
 Build (`CELL_OCCUPIED`, `BUILDING_OVERLAP`) keeps the preview, judged again on the farm the reply brought. A
 successful Build (C-114) pops the building in and puffs dust with the main farm's look-swap effect (`P0Fence.pop_in` /
@@ -169,6 +172,15 @@ shows the preview's `Explore and walk. Farming actions come later.` Copy and scr
 parcel's card says where to go; the map reads the home's save (`GET /parcels/mine`, no gift) on each return, and its
 bottom card names the step done off the parcel (`Tap Washington Square to sell your carrot.` … since C-115), with nothing
 selected or added under `Your home`. Copy and screenshots: `docs/plans/C-61.md`.
+
+0.4.5 (C-175, the run-through of 0.4.5's content) replaces C-61's gathering loop after the first sale, since selling
+what was gathered sold the Timber and Stone the farm upgrade needs: sold -> `blueprint`; the coop blueprint in the bag
+-> `coop`; a coop never fed -> `feed` (with no carrot in the bag: `sow` / `till` with seeds, `buy_seeds` without);
+a hen fed or an egg in the bag on a Lv1 farm -> `egg` (laid or not) / `sell_egg`; then `gather_upgrade` until the bag
+holds Lv2's Timber and Stone, `upgrade` (at Scott's) after; nothing once the farm is past Lv1. A ripe carrot asks for
+`harvest` before anything, a dry one with water left in the pail for `water_pail`. `ParcelGuide.stage` is the milestone
+the phone's task rows follow (`ParcelTasks`: GET STARTED, TOWN, YOUR FARM). A tap on the coop's floor offers the
+nearest feeder's Feed and walks there on the press. Copy: `docs/plans/C-175.md`.
 
 ## Washington Square room (C-115)
 
