@@ -10,6 +10,8 @@ REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$REPO_ROOT"
 
 mkdir -p build/ios
+# 编辑器导出结束时不关共享 adb 服务（C-210；工程里有可运行的安卓预设，iOS 导出也会关）。
+python3 -I tools/godot_keep_adb_settings.py godot
 godot --headless --path . --export-debug "iOS" build/ios/sensen.ipa
 
 cp tools/ios/G3Spike.mm build/ios/sensen/G3Spike.mm

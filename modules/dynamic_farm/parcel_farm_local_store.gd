@@ -23,13 +23,16 @@ func enter() -> Dictionary:
 	if rules.is_empty(): return _failure("RULES", 0, {}, ParcelFarm.empty_state(), 0)
 	var saved := _load()
 	var now: int = now_ms.call()
-	var welcomed = ParcelFarm.welcome(rules, saved.farm, now)
+	# C-209: a building from before its type's cutouts (C-192's 8×6 barn) taken down and given back in the same write.
+	var farm: Dictionary = saved.farm.duplicate(true)
+	var took_down := ParcelFarm.retire_draft_buildings(rules, farm)
+	var welcomed = ParcelFarm.welcome(rules, farm, now)
 	# C-151: the one-off grants the farm has not had yet, in the same write (the server's enter).
 	var gift: Dictionary = rules.welcome_gift.duplicate() if welcomed != null else {}
-	var granted = ParcelFarm.grant(rules, welcomed if welcomed != null else saved.farm, now)
+	var granted = ParcelFarm.grant(rules, welcomed if welcomed != null else farm, now)
 	if granted != null:
 		for id: String in granted.gift: gift[id] = int(gift.get(id, 0)) + int(granted.gift[id])
-	var next = granted.state if granted != null else welcomed
+	var next = granted.state if granted != null else welcomed if welcomed != null else farm if took_down else null
 	if next == null:
 		return {"ok": true, "granted": false, "gift": {}, "farm": ParcelFarm.view(rules, saved.farm, now), "farm_version": saved.version,
 			"server_time": now}

@@ -2,11 +2,14 @@ import {execFile} from 'node:child_process';
 import {promisify,isDeepStrictEqual} from 'node:util';
 import {writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
+import {requireEmulator,runSerial} from './run_serial.mjs';
 
 const execute=promisify(execFile);
 const dir='output/combat-latency-emulator-2026-09-15';
 const snapshot=async()=> (await fetch('http://127.0.0.1:3155/v1/qa/journey/scene')).json();
-const adb=args=>execute('adb',['-s','emulator-5560',...args],{encoding:'buffer',timeout:30000,maxBuffer:8*1024*1024});
+// The session's serial (run_test.sh), else this Run's emulator (C-212), else the local default; emulators only (C-216).
+const serial=requireEmulator(runSerial(['JOURNEY_SERIAL'],{host:['CARDIGAN_EMULATOR_SERIAL']})||'emulator-5560');
+const adb=args=>execute('adb',['-s',serial,...args],{encoding:'buffer',timeout:30000,maxBuffer:8*1024*1024});
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const center=(s,name)=>{
   const node=[...s.controls,...(s.world?.controls??[])].find(n=>n.path===name||n.path.endsWith('/'+name));

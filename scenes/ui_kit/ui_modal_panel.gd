@@ -18,6 +18,12 @@ const _HERO_LEFT := 12.0
 const _CLOSE_GLYPH := 14.0
 const _CLOSE_STROKE := 2.5
 const _CENTRE_ABOVE := 0.04   # C-L4: 4 % above the middle (the NPC card's 8 % is UiNpcCard's)
+## M-06 stagger (C-185 P-01, C-186): the hero at 80, the name tag at 140, the slots from 120 each a grid step
+## (MOTION_STAGGER_MS_GRID, 20) later, none after 200; each fades in over 120.
+const STAGGER_HERO_MS := 80.0
+const STAGGER_TAG_MS := 140.0
+const STAGGER_ITEMS_FROM_MS := 120.0
+const STAGGER_LAST_MS := 200.0
 
 var title := "": set = set_title
 var hero: Texture2D: set = set_hero
@@ -114,6 +120,21 @@ func header() -> Control: return _header
 ## M-04. Call once it is in the tree.
 func open() -> void:
 	UiMotion.panel_in(frame, scrim)
+
+## M-06, with open(): the hero, the tag and `items` (the body's slots) fade in one after another (STAGGER_*). Reduced:
+## they are simply there. Container children keep their layout; only their opacity moves.
+func stagger(items: Array = []) -> void:
+	if not is_inside_tree() or UiMotion.reduced: return
+	var parts: Array = [[_hero, STAGGER_HERO_MS], [_tag, STAGGER_TAG_MS]]
+	for i in items.size():
+		parts.append([items[i], minf(STAGGER_ITEMS_FROM_MS + UiTokens.MOTION_STAGGER_MS_GRID * i, STAGGER_LAST_MS)])
+	for part in parts:
+		var c := part[0] as CanvasItem
+		if c == null or not is_instance_valid(c): continue
+		c.modulate.a = 0.0
+		var tw := UiMotion.tween(c, UiTokens.MOTION_EASING_STANDARD)
+		tw.tween_interval(UiMotion.secs(float(part[1])))
+		tw.tween_property(c, "modulate:a", 1.0, UiMotion.secs(UiTokens.MOTION_DURATION_FAST_MS))
 
 ## M-05, then `closed` and the node frees itself. Touches go through at once.
 func close() -> void:

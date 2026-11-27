@@ -116,9 +116,13 @@ func _build_yard(b: Dictionary, rule: Dictionary) -> void:
 	root.transform = Building.transform(_walk, Building.at_of(b), base, int(b.rotation))
 	add_child(root)
 	var yard := {"state": b.duplicate(), "rule": rule, "type": type, "base": base, "root": root, "animals": [], "drops": {},
-		"pending": {}, "rects": {}, "cells": {}, "feeders": Livestock.feeders(type), "feeder_points": []}
+		"pending": {}, "rects": {}, "cells": {}, "feeders": Livestock.feeders(type), "eat": Livestock.eat_points(type),
+		"feeder_points": [], "stand_points": [], "cutouts": Building.cutouts_of(b)}
 	for cell: Vector2i in ParcelFarm.building_footprint(b): yard.cells[cell] = true
-	for f: Vector2 in yard.feeders: yard.feeder_points.append(root.transform * Livestock.model_point(f, base, _cell_m))
+	var stands := Livestock.refill_points(type)
+	for i in yard.feeders.size():
+		yard.feeder_points.append(root.transform * Livestock.model_point(yard.feeders[i], base, _cell_m))
+		yard.stand_points.append(root.transform * Livestock.model_point(stands[i], base, _cell_m) if stands[i] is Vector2 else null)
 	var kinds: Array = b.get("animals", rule.animals)
 	for i in kinds.size():
 		var made := Livestock.animal(str(kinds[i]), _cell_m)
@@ -310,7 +314,10 @@ func _send_to_feeder(yard: Dictionary, index: int) -> void:
 	var a: Dictionary = yard.animals[index]
 	var feeder = _nearest_feeder(yard, a.pos)
 	if feeder == null: return
-	_go(yard, a, _free_point(yard, a.radius, feeder + (a.pos - feeder).normalized() * 0.55, 12, 0.3), WALK_SPEED * 1.4, "feed")
+	# C-202: where the feeder says its animals eat (the barn's cows behind the trough), else beside it on her side.
+	var eat = yard.eat[yard.feeders.find(feeder)]
+	var want: Vector2 = eat if eat is Vector2 else feeder + (a.pos - feeder).normalized() * 0.55
+	_go(yard, a, _free_point(yard, a.radius, want, 12, 0.3), WALK_SPEED * 1.4, "feed")
 
 func _nearest_feeder(yard: Dictionary, from: Vector2) -> Variant:
 	var best = null
@@ -456,7 +463,8 @@ func _open(yard: Dictionary, p: Vector2, radius: float) -> bool:
 ## The open floor and the parts grown by `radius`, worked out once per yard and radius.
 func _rects(yard: Dictionary, radius: float) -> Dictionary:
 	if not yard.rects.has(radius):
-		yard.rects[radius] = {"floor": Livestock.floor_rect(yard.type, yard.base, radius), "blocked": Livestock.blocked_rects(yard.type, radius)}
+		yard.rects[radius] = {"floor": Livestock.floor_rect(yard.type, yard.base, radius),
+			"blocked": Livestock.blocked_rects(yard.type, radius, yard.cutouts)}
 	return yard.rects[radius]
 
 # ------------------------------------------------------------------ pickup
@@ -512,16 +520,20 @@ func drop_position(id: int) -> Variant:
 
 # ------------------------------------------------------------------ feeding
 
-## The livestock building whose feeder is nearest `player` within `reach` (m): {building: state, point: Vector3}, or {}.
+## The livestock building whose feeder is nearest `player` within `reach` (m), from its centre or from where the player
+## stands to fill it (its `refill`, C-202): {building: state, point: Vector3 (the centre), stand: Vector3 or null}, or {}.
 func feeder_near(player: Vector3, reach: float) -> Dictionary:
 	var best := {}
 	var best_d := reach
 	for yard: Dictionary in _yards.values():
-		for p: Vector3 in yard.feeder_points:
+		for i in yard.feeder_points.size():
+			var p: Vector3 = yard.feeder_points[i]
+			var stand = yard.stand_points[i]
 			var d := Vector2(p.x - player.x, p.z - player.z).length()
+			if stand is Vector3: d = minf(d, Vector2(stand.x - player.x, stand.z - player.z).length())
 			if d <= best_d:
 				best_d = d
-				best = {"building": yard.state, "point": p}
+				best = {"building": yard.state, "point": p, "stand": stand}
 	return best
 
 ## The cells under livestock buildings (their floor is walked, never farmed).

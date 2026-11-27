@@ -28,6 +28,8 @@ signal slot_removed(id: String)
 signal bag_requested
 signal close_requested
 signal handle_tapped
+## Farm style: the Seeds end was tapped (the owner opens the bag on the seeds).
+signal seeds_pressed
 
 const SLOTS := 5
 const BAG_GLYPH := preload("res://assets/p0/icons/bag.svg")
@@ -85,12 +87,28 @@ const FLY_BACK_MS := 200        # cancel: back to its place, ease-out (a lifted 
 const _FLY_HOME_MS := 150       # pin toggle: back to its place
 const _FLY_IN_MS := 150         # remove: into the zone's centre
 
+## C-186 farm style (C-185 §3.1 D, C-185#79 after the owner's attachment-1820), `UiQuickBar.new(true)`: a Seeds end
+## on the left (the seed the key would sow: `seeds_item`), `slot_count` 4 frosted slots and the Bag end on the right;
+## the bar frosted white (`bar/frost`, radius 20, a 1.2 white edge), both ends opaque cream clay tiles with the colour
+## icon, three yellow sparkles and ink text. The Bag end's capacity dot is the one P0 shows (`capacity_warning`).
+## Presses play M-01 on the slots and ends; a count that changes rolls (MS-03); `landing_for` is where a gain lands.
+var farm_style := false
+var slot_count := SLOTS
+## Farm style: {id, icon} of the seed shown on the Seeds end, or {} (the end then shows the bag's seed icon dimmed).
+var seeds_item := {}: set = set_seeds_item
+var _seeds: Button
+var _seeds_icon: TextureRect
+var _seeds_label: Label
+var _shown_qty := {}
+
 ## UI v3 (C-Q1, C-105): the bar's dark glass, `radius/lg`, drawn this far outside the slots (it takes no room, so
 ## every placement keeps its layout); hidden while collapsed or bag-only.
 const GLASS_PAD := 6.0
 var _glass: Panel
 
-func _init() -> void:
+func _init(farm_ := false) -> void:
+	farm_style = farm_
+	if farm_style: slot_count = UiTokens.SIZE_QUICK_SLOTS_FARM
 	custom_minimum_size = Vector2(UiTokens.SIZE_QUICK_BAR_W, UiTokens.SIZE_QUICK_BAR_H)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_glass = Panel.new()
@@ -102,21 +120,31 @@ func _init() -> void:
 	_glass.offset_top = lift - GLASS_PAD
 	_glass.offset_right = GLASS_PAD
 	_glass.offset_bottom = GLASS_PAD
-	_glass.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_GLASS_FILL, UiTokens.RADIUS_LG))
+	if farm_style: _glass.add_theme_stylebox_override(&"panel", UiClay.frost(UiTokens.SIZE_QUICK_FROST_RADIUS))
+	else: _glass.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_GLASS_FILL, UiTokens.RADIUS_LG))
 	add_child(_glass)
 	_row = HBoxContainer.new()
 	_row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_row.add_theme_constant_override(&"separation", int(UiTokens.SPACE_QUICK_BAR_GAP))
 	_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_row)
-	for i in SLOTS:
+	if farm_style:
+		_seeds = _build_seeds()
+		_row.add_child(_seeds)
+	for i in slot_count:
 		var cell := UiItemCell.new(UiItemCell.Density.QUICK)
+		cell.frost = farm_style
 		cell.tapped.connect(_on_tapped.bind(i))
 		cell.gesture.connect(_on_gesture.bind(i))
+		if farm_style: cell.gui_input.connect(_press_slot.bind(cell))
 		_cells.append(cell)
 		_row.add_child(cell)
 	_end = _build_end()
 	_row.add_child(_end)
+	if farm_style:
+		# Seeds end + 4 slots + Bag end share the bar's width: spread them across it.
+		_row.add_theme_constant_override(&"separation", int((UiTokens.SIZE_QUICK_BAR_W - UiTokens.SIZE_QUICK_END_FARM_W * 2.0 \
+			- UiTokens.SIZE_QUICK_SLOT_W * slot_count) / float(slot_count + 1)))
 	_handle = _build_handle()
 	add_child(_handle)
 	_refresh()
@@ -128,6 +156,68 @@ func set_bag_open(v: bool) -> void: bag_open = v; _refresh()
 func set_capacity_warning(v: bool) -> void: capacity_warning = v; _refresh()
 func set_bag_only(v: bool) -> void: bag_only = v; _refresh()
 func set_bag_icon(v: Texture2D) -> void: bag_icon = v; _refresh()
+func set_seeds_item(v: Dictionary) -> void: seeds_item = v; _refresh()
+func seeds_end() -> Button: return _seeds
+
+## Where a gain of `id` lands (MS-04): the slot holding it, the Seeds end for the seed it shows, else the Bag end.
+func landing_for(id: String) -> Control:
+	var cell := cell_for(id)
+	if cell != null: return cell
+	if farm_style and _seeds != null and _seeds.visible and str(seeds_item.get("id", "")) == id: return _seeds
+	return _end
+
+## M-01 on a frosted slot's surface (the cell itself sits in the row, which resets a scale).
+func _press_slot(e: InputEvent, cell: UiItemCell) -> void:
+	var down := false
+	if e is InputEventMouseButton and (e as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT: down = e.pressed
+	elif e is InputEventScreenTouch: down = e.pressed
+	else: return
+	UiMotion.press(cell._surface, down)
+
+## Farm style: the Seeds end, a cream clay tile 56 × 68 like the Bag end: the seed's colour icon, sparkles, `Seeds`.
+func _build_seeds() -> Button:
+	var b := _end_tile("Seeds")
+	b.name = "SeedsEnd"
+	_seeds_icon = b.get_node("Icon") as TextureRect
+	_seeds_label = b.get_node("Label") as Label
+	b.pressed.connect(func(): seeds_pressed.emit())
+	return b
+
+## A cream clay end tile (farm style): icon 26 at the top, sparkles beside it, its word under it in ink.
+func _end_tile(word: String) -> Button:
+	var b := Button.new()
+	b.focus_mode = Control.FOCUS_NONE
+	var w := float(UiTokens.SIZE_QUICK_END_FARM_W)
+	b.custom_minimum_size = Vector2(w, UiTokens.SIZE_QUICK_SLOT_H)
+	var lift := UiTokens.SIZE_QUICK_SLOT_H - UiTokens.SIZE_QUICK_SLOT_SURFACE_H
+	var up := UiClay.face(UiTokens.SIZE_HUD_CLAY_RADIUS, UiTokens.COLOR_BAR_END_TILE)
+	up.expand_margin_top = -lift
+	var down := UiClay.face_pressed(UiTokens.SIZE_HUD_CLAY_RADIUS)
+	down.expand_margin_top = -lift
+	for st in [&"normal", &"hover", &"focus", &"disabled"]: b.add_theme_stylebox_override(st, up)
+	for st in [&"pressed", &"hover_pressed"]: b.add_theme_stylebox_override(st, down)
+	var icon := UiKit.icon(null, 26.0)
+	icon.name = "Icon"
+	icon.position = Vector2((w - 26.0) * 0.5, lift + 9.0)
+	b.add_child(icon)
+	var sparkle := Control.new()
+	sparkle.name = "Sparkle"
+	sparkle.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sparkle.position = Vector2((w + 26.0) * 0.5 - 1.0, lift + 8.0)
+	sparkle.draw.connect(func(): UiClay.draw_sparkle(sparkle, Vector2.ZERO, 0.85))
+	b.add_child(sparkle)
+	var label := UiKit.label(word, UiTokens.STYLE_C11_B, UiTokens.COLOR_HUD_CLAY_INK)
+	label.name = "Label"
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.grow_vertical = Control.GROW_DIRECTION_BOTH
+	label.anchor_right = 1.0
+	label.offset_top = lift + _END_LABEL_TOP
+	label.offset_bottom = lift + _END_LABEL_TOP + _END_LABEL_H
+	b.add_child(label)
+	UiMotion.press_feedback(b)
+	return b
 
 func cells() -> Array[UiItemCell]: return _cells
 func end_button() -> Button: return _end
@@ -142,6 +232,20 @@ func slot(i: int) -> Dictionary:
 # ------------------------------------------------------------------ build
 
 func _build_end() -> Button:
+	if farm_style:
+		var t := _end_tile("Bag")
+		t.name = "BagEnd"
+		_end_icon = t.get_node("Icon") as TextureRect
+		_end_label = t.get_node("Label") as Label
+		_end_dot = Panel.new()
+		_end_dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var lift_ := UiTokens.SIZE_QUICK_SLOT_H - UiTokens.SIZE_QUICK_SLOT_SURFACE_H
+		_end_dot.position = Vector2(UiTokens.SIZE_QUICK_END_FARM_W - 11.0, lift_ + 4.0)
+		_end_dot.size = Vector2(UiTokens.SIZE_CAPACITY_DOT, UiTokens.SIZE_CAPACITY_DOT)
+		_end_dot.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_WARNING, UiTokens.SIZE_CAPACITY_DOT * 0.5))
+		t.add_child(_end_dot)
+		t.pressed.connect(func(): if bag_open: close_requested.emit() else: bag_requested.emit())
+		return t
 	var b := Button.new()
 	b.focus_mode = Control.FOCUS_NONE
 	b.custom_minimum_size = Vector2(UiTokens.SIZE_QUICK_END_W, UiTokens.SIZE_QUICK_SLOT_H)
@@ -198,16 +302,27 @@ func _build_handle() -> Button:
 
 func _refresh() -> void:
 	if _row == null: return
-	for i in SLOTS:
+	var shown := {}   # the counts now on the bar: an item that left it rolls no stale number when it comes back
+	for i in slot_count:
 		var cell := _cells[i]
 		cell.visible = not collapsed and not bag_only
-		if i == _dragging: continue
+		if i == _dragging:
+			var held := str(slot(i).get("id", ""))
+			if _shown_qty.has(held): shown[held] = _shown_qty[held]
+			continue
 		var d := slot(i)
 		var id := str(d.get("id", ""))
 		cell.icon = d.get("icon", null)
 		cell.title = str(d.get("title", ""))
 		var qty := int(d.get("quantity", 0))
-		cell.quantity = "×%d" % qty if id != "" else ""
+		# MS-03: a count that changes for the same item rolls to the new number (farm style).
+		var was := int(_shown_qty.get(id, -1))
+		if farm_style and id != "" and was >= 0 and was != qty and str(cell.get_meta(&"_qty_id", "")) == id \
+				and cell.is_inside_tree() and not UiMotion.reduced:
+			_roll_qty(cell, was, qty)
+		else: cell.quantity = "×%d" % qty if id != "" else ""
+		cell.set_meta(&"_qty_id", id)
+		if id != "": shown[id] = qty
 		if id != "" and str(d.get("cooldown", "")) != "": cell.quantity += " · " + str(d.cooldown)
 		cell.pinned = bool(d.get("pinned", false)) and id != ""
 		if i == _target: cell.state = UiItemCell.State.DROP_TARGET   # an empty slot too: a bag item lands there (225)
@@ -215,17 +330,29 @@ func _refresh() -> void:
 		elif id == selected: cell.state = UiItemCell.State.SELECTED
 		elif qty <= 0 and cell.pinned: cell.state = UiItemCell.State.ZERO
 		else: cell.state = UiItemCell.State.DEFAULT
+	_shown_qty = shown
 	_handle.visible = collapsed and not bag_only
 	mouse_filter = Control.MOUSE_FILTER_IGNORE if collapsed or bag_only else Control.MOUSE_FILTER_STOP
 	# Collapsed or bag-only: the end stays at the right (BAR-1-2); the handle sits centred when collapsed.
 	_row.alignment = BoxContainer.ALIGNMENT_END if collapsed or bag_only else BoxContainer.ALIGNMENT_BEGIN
 	_end_icon.texture = CLOSE_GLYPH if bag_open else bag_icon
-	_end_icon.self_modulate = UiTokens.COLOR_TEXT_ON_DARK if bag_open else Color.WHITE
+	_end_icon.self_modulate = (UiTokens.COLOR_HUD_CLAY_INK if farm_style else UiTokens.COLOR_TEXT_ON_DARK) if bag_open else Color.WHITE
+	if _seeds != null:
+		_seeds.visible = not collapsed and not bag_only
+		_seeds_icon.texture = seeds_item.get("icon", null)
+		_seeds_icon.modulate.a = 1.0 if str(seeds_item.get("id", "")) != "" else UiTokens.OPACITY_ZERO_ICON
 	_glass.visible = not collapsed and not bag_only
 	_end_label.text = "Close" if bag_open else "Bag"
 	_end_dot.visible = capacity_warning and not bag_open
 
 # ------------------------------------------------------------------ gestures
+
+## The slot's `×N` counts from `from` to `to` (400, MS-03); rising, the slot's surface bumps. The cell keeps the
+## final count as its `quantity` (its own refreshes write that); the roll writes over it each frame until it ends.
+func _roll_qty(cell: UiItemCell, from: int, to: int) -> void:
+	cell.quantity = "×%d" % to
+	cell._qty.text = "×%d" % from
+	UiMotion.roll(cell._qty, from, to, "×%d", cell._surface)
 
 func _on_tapped(i: int) -> void:
 	var id := str(slot(i).get("id", ""))
@@ -278,7 +405,7 @@ func slot_at(global_pos: Vector2) -> int:
 ## Ignored while one of the bar's own slots is being dragged (that drag owns the target).
 func set_drop_target(index: int) -> void:
 	if _dragging >= 0: return
-	var t := index if index >= 0 and index < SLOTS else -1
+	var t := index if index >= 0 and index < slot_count else -1
 	if t == _target: return
 	_target = t
 	_refresh()
@@ -287,7 +414,7 @@ func set_drop_target(index: int) -> void:
 ## Call after `slots` is set; an id not on the bar, or a folded bar, is ignored.
 func flash(id: String) -> void:
 	if collapsed or bag_only or id == "": return
-	for i in mini(slots.size(), SLOTS):
+	for i in mini(slots.size(), slot_count):
 		if str(slot(i).get("id", "")) == id:
 			_cells[i].flash()
 			return
@@ -295,7 +422,7 @@ func flash(id: String) -> void:
 ## The guide may highlight a visible slot, never select or insert it for the player.
 func cell_for(id: String) -> UiItemCell:
 	if collapsed or bag_only or id == "": return null
-	for i in mini(slots.size(), SLOTS):
+	for i in mini(slots.size(), slot_count):
 		if str(slot(i).get("id", "")) == id: return _cells[i]
 	return null
 

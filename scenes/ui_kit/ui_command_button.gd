@@ -121,10 +121,43 @@ func _notification(what: int) -> void:
 ## variation changes).
 const _INKS: Array[StringName] = [&"font_color", &"font_hover_color", &"font_pressed_color", &"font_hover_pressed_color", &"font_focus_color"]
 
+## C-186 (C-185 §3.1 E): the farm's scene side key (Build Cottage) as the action key's clay — a pill in the harvest
+## group's green with its shade as the bottom edge and deep green ink (6.0:1); unavailable it is grey clay. Content,
+## copy and when it shows are unchanged.
+var clay := false:
+	set(v):
+		clay = v
+		_fit()
+
+func _clay_box(fill: Color, edge: Color) -> StyleBoxFlat:
+	var b := StyleBoxFlat.new()
+	b.bg_color = fill
+	b.set_corner_radius_all(int(custom_minimum_size.y * 0.5))
+	b.border_color = edge
+	b.border_width_bottom = 4
+	b.shadow_color = UiTokens.COLOR_ACTION_CLAY_SHADOW
+	b.shadow_size = 6
+	b.shadow_offset = Vector2(0, 4)
+	b.content_margin_left = 16.0
+	b.content_margin_right = 16.0
+	b.anti_aliasing = true
+	return b
+
 func _fit() -> void:
 	_fitting = true
 	for st in _STYLES: remove_theme_stylebox_override(st)
 	for c in _INKS: remove_theme_color_override(c)
+	if clay:
+		var grey := is_unavailable() or is_offline()
+		var pal := UiActionClay.palette(UiActionClay.Group.OFF if grey else UiActionClay.Group.HARVEST)
+		var up := _clay_box(pal[0], pal[1])
+		var down := _clay_box(pal[1], pal[1])
+		down.shadow_size = 2
+		for st in _STYLES: add_theme_stylebox_override(st, down if st in [&"pressed", &"hover_pressed"] else up)
+		for c in _INKS: add_theme_color_override(c, pal[3] if grey else UiTokens.COLOR_ACTION_CLAY_HARVEST_SIDE_INK)
+		add_theme_font_override(&"font", UiKit.font(&"extrabold"))
+		_fitting = false
+		return
 	var amber := need_energy and is_unavailable() and not is_offline()
 	if fit_text or visual_inset_x > 0.0 or amber:
 		for st in _STYLES:
@@ -199,5 +232,5 @@ func _apply() -> void:
 
 ## The v3 white-on-colour outline (§2.1) is for the live key; a disabled one's grey ink goes without it.
 func _outline_when_enabled() -> void:
-	if disabled: add_theme_constant_override(&"outline_size", 0)
+	if disabled or clay: add_theme_constant_override(&"outline_size", 0)
 	else: remove_theme_constant_override(&"outline_size")

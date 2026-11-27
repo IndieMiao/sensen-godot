@@ -283,3 +283,41 @@ func test_caption_counts_in_the_group_height() -> void:
 	assert_float(g.get_combined_minimum_size().y).is_equal(148.0)
 	g.caption = "uses your Energy"
 	assert_float(g.get_combined_minimum_size().y).is_equal(168.0)
+
+# ---------------------------------------------------------------- clay key (C-185 §3.7 / §3.8, owner Q-285; C-186)
+
+func test_clay_key_is_a_104_by_96_lump_coloured_by_action() -> void:
+	var k := _host(UiSceneAction.new(true)) as UiSceneAction
+	await _settle()
+	k.verb = "Sow"
+	k.cost = "3 Energy"
+	assert_vector(k.size).is_equal(Vector2(UiTokens.SIZE_CLAY_KEY_W, UiTokens.SIZE_CLAY_KEY_H))
+	assert_int(k.clay_group()).is_equal(UiActionClay.Group.SOW)
+	assert_bool(k._pill.visible and k._cost.text == "3 Energy").is_true()
+	k.state = S.UNAVAILABLE
+	assert_int(k.clay_group()).is_equal(UiActionClay.Group.OFF)   # any refusal is grey clay
+	k.state = S.INSUFFICIENT
+	await _settle()
+	# Short of Energy: the colour stays, the pill turns dark with energyLow text (owner Q-307, C-185#137 item 3)
+	assert_int(k.clay_group()).is_equal(UiActionClay.Group.SOW)
+	assert_str(k._pill_box.bg_color.to_html()).is_equal(UiTokens.COLOR_ACTION_CLAY_PILL_SHORT.to_html())
+	assert_str(k._cost.get_theme_color(&"font_color").to_html()).is_equal(UiTokens.COLOR_HUD_ENERGY_LOW.to_html())
+
+func test_clay_switch_swaps_verb_and_cost_together() -> void:
+	# MS-22: a new verb squashes and springs back; the new second line comes with it, never the old one (C-186)
+	var k := _host(UiSceneAction.new(true)) as UiSceneAction
+	await _settle()
+	k.verb = "Sow"
+	k.cost = "3 Energy"
+	await _settle()
+	k.verb = "Till"
+	k.cost = "2 Energy"
+	assert_bool(k._switch != null and k._switch.is_valid()).is_true()
+	await get_tree().create_timer(0.5).timeout
+	assert_str(k._verb.text).is_equal("Till")
+	assert_str(k._cost.text).is_equal("2 Energy")
+	assert_vector(k._face.scale).is_equal_approx(Vector2.ONE, Vector2.ONE * 0.01)
+	k.cost = "Pail empty"   # only the second line changes: no squash
+	assert_bool(k._switch == null or not k._switch.is_valid()).is_true()
+	await get_tree().create_timer(0.3).timeout
+	assert_str(k._cost.text).is_equal("Pail empty")

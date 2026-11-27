@@ -18,9 +18,10 @@ tools/android/run_test.sh com.sensen.journeycombatqa -- node path/to/scenario.mj
 tools/android/run_test.sh --clean-all
 ```
 
-The default target is `emulator-5560`; set `--serial`, `JOURNEY_SERIAL` or `DEV`
-for another authorized device. `ADB` selects the adb executable. The scenario
-inherits `JOURNEY_SERIAL` and `JOURNEY_PACKAGE`. Build and install the APK before
+The target is `--serial`, else `JOURNEY_SERIAL`, `DEV`, then the Run's own device
+(see below), else `emulator-5560`. `--device` picks the Run's physical device
+(`CARDIGAN_DEVICE_SERIAL`). `ADB` selects the adb executable. The scenario
+inherits `JOURNEY_SERIAL` and `JOURNEY_PACKAGE`, and `ANDROID_SERIAL` set to the same device. Build and install the APK before
 starting the session. Use one session for the entire multi-step test, rather
 than restarting the app for individual taps.
 
@@ -31,8 +32,100 @@ cannot run shell traps; the next session's pre-launch stop handles that residue.
 
 Verify runner behavior with `node --test tools/android/run_test.test.mjs`.
 
+## adb port and device serial in a Cardigan Run (C-212)
+
+A machine with per-Run adb slots gives each Run its own adb server and devices through these variables.
+The scripts read them and fall back to the old defaults when they are not set, so manual runs are unchanged:
+
+| Variable | Meaning |
+| --- | --- |
+| `ANDROID_ADB_SERVER_PORT` | the Run's adb server port (adb itself reads it too) |
+| `ANDROID_SERIAL` | the Run's device (adb itself uses it when no `-s` is given) |
+| `CARDIGAN_EMULATOR_SERIAL` | the Run's emulator, `emulator-<port>` |
+| `CARDIGAN_EMULATOR_PORT` | the console port to start that emulator on (`emulator -port …`) |
+| `CARDIGAN_DEVICE_SERIAL` | the physical device the Run holds |
+
+- adb port: `build_worker_apk.sh` uses `ANDROID_ADB_SERVER_PORT`, else **5137** (until the slots are on, the
+  workers' shared server); it refuses 5037 and anything that is not a port. `dynamic_farm/crash_repro.sh` takes
+  it as the `--port` default. `gather_qa_apk.sh` already passed it on with the same fallback. The scripts below run `adb`
+  without `-P` (`android_p0.sh` unless `ADB_PORT` is set), so adb uses the variable itself.
+- Serial, any device (`run_test.sh`, `tools/dev/online_android_qa.mjs`, `tools/p0/android_p0.sh`,
+  `--serial` default of `crash_repro.sh`): the script's own option or variable, then `ANDROID_SERIAL`,
+  `CARDIGAN_EMULATOR_SERIAL`, `CARDIGAN_DEVICE_SERIAL`, then the old default (`emulator-5560`, `emulator-5570` in
+  P0). `run_test.sh --device` takes `CARDIGAN_DEVICE_SERIAL` and fails when it is not set.
+- Serial, emulator only (`tools/dev/combat_emulator_qa.mjs`, `combat_latency_emulator_qa.mjs`,
+  `movement_emulator_qa.mjs`): `JOURNEY_SERIAL`, then `CARDIGAN_EMULATOR_SERIAL`, then `emulator-5560`. They
+  refuse any serial that does not start with `emulator-` (C-216), e.g. a phone picked by `run_test.sh --device`.
+  `farm_pond_removal_android_qa.py` accepts any `emulator-*` session, no longer only `emulator-5580`.
+- In a Run (`CARDIGAN_EMULATOR_SERIAL` or `CARDIGAN_DEVICE_SERIAL` is set), a `JOURNEY_SERIAL`, `DEV` or P0 `SERIAL`
+  variable naming none of the Run's devices is ignored with a warning (`… is not a device of this Run; ignoring
+  it.`), so one left in the login environment cannot move the Run to another device (C-216). Serials given on the
+  command line (`--serial`, P0's argument) are used as given. The rule lives in `tools/android/run_serial.sh` and
+  `tools/dev/run_serial.mjs`; test with `node --test tools/dev/run_serial.test.mjs`.
+- Scenarios started by `run_test.sh` use the `JOURNEY_SERIAL` it exports, so they follow the same order.
+
+Scripts with their own private adb server and SDK for a laptop or gs66 (`pond_art_adb.sh`,
+`start_pond_art_emulator.sh`, `tools/dev/pond_art_godot.sh` on 5041; `tools/dev/basic_room/adb.sh` on 5061;
+`tools/p0/build_demo_apk.sh`, `play_aab.py` and `start_emulator.sh`) keep their ports: they never use 5137, and
+are not for Cardigan Runs. In a Run, start an emulator with `-port "$CARDIGAN_EMULATOR_PORT"` and never kill the
+Run's adb server yourself; the host closes it when the Run ends.
+
 Background CPU measurements and limitations are recorded in
 [`docs/qa/android-background-cpu-2026-09-15.md`](../../docs/qa/android-background-cpu-2026-09-15.md).
+
+## Godot editor runs and the shared adb server (C-210)
+
+Godot's editor setting `export/android/shutdown_adb_on_exit` defaults to `true`. Every editor-mode
+run (`--import`, `--export-*`, `--editor`; an iOS export too) of a project with a runnable Android
+preset then ends with `adb kill-server`. Its adb is `$ANDROID_HOME/platform-tools/adb` unless the
+settings name another SDK, and it honours `ANDROID_ADB_SERVER_PORT`, so on the Cardigan workers it
+stops the shared server on **5137** (on mac-mini that drops the owner's tablet and every session's
+emulator). The hosts set the key to `false` in the account's settings, but a run under a private
+`HOME` reads other settings (on Linux also a private `XDG_CONFIG_HOME`; macOS reads
+`$HOME/Library/Application Support/Godot` whatever `XDG_*` says), where the default applies.
+Script-mode runs (`--script`, running a scene, gdUnit, `tools/ci/dynamic_farm_tests.sh`) open no
+editor settings and never call adb.
+
+The same runnable preset also makes the editor poll `adb devices` every few seconds, whatever the
+key says. While the shared server is up that is only a client call; if it is down at that moment,
+adb starts a new one under the run's `HOME`, with that `HOME`'s adb keys, and the devices show as
+`unauthorized` (SEN-C-186#16). Presets a script generates for its own staging project are therefore
+not runnable (a command-line export does not need it): then the editor makes no adb call at all.
+
+Before an editor-mode run, with the same environment and Godot binary, run
+
+```sh
+python3 -I tools/godot_keep_adb_settings.py "$GODOT_BIN"   # default: $GODOT_BIN, else godot on PATH
+```
+
+It sets the key to `false` in the settings that Godot will read when they are private (creating
+them if needed), and never writes the account's own settings or a self-contained Godot's; there it
+only prints a note when the key is not `false`. Do this for any manual `HOME=... godot --import`
+or export as well. Repository scripts already do it:
+
+- `tools/run_tests.sh` (`--ci-import` and the local import), `tools/dev/pond_art_godot.sh` (so
+  `open_pond_art.command`), `tools/dev/open_basic_room.sh`, `tools/dev/open_landmark_art.command`,
+  `tools/dev/run_journey.mjs` (the `open_*.command` playtests), `tools/ios/setup_ios_g3.sh`;
+- `tools/android/build_worker_apk.sh` and `tools/dev/dynamic_farm/gather_qa_apk.sh` run a portable
+  editor copy whose own settings say `false`, with a generated non-runnable preset (so no adb call);
+  `tools/dev/basic_room/prepare_basic_room.py` also generates a non-runnable preset;
+  `tools/p0/build_demo_apk.sh`, `android_p0.sh` and `play_aab.py` use a portable copy whose settings
+  say `false` through `tools/p0/godot_keep_adb.sh`.
+
+The repository's own `export_presets.cfg` keeps its runnable presets, so an import or export of the
+game project still polls `adb devices`, and if the shared server is down at that moment the editor's
+adb starts one under the private `HOME` (C-213). adb takes its keys only from `$HOME/.android`
+(`ANDROID_USER_HOME` is ignored, checked with platform-tools 37), so the same helper also makes
+`$HOME/.android/adbkey` and `adbkey.pub` of a private `HOME` symlinks to the account's own
+`~/.android` keys: a server restarted there offers the account's key and the devices stay
+authorized. The account's `~/.android` is only read, and a `HOME` whose `.android` is the account's
+is left alone. `SENSEN_ADB_KEY_DIR=<directory>` links another key pair instead and
+`SENSEN_ADB_KEY_DIR=none` turns the links off.
+Symlinks rather than `ADB_VENDOR_KEYS` because every caller already hands Godot the `HOME` it ran
+the helper with, whereas an environment variable would have to be exported into each Godot process.
+
+Tests: `python3 -m unittest tools/test_godot_keep_adb_settings.py` (its last case runs the real
+Godot against a stub adb: without the helper the import calls `kill-server`, with it it does not).
 
 ## Test build version
 
@@ -76,6 +169,9 @@ settings or require changing the game or its data.
 
 ## Linux x86_64 emulator (gs66)
 
+A manual setup on gs66 with a fixed private port (5071) and emulator (`emulator-5594`); a Cardigan Run uses its own
+adb port and emulator instead (see "adb port and device serial" above).
+
 Verified on 2026-10-10 on gs66-ubuntu (SGODOT-276): Pixel_API_36, Android 16 x86_64, P0 QA package. Mapbox
 (Core Maps 11.29) and LiveKit load from `lib/x86_64`, the map renders, and the app reaches a local P0 server.
 This is an emulator for map and UI tests only. It never touches a USB or remote phone, and it does not replace
@@ -109,8 +205,9 @@ adb -P 5071 -s emulator-5594 shell settings put secure immersive_mode_confirmati
 ```
 
 Record the qemu PID. Stop the emulator with `adb -P 5071 -s emulator-5594 emu kill` (its data is kept), then
-`adb -P 5071 kill-server`. Godot's Android export stops "its" adb server on exit, so restart the private one
-after every export, with `ADB_LOCAL_TRANSPORT_MAX_PORT=5553` set again.
+`adb -P 5071 kill-server`. Godot's Android export stops "its" adb server on exit unless its editor settings say
+otherwise (see "Godot editor runs and the shared adb server" above); if it did, restart the private one with
+`ADB_LOCAL_TRANSPORT_MAX_PORT=5553` set again.
 
 **QA package.** The P0 presets build arm64 only. For the emulator, export `Android P0` with `x86_64` turned on
 in a temporary copy of `export_presets.cfg`, and restore the file afterwards, as `tools/p0/build_demo_apk.sh`
@@ -248,7 +345,8 @@ choose a production signing identity, install an app or authorize publication.
    The script stages committed game sources in a disposable project, generates
    one non-runnable, `package/signed=false` APK preset, prepares the Gradle template + native
    plugins, then imports and exports **release** serially in a fresh portable
-   editor. It fixes ADB to 5137, disables editor ADB shutdown and needs no
+   editor. It points ADB at `ANDROID_ADB_SERVER_PORT` (default 5137, see "adb port and device serial"
+   above), disables editor ADB shutdown and needs no
    device or emulator. Gradle may need to download build dependencies; there
    is no artifact upload step in the build script.
 

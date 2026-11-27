@@ -17,6 +17,7 @@ enum Layer { DRAWER, CARD }
 var _content := {}    # Layer -> Control
 var _scrim := {}      # Layer -> ColorRect
 var _on_close := {}   # Layer -> Callable
+var _animate_out := {}   # Layer -> true: the layer leaves with its exit motion (C-186)
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -30,7 +31,9 @@ func card() -> Control: return _content.get(Layer.CARD)
 func top() -> Control: return card() if has_card() else drawer()
 
 ## opts: scrim (opacity, default UiTokens.OPACITY_SCRIM_DRAWER), scrim_closes (default true),
-## on_close (Callable run after the drawer is removed).
+## on_close (Callable run after the drawer is removed), animate_out (default false; C-186, C-185 MS-14: the layer is
+## closed at once — the stack forgets it and input is let go — but stays drawn while it leaves: a drawer's play_out(),
+## else M-05 from the card's bottom middle; then both it and its scrim are freed).
 func open_drawer(content: Control, opts := {}) -> void:
 	close_card()
 	_close(Layer.DRAWER)
@@ -75,6 +78,7 @@ func _open(layer: Layer, content: Control, scrim_opacity: float, opts: Dictionar
 	_scrim[layer] = scrim
 	_content[layer] = content
 	if opts.has("on_close"): _on_close[layer] = opts.on_close
+	if opts.get("animate_out", false): _animate_out[layer] = true
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	opened.emit(layer, content)
 
@@ -84,10 +88,22 @@ func _close(layer: Layer) -> void:
 	_content.erase(layer)
 	var scrim: Control = _scrim[layer]
 	_scrim.erase(layer)
-	remove_child(scrim)
-	scrim.queue_free()
-	if content.get_parent() == self: remove_child(content)
-	content.queue_free()
+	if _animate_out.get(layer, false) and content.get_parent() == self and content.is_inside_tree():
+		_animate_out.erase(layer)
+		scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		content.propagate_call(&"set_mouse_filter", [Control.MOUSE_FILTER_IGNORE])   # no tap on what is leaving
+		content.name = String(content.name) + "_Leaving"
+		var gone := func() -> void:
+			if is_instance_valid(scrim): scrim.queue_free()
+			if is_instance_valid(content): content.queue_free()
+		if content.has_method(&"play_out"): content.call(&"play_out", scrim, gone)
+		else: UiMotion.panel_out(content, scrim, gone, Vector2(0.5, 1.0))
+	else:
+		_animate_out.erase(layer)
+		remove_child(scrim)
+		scrim.queue_free()
+		if content.get_parent() == self: remove_child(content)
+		content.queue_free()
 	var cb: Callable = _on_close.get(layer, Callable())
 	_on_close.erase(layer)
 	closed.emit(layer, content)

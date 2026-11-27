@@ -1,7 +1,8 @@
 extends SceneTree
 ## C-193 guard (Q-289 A): the two narrowest claimable r8 starter parcels, unmodified in fixtures/r8/, still hold the
-## coop (7×5, its real art and kept cells), the barn (C-192's draft 8×6, the cell outside its entry) and the sheep
-## pen up to 9×7 (one walkable cell outside its front) with the yard cleared, in at least one of the four turns.
+## coop (7×5, its real art and kept cells), the barn (C-202: SEN-C-179's 11×6 less its rear-left 2×2, the two cells
+## outside its gate, its real rules and art) and the sheep pen up to 9×7 (one walkable cell outside its front) with the
+## yard cleared, in at least one of the four turns.
 ## The judgement is the game's placement rule through tools/dev/dynamic_farm/building_fit.gd, the same code as the
 ## statistic (building_fit_stats.gd, docs/plans/C-193.md). If a new dataset or a larger building breaks this, rerun
 ## the statistic over the new starter zone before changing the fixtures.
@@ -56,7 +57,7 @@ func _narrow(block_id: String, sha: String) -> void:
 	var y := Fit.yard(raw)
 	_check(y.ok, "%s: decodes" % block_id)
 	if not y.ok: return
-	var shapes := {"coop 7×5": Fit.coop(), "barn 8×6": Fit.barn(), "pen 9×7": Fit.plain(Vector2i(9, 7))}
+	var shapes := {"coop 7×5": Fit.coop(), "barn 11×6 less 2×2": Fit.barn(), "pen 9×7": Fit.plain(Vector2i(9, 7))}
 	for name: String in shapes:
 		var s: Dictionary = shapes[name]
 		var b := Fit.best(y, s)

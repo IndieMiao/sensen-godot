@@ -13,6 +13,8 @@ extends VBoxContainer
 ##            "Need 1 more Fine fish")
 ## Done (delivered while the drawer is open): status Done, the Reward line stays, no needs and no command; the coins
 ## float up from where the button was (UiFloatText, Coins tone, by the host — 不知火舞 on 224).
+## C-186 (C-185 §3.6): with `status_tone` in the data ("open", "tracked", "ready", "done") the status is a tag — Open and
+## Done grey, Tracked blue, Ready to deliver lime tint; without it the line is as before (P0's Stall Board).
 
 signal command_pressed
 signal unavailable_pressed(reason: String)
@@ -100,6 +102,7 @@ func show_request(d: Dictionary) -> void:
 	_chevron.visible = _info
 	_title_line.mouse_filter = Control.MOUSE_FILTER_STOP if _info else Control.MOUSE_FILTER_IGNORE
 	_status.text = str(d.get("status", ""))
+	_tag_status(str(d.get("status_tone", "")))
 	for c in _facts.get_children():
 		_facts.remove_child(c)
 		c.free()   # out of the tree and nothing points at it: no orphan left until the next frame
@@ -146,6 +149,24 @@ func show_request(d: Dictionary) -> void:
 	_command.min_width = _COMMAND_W   # kept through PENDING and Offline; a longer gap grows it
 
 func command_button() -> UiCommandButton: return _command
+func status_label() -> Label: return _status
+
+const _TAG_COLORS := {"open": [UiTokens.COLOR_SURFACE_SUNKEN, UiTokens.COLOR_TEXT_SECONDARY],
+	"done": [UiTokens.COLOR_SURFACE_SUNKEN, UiTokens.COLOR_TEXT_SECONDARY],
+	"tracked": [UiTokens.COLOR_ROLE_TACKLE_TINT, UiTokens.COLOR_ROLE_TACKLE],
+	"ready": [UiTokens.COLOR_PRIMARY_TINT, UiTokens.COLOR_PRIMARY_INK]}
+
+## The status as a pill tag (C-185 §3.6), or the plain secondary line when `tone` is none of the four.
+func _tag_status(tone: String) -> void:
+	if not _TAG_COLORS.has(tone):
+		_status.remove_theme_stylebox_override(&"normal")
+		_status.add_theme_color_override(&"font_color", UiTokens.COLOR_SECONDARY)
+		_status.size_flags_horizontal = Control.SIZE_FILL
+		return
+	var c: Array = _TAG_COLORS[tone]
+	_status.add_theme_stylebox_override(&"normal", UiStyleBox.make(c[0], UiTokens.RADIUS_PILL).with_margins(8, 1, 8, 2))
+	_status.add_theme_color_override(&"font_color", c[1])
+	_status.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 
 ## A page fact above the rows (BOARD-READY `Requests today  4/6`): C11 Bold secondary label, C12 ExtraBold value
 ## right-aligned, 25 high.

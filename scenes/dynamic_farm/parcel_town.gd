@@ -22,6 +22,13 @@ extends Control
 ##   crops, the town sends `claim_seed_aid` once (ParcelFarm.seed_aid_refusal decides whether to ask; the server decides);
 ##   given, her greeting line says so and the existing `Received … ×N` toast names the seeds. Nothing else on the card
 ##   changes (LOCK-16: Trade stays the one key). A refusal is silent: the greeting stays as it was.
+## C-186 (C-185 §3.3–3.4, MS-13–17): a read done within `motion/delay/loadingGrace` (300) opens the greeting with its
+## line; a slower one opens it at 300 with the portrait and name and three dots looping, then the line fades in and the
+## keys follow. Greeting → counter / sheet hands over (the card leaves by M-05, the drawer rises 80 later); drawers leave
+## sinking. Toasts sit 8 over the greeting card (its portrait and name tag included), over a drawer's fixed decision area,
+## or at the foot of a drawer without one (q(16)). A grey key's tap shakes it; its toast only when the reason differs from
+## the key's text (MS-02). A sale or a delivery flies its coins; an upgrade hands its needs in and shows the level-up card
+## (M-12) instead of a toast, the sheet moving on to the next level when the card closes.
 ## The parcel save (store: read / send, parcel_farm_remote_store.gd or the local stand-in) is authoritative; this
 ## node draws what it answers. Coins are the parcel's own, separate from the main farm's.
 signal closed
@@ -60,6 +67,8 @@ const LINES := {
 	"upgraded_gift": "Farm Lv%d · +%d %s",
 	# C-197 seed aid: Jasmine's line when she gives the seeds (count, seed name), awaiting PM's C-45 final on SEN-C-197.
 	"seed_aid": "Out of coins and seeds? Here are %d %s, on me.",
+	# C-186 level-up card (C-185 §3.4): its one button, the copy PM settled on SEN-C-186#44 (C-45).
+	"level_ok": "OK",
 }
 const MET_PATH := "user://dynamic_farm_local/town.json"
 
@@ -83,6 +92,13 @@ var _switching := false   # the card closes because the counter opens over it
 ## C-197: what the seed aid gave this visit ({item, amount}); her greeting line says so while it is set.
 var aid_given := {}
 var _met_path := MET_PATH
+## C-186: the greeting opened before the read came back (MS-13): the line and keys reveal when it lands.
+var _waited := false
+var _dots: Tween
+## C-186 M-12: the level-up card over everything while it shows (tests read it), and its layer.
+var level_card: UiRewardMoment
+var _level_layer: Control
+var _handing_in := false   # MS-17: the needs are going in; a second tap does nothing
 
 ## who: MARKET, CARPENTER or BOARD; store answers read() and send(); parcel_id names the player's parcel (the met record).
 static func open(parent: Node, who_: String, store_: RefCounted, parcel_id_: String, met_path := MET_PATH) -> Control:
@@ -113,6 +129,8 @@ func _ready() -> void:
 	add_child(stack)
 	toast = ToastLayer.new()
 	add_child(toast)
+	toast.shown.connect(func(_t: String, _s: int): _place_toast())
+	stack.opened.connect(func(_l: int, c: Control): _follow(c))
 	await reload()
 
 ## Reads the parcel save and greets again; a failed read says so and offers Retry.
@@ -121,11 +139,15 @@ func reload() -> void:
 		await _reload_board()
 		return
 	busy = true
-	_greet()
+	# MS-13: the greeting waits up to `motion/delay/loadingGrace` for the read; past it, it opens with the dots.
+	if card != null and is_instance_valid(card): _greet()
+	else: _open_late.call_deferred()
 	var result: Dictionary = await store.read()
 	busy = false
 	if not is_inside_tree(): return
+	if card == null or not is_instance_valid(card): _greet()
 	if not _adopt(result) and farm.is_empty():
+		_stop_dots()
 		card.line = LINES.unreachable
 		var retry := UiCommandButton.new("Retry", UiCommandButton.Kind.SECONDARY)
 		retry.name = "Retry"
@@ -170,8 +192,9 @@ func _open_board() -> void:
 	board.close_requested.connect(func(): stack.close_drawer())
 	board.command_requested.connect(board_command)
 	board.refill_due.connect(func(): if not busy: _reload_board())
-	stack.open_drawer(board)
-	toast.anchor_above(board)
+	board.rise = true
+	stack.open_drawer(board, {"animate_out": true})
+	_place_toast()
 
 ## A board key's command. A delivery floats its coins up from its key; a drop shows BOARD-DROPPED. A refusal toasts
 ## what the server said (the keys already carry the gaps it checks).
@@ -179,12 +202,26 @@ func board_command(command: Dictionary) -> Dictionary:
 	if busy or board == null or not is_instance_valid(board): return {}
 	var at := board.key_point(int(command.get("request", 0)))
 	var coins := int(farm.get("coins", 0))
+	var delivering := str(command.type) == "deliver_request"
+	# MS-16: the list stays as drawn while the delivery plays (the answer's refilled slot comes in after it).
+	if delivering: board.hold_for_delivery()
 	var result := await _send(command)
-	if not result.get("ok", false) or board == null or not is_instance_valid(board): return result
+	if board == null or not is_instance_valid(board): return result
+	if not result.get("ok", false):
+		if delivering: board.release()
+		return result
 	match str(command.type):
-		"deliver_request": if at != Vector2.INF: board.float_coins(int(farm.coins) - coins, at)
+		"deliver_request": board.celebrate_delivery(int(command.get("request", 0)), coins, int(farm.coins), at)
 		"drop_request": board.dropped()
 	return result
+
+## MS-13: still reading after the grace: open the greeting now, the dots looping in its line.
+func _open_late() -> void:
+	if not is_inside_tree() or not busy or (card != null and is_instance_valid(card)): return
+	await get_tree().create_timer(UiKit.secs(UiTokens.MOTION_DELAY_LOADING_GRACE), true).timeout
+	if not is_inside_tree() or not busy or (card != null and is_instance_valid(card)) or who == BOARD: return
+	_waited = true
+	_greet()
 
 ## The keeper's greeting card: a fresh one each time it is shown (the read, a sale, the blueprint).
 func _greet() -> void:
@@ -194,17 +231,89 @@ func _greet() -> void:
 		card = UiNpcCard.new(portrait(who), "%s · %s" % [data.role, data.name])
 		card.place_centred()
 		card.close_requested.connect(close)
-		stack.open_card(card)
+		stack.open_card(card, {"animate_out": true})
 		card.play_in(stack.get_node_or_null(^"ScrimCard"))
-		toast.anchor_above(card)
+		card.resized.connect(_place_toast)
+		_place_toast()
 	for c in card.content.get_children():
 		c.hide()
 		c.queue_free()
 	if farm.is_empty():
 		card.line = "…" if busy else card.line
+		if busy: _start_dots()
 		return
+	var reveal := _waited
+	_waited = false
+	_stop_dots()
 	if who == MARKET: _greet_market()
 	else: _greet_carpenter()
+	if reveal: _reveal()
+
+## MS-13: three dots loop in the line slot (one cycle per `motion/duration/dotsLoop`, 1600); reduced: still dots.
+func _start_dots() -> void:
+	if card == null or (_dots != null and _dots.is_valid()): return
+	var l := card.line_label()
+	l.text = "···"
+	if UiMotion.reduced: return
+	_dots = UiMotion.tween(l, UiTokens.MOTION_EASING_LINEAR)
+	_dots.set_loops()
+	_dots.tween_method(func(v: float): l.text = "·".repeat(1 + int(v) % 3), 0.0, 2.999,
+		UiKit.secs(UiTokens.MOTION_DURATION_DOTS_LOOP_MS))
+
+func _stop_dots() -> void:
+	if _dots != null and _dots.is_valid(): _dots.kill()
+	_dots = null
+
+## MS-13: the line fades in (120) and the keys follow (160), once the read lands on a card opened early.
+func _reveal() -> void:
+	if card == null or UiMotion.reduced: return
+	for part: CanvasItem in [card.line_label(), card.content]:
+		part.modulate.a = 0.0
+	UiMotion.tween(card.line_label(), UiTokens.MOTION_EASING_STANDARD) \
+		.tween_property(card.line_label(), ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_FAST_MS))
+	var keys_in := UiMotion.tween(card.content, UiTokens.MOTION_EASING_STANDARD)
+	keys_in.tween_interval(UiKit.secs(UiTokens.MOTION_DURATION_FAST_MS))
+	keys_in.tween_property(card.content, ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_QUICK_MS))
+
+## q(16) / C-185 §3.5 (C-186#9): where the toast sits. Over an open drawer's fixed decision area, or at its foot (232 wide)
+## without one; over the centred greeting, 8 above its top edge (`size/toast/aboveCard`) — the portrait and name tag that
+## stand over the card included — so it never covers her line, head or name; else the default.
+func _place_toast() -> void:
+	if toast == null or not toast.is_inside_tree(): return
+	var d: Control = stack.drawer() if stack != null else null
+	if d is UiDrawer and is_instance_valid(d):
+		var area := (d as UiDrawer).action_area()
+		if area != null: toast.anchor_above(area)
+		else:
+			var foot := d.get_global_rect().end.y - (d as UiDrawer).pad - (d as UiDrawer).safe_bottom
+			toast.anchor_bottom(_toast_y(foot), ToastLayer.NARROW_WIDTH)
+		return
+	if card != null and is_instance_valid(card) and card.is_inside_tree():
+		toast.anchor_bottom(_toast_y(card_top()) - UiTokens.SIZE_TOAST_ABOVE_CARD)
+		return
+	toast.anchor_above(null)
+
+## The greeting's top edge on screen: the card's, or its portrait's or name tag's where they stand over it.
+func card_top() -> float:
+	var top := card.get_global_rect().position.y
+	for part: Control in [card.find_child("Portrait", false, false) as Control, card.name_tag()]:
+		if part != null and part.visible: top = minf(top, part.get_global_rect().position.y)
+	return top
+
+func _toast_y(global_y: float) -> float:
+	return (toast.get_global_transform().affine_inverse() * Vector2(0.0, global_y)).y
+
+## A layer opened: the toast follows it, as it moves (a drawer rising) and changes (its decision area appearing).
+func _follow(c: Control) -> void:
+	if c == null: return
+	if not c.item_rect_changed.is_connected(_place_toast): c.item_rect_changed.connect(_place_toast)
+	_place_toast()
+
+## MS-02: a grey key was tapped. It shakes; the toast only when `reason` is not already the key's text.
+func refused(key: Control, reason: String) -> void:
+	UiMotion.shake(key)
+	var shown := (key as Button).text if key is Button else ""
+	if reason != shown: toast.show_toast(reason, ToastLayer.Severity.INFO)
 
 func _greet_market() -> void:
 	if not aid_given.is_empty():
@@ -246,7 +355,7 @@ func _greet_carpenter() -> void:
 		buy_key.sends = true
 		buy_key.reason = gap
 		buy_key.activated.connect(claim_blueprint.bind(id))
-		buy_key.unavailable_pressed.connect(func(reason: String): toast.show_toast(reason, ToastLayer.Severity.INFO))
+		buy_key.unavailable_pressed.connect(func(reason: String): refused(buy_key, reason))
 		card.content.add_child(buy_key)
 		keys["buy_" + id] = buy_key
 	# C-152: the farm's upgrade, at Scott's whatever his blueprint line says (none in rules without farm levels).
@@ -267,10 +376,11 @@ func open_counter() -> void:
 	counter.close_requested.connect(func(): stack.close_drawer())
 	counter.sell_requested.connect(sell)
 	counter.buy_requested.connect(buy)
+	_hand_over(counter)
 	_switching = true
-	stack.open_drawer(counter, {"scrim": UiTokens.OPACITY_SCRIM_COUNTER})
+	stack.open_drawer(counter, {"scrim": UiTokens.OPACITY_SCRIM_COUNTER, "animate_out": true})
 	_switching = false
-	toast.anchor_above(counter)
+	_place_toast()
 
 ## C-152: Scott's upgrade sheet over the greeting, as Jasmine's counter opens over hers.
 func open_upgrade() -> void:
@@ -278,42 +388,154 @@ func open_upgrade() -> void:
 	upgrade_sheet = Upgrade.new(farm)
 	upgrade_sheet.close_requested.connect(func(): stack.close_drawer())
 	upgrade_sheet.upgrade_requested.connect(upgrade)
-	upgrade_sheet.button.unavailable_pressed.connect(func(reason: String): toast.show_toast(reason, ToastLayer.Severity.INFO))
+	# MS-02: the sheet shakes its key and flashes the short need itself; the toast only when it says something else.
+	var sheet := upgrade_sheet
+	sheet.button.unavailable_pressed.connect(func(reason: String):
+		if reason != sheet.button.text: toast.show_toast(reason, ToastLayer.Severity.INFO))
+	_hand_over(upgrade_sheet)
 	_switching = true
-	stack.open_drawer(upgrade_sheet)
+	stack.open_drawer(upgrade_sheet, {"animate_out": true})
 	_switching = false
-	toast.anchor_above(upgrade_sheet)
+	_place_toast()
+
+## MS-14: a drawer replacing the greeting rises in `motion/delay/handoff` (80) after the card starts leaving (M-05).
+func _hand_over(drawer: UiDrawer) -> void:
+	drawer.rise = true
+	drawer.enter_delay = UiTokens.MOTION_DELAY_HANDOFF if stack.has_card() else 0.0
 
 ## C-152: `upgrade_farm` at the rules' price (the server's own; none is sent). The sheet follows the answer, now the
 ## next level's (or the top's); a toast names the new level and any blueprint it gave.
+## C-186 (MS-17): the sheet holds its level while the command is out; on success its needs go in and the level-up card
+## shows what changed (M-12); the sheet moves on when the card closes. A refusal: the sheet as it is, the reason toast.
 func upgrade() -> Dictionary:
-	if busy: return {}
+	if busy or level_card != null or _handing_in: return {}
+	var rules := ParcelFarm.rules()
 	var before := ParcelFarm.farm_level(farm)
-	var gift: Dictionary = ParcelFarm.next_level(ParcelFarm.rules(), before).get("gift", {})
+	var gift: Dictionary = ParcelFarm.next_level(rules, before).get("gift", {})
+	var rows := Upgrade.level_rows(rules, farm)
+	var sheet: Upgrade = null
+	if upgrade_sheet != null and is_instance_valid(upgrade_sheet): sheet = upgrade_sheet
+	if sheet != null: sheet.hold = true
 	var result := await _send({"type": "upgrade_farm"})
-	if result.get("ok", false):
-		var level := ParcelFarm.farm_level(farm)
-		if gift.is_empty(): toast.show_toast(LINES.upgraded % level, ToastLayer.Severity.SUCCESS)
-		else:
-			var item: String = gift.keys()[0]
-			toast.show_toast(LINES.upgraded_gift % [level, int(gift[item]), ParcelItems.name_of(item)], ToastLayer.Severity.SUCCESS)
+	if not result.get("ok", false):
+		if sheet != null and is_instance_valid(sheet): sheet.release()
+		return result
+	var level := ParcelFarm.farm_level(farm)
+	if not gift.is_empty():
+		var item: String = gift.keys()[0]
+		rows.append({"icon": ParcelItems.icon_of(item), "label": Upgrade.COPY.gift % [int(gift[item]), ParcelItems.name_of(item)],
+			"value": "", "gift": true})
+	_handing_in = true
+	var ms := sheet.hand_in() if sheet != null and is_instance_valid(sheet) else 0.0
+	if ms > 0.0 and is_inside_tree(): await get_tree().create_timer(UiKit.secs(ms), true).timeout
+	_handing_in = false
+	if is_inside_tree(): show_level_card(level, rows, sheet)
 	return result
+
+## M-12: the level-up card over the scene — scrim, the light turning behind, `hero_home` over the card, `Farm LvN`, what
+## changes, the gift as the strip, the one button. The button or the scrim closes it (M-05); then `sheet` (if still open)
+## fades its next level in.
+func show_level_card(level: int, rows: Array, sheet = null) -> void:
+	close_level_card()
+	_level_layer = Control.new()
+	_level_layer.name = "LevelUp"
+	_level_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_level_layer.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(_level_layer)
+	move_child(toast, -1)
+	var scrim := ColorRect.new()
+	scrim.name = "Scrim"
+	scrim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	scrim.color = UiTokens.COLOR_SCRIM_MODAL
+	scrim.mouse_filter = Control.MOUSE_FILTER_STOP
+	# Nothing shows until the card is measured and centred next frame (C-186#82: it flashed at (0,0) over a full scrim).
+	scrim.modulate.a = 0.0
+	_level_layer.add_child(scrim)
+	var glow: Control = null
+	if not UiMotion.reduced:
+		glow = UiRewardMoment.Glow.new()
+		glow.name = "Glow"
+		glow.modulate.a = 0.0
+		_level_layer.add_child(glow)
+	var m := UiRewardMoment.new()
+	m.name = "LevelCard"
+	m.modulate.a = 0.0
+	m.tone = UiRewardMoment.Tone.MILESTONE
+	m.event = LINES.upgraded % level
+	m.hero = UiArt.hero("home")
+	var plain: Array = rows.filter(func(r: Dictionary): return not r.get("gift", false))
+	var gifts: Array = rows.filter(func(r: Dictionary): return r.get("gift", false))
+	m.rows = plain
+	if not gifts.is_empty():
+		m.strip = str(gifts[0].label)
+		m.strip_icon = gifts[0].icon
+	m.primary = LINES.level_ok
+	_level_layer.add_child(m)
+	level_card = m
+	var done := func() -> void: close_level_card(sheet)
+	m.primary_pressed.connect(done)
+	scrim.gui_input.connect(func(e: InputEvent):
+		if (e is InputEventMouseButton and not e.pressed) or (e is InputEventScreenTouch and not e.pressed): done.call())
+	await get_tree().process_frame
+	if not is_instance_valid(m) or not m.is_inside_tree() or level_card != m or _level_layer == null: return
+	m.reset_size()
+	m.position = (_level_layer.size - m.size) * 0.5 + Vector2(0, UiRewardMoment.HERO_OVER * 0.5)
+	if glow != null:
+		var side := maxf(m.size.x, m.size.y) * 2.2
+		glow.size = Vector2(side, side)
+		glow.position = m.position + Vector2(m.size.x * 0.5, 0) - glow.size * 0.5
+		UiMotion.tween(glow, UiTokens.MOTION_EASING_LINEAR).tween_property(glow, ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_FAST_MS))
+	m.play_level_in(scrim)
+
+## The level-up card leaves (M-05, its scrim fading); `sheet` then shows the next level.
+func close_level_card(sheet = null) -> void:
+	if _level_layer == null or not is_instance_valid(_level_layer):
+		_level_layer = null
+		level_card = null
+		return
+	var layer := _level_layer
+	var m := level_card
+	_level_layer = null
+	level_card = null
+	layer.propagate_call(&"set_mouse_filter", [Control.MOUSE_FILTER_IGNORE])
+	if is_instance_valid(sheet) and sheet.has_method(&"release"): sheet.call(&"release")
+	if m != null and is_instance_valid(m): UiMotion.panel_out(m, layer.get_node_or_null(^"Scrim") as CanvasItem, layer.queue_free)
+	else: layer.queue_free()
 
 func sell(item: String, count: int) -> Dictionary:
 	if busy or count <= 0: return {}
 	var before := int(farm.get("coins", 0))
 	var result := await _send({"type": "sell", "item": item, "count": count})
 	if result.get("ok", false) and counter != null and is_instance_valid(counter):
-		counter.keeper_bar.line = LINES.thanks % (int(farm.coins) - before)
+		# MS-15: the clerk's line cross-fades; `+N` and the coins fly from the key, the Coins row bumps and rolls.
+		_swap_line(counter.keeper_bar, LINES.thanks % (int(farm.coins) - before))
+		counter.celebrate_sale(before, int(farm.coins))
 	return result
+
+## The keeper bar's line, cross-faded (120) as MS-15 asks; at once when reduced.
+func _swap_line(bar: UiKeeperBar, text: String) -> void:
+	var l: Label = bar._line
+	if UiMotion.reduced or l == null or not l.is_inside_tree():
+		bar.line = text
+		return
+	var old := l.text
+	bar.line = text   # the bar's state is the new line at once; its label shows the old one until it has faded
+	l.text = old
+	var half := UiKit.secs(UiTokens.MOTION_DURATION_FAST_MS * 0.5)
+	var tw := UiMotion.tween(l, UiTokens.MOTION_EASING_STANDARD)
+	tw.tween_property(l, ^"modulate:a", 0.0, half)
+	tw.tween_callback(func(): l.text = text)
+	tw.tween_property(l, ^"modulate:a", 1.0, half)
 
 ## C-149: buys `count` of `item` at the rules' price (the server's own; none is sent). The row's `Bag ×N` and the
 ## coins follow the answer; a toast says what came in.
 func buy(item: String, count: int) -> Dictionary:
 	if busy or count <= 0: return {}
+	var before := int(farm.get("coins", 0))
 	var result := await _send({"type": "buy", "item": item, "count": count})
 	if result.get("ok", false):
-		toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(item), count], ToastLayer.Severity.SUCCESS)
+		if counter != null and is_instance_valid(counter): counter.roll_coins(before)
+		toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(item), count], ToastLayer.Severity.SUCCESS, "", 0.0, ParcelItems.icon_of(item))
 	return result
 
 ## C-181: the economy's blueprints with a price in coins this farm has not bought yet, in the rules' order.
@@ -352,7 +574,7 @@ func claim_seed_aid() -> Dictionary:
 	_adopt(result)
 	if not result.get("ok", false): return result
 	aid_given = {"item": aid.item, "amount": int(aid.amount)}
-	toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(str(aid.item)), int(aid.amount)], ToastLayer.Severity.SUCCESS)
+	toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(str(aid.item)), int(aid.amount)], ToastLayer.Severity.SUCCESS, "", 0.0, ParcelItems.icon_of(str(aid.item)))
 	if card != null and is_instance_valid(card): _greet()
 	return result
 
@@ -362,7 +584,7 @@ func claim_blueprint(id := BLUEPRINT) -> Dictionary:
 	var rule: Dictionary = ParcelFarm.rules().economy.blueprints[id]
 	var result := await _send({"type": "claim_blueprint", "blueprint": id})
 	if result.get("ok", false):
-		toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(str(rule.item)), int(rule.amount)], ToastLayer.Severity.SUCCESS)
+		toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(str(rule.item)), int(rule.amount)], ToastLayer.Severity.SUCCESS, "", 0.0, ParcelItems.icon_of(str(rule.item)))
 	_greet()
 	return result
 
@@ -419,6 +641,9 @@ func close() -> void:
 ## Back: a board sheet goes back a page (BOARD-3 to its request, the others to the list), else the top layer closes;
 ## false when nothing was open.
 func step_back() -> bool:
+	if level_card != null:
+		close_level_card(upgrade_sheet)
+		return true
 	if board != null and is_instance_valid(board) and board.page != "list":
 		if board.page == "drop": board.open_request(int(board.focus.get("id", 0)))
 		else: board.back_to_list()

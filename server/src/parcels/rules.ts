@@ -32,7 +32,16 @@ export interface BuildingRule {
   materials?: Record<string, number>;
   /** 养殖建筑（C-154 鸡场）：里面的动物、喂什么、产什么、多久产、地上最多留几个。没有就是普通建筑。 */
   livestock?: LivestockRule;
+  /**
+   * 占地里不算这栋建筑的格（C-202 牛棚：11×6 缺左后 2×2，可选，默认不缺）：每项 [x, z, 宽, 深]，按未转向的自身坐标
+   * （同 livestock.spots：原点在占地后左角，x 向右，z 向入口），转向时跟着建筑一起转。这些格可以放别的建筑、开垦、种地。
+   */
+  cutouts?: Cutout[];
 }
+/** 未转向占地里的一块矩形 [x, z, 宽, 深]（C-202）。 */
+export type Cutout = [number, number, number, number];
+/** 一类建筑最多几块缺口（C-202）。 */
+export const MAX_CUTOUTS = 8;
 /**
  * 养殖建筑的规则（C-154）：放下时带 animals 这些动物（按序号区分，类型只决定外观）。在建筑里喂一次 feed（1 个），
  * 体力按 energy.costs.feed，喂过 produce_seconds 秒后，这只动物在建筑里的一个落点 spots[i] 下 amount 个 product，
@@ -160,6 +169,7 @@ export function parseParcelRules(raw: unknown): ParcelRules {
       if (!b.materials || typeof b.materials !== 'object' || Array.isArray(b.materials)) fail(`buildings.${id}.materials 不对`);
       for (const [item, n] of Object.entries(b.materials)) if (!isId(item) || !count(n, 1, 999)) fail(`buildings.${id}.materials.${item} 不对`);
     }
+    if (b.cutouts !== undefined) parseCutouts(b, fail, `buildings.${id}.cutouts`);
     if (b.livestock !== undefined) parseLivestock(b.livestock, b, fail, `buildings.${id}.livestock`);
   }
   if (!Object.hasOwn(r.buildings, HOME_BUILDING)) fail(`buildings 缺少 ${HOME_BUILDING}`);
@@ -192,7 +202,30 @@ function parseLivestock(l: LivestockRule, b: BuildingRule, fail: (what: string) 
   if (!Array.isArray(l.spots) || l.spots.length < l.max_ground || l.spots.length > MAX_GROUND_DROPS * 4) fail(`${at}.spots 个数不对`);
   for (const p of l.spots)
     if (!Array.isArray(p) || p.length !== 2 || !p.every(v => typeof v === 'number' && Number.isFinite(v))
-      || p[0] < 0 || p[0] > b.width || p[1] < 0 || p[1] > b.depth) fail(`${at}.spots 有落点不在占地里`);
+      || p[0] < 0 || p[0] > b.width || p[1] < 0 || p[1] > b.depth
+      || (b.cutouts ?? []).some(([x, z, w, d]) => p[0] > x && p[0] < x + w && p[1] > z && p[1] < z + d)) fail(`${at}.spots 有落点不在占地里`);
+}
+
+/** 缺口的边界（C-202）：至多 MAX_CUTOUTS 块，每块是占地里的非空整格矩形，去掉后至少还剩一格。 */
+function parseCutouts(b: BuildingRule, fail: (what: string) => never, at: string): void {
+  if (!Array.isArray(b.cutouts) || b.cutouts.length > MAX_CUTOUTS) fail(`${at} 不对`);
+  for (const r of b.cutouts!)
+    if (!Array.isArray(r) || r.length !== 4 || !count(r[0], 0, b.width - 1) || !count(r[1], 0, b.depth - 1)
+      || !count(r[2], 1, b.width - r[0]) || !count(r[3], 1, b.depth - r[1])) fail(`${at} 有缺口不在占地里`);
+  if (ownCells(b.width, b.depth, b.cutouts).length === 0) fail(`${at} 把占地全缺掉了`);
+}
+
+/**
+ * 未转向占地 width×depth 去掉缺口后剩下的格，按自身坐标 [x, z]（C-202）。不成形的缺口不算（存档里的只会是放下时规则里的副本）。
+ */
+export function ownCells(width: number, depth: number, cutouts: unknown): [number, number][] {
+  const rects = (Array.isArray(cutouts) ? cutouts : []).filter((r): r is Cutout =>
+    Array.isArray(r) && r.length === 4 && r.every(v => Number.isInteger(v)));
+  const out: [number, number][] = [];
+  for (let z = 0; z < depth; z++)
+    for (let x = 0; x < width; x++)
+      if (!rects.some(([rx, rz, w, d]) => x >= rx && x < rx + w && z >= rz && z < rz + d)) out.push([x, z]);
+  return out;
 }
 
 /** 农场等级的边界：从 2 级起连续，金币 0–100000，材料和赠品每样 1–999，建筑上限是已有类型、不低于前一级。 */

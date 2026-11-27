@@ -41,6 +41,12 @@ extends RefCounted
 ## template's own `tiers`, else its item's `item_tiers`, else the shared `tiers`. The seed aid (server seed_aid.ts):
 ## with no coins for one of the rules' `seed_aid` seed, no crop seeds and no crops (in the bag or in the ground),
 ## `claim_seed_aid` gives `seed_aid.amount` of it once a player day; the save's `seed_aid_day` is that day (absent: never).
+## C-202 (the barn's 11×6 less its rear-left 2×2, owner SEN-Q-300): a building type's optional `cutouts` are cells of its
+## footprint that are not the building's, rects [x, z, width, depth] in its own unturned frame (as `livestock.spots`:
+## origin at the rear-left corner, z toward the entry), turning with it. A building placed keeps a copy (`cutouts`, as it
+## keeps its width and depth); other buildings, tilling and crops may use those cells.
+## C-209: a building placed before its type had cutouts (C-192's 8×6 barn) is taken down when the save is read, its
+## blueprint, materials and drops given back (`retire_draft_buildings`); no save field is added.
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
 const STATE_VERSION := 1
 const MAX_COORD := 1024
@@ -67,6 +73,8 @@ const HOME_BUILDING := "cottage"
 ## Most buildings on one parcel, all types together; most cells along a building's side (server rules.ts).
 const MAX_BUILDINGS := 64
 const MAX_BUILDING_SIDE := 16
+## Most cutouts a building type may list (server rules.ts MAX_CUTOUTS).
+const MAX_CUTOUTS := 8
 ## The highest level the rules may list (server rules.ts MAX_FARM_LEVEL).
 const MAX_FARM_LEVEL := 99
 const HOUSE_FIELDS := ["model", "x", "y", "width", "depth", "rotation", "built_at"]
@@ -100,6 +108,7 @@ static func parse_rules(raw: Variant) -> Dictionary:
 			if not b.materials is Dictionary: return {}
 			for item in b.materials:
 				if not item is String or not whole_in(b.materials[item], 1, 999): return {}
+		if b.has("cutouts") and not _cutouts_fit(b.cutouts, int(b.width), int(b.depth)): return {}
 		if b.has("livestock") and _parse_livestock(b.livestock, b).is_empty(): return {}
 	for id in raw.welcome_gift:
 		if not id is String or not whole_in(raw.welcome_gift[id], 1, 999): return {}
@@ -136,6 +145,7 @@ static func parse_rules(raw: Variant) -> Dictionary:
 		var materials := {}
 		for item in parsed.buildings[id].get("materials", {}): materials[item] = int(parsed.buildings[id].materials[item])
 		parsed.buildings[id].materials = materials
+		if parsed.buildings[id].has("cutouts"): parsed.buildings[id].cutouts = _cutout_ints(parsed.buildings[id].cutouts)
 		if parsed.buildings[id].has("livestock"):
 			parsed.buildings[id].livestock = _parse_livestock(parsed.buildings[id].livestock, parsed.buildings[id])
 	parsed["economy"] = _parse_economy(raw.get("economy"))
@@ -228,10 +238,28 @@ static func _parse_livestock(raw: Variant, building: Dictionary) -> Dictionary:
 	for p in raw.spots:
 		if not p is Array or p.size() != 2 or not _number(p[0]) or not _number(p[1]): return {}
 		if float(p[0]) < 0 or float(p[0]) > float(building.width) or float(p[1]) < 0 or float(p[1]) > float(building.depth): return {}
+		# C-202: not inside a cutout either (on its edge is the footprint's).
+		for r in building.get("cutouts", []):
+			if float(p[0]) > float(r[0]) and float(p[0]) < float(r[0]) + float(r[2]) and float(p[1]) > float(r[1]) \
+					and float(p[1]) < float(r[1]) + float(r[3]):
+				return {}
 		spots.append(Vector2(float(p[0]), float(p[1])))
 	return {"animals": raw.animals.duplicate(), "feed": raw.feed, "feed_amount": int(raw.get("feed_amount", 1)), "product": raw.product,
 		"amount": int(raw.amount),
 		"produce_seconds": int(raw.produce_seconds), "max_ground": int(raw.max_ground), "spots": spots}
+
+## C-202 a type's `cutouts` with the server's bounds (rules.ts parseCutouts): at most MAX_CUTOUTS whole-cell rects
+## [x, z, width, depth], each non-empty inside the width × depth footprint, leaving at least one cell.
+static func _cutouts_fit(raw: Variant, width: int, depth: int) -> bool:
+	if not raw is Array or raw.size() > MAX_CUTOUTS: return false
+	for r in raw:
+		if not r is Array or r.size() != 4 or not whole_in(r[0], 0, width - 1) or not whole_in(r[1], 0, depth - 1) \
+				or not whole_in(r[2], 1, width - int(r[0])) or not whole_in(r[3], 1, depth - int(r[1])):
+			return false
+	return not own_cells(Vector2i(width, depth), raw).is_empty()
+
+static func _cutout_ints(raw: Array) -> Array:
+	return raw.map(func(r): return [int(r[0]), int(r[1]), int(r[2]), int(r[3])])
 
 ## C-152 `farm_levels` with the server's bounds (rules.ts parseFarmLevels): from Lv2 on, one entry a level, coins 0–100000,
 ## materials and gifts 1–999 each, a level's building limits for known types and never below the one before; null when
@@ -353,6 +381,11 @@ static func normalize(raw: Variant) -> Dictionary:
 				for a in b.animals:
 					if not a is String: return {}
 					read.animals.append(a)
+			# C-202: the cutouts it was placed with; malformed ones are not counted (server rules.ts ownCells).
+			if b.get("cutouts") is Array:
+				var rects: Array = (b.cutouts as Array).filter(func(r): return r is Array and r.size() == 4 \
+					and (r as Array).all(func(v): return whole_in(v, -MAX_COORD, MAX_COORD)))
+				read.cutouts = _cutout_ints(rects)
 			state.buildings.append(read)
 	elif buildings != null:
 		return {}
@@ -453,9 +486,11 @@ static func drops_in(state: Dictionary, building_id: int) -> Array:
 static func feed_refusal(rule_set: Dictionary, state: Dictionary, building: Dictionary, now: int) -> String:
 	var rule := livestock_of(rule_set, building)
 	if rule.is_empty() or not building.get("animals") is Array or building.animals.is_empty(): return "NOT_LIVESTOCK"
-	if int(state.get("bag", {}).get(rule.feed, 0)) < int(rule.get("feed_amount", 1)): return "NO_FEED"
+	# C-186#8: a full ground first (with or without the feed, nothing can be fed until some are picked up), then the feed;
+	# the server's feed checks in the same order (server/src/parcels/farm.ts).
 	var mine := drops_in(state, int(building.id))
 	if mine.size() >= int(rule.max_ground): return "GROUND_FULL"
+	if int(state.get("bag", {}).get(rule.feed, 0)) < int(rule.get("feed_amount", 1)): return "NO_FEED"
 	return "" if _free_animal(building, mine, now) >= 0 else "ANIMALS_FED"
 
 ## The first animal with no product on its way (laid ones do not count), or -1.
@@ -714,11 +749,13 @@ static func settle_board(rule_set: Dictionary, state: Dictionary, now: int) -> v
 		if i < int(q.slots) or b.slots[i].req != null: kept.append(b.slots[i])
 	b.slots = kept
 
-## The farm as the server reads it out (routes farmView): a copy with the board settled to `now`.
+## The farm as the server reads it out (routes farmView): a copy with the board settled to `now` and a building from
+## before its type's cutouts taken down (C-209).
 static func view(rule_set: Dictionary, state: Dictionary, now: int) -> Dictionary:
 	var out := state.duplicate(true)
 	if not out.has("board"): out.board = empty_board()
 	if not out.has("requests_done"): out.requests_done = 0
+	retire_draft_buildings(rule_set, out)
 	settle_board(rule_set, out, now)
 	return out
 
@@ -820,21 +857,78 @@ static func grant(rule_set: Dictionary, state: Dictionary, now: int) -> Variant:
 		next.grants[id] = now
 	return {"state": next, "gift": gift} if not gift.is_empty() else null
 
+## C-209 (server farm.ts retireDraftBuildings): a building placed before its type had `cutouts` (C-192's 8×6 barn) would
+## show the new model over its neighbours, so it is taken down when the save is read and the player places it anew: its
+## blueprint and the rules' materials (what placing it again takes) go back into the bag, its animals go with it (a new
+## one has the rules'), and its drops, laid or not, go into the bag as their product. `drop_seq` stays. Changes `state`
+## in place (a copy with `buildings` and `drops`); true when one was taken down.
+static func retire_draft_buildings(rule_set: Dictionary, state: Dictionary) -> bool:
+	var gone := {}
+	for b: Dictionary in buildings_of(state):
+		var rule = rule_set.get("buildings", {}).get(str(b.type))
+		if rule is Dictionary and not cutouts_of(rule).is_empty() and cutouts_of(b).is_empty(): gone[int(b.id)] = rule
+	if gone.is_empty(): return false
+	for id: int in gone:
+		var back := {gone[id].blueprint: 1}
+		back.merge(gone[id].get("materials", {}))
+		for item: String in back: state.bag[item] = int(state.bag.get(item, 0)) + int(back[item])
+	for d: Dictionary in state.get("drops", []):
+		if gone.has(int(d.building)): state.bag[d.item] = int(state.bag.get(d.item, 0)) + int(d.amount)
+	state.drops = state.get("drops", []).filter(func(d: Dictionary): return not gone.has(int(d.building)))
+	state.buildings = buildings_of(state).filter(func(b: Dictionary): return not gone.has(int(b.id)))
+	state.house = home_of(state.buildings)
+	return true
+
+## A rules entry's or a saved building's `cutouts` (C-202), [] without.
+static func cutouts_of(entry: Dictionary) -> Array:
+	return entry.get("cutouts", []) if entry.get("cutouts") is Array else []
+
 ## A footprint's size: `base` is width × depth unturned; a quarter or three-quarter turn swaps them.
 static func turned(base: Vector2i, rotation: int) -> Vector2i:
 	return Vector2i(base.y, base.x) if rotation % 2 else base
 
-## The cells of a footprint whose lowest-x, lowest-y cell is `at`.
-static func footprint(at: Vector2i, base: Vector2i, rotation: int) -> Array[Vector2i]:
+## The cells of a footprint whose lowest-x, lowest-y cell is `at`, its `cutouts` (C-202) left out.
+## Row by row from the lowest y, each from the lowest x.
+static func footprint(at: Vector2i, base: Vector2i, rotation: int, cutouts := []) -> Array[Vector2i]:
+	var own := {}
+	for cell: Vector2i in own_cells(base, cutouts): own[own_to_grid(cell, base, rotation)] = true
 	var s := turned(base, rotation)
 	var out: Array[Vector2i] = []
 	for dy in s.y:
-		for dx in s.x: out.append(at + Vector2i(dx, dy))
+		for dx in s.x:
+			if own.has(Vector2i(dx, dy)): out.append(at + Vector2i(dx, dy))
 	return out
+
+## C-202 the cells of an unturned width × depth footprint (`base`) that are the building's, in its own frame (x right,
+## y the frame's z, toward the entry), row by row from the rear: all but those in a well-formed rect of `cutouts`.
+static func own_cells(base: Vector2i, cutouts := []) -> Array[Vector2i]:
+	var cut := {}
+	for r in cutouts:
+		if not r is Array or r.size() != 4: continue
+		var whole := true
+		for v in r: whole = whole and (v is int or (v is float and v == floorf(v)))
+		if not whole: continue
+		for z in range(maxi(0, int(r[1])), mini(base.y, int(r[1]) + int(r[3]))):
+			for x in range(maxi(0, int(r[0])), mini(base.x, int(r[0]) + int(r[2]))): cut[Vector2i(x, z)] = true
+	var out: Array[Vector2i] = []
+	for z in base.y:
+		for x in base.x:
+			if not cut.has(Vector2i(x, z)): out.append(Vector2i(x, z))
+	return out
+
+## C-202 where a cell of the building's own unturned frame (x right, y toward the entry; it may lie outside the
+## footprint) falls from the turned footprint's lowest cell. Unturned, the entry row is the lowest grid y; each turn
+## spins it a quarter about the footprint's middle, as FarmBuilding.transform turns the model (server farm.ts footprint).
+static func own_to_grid(own: Vector2i, base: Vector2i, rotation: int) -> Vector2i:
+	match posmod(rotation, 4):
+		1: return Vector2i(own.y, own.x)
+		2: return Vector2i(base.x - 1 - own.x, own.y)
+		3: return Vector2i(base.y - 1 - own.y, base.x - 1 - own.x)
+	return Vector2i(own.x, base.y - 1 - own.y)
 
 ## A saved building's cells.
 static func building_footprint(b: Dictionary) -> Array[Vector2i]:
-	return footprint(Vector2i(int(b.x), int(b.y)), Vector2i(int(b.width), int(b.depth)), int(b.rotation))
+	return footprint(Vector2i(int(b.x), int(b.y)), Vector2i(int(b.width), int(b.depth)), int(b.rotation), b.get("cutouts", []))
 
 ## Cells under every building, as {Vector2i: true}.
 static func building_cells(state: Dictionary) -> Dictionary:
@@ -855,6 +949,7 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 		if not next.has(field): next[field] = blank[field]
 	next.level = farm_level(next)
 	next.buildings = buildings_of(next).duplicate(true)
+	retire_draft_buildings(rule_set, next)
 	settle_energy(rule_set, next, now)
 	settle_board(rule_set, next, now)   # C-191: before the first command and again after the batch
 	for index in commands.size():
@@ -1170,9 +1265,10 @@ static func _place(rule_set: Dictionary, next: Dictionary, command: Dictionary, 
 			return {"code": "NOT_ENOUGH", "detail": {"item": item, "have": int(next.bag.get(item, 0)), "need": need}}
 	var building := {"id": id + 1, "type": type, "model": rule.model, "x": int(command.x), "y": int(command.y),
 		"width": int(rule.width), "depth": int(rule.depth), "rotation": int(command.get("rotation", 0)), "built_at": now}
+	var far := Vector2i(building.x, building.y) + turned(Vector2i(building.width, building.depth), building.rotation) - Vector2i.ONE
+	if far.x >= MAX_COORD or far.y >= MAX_COORD: return {"code": "OUT_OF_BOUNDS", "detail": {}}
+	if not (rule.get("cutouts", []) as Array).is_empty(): building.cutouts = (rule.cutouts as Array).duplicate(true)
 	var cells := building_footprint(building)
-	for at: Vector2i in cells:
-		if at.x >= MAX_COORD or at.y >= MAX_COORD: return {"code": "OUT_OF_BOUNDS", "detail": {}}
 	var under := building_cells(next)
 	var overlap: Array = []
 	for at: Vector2i in cells:

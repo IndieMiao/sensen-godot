@@ -4,7 +4,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONTENT_DIR } from '../../src/domain/content.js';
 import { applyFarmCommands, emptyFarm, grant, MAX_BATCH, MAX_BUY_COUNT, MAX_COINS, MAX_SELL_COUNT, NEVER, parseCell, parseFarmCommands, rebaseFarm,
-  welcome, withEconomy, type FarmCommand, type ParcelFarmState } from '../../src/parcels/farm.js';
+  retireDraftBuildings, welcome, withEconomy, type FarmCommand, type ParcelFarmState } from '../../src/parcels/farm.js';
 import { maxEnergy } from '../../src/parcels/energy.js';
 import { emptyBoard } from '../../src/parcels/requests.js';
 import { buildingMax, communityOf, isNewerDataset, loadParcelRules, nextFarmLevel, parseParcelRules } from '../../src/parcels/rules.js';
@@ -43,7 +43,7 @@ describe('dynamic_farm.json', () => {
     // (more wells come with farm levels, SEN-C-152).
     expect(rules.buildings.cottage).toEqual({ model: 'cottage', blueprint: 'blueprint_cottage', width: 3, depth: 3, max: 1 });
     expect(rules.buildings.well).toEqual({ model: 'well', blueprint: 'blueprint_well', width: 1, depth: 1, max: 1 });
-    expect(Object.keys(rules.buildings)).toEqual(['cottage', 'coop', 'barn', 'well']); // C-181: the 8×6 barn (its own describe)
+    expect(Object.keys(rules.buildings)).toEqual(['cottage', 'coop', 'barn', 'well']); // C-181: the barn (its own describe; C-202: 11×6 less a 2×2)
     // C-151 (owner SEN-C-137#6, #15): a pail holds 3 waterings, filled at a well; every farm gets one well blueprint and one pail, once.
     expect(rules.watering).toEqual({ well: 'well', pail: 'pail', pail_uses: 3 });
     expect(rules.grants).toEqual({ watering: { blueprint_well: 1, pail: 1 } });
@@ -813,7 +813,8 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
 
   it('ships the owner\'s numbers (SEN-Q-282): 600 coins from farm level 2, 20 Timber + 10 Stone, 2 cows, 2 carrots give a milk in 15 min, 2 on the ground, 45 coins', () => {
     const { livestock, ...barn } = rules.buildings.barn;
-    expect(barn).toEqual({ model: 'cow_barn', blueprint: 'blueprint_barn', width: 8, depth: 6, max: 1, materials: { wood: 20, stone: 10 } });
+    // C-202: SEN-C-179's yard, 11×6 less its rear-left 2×2 (owner SEN-Q-300).
+    expect(barn).toEqual({ model: 'cow_barn', blueprint: 'blueprint_barn', width: 11, depth: 6, cutouts: [[0, 0, 2, 2]], max: 1, materials: { wood: 20, stone: 10 } });
     expect(livestock).toMatchObject({ animals: ['cow', 'cow'], feed: 'crop_carrot', feed_amount: 2, product: 'milk', amount: 1,
       produce_seconds: 900, max_ground: 2 });
     expect(livestock!.spots.length).toBeGreaterThanOrEqual(livestock!.max_ground);
@@ -839,6 +840,15 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
       barn: { ...rules.buildings.barn, livestock: { ...rules.buildings.barn.livestock!, feed_amount } } } });
     expect(portion(2)).not.toThrow();
     for (const bad of [0, 100, 1.5, '2']) expect(portion(bad)).toThrow();
+    // C-202: cutouts are whole-cell rects inside the footprint that leave some of it; no milk spot inside one.
+    const cut = (cutouts: unknown) => () => parseParcelRules({ ...rules, buildings: { ...rules.buildings, barn: { ...rules.buildings.barn, cutouts } } });
+    expect(cut([[0, 0, 2, 2]])).not.toThrow();
+    expect(cut([])).not.toThrow();
+    expect(cut([[9, 4, 2, 2], [0, 0, 1, 6]])).not.toThrow();
+    for (const bad of [[[0, 0, 0, 2]], [[10, 0, 2, 1]], [[0, 5, 1, 2]], [[-1, 0, 1, 1]], [[0, 0, 1.5, 1]], [[0, 0, 11, 6]], [[0, 0, 2]], {}, '0,0,2,2',
+      Array.from({ length: 9 }, () => [0, 0, 1, 1])]) expect(cut(bad)).toThrow();
+    expect(() => parseParcelRules({ ...rules, buildings: { ...rules.buildings, barn: { ...rules.buildings.barn,
+      livestock: { ...rules.buildings.barn.livestock!, spots: [[1, 1], ...rules.buildings.barn.livestock!.spots] } } } })).toThrow(/spots/);
   });
 
   it('buying the blueprint takes 600 coins once, from farm level 2, with no sale needed; short of coins or below level 2 nothing changes', () => {
@@ -878,14 +888,18 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
     expect(built.coins).toBe(50);
   });
 
-  it('places the 8×6 barn in any of four turns with its two cows, off other buildings, tilled cells and crops', () => {
+  it('places the 11×6 barn less its rear-left 2×2 in any of four turns with its two cows, off other buildings, tilled cells and crops', () => {
     for (const rotation of [0, 1, 2, 3]) {
       const s = withBarn(rotation);
-      expect(s.buildings).toEqual([{ id: 1, type: 'barn', model: 'cow_barn', x: 20, y: 20, width: 8, depth: 6, rotation, built_at: T0, animals: ['cow', 'cow'] }]);
-      // Turned a quarter it is 6 wide and 8 deep.
-      const [inside, outside] = rotation % 2 ? ['25,27', '26,20'] : ['27,25', '20,26'];
+      expect(s.buildings).toEqual([{ id: 1, type: 'barn', model: 'cow_barn', x: 20, y: 20, width: 11, depth: 6, rotation, built_at: T0,
+        animals: ['cow', 'cow'], cutouts: [[0, 0, 2, 2]] }]);
+      // Turned a quarter it is 6 wide and 11 deep; the cutout turns with it (unturned the entry row is the lowest y, so
+      // the rear-left corner is the lowest x, highest y).
+      const [inside, outside] = rotation % 2 ? ['23,30', '26,20'] : ['30,25', '31,20'];
+      const corner = ['20,25', '20,20', '30,20', '25,30'][rotation];
       expect(tryIt(s, [{ type: 'till', cell: inside }])).toMatchObject({ ok: false, code: 'CELL_OCCUPIED' });
       expect(tryIt(s, [{ type: 'till', cell: outside }]).ok).toBe(true);
+      expect(tryIt(s, [{ type: 'till', cell: corner }]).ok).toBe(true);
     }
     const s = run(rich(), [buy, { type: 'place_house', x: 10, y: 10 }, { type: 'till', cell: '40,40' }, { type: 'sow', cell: '40,40', crop: 'crop_carrot' }]);
     const frozen = structuredClone(s);
@@ -944,6 +958,9 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
     const again = run(one, [feed()], T0 + LAY);
     expect(again.drops.map(d => [d.id, d.animal])).toEqual([[2, 1], [3, 0]]);
     expect(tryIt(again, [feed()], T0 + LAY)).toMatchObject({ ok: false, code: 'GROUND_FULL' });
+    // C-186#8: with the ground full and no carrots in hand the refusal is the ground, not the feed (pick up first).
+    const empty = { ...s, bag: { ...s.bag, crop_carrot: 0 } };
+    expect(tryIt(empty, [feed()], T0 + 3 * LAY)).toEqual({ ok: false, index: 0, code: 'GROUND_FULL', detail: { max: 2 } });
   });
 
   it('an older save (coop, eggs, claimed coop blueprint) reads and plays as before; Scott sells it the barn blueprint once at level 2', () => {
@@ -971,6 +988,68 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
     expect(moved.drops).toEqual([]);
     expect(moved.bag).toMatchObject({ milk: 1, crop_carrot: 4, blueprint_barn: 1, wood: 4, stone: 4 });
     expect(moved.blueprints_claimed.barn).toBe(T0);
+  });
+});
+
+/**
+ * C-209：SEN-C-192 时期盖下的 8×6 牛棚（存档里没有 cutouts）读档时拆掉，蓝图、材料和它的奶（下没下都算）进背包，按新占地重新摆。
+ * 旧存档用当时的规则（8×6、没有缺口）真的盖、真的喂出来。
+ */
+describe('an old 8×6 barn from before its cutout is taken down and given back (C-209)', () => {
+  const { cutouts: _cutouts, ...barn } = rules.buildings.barn;
+  const c192 = { ...rules, buildings: { ...rules.buildings, barn: { ...barn, width: 8 } } };
+  const LAY = 900_000;
+  /** C-192 的规则下：小屋、井、8×6 牛棚（id 3），喂过两次，一份奶已经下了、一份还没下；背包里剩 4 木材、4 石头、2 根胡萝卜。 */
+  const old = (): ParcelFarmState => {
+    const s = grant(rules, welcomed(), T0)!.state;
+    s.coins = 650;
+    s.level = 2;
+    s.bag = { ...s.bag, wood: 24, stone: 14, crop_carrot: 6 };
+    const built = applyFarmCommands(c192, s, [{ type: 'place_house', x: 2, y: 2 }, { type: 'place_building', building: 'well', ...WELL_AT, rotation: 0 },
+      { type: 'claim_blueprint', blueprint: 'barn' }, { type: 'place_building', building: 'barn', x: 20, y: 20, rotation: 0 }, { type: 'feed', building: 3 }], T0);
+    if (!built.ok) throw new Error(built.code);
+    const fed = applyFarmCommands(c192, built.state, [{ type: 'feed', building: 3 }], T0 + LAY);
+    if (!fed.ok) throw new Error(fed.code);
+    expect(fed.state.buildings[2]).toMatchObject({ type: 'barn', width: 8, depth: 6 });
+    expect(fed.state.buildings[2].cutouts).toBeUndefined();
+    return fed.state;
+  };
+
+  it('takes the barn down: its blueprint, 20 Timber and 10 Stone back, both milks (laid or not) in the bag; the rest stays', () => {
+    const saved = old();
+    const frozen = structuredClone(saved);
+    const s = withEconomy(saved);
+    expect(retireDraftBuildings(rules, s)).toBe(true);
+    expect(s.buildings.map(b => b.type)).toEqual(['cottage', 'well']);
+    expect(s.house).toEqual(frozen.house);
+    expect(s.drops).toEqual([]);
+    expect(s.drop_seq).toBe(2);
+    expect(s.bag).toEqual({ ...frozen.bag, blueprint_barn: 1, wood: 24, stone: 14, milk: 2 });
+    expect({ ...s, buildings: frozen.buildings, drops: frozen.drops, bag: frozen.bag }).toEqual(withEconomy(frozen));
+    expect(saved).toEqual(frozen);
+    // Once only: the save as written back has nothing more to take down.
+    expect(retireDraftBuildings(rules, s)).toBe(false);
+  });
+
+  it('every command batch sees it gone first: the 11×6 goes down where it stood and its cows eat; the old milk is not on the ground', () => {
+    const s = run(old(), [{ type: 'place_building', building: 'barn', x: 20, y: 20, rotation: 1 }, { type: 'feed', building: 3 }], T0 + LAY);
+    expect(s.buildings[2]).toMatchObject({ id: 3, type: 'barn', width: 11, depth: 6, rotation: 1, cutouts: [[0, 0, 2, 2]], animals: ['cow', 'cow'] });
+    expect(s.drops).toEqual([expect.objectContaining({ id: 3, building: 3, animal: 0 })]);
+    expect(s.bag).toMatchObject({ wood: 4, stone: 4, milk: 2 });
+    expect(s.bag.crop_carrot).toBeUndefined();
+    expect(applyFarmCommands(rules, old(), [{ type: 'pick_up', drop: 1 }], T0 + LAY)).toEqual({ ok: false, index: 0, code: 'NO_DROP', detail: { drop: 1 } });
+  });
+
+  it('leaves alone a barn placed with its cutout, every other type, and everything under rules without cutouts', () => {
+    const s = withEconomy(old());
+    const kept = structuredClone(s);
+    expect(retireDraftBuildings(c192, s)).toBe(false);
+    expect(s).toEqual(kept);
+    expect(retireDraftBuildings(rules, s)).toBe(true);
+    const placed = run(s, [{ type: 'place_building', building: 'barn', x: 20, y: 20, rotation: 0 }]);
+    const again = structuredClone(placed);
+    expect(retireDraftBuildings(rules, placed)).toBe(false);
+    expect(placed).toEqual(again);
   });
 });
 

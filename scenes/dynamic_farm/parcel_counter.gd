@@ -8,6 +8,9 @@ extends UiDrawer
 ## C-149: a shelf over the divider, as the P0 counter's Buy page (FARM-6 / NPC-2): one UiShopRow per `buy_prices` item
 ## (`Bag ×3`, `9 coins`, stepper + Buy, or the grey `Need 4 more coins`; copy as PM finalised it on C-149#10).
 ## Buttons only report (`sell_requested`, `buy_requested`); the town sends the command.
+## C-186 (C-185 §3.3 D–E, MS-15 / MS-02): a sale floats `+N` over its key and up to three coins fly to the Coins row, which
+## bumps and rolls as the first lands; a purchase rolls the coins down (they flash, nothing pops); a tap on a grey
+## `Need N more coins` shakes the key and flashes the Coins number `action/danger` (no toast: the key already says it).
 
 signal sell_requested(item_id: String, count: int)
 signal buy_requested(item_id: String, count: int)
@@ -32,6 +35,10 @@ var coins: UiFactRow
 var _empty: Label
 var _rows := {}   # item id -> UiShopRow
 var _qty := {}    # item id -> stepper count
+## Where the last Sell / Sell All key was (global), for the coins that fly from it (C-186 MS-15).
+var sell_point := Vector2.INF
+## A sale's coins are on their way: refresh() leaves the number for the roll.
+var _rolling := false
 
 ## npc: {name, role, title, look}; prices: item id → coins each (sold here); buy_prices_: item id → coins each (bought).
 func _init(farm_: Dictionary, prices_: Dictionary, npc: Dictionary, portrait: Texture2D, buy_prices_ := {}) -> void:
@@ -70,7 +77,9 @@ func _init(farm_: Dictionary, prices_: Dictionary, npc: Dictionary, portrait: Te
 	_gap(_SMALL)
 	sheet = UiInfoSheet.new()
 	sheet.rules = func(id: String, _c: StringName, _o: Dictionary) -> Dictionary: return spec(id)
-	sheet.action_requested.connect(func(_a: StringName, id: String, p: Dictionary): sell_requested.emit(id, int(p.get("count", 1))))
+	sheet.action_requested.connect(func(a: StringName, id: String, p: Dictionary):
+		sell_point = _key_point(a)
+		sell_requested.emit(id, int(p.get("count", 1))))
 	sheet.visible = false
 	body.add_child(sheet)
 	_gap(_SMALL)
@@ -94,7 +103,10 @@ func sellable() -> Array:
 ## New farm from the store: coins, the grid and the open card follow it; the selection stays while it can be sold.
 func refresh(farm_: Dictionary) -> void:
 	farm = farm_
+	# The row's value is always the farm's; a count still running (coins in flight, a roll) keeps its number drawn.
+	var drawn := coins_label().text
 	coins.value = str(int(farm.get("coins", 0)))
+	if _rolling or UiMotion.rolling(coins_label()): coins_label().text = drawn
 	var items := sellable().map(func(id): return {id = id, icon = ParcelItems.icon_of(id),
 		qty = int(farm.bag[id]), rarity = 0, kind = "", tab = &""})
 	grid.capacity = maxi(_COLUMNS, ceili(items.size() / float(_COLUMNS)) * _COLUMNS)
@@ -106,6 +118,43 @@ func refresh(farm_: Dictionary) -> void:
 		else:
 			sheet.close()
 			grid.clear_selection()
+
+## The Coins row's number (rolls, flashes) and its icon (the coins' landing).
+func coins_label() -> Label: return coins._value
+func coins_icon() -> Control: return coins._icon
+
+## The sheet key `action` (&"sell" / &"sell_all") on screen, else the sheet's middle, else INF.
+func _key_point(action: StringName) -> Vector2:
+	var want := "Sell" if action == &"sell" else "Sell All"
+	for b in sheet.find_children("*", "UiCommandButton", true, false):
+		var key := b as UiCommandButton
+		if key.is_visible_in_tree() and (key.label == want or (action == &"sell_all" and key.label.begins_with(want))):
+			return key.get_global_rect().get_center()
+	return sheet.get_global_rect().get_center() if sheet.is_visible_in_tree() else Vector2.INF
+
+## MS-15: `+N` rises over the key, coins fly to the Coins row; as the first lands its icon bumps and the number rolls
+## from `before` to `after` (400). Reduced: only the number (set at once).
+func celebrate_sale(before: int, after: int) -> void:
+	var gain := after - before
+	var at := sell_point if sell_point != Vector2.INF else coins.get_global_rect().get_center()
+	var host := get_parent() as Control
+	if gain > 0 and host != null and is_inside_tree():
+		var f := UiGainFloat.new("+%d" % gain, UiGainFloat.Tone.COINS, UiArt.COIN)
+		f.name = "SaleFloat"
+		f.theme = UiKit.theme()
+		host.add_child(f)
+		f.play(at - host.global_position - Vector2(0, UiTokens.SPACE_S5))
+	_rolling = true
+	coins.value = str(after)
+	coins_label().text = str(before)   # the row's value is the new sum; its number counts up to it as the coins land
+	fly_coins(gain, at, coins_icon(), func():
+		_rolling = false
+		UiMotion.roll(coins_label(), float(before), float(int(farm.get("coins", after))), "%d", coins_icon()))
+
+## A purchase: the coins roll down to what is left (MS-03: they flash, nothing pops).
+func roll_coins(before: int) -> void:
+	_rolling = false
+	UiMotion.roll(coins_label(), float(before), float(int(farm.get("coins", 0))))
 
 func select(id: String) -> void:
 	sheet.open(id, &"counter_sell")
@@ -149,7 +198,15 @@ func _show_row(id: String) -> void:
 	var qty := clampi(int(_qty.get(id, 1)), 1, top)
 	_qty[id] = qty
 	# The row's new stepper takes its old count, capped at `top` (the wallet shrank under it): the same as qty here.
-	(_rows[id] as UiShopRow).show_spec(buy_spec(id, qty), false, top)
+	var row := _rows[id] as UiShopRow
+	row.show_spec(buy_spec(id, qty), false, top)
+	if row.buy != null and row.buy.is_unavailable():
+		row.buy.unavailable_pressed.connect(func(_r: String): refuse(row.buy))
+
+## MS-02: the grey key shakes and the Coins number flashes `action/danger` (120); the key's own text says why.
+func refuse(key: Control) -> void:
+	UiMotion.shake(key)
+	UiMotion.flash(coins_label(), UiTokens.COLOR_ACTION_DANGER)
 
 func _gap(h: float) -> void:
 	var c := Control.new()

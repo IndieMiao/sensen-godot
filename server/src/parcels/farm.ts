@@ -49,11 +49,14 @@
  *
  * 种子兜底（C-197，见 seed_aid.ts）：没钱、没种子、没作物时，在 Jasmine 那里 claim_seed_aid，每个玩家日送一次种子；
  * seed_aid_day 记最近一次送的玩家日，也是 v1 上追加的字段：旧存档没有时按没送过读。换数据集不动它。
+ *
+ * 旧牛棚（C-209）：C-202 之前盖的 8×6 牛棚（存档里没有 cutouts）读档时拆掉，蓝图、材料和它的奶退进背包，玩家按新占地重新摆
+ * （见 retireDraftBuildings）。不加字段，版本号不变。
  */
 import { dayKey, energyCost, maxEnergy, nextRollover, nextTickIn, settleEnergy, spendEnergy, type EnergyState } from './energy.js';
 import { boardOf, emptyBoard, requestCommand, settleBoard, type BoardState } from './requests.js';
 import { claimSeedAid } from './seed_aid.js';
-import { buildingMax, gatherSourceOf, HOME_BUILDING, MAX_BUILDINGS, nextFarmLevel, type ParcelRules } from './rules.js';
+import { buildingMax, gatherSourceOf, HOME_BUILDING, MAX_BUILDINGS, nextFarmLevel, ownCells, type Cutout, type ParcelRules } from './rules.js';
 
 export const FARM_STATE_VERSION = 1;
 /** 格坐标上限与每类格数上限；地块总格数不超过 8192（客户端 parcel_metadata）。 */
@@ -81,6 +84,8 @@ export interface BuildingState extends HouseState {
   id: number; type: string;
   /** C-154：养殖建筑放下时的动物（规则 livestock.animals 的副本，以后改配置不影响已建的）；普通建筑没有。 */
   animals?: string[];
+  /** C-202：放下时规则里的缺口（cutouts 的副本，以后改配置不影响已建的）；这些格不算它的占地。规则没写缺口的建筑没有。 */
+  cutouts?: Cutout[];
 }
 /**
  * 地上的一个掉落物（C-154）：id 在本块地永不复用；item × amount 是捡到什么；building / animal / spot 是哪栋建筑里哪只动物
@@ -295,6 +300,29 @@ export function rebaseFarm(rules: ParcelRules, state: ParcelFarmState, now: numb
   return s;
 }
 
+/**
+ * C-209：C-202 之前盖下的建筑，规则里这一类现在写了缺口、它自己没有（SEN-C-192 时期 8×6 的牛棚），按现在的规则会画成新模型、
+ * 伸到旁边的地和建筑上。读档时拆掉它，东西退给玩家，玩家按新占地重新摆：退一张它的蓝图和盖它要的材料（按现在的规则，重新盖正好够）；
+ * 它的动物跟着拆掉，重新盖时照规则带上；它地上的掉落物不论下没下都按产物进背包，喂过的不白喂。掉落物编号不回退。
+ * 读档、命令、进入都先过一遍（结果不随时间变，读出来的就是写回去的）；就地修改 s（withEconomy 之后的副本），拆了返回 true。
+ */
+export function retireDraftBuildings(rules: ParcelRules, s: ParcelFarmState): boolean {
+  const draft = (b: BuildingState): boolean => Object.hasOwn(rules.buildings, b.type) && Boolean(rules.buildings[b.type].cutouts?.length)
+    && !b.cutouts?.length;
+  const gone = s.buildings.filter(draft);
+  if (!gone.length) return false;
+  for (const b of gone) {
+    const rule = rules.buildings[b.type];
+    for (const [item, n] of Object.entries({ [rule.blueprint]: 1, ...rule.materials })) s.bag[item] = (s.bag[item] ?? 0) + n;
+    for (const d of s.drops.filter(x => x.building === b.id)) s.bag[d.item] = (s.bag[d.item] ?? 0) + d.amount;
+  }
+  const ids = new Set(gone.map(b => b.id));
+  s.drops = s.drops.filter(d => !ids.has(d.building));
+  s.buildings = s.buildings.filter(b => !ids.has(b.id));
+  s.house = homeOf(s.buildings);
+  return true;
+}
+
 const coord = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 0 && (v as number) < MAX_COORD;
 
 /** "x,y" 的规范写法（无前导零、无空格）才收，避免同一格两种写法各占一行。 */
@@ -391,30 +419,35 @@ export function parseObjectId(v: unknown): OuterObjectId | null {
 }
 export const objectId = (o: OuterObjectId): string => `${o.parcel_id}:${o.recipe_version}:${o.model}:${o.cell}:${o.ordinal}`;
 
-interface Rect { x0: number; y0: number; x1: number; y1: number }
-/** 建筑占的格子范围（含两端）；转 90°/270° 时宽深互换。 */
-function footprint(h: { x: number; y: number; width: number; depth: number; rotation: number }): Rect {
+type Placed = { x: number; y: number; width: number; depth: number; rotation: number; cutouts?: Cutout[] };
+/** 建筑占地的外框右下角（含）；转 90°/270° 时宽深互换。 */
+function farCorner(h: Placed): [number, number] {
   const [w, d] = h.rotation % 2 ? [h.depth, h.width] : [h.width, h.depth];
-  return { x0: h.x, y0: h.y, x1: h.x + w - 1, y1: h.y + d - 1 };
+  return [h.x + w - 1, h.y + d - 1];
 }
 
-const inRect = (f: Rect, x: number, y: number): boolean => x >= f.x0 && x <= f.x1 && y >= f.y0 && y <= f.y1;
+/**
+ * 建筑占的格，"x,y"：外框里去掉缺口（C-202）。自身坐标 [cx, cz]（原点在后左角，z 向入口）转到格子上：
+ * 不转时入口一排是格 y 最小的一排（客户端 farm_building.gd 的 apron 同一转法）。
+ */
+function footprint(h: Placed): string[] {
+  const { width: w, depth: d } = h;
+  return ownCells(w, d, h.cutouts).map(([cx, cz]) => {
+    const [dx, dy] = [[cx, d - 1 - cz], [cz, cx], [w - 1 - cx, cz], [d - 1 - cz, w - 1 - cx]][h.rotation % 4];
+    return `${h.x + dx},${h.y + dy}`;
+  });
+}
+
+/** 所有建筑占的格。 */
+const buildingCells = (s: ParcelFarmState): Set<string> => new Set(s.buildings.flatMap(footprint));
 
 /** 格子在哪栋建筑下面。 */
-const underBuilding = (s: ParcelFarmState, cell: string): boolean => {
-  const [x, y] = parseCell(cell)!;
-  return s.buildings.some(b => inRect(footprint(b), x, y));
-};
+const underBuilding = (s: ParcelFarmState, cell: string): boolean => buildingCells(s).has(cell);
 
-/** 占地 f 里已被其它建筑占的格，"x,y" 按字符串排序。 */
-function overlapped(s: ParcelFarmState, f: Rect): string[] {
-  const out: string[] = [];
-  for (const b of s.buildings) {
-    const o = footprint(b);
-    for (let y = Math.max(f.y0, o.y0); y <= Math.min(f.y1, o.y1); y++)
-      for (let x = Math.max(f.x0, o.x0); x <= Math.min(f.x1, o.x1); x++) out.push(`${x},${y}`);
-  }
-  return [...new Set(out)].sort();
+/** 格子 cells 里已被其它建筑占的，"x,y" 按字符串排序。 */
+function overlapped(s: ParcelFarmState, cells: string[]): string[] {
+  const under = buildingCells(s);
+  return cells.filter(cell => under.has(cell)).sort();
 }
 
 /**
@@ -425,6 +458,7 @@ function overlapped(s: ParcelFarmState, f: Rect): string[] {
  */
 export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, commands: FarmCommand[], now: number, ctx?: FarmContext): FarmOutcome {
   const s = withEconomy(state);
+  retireDraftBuildings(rules, s);
   const eco = rules.economy;
   settleEnergy(rules, s, now);
   settleBoard(rules, s, now);
@@ -459,14 +493,14 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         const building: BuildingState = { id, type, model: rule.model, x: c.x, y: c.y, width: rule.width, depth: rule.depth,
           rotation: c.rotation ?? 0, built_at: now };
         if (rule.livestock) building.animals = [...rule.livestock.animals];
+        if (rule.cutouts?.length) building.cutouts = rule.cutouts.map(r => [...r] as Cutout);
+        const [x1, y1] = farCorner(building);
+        if (x1 >= MAX_COORD || y1 >= MAX_COORD) return fail('OUT_OF_BOUNDS');
         const f = footprint(building);
-        if (f.x1 >= MAX_COORD || f.y1 >= MAX_COORD) return fail('OUT_OF_BOUNDS');
         const overlap = overlapped(s, f);
         if (overlap.length) return fail('BUILDING_OVERLAP', { cells: overlap });
-        const covered = [...s.tilled, ...Object.keys(s.crops)].filter(cell => {
-          const [x, y] = parseCell(cell)!;
-          return inRect(f, x, y);
-        });
+        const mine = new Set(f);
+        const covered = [...s.tilled, ...Object.keys(s.crops)].filter(cell => mine.has(cell));
         if (covered.length) return fail('CELL_OCCUPIED', { cells: [...new Set(covered)].sort() });
         take(s.bag, rule.blueprint, 1);
         for (const [item, need] of Object.entries(rule.materials ?? {})) take(s.bag, item, need);
@@ -614,10 +648,11 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         const rule = Object.hasOwn(rules.buildings, b.type) ? rules.buildings[b.type].livestock : undefined;
         if (!rule || !b.animals?.length) return fail('NOT_LIVESTOCK', { building: c.building });
         // C-181：喂一次 feed_amount 个（牛 2 根胡萝卜，鸡 1 根）。
+        // C-186（C-186#8）：先查地上满没满，再查饲料——地上满了，手里有没有胡萝卜都喂不了，先提示捡。客户端 feed_refusal 同序。
         const portion = rule.feed_amount ?? 1;
-        if ((s.bag[rule.feed] ?? 0) < portion) return fail('NO_FEED', { item: rule.feed });
         const mine = s.drops.filter(d => d.building === b.id);
         if (mine.length >= rule.max_ground) return fail('GROUND_FULL', { max: rule.max_ground });
+        if ((s.bag[rule.feed] ?? 0) < portion) return fail('NO_FEED', { item: rule.feed });
         const waiting = new Set(mine.filter(d => d.ready_at > now).map(d => d.animal));
         const animal = b.animals.findIndex((_, i) => !waiting.has(i));
         if (animal < 0) return fail('ANIMALS_FED', { next_at: Math.min(...mine.filter(d => d.ready_at > now).map(d => d.ready_at)) });

@@ -57,7 +57,8 @@ const withCoop = (s: ParcelFarmState): ParcelFarmState =>
   ({ ...structuredClone(s), buildings: [...s.buildings, { id: 2, type: 'coop', model: 'chicken_yard', x: 10, y: 10, width: 7, depth: 5, rotation: 0, built_at: T0, animals: ['hen_white'] }] });
 /** 盖好的牛棚（建筑 3），出牛奶单要它（C-192）。 */
 const withBarn = (s: ParcelFarmState): ParcelFarmState =>
-  ({ ...structuredClone(s), buildings: [...s.buildings, { id: 3, type: 'barn', model: 'cow_barn', x: 20, y: 10, width: 8, depth: 6, rotation: 0, built_at: T0, animals: ['cow', 'cow'] }] });
+  ({ ...structuredClone(s), buildings: [...s.buildings, { id: 3, type: 'barn', model: 'cow_barn', x: 20, y: 10, width: 11, depth: 6, rotation: 0, built_at: T0, animals: ['cow', 'cow'],
+    cutouts: [[0, 0, 2, 2]] }] });
 
 describe('dynamic_farm.json requests (C-191)', () => {
   it('ships SEN-Q-281: 2 slots, at once / 8 h / 72 h, 6 a day, bonus 100 a day, Jasmine\'s price × count + bonus, count by item', () => {

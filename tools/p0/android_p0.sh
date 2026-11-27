@@ -11,7 +11,11 @@
 # so the export does not drop emulators on a shared adb port.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
-SERIAL="${1:-${SERIAL:-emulator-5570}}"
+# A Cardigan Run's own device when no serial is given (C-212; a SERIAL outside the Run is ignored, C-216),
+# else the local default.
+source tools/android/run_serial.sh
+SERIAL="${1:-$(run_serial SERIAL)}"
+SERIAL="${SERIAL:-emulator-5570}"
 adb() { command adb ${ADB_PORT:+-P "$ADB_PORT"} "$@"; }
 PKG=com.sensen.p0proto
 APK=build/p0-debug.apk

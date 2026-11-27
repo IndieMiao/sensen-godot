@@ -25,24 +25,30 @@ const VERDICT := ["none", "path", "reach", "ok"]
 
 ## A plain W×D shape with one walkable cell outside its front middle (the sheep pen's size is not set yet).
 static func plain(base: Vector2i) -> Dictionary:
-	return {"base": base, "type": "", "keep": [{"cell": Vector2i(base.x / 2, base.y), "walk": true}]}
+	return {"base": base, "type": "", "keep": [{"cell": Vector2i(base.x / 2, base.y), "walk": true}], "cutouts": []}
 
 ## The coop with its real art (7×5 and its kept cells, from the art file).
 static func coop() -> Dictionary:
-	return {"base": Building.base_of(ParcelFarm.rules().buildings.coop), "type": "coop", "keep": []}
+	return {"base": Building.base_of(ParcelFarm.rules().buildings.coop), "type": "coop", "keep": [], "cutouts": []}
 
-## The barn as C-192's draft art: 8×6, the cell outside its entry (f000a009).
+## The barn with its real art (C-202, SEN-C-179's final yard: 11×6 less the rear-left 2×2, the two cells outside its
+## gate, from the rules and the art file).
 static func barn() -> Dictionary:
-	return {"base": Vector2i(8, 6), "type": "", "keep": [{"cell": Vector2i(3, 6), "walk": true}]}
+	var rule: Dictionary = ParcelFarm.rules().buildings.barn
+	return {"base": Building.base_of(rule), "type": "barn", "keep": [], "cutouts": Building.cutouts_of(rule)}
+
+## C-192's draft barn: 8×6, the cell outside its entry (f000a009), for comparison with earlier statistics.
+static func draft_barn() -> Dictionary:
+	return {"base": Vector2i(8, 6), "type": "", "keep": [{"cell": Vector2i(3, 6), "walk": true}], "cutouts": []}
 
 ## The cottage, 3×3, keeping nothing past its footprint.
 static func cottage() -> Dictionary:
-	return {"base": Building.base_of(ParcelFarm.rules().buildings.cottage), "type": "", "keep": []}
+	return {"base": Building.base_of(ParcelFarm.rules().buildings.cottage), "type": "", "keep": [], "cutouts": []}
 
 ## The statistic's shapes: name → {base, keep: [{cell, walk}] in the unturned frame (cells outside the footprint),
-## type: real art type or ""}.
+## type: real art type or "", cutouts: the footprint's rects that are not its own (C-202)}.
 static func shapes() -> Dictionary:
-	var out := {"coop": coop(), "barn_8x6": barn()}
+	var out := {"coop": coop(), "barn": barn(), "barn_8x6": draft_barn()}
 	for s: Vector2i in [Vector2i(5, 3), Vector2i(6, 4), Vector2i(7, 5), Vector2i(8, 6), Vector2i(9, 7), Vector2i(10, 8)]:
 		out["plain_%dx%d" % [s.x, s.y]] = plain(s)
 	return out
@@ -71,13 +77,8 @@ static func yard(raw: Variant) -> Dictionary:
 static func kept(s: Dictionary, at: Vector2i, rotation: int) -> Dictionary:
 	if s.type != "": return Building.apron(s.type, at, s.base, rotation)
 	var out := {"walk": [] as Array[Vector2i], "art": [] as Array[Vector2i]}
-	var base: Vector2i = s.base
-	var size := Building.size(base, rotation)
 	for k: Dictionary in s.keep:
-		var x: int = 2 * k.cell.x + 1 - base.x
-		var z: int = 2 * k.cell.y + 1 - base.y
-		var grid: Vector2i = [Vector2i(x, -z), Vector2i(z, x), Vector2i(-x, z), Vector2i(-z, -x)][posmod(rotation, 4)]
-		out["walk" if k.walk else "art"].append(Vector2i(floori((2 * at.x + size.x + grid.x) / 2.0), floori((2 * at.y + size.y + grid.y) / 2.0)))
+		out["walk" if k.walk else "art"].append(at + ParcelFarm.own_to_grid(k.cell, s.base, rotation))
 	return out
 
 ## The shape's kept cells in the unturned frame, for reports.
@@ -87,7 +88,7 @@ static func kept_view(s: Dictionary) -> Array:
 
 ## NONE core fails, PATH core ok but on the path, REACH path ok but cuts a walk cell off spawn, OK the spot passes.
 static func level(data: Dictionary, s: Dictionary, at: Vector2i, rotation: int, taken: Dictionary, path: Dictionary, walk_blocked: Dictionary) -> int:
-	var footprint := Building.cells(at, s.base, rotation)
+	var footprint := Building.cells(at, s.base, rotation, s.get("cutouts", []))
 	var k := kept(s, at, rotation)
 	var all_kept: Array[Vector2i] = []
 	all_kept.append_array(k.walk)
@@ -132,7 +133,7 @@ static func together(y: Dictionary, order: Array) -> int:
 		if b.level != OK: break
 		placed += 1
 		var k := kept(s, b.at, b.rotation)
-		for cell in Building.cells(b.at, s.base, b.rotation):
+		for cell in Building.cells(b.at, s.base, b.rotation, s.get("cutouts", [])):
 			taken[cell] = true
 			walk_blocked[cell] = true
 		for cell in k.walk + k.art: taken[cell] = true

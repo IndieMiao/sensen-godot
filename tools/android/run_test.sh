@@ -3,14 +3,18 @@ set -euo pipefail
 
 usage() {
     printf '%s\n' \
-        'Usage: tools/android/run_test.sh [--serial SERIAL] [--clean-all] [--wait SECONDS] PACKAGE [-- COMMAND ...]' \
+        'Usage: tools/android/run_test.sh [--serial SERIAL | --device] [--clean-all] [--wait SECONDS] PACKAGE [-- COMMAND ...]' \
         'Runs an installed com.sensen.* app; stops it before launch and on exit.' \
+        '--device selects the physical device in CARDIGAN_DEVICE_SERIAL.' \
         'Without COMMAND or --wait, press Enter to finish a manual test.' \
         '--clean-all alone stops all com.sensen.* apps on the selected device.'
 }
 
 adb_bin="${ADB:-adb}"
-serial="${JOURNEY_SERIAL:-${DEV:-emulator-5560}}"
+source "$(dirname "${BASH_SOURCE[0]}")/run_serial.sh"
+# Explicit choice first, then the device the host gave this Run (C-212, C-216), then the local default.
+serial=$(run_serial JOURNEY_SERIAL DEV)
+serial=${serial:-emulator-5560}
 package=''
 duration=''
 clean_all=false
@@ -22,6 +26,9 @@ while (($#)); do
             (($# >= 2)) || { usage >&2; exit 2; }
             if [[ "$1" == --serial ]]; then serial="$2"; else duration="$2"; fi
             shift 2 ;;
+        --device)
+            [[ -n "${CARDIGAN_DEVICE_SERIAL:-}" ]] || { printf 'CARDIGAN_DEVICE_SERIAL is not set.\n' >&2; exit 2; }
+            serial="$CARDIGAN_DEVICE_SERIAL"; shift ;;
         --clean-all) clean_all=true; shift ;;
         --) shift; command_args=("$@"); break ;;
         -*) printf 'Unknown option: %s\n' "$1" >&2; exit 2 ;;
@@ -90,7 +97,8 @@ component=$("$adb_bin" -s "$serial" shell cmd package resolve-activity --brief "
 launch=$("$adb_bin" -s "$serial" shell am start -W -n "$component")
 printf '%s\n' "$launch"
 [[ "$launch" == *'Status: ok'* ]] || { printf 'App launch did not succeed.\n' >&2; exit 1; }
-export JOURNEY_SERIAL="$serial" JOURNEY_PACKAGE="$package"
+# ANDROID_SERIAL too, so the scenario's own serial check accepts a --serial outside the Run's devices.
+export JOURNEY_SERIAL="$serial" ANDROID_SERIAL="$serial" JOURNEY_PACKAGE="$package"
 if ((${#command_args[@]})); then
     set -m
     "${command_args[@]}" &
