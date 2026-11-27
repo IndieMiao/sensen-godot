@@ -7,6 +7,10 @@ They are the parcels the dynamic-farm reviews already use: `p-3139010`, `p-31390
 and `p-5402049` (C-18/C-20 review set, `BEFORE_REACHABLE` in test_outer_groves.gd) and
 `p-4591A011*` (edge-decor sample with `sample_caps`, rock/flower probe).
 
+`p-5402049` is r4 only: r8 (the current release) and r6 have no such parcel, so no
+home is entered on it. Its core is a 267×3 strip, too narrow for the coop, the barn or
+the sheep pen; tests keep it that way as a control (C-193), it is not a parcel to fix.
+
 `p-4591A011-star.json` holds block `p-4591A011*`; only the file name drops the `*`.
 The tests read the block ID from the payload, never from the file name.
 

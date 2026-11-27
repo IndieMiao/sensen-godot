@@ -90,6 +90,10 @@ under "Skipped"; run it by hand as its header describes.
 Anything that cannot run is listed under "Skipped" in the job summary, never as passed
 (currently `test_mesh_edges.gd --legacy`, whose old mesh script is not in the repository).
 Locally: `tools/run_tests.sh --ci-import` once, then `tools/ci/dynamic_farm_tests.sh [test_name…]`.
+`test_building_fit.gd` (C-193) does not take the r4 set: it reads the two narrowest r8 starter
+parcels pinned in `fixtures/r8/` and asserts the cleared yard still holds the coop, the barn
+(8×6) and a pen up to 9×7; p-5402049 (r4) is its negative control. The statistic behind it and
+how to rerun it on a new dataset: `docs/plans/C-193.md`.
 
 
 Run prepare_isolated.py with a fresh external target. It copies exact scripts and

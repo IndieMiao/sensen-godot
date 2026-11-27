@@ -6,6 +6,7 @@ import { DEFAULT_CONTENT_DIR } from '../../src/domain/content.js';
 import { applyFarmCommands, emptyFarm, grant, MAX_BATCH, MAX_BUY_COUNT, MAX_COINS, MAX_SELL_COUNT, NEVER, parseCell, parseFarmCommands, rebaseFarm,
   welcome, withEconomy, type FarmCommand, type ParcelFarmState } from '../../src/parcels/farm.js';
 import { maxEnergy } from '../../src/parcels/energy.js';
+import { emptyBoard } from '../../src/parcels/requests.js';
 import { buildingMax, communityOf, isNewerDataset, loadParcelRules, nextFarmLevel, parseParcelRules } from '../../src/parcels/rules.js';
 
 const rules = loadParcelRules(DEFAULT_CONTENT_DIR);
@@ -227,7 +228,7 @@ describe('parcel economy (C-58)', () => {
     const legacy = { v: 1, house: null, cleared: ['2,2'], tilled: ['1,1'], crops: {}, bag: { hoe_starter: 1, crop_carrot: 1 }, welcomed_at: T0 } as unknown as ParcelFarmState;
     const frozen = structuredClone(legacy);
     expect(withEconomy(legacy)).toEqual({ ...frozen, buildings: [], coins: 0, sales: 0, gathered: {}, blueprints_claimed: {},
-      drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1 });
+      drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1, board: emptyBoard(), requests_done: 0, seed_aid_day: null });
     expect(legacy).toEqual(frozen);
     expect(withEconomy({ ...legacy, coins: 30, sales: 2 } as ParcelFarmState)).toMatchObject({ coins: 30, sales: 2 });
     // And it can sell straight away.
@@ -364,7 +365,8 @@ describe('parcel buy (C-149)', () => {
     expect(bad({ ...eco, buy_prices: { 'Seed Carrot': 9 } })).toThrow();
     expect(bad({ ...eco, buy_prices: [9] })).toThrow();
     const { buy_prices: _, ...without } = eco;
-    const none = parseParcelRules(structuredClone({ ...rules, economy: without }));
+    // C-197：种子兜底用 Jasmine 的种子价判断“没钱”，什么都不卖时也不送。
+    const none = parseParcelRules(structuredClone({ ...rules, economy: without, seed_aid: undefined }));
     expect(none.economy.buy_prices).toEqual({});
     const out = applyFarmCommands(none, with24(), [{ type: 'buy', item: 'seed_carrot', count: 1 }], T0 + 60_000);
     expect(out).toMatchObject({ ok: false, code: 'NOT_FOR_SALE' });
@@ -460,7 +462,7 @@ describe('rebase onto a newer dataset (C-136, Q-168)', () => {
     // A C-31 era save without the economy fields comes out with them.
     const legacy = { v: 1, house: null, cleared: ['1,2'], tilled: [], crops: {}, bag: { hoe_starter: 1 }, welcomed_at: T0 } as unknown as ParcelFarmState;
     expect(rebaseFarm(rules, legacy, T0)).toEqual({ ...legacy, buildings: [], cleared: [], coins: 0, sales: 0, gathered: {}, blueprints_claimed: {},
-      drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1 });
+      drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1, board: emptyBoard(), requests_done: 0, seed_aid_day: null });
   });
 });
 
@@ -746,7 +748,7 @@ describe('coop, feeding and drops (C-154)', () => {
       bag: { blueprint_coop: 1 }, welcomed_at: T0, coins: 12, sales: 1, gathered: {}, blueprints_claimed: { coop: T0 } } as unknown as ParcelFarmState;
     const frozen = structuredClone(old);
     const read = withEconomy(old);
-    expect(read).toEqual({ ...frozen, drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1 });
+    expect(read).toEqual({ ...frozen, drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1, board: emptyBoard(), requests_done: 0, seed_aid_day: null });
     expect(old).toEqual(frozen);
     // Its blueprint builds the coop; Scott does not give a second one.
     expect(run(old, [coopAt(20, 20)]).buildings.map(b => b.type)).toEqual(['cottage', 'coop']);
@@ -963,12 +965,12 @@ describe('farm levels (C-152)', () => {
   };
   const wellAt = (x: number): FarmCommand => ({ type: 'place_building', building: 'well', x, y: 30, rotation: 0 });
 
-  it('ships Lv1 to Lv5: coins as P0 Homestead Lv2–5, Timber and Stone rising; wells 1 / 2 / 3 at Lv1 / 3 / 5; Max Energy 200 + 10 a level', () => {
+  it('ships Lv1 to Lv5: coins 100 / 300 / 600 / 1,000 (Q-282), Timber and Stone rising; wells 1 / 2 / 3 at Lv1 / 3 / 5; Max Energy 200 + 10 a level', () => {
     expect(rules.farm_levels).toEqual([
-      { level: 2, coins: 40, items: { wood: 6, stone: 4 } },
-      { level: 3, coins: 60, items: { wood: 10, stone: 8 }, buildings: { well: 2 }, gift: { blueprint_well: 1 } },
-      { level: 4, coins: 70, items: { wood: 14, stone: 12 } },
-      { level: 5, coins: 80, items: { wood: 20, stone: 16 }, buildings: { well: 3 }, gift: { blueprint_well: 1 } },
+      { level: 2, coins: 100, items: { wood: 6, stone: 4 } },
+      { level: 3, coins: 300, items: { wood: 10, stone: 8 }, buildings: { well: 2 }, gift: { blueprint_well: 1 } },
+      { level: 4, coins: 600, items: { wood: 14, stone: 12 } },
+      { level: 5, coins: 1000, items: { wood: 20, stone: 16 }, buildings: { well: 3 }, gift: { blueprint_well: 1 } },
     ]);
     expect([1, 2, 3, 4, 5].map(l => maxEnergy(rules, at(l)))).toEqual([200, 210, 220, 230, 240]);
     expect([1, 2, 3, 4, 5].map(l => buildingMax(rules, 'well', l))).toEqual([1, 1, 2, 2, 3]);
@@ -986,6 +988,17 @@ describe('farm levels (C-152)', () => {
     expect(rebaseFarm(rules, at(4), T0).level).toBe(4);
   });
 
+  it('Q-282: a farm upgraded at the old prices keeps its level and coins on reading, nothing taken or given back; the next level asks the new price', () => {
+    // Lv3, paid 40 + 60 before; 25 coins left over, saved as JSON.
+    const saved = JSON.parse(JSON.stringify({ ...at(3, { wood: 14, stone: 12 }), coins: 25 })) as ParcelFarmState;
+    const read = withEconomy(saved);
+    expect(read).toMatchObject({ level: 3, coins: 25, bag: { wood: 14, stone: 12 } });
+    expect(rebaseFarm(rules, saved, T0)).toMatchObject({ level: 3, coins: 25 });
+    expect(run(read, [{ type: 'clear_obstacle', cell: '9,9' }])).toMatchObject({ level: 3, coins: 25 });
+    expect(applyFarmCommands(rules, read, [UP], T0)).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH_COINS', detail: { coins: 25, need: 600 } });
+    expect(run({ ...read, coins: 625 }, [UP])).toMatchObject({ level: 4, coins: 25, bag: welcomed().bag });
+  });
+
   it('upgrading takes the next level\'s coins, Timber and Stone, costs no Energy and raises Max Energy by 10', () => {
     const out = applyFarmCommands(rules, enough(1), [UP], T0);
     expect(out.ok).toBe(true);
@@ -997,7 +1010,7 @@ describe('farm levels (C-152)', () => {
     const later = run(out.state, [{ type: 'clear_obstacle', cell: '9,9' }], T0 + 10 * 160_000);
     expect(later.energy).toEqual({ value: 208, at: T0 + 10 * 160_000, rested_on: null });
     // Lv3 and Lv5 put one more well blueprint in the bag; leftover coins and materials stay.
-    const three = run({ ...enough(2), coins: 65, bag: { ...enough(2).bag, wood: 11 } }, [UP]);
+    const three = run({ ...enough(2), coins: 305, bag: { ...enough(2).bag, wood: 11 } }, [UP]);
     expect(three).toMatchObject({ level: 3, coins: 5, bag: { wood: 1, blueprint_well: 1 } });
     expect(run(enough(4), [UP]).bag.blueprint_well).toBe(1);
   });
@@ -1011,8 +1024,13 @@ describe('farm levels (C-152)', () => {
       return out;
     };
     expect(refuse(at(1))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 6 } });
-    expect(refuse(at(1, { wood: 6, stone: 3 }, 40))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH', detail: { item: 'stone', have: 3, need: 4 } });
-    expect(refuse(at(1, next.items, 39))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH_COINS', detail: { coins: 39, need: 40 } });
+    expect(refuse(at(1, { wood: 6, stone: 3 }, 100))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH', detail: { item: 'stone', have: 3, need: 4 } });
+    expect(refuse(at(1, next.items, 99))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH_COINS', detail: { coins: 99, need: 100 } });
+    // The old Lv2–5 prices (40 / 60 / 70 / 80) no longer pay for any level (Q-282).
+    for (const [level, old] of [[1, 40], [2, 60], [3, 70], [4, 80]]) {
+      const need = nextFarmLevel(rules, level)!;
+      expect(refuse(at(level, need.items, old))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH_COINS', detail: { coins: old, need: need.coins } });
+    }
     expect(refuse(at(1, { wood: 5, stone: 4 }, 0))).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH', detail: { item: 'wood', have: 5, need: 6 } });
     // Two upgrades in one batch pay for both; with only Lv2's price the second is refused and the first is undone.
     expect(refuse(enough(1), [UP, UP])).toEqual({ ok: false, index: 1, code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 10 } });

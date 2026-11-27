@@ -299,6 +299,8 @@ func _keep_clear() -> void:
 ## On a real parcel: every coop spot in all four turns keeps its entry and rear row in the core and off solid
 ## obstacles; with the coop standing, every cottage the placement accepts near the entry leaves its floor reachable
 ## from spawn by the real walker.
+## p-5402049 (r4 only, a 267×3 core; not in r8) has no coop spot, so it reports spots=0 and checks nothing more;
+## that is expected (C-193). Whether the current parcels hold the coop is test_building_fit.gd's.
 func _keep_clear_parcel(raw: Dictionary) -> void:
 	var data := Data.decode(raw)
 	if not data.ok: return
@@ -314,6 +316,9 @@ func _keep_clear_parcel(raw: Dictionary) -> void:
 	var taken := Building.blocked({}, {})
 	var walk_blocked: Dictionary = walk.reserved.duplicate()
 	var stones := Building.solid(layout, obstacles)
+	# C-175#53: on the fresh yard (every obstacle standing) the preview starts where clearing makes room for the coop.
+	var start = Building.start_spot(data, data.spawn, base, Building.blocked(obstacles, {}), path, stones.merged(walk.reserved), "coop",
+		obstacles, taken, walk_blocked)
 	var exact := true
 	var spots := 0
 	var reached := true
@@ -353,6 +358,9 @@ func _keep_clear_parcel(raw: Dictionary) -> void:
 		cottages += tried
 	_check(exact, "%s: every coop spot keeps its entry and rear row in the core, off solid obstacles" % data.block_id)
 	_check(reached, "%s: %d cottages beside the coop's entry leave its floor reachable" % [data.block_id, cottages])
+	# (A parcel whose cleared core holds no coop at all has no such spot either.)
+	_check(start != null and Building.reason(data, start.at, base, start.rotation, taken, path, walk_blocked, "coop") == ""
+		if spots > 0 else start == null, "%s: the fresh yard's coop preview starts on a spot clearing makes room on" % data.block_id)
 	print("COOP keep_clear parcel=%s spots=%d cottages=%d" % [data.block_id, spots, cottages])
 
 ## Flood fill on a 0.2 m lattice from spawn: the player reaches `target` (within one step).

@@ -34,6 +34,8 @@ const HOME := ParcelFarm.HOME_BUILDING
 const OUTSIDE := "Outside your yard"
 const TAKEN := "Space taken"
 const PATH := "Keep the path clear"
+## C-175: the spot is refused only for the core obstacles standing on it; it is valid once they are cleared.
+const CLEAR := "Clear the plants and rocks here first"
 const AROUND := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 
 ## The client art of a type: {asset, name, profile} (KINDS), {name, livestock: true} for a type the art file
@@ -132,6 +134,34 @@ static func nearest(data: Dictionary, near: Vector2i, base: Vector2i, taken: Dic
 		return da < db or (da == db and (a.y < b.y or (a.y == b.y and a.x < b.x))))
 	for at in candidates:
 		if reason(data, at, base, rotation, taken, path, walk_blocked, type) == "": return at
+	return null
+
+## Where a placement preview starts (C-175) as {at, rotation}: the valid spot nearest `near`, unturned first, then in
+## the other turns. A fresh yard often has no room for the coop until some of its trees, bushes, rocks and weeds are
+## cleared, so with no valid spot it starts on the one that needs the fewest of them (`obstacles`) cleared, nearest
+## first, judged with them gone (`clear_taken` / `clear_walk_blocked`); null when even a cleared yard has none.
+static func start_spot(data: Dictionary, near: Vector2i, base: Vector2i, taken: Dictionary, path: Dictionary,
+		walk_blocked: Dictionary, type: String, obstacles: Dictionary, clear_taken: Dictionary,
+		clear_walk_blocked: Dictionary) -> Variant:
+	for rotation in 4:
+		var found = nearest(data, near, base, taken, path, walk_blocked, rotation, type)
+		if found != null: return {"at": found, "rotation": rotation}
+	var options: Array = []
+	for rotation in 4:
+		var offset := middle(base, rotation)
+		for cell: Dictionary in data.cells:
+			if cell.zone != "core": continue
+			var at := Vector2i(cell.x, cell.y) - offset
+			var count := 0
+			for c in cells(at, base, rotation):
+				if obstacles.has(c): count += 1
+			for c in apron_cells(type, at, base, rotation):
+				if walk_blocked.has(c): count += 1 # only solid ones (and buildings) refuse the kept-clear cells
+			options.append([count, (at - near + offset).length_squared(), rotation, at])
+	options.sort_custom(func(a: Array, b: Array):
+		return a[0] < b[0] or (a[0] == b[0] and (a[1] < b[1] or (a[1] == b[1] and a[2] < b[2]))))
+	for o: Array in options:
+		if reason(data, o[3], base, o[2], clear_taken, path, clear_walk_blocked, type) == "": return {"at": o[3], "rotation": o[2]}
 	return null
 
 ## C-154 the cells outside the footprint a type keeps clear (FarmLivestock.keep_clear), turned with the building:
