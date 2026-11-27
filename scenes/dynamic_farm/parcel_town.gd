@@ -484,7 +484,7 @@ func show_level_card(level: int, rows: Array, sheet = null) -> void:
 		var side := maxf(m.size.x, m.size.y) * 2.2
 		glow.size = Vector2(side, side)
 		glow.position = m.position + Vector2(m.size.x * 0.5, 0) - glow.size * 0.5
-		glow.modulate.a = 1.0
+		UiMotion.tween(glow, UiTokens.MOTION_EASING_LINEAR).tween_property(glow, ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_FAST_MS))
 	m.play_level_in(scrim)
 
 ## The level-up card leaves (M-05, its scrim fading); `sheet` then shows the next level.

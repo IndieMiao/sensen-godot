@@ -304,7 +304,8 @@ func _level_card_first_frame() -> void:
 		_check(card.position.is_equal_approx(centre) and card.position != Vector2.ZERO, "%s: then the card is centred (%s)" % [tag, card.position])
 		_check(card.modulate.a < 0.5 and scrim.modulate.a < 0.5, "%s: and fades in from there (card %.2f, scrim %.2f)" % [tag, card.modulate.a, scrim.modulate.a])
 		for i in 30: await process_frame
-		_check(is_equal_approx(card.modulate.a, 1.0) and is_equal_approx(scrim.modulate.a, 1.0), "%s: card and scrim end fully in" % tag)
+		_check(is_equal_approx(card.modulate.a, 1.0) and is_equal_approx(scrim.modulate.a, 1.0) and (glow == null or is_equal_approx(glow.modulate.a, 1.0)),
+			"%s: card, scrim and light end fully in" % tag)
 		town.close()
 		await process_frame
 	UiMotion.reduced = false
