@@ -413,6 +413,23 @@ class WorkerAPK(unittest.TestCase):
                 self.assertIn(message, result.stderr)
                 self.assertFalse(out.exists())
 
+    def test_build_script_takes_the_runs_adb_port(self):
+        # C-212: any private port (a Run's own adb slot) is accepted; unset falls back to 5137; 5037 is refused.
+        base = {k: v for k, v in os.environ.items() if k not in ('ANDROID_HOME', 'ANDROID_ADB_SERVER_PORT')}
+        script = ROOT / 'tools/android/build_worker_apk.sh'
+        out = self.tmp / 'candidate'
+        for port, message in [(None, b'shared Android SDK required'), ('5137', b'shared Android SDK required'),
+                              ('5201', b'shared Android SDK required'), ('5037', b'private adb port'),
+                              ('', b'shared Android SDK required'), ('05201', b'private adb port'),
+                              ('70000', b'private adb port'), ('tcp:5201', b'private adb port')]:
+            env = dict(base) if port is None else dict(base, ANDROID_ADB_SERVER_PORT=port)
+            with self.subTest(port=port):
+                result = subprocess.run(['bash', script, '--dynamic-farm', out], cwd=self.tmp, capture_output=True,
+                                        env=env)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(message, result.stderr)
+                self.assertFalse(out.exists())
+
     def test_cli_generates_the_internal_preset(self):
         out = self.tmp / 'internal.cfg'
         subprocess.run(['python3', '-B', ROOT / 'tools/android/worker_apk.py', '--variant', 'dynamic-farm-internal',

@@ -38,6 +38,7 @@ func _run() -> void:
 	await _buy()
 	await _carpenter()
 	await _upgrade()
+	await _level_card_first_frame()
 	await _barn_blueprint()
 	await _sheep_pen_blueprint()
 	await _failures()
@@ -225,8 +226,11 @@ func _carpenter() -> void:
 
 ## C-152: Scott's Upgrade Farm opens the sheet; Upgrade pays the next level, the sheet moves on to the one after, a toast
 ## names the level (and Lv3's well blueprint); short, the key shows the gap and the store refuses; kept after reopening.
+## C-186 (C-185 MS-17): the level-up card replaces the toast — `Farm LvN`, what changes as `from → to`, the level's gift as
+## its strip, `OK` — and the sheet keeps its level until the card closes. Run with reduced motion (no waiting on tweens).
 func _upgrade() -> void:
 	_clean()
+	UiMotion.reduced = true
 	var store := LocalStore.new(PARCEL, DIR)
 	store.now_ms = func() -> int: return T0
 	store._save(ParcelFarm.normalize({"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {"wood": 16, "stone": 12},
@@ -246,12 +250,23 @@ func _upgrade() -> void:
 	_check(asked[0], "Upgrade reports")
 	for i in 3: await process_frame
 	_check(town.farm.level == 2 and town.farm.coins == 300 and town.farm.bag == {"wood": 10, "stone": 8}, "Lv2: 100 coins, 6 Timber, 4 Stone taken")
-	_check(town.toast.current_text() == "Farm Lv2", "the toast names the level")
-	_check(sheet.title.text == "Farm Lv2 → Lv3" and sheet.button.reason == "", "the sheet moves on to Lv3")
+	var card: UiRewardMoment = town.level_card
+	_check(card != null and card.event == "Farm Lv2" and card.primary == "OK" and card.hero != null, "the level-up card: Farm Lv2, hero_home, OK (C-185 MS-17)")
+	_check(card != null and card.rows.size() == 1 and card.rows[0].label == "Max Energy" and " → " in str(card.rows[0].value) and card.strip == "",
+		"what changes as `from → to`, no gift at Lv2 (%s)" % [card.rows if card != null else []])
+	_check(town.toast.current_text() != "Farm Lv2", "no level toast any more: the card says it")
+	_check(sheet.title.text == "Farm Lv1 → Lv2", "the sheet keeps its level while the card shows")
+	card.primary_pressed.emit()
+	_check(town.level_card == null and sheet.title.text == "Farm Lv2 → Lv3" and sheet.button.reason == "", "OK closes it: the sheet moves on to Lv3")
 	await town.upgrade()
 	_check(town.farm.level == 3 and town.farm.bag == {"blueprint_well": 1} and town.farm.coins == 0, "Lv3: its price taken, a well blueprint given")
-	_check(town.toast.current_text() == "Farm Lv3 · +1 Well Blueprint", "the toast names the blueprint (C-152#29)")
+	card = town.level_card
+	_check(card != null and card.event == "Farm Lv3" and card.strip == "+1 Well Blueprint" and card.rows.size() == 2,
+		"Lv3's card: Max Energy and Wells, the well blueprint as its strip")
+	_check(town.step_back() and town.level_card == null and town.upgrade_sheet == sheet, "Back closes the card first, the sheet stays")
 	_check(sheet.title.text == "Farm Lv3 → Lv4" and sheet.button.reason == "Need 14 more Timber", "short for Lv4: the gap on the key")
+	sheet.button.unavailable_pressed.emit(sheet.button.reason)
+	_check(town.toast.current_text() != "Need 14 more Timber", "a tap on the grey key: the key already says why, no repeat toast (MS-02)")
 	var refused: Dictionary = await town.upgrade()
 	_check(not refused.ok and refused.code == "NOT_ENOUGH" and store.read().farm.level == 3, "the store refuses a short upgrade, still Lv3")
 	sheet.close_requested.emit()
@@ -271,6 +286,35 @@ func _upgrade() -> void:
 	_check(town.keys.has("take") and town.keys.upgrade.kind == UiCommandButton.Kind.SECONDARY, "beside Take Blueprint, Upgrade Farm is secondary")
 	town.close()
 	await process_frame
+	UiMotion.reduced = false
+
+## C-186#82: the level-up card is measured and centred a frame after it joins the scene; until then nothing of it shows —
+## the card, its light and the scrim all start transparent — so it never flashes at (0, 0) over a full scrim. Both motions.
+func _level_card_first_frame() -> void:
+	for reduced in [false, true]:
+		_clean()
+		UiMotion.reduced = reduced
+		var store := LocalStore.new(PARCEL, DIR)
+		store.now_ms = func() -> int: return T0
+		var town := await _open(Town.CARPENTER, store)
+		town.show_level_card(2, [{"icon": null, "label": "Max Energy", "value": "200 → 210"}])
+		var layer: Control = town.get_node(^"LevelUp")
+		var card: Control = layer.get_node(^"LevelCard")
+		var scrim: CanvasItem = layer.get_node(^"Scrim")
+		var glow: CanvasItem = layer.get_node_or_null(^"Glow")
+		var tag := "reduced" if reduced else "full"
+		_check(card.modulate.a == 0.0 and scrim.modulate.a == 0.0 and (glow == null or glow.modulate.a == 0.0),
+			"%s: before the first frame the card, its light and the scrim are all transparent" % tag)
+		await process_frame
+		var centre := (layer.size - card.size) * 0.5 + Vector2(0, UiRewardMoment.HERO_OVER * 0.5)
+		_check(card.position.is_equal_approx(centre) and card.position != Vector2.ZERO, "%s: then the card is centred (%s)" % [tag, card.position])
+		_check(card.modulate.a < 0.5 and scrim.modulate.a < 0.5, "%s: and fades in from there (card %.2f, scrim %.2f)" % [tag, card.modulate.a, scrim.modulate.a])
+		for i in 30: await process_frame
+		_check(is_equal_approx(card.modulate.a, 1.0) and is_equal_approx(scrim.modulate.a, 1.0) and (glow == null or is_equal_approx(glow.modulate.a, 1.0)),
+			"%s: card, scrim and light end fully in" % tag)
+		town.close()
+		await process_frame
+	UiMotion.reduced = false
 
 ## C-181: Scott sells the barn blueprint. Below farm level 2 (C-192, SEN-Q-282) the key reads `Farm Lv2 needed` whatever the
 ## coins, short of coins it reads the gap (secondary, Upgrade Farm stays primary), a tap says why and the store refuses; with
@@ -288,7 +332,8 @@ func _barn_blueprint() -> void:
 		"farm level 1 with 999 coins: the key reads `Farm Lv2 needed`, secondary")
 	_check(town.keys.upgrade.kind == UiCommandButton.Kind.PRIMARY, "below the level Upgrade Farm is the primary key")
 	town.keys.buy_barn.unavailable_pressed.emit(town.keys.buy_barn.reason)
-	_check(town.toast.current_text() == "Farm Lv2 needed", "a tap on it says why")
+	_check(town.toast.current_text() != "Farm Lv2 needed" and town.keys.buy_barn.has_meta(&"_ui_shake"),
+		"a tap on it shakes the key; the key already says why, so no repeat toast (C-185 MS-02)")
 	var low: Dictionary = await town.claim_blueprint("barn")
 	_check(not low.ok and low.code == "CONDITION_NOT_MET" and low.get("detail", {}).get("min_level") == 2 and store.read().farm.coins == 999 \
 		and not store.read().farm.bag.has("blueprint_barn"), "the store refuses below level 2: coins and bag unchanged")
@@ -303,7 +348,8 @@ func _barn_blueprint() -> void:
 		"short of 30 coins: the key reads the gap, secondary")
 	_check(town.keys.upgrade.kind == UiCommandButton.Kind.PRIMARY, "Upgrade Farm stays the primary key")
 	town.keys.buy_barn.unavailable_pressed.emit(town.keys.buy_barn.reason)
-	_check(town.toast.current_text() == "Need 30 more coins", "a tap on the short key says why")
+	_check(town.toast.current_text() != "Need 30 more coins" and town.keys.buy_barn.has_meta(&"_ui_shake"),
+		"a tap on the short key shakes it, no repeat toast (MS-02)")
 	var refused: Dictionary = await town.claim_blueprint("barn")
 	_check(not refused.ok and refused.code == "NOT_ENOUGH_COINS" and store.read().farm.coins == 570 \
 		and not store.read().farm.bag.has("blueprint_barn"), "the store refuses: coins and bag unchanged")
@@ -494,6 +540,8 @@ func _seed_aid() -> void:
 		"broke at Jasmine's: 3 carrot seeds go into the bag and the day is saved")
 	_check(town.card.line == "Out of coins and seeds? Here are 3 Carrot Seeds, on me.", "her line says so (%s)" % town.card.line)
 	_check(town.toast.current_text() == "Received Carrot Seeds ×3", "the toast names the seeds (%s)" % town.toast.current_text())
+	_check(town.toast.label().get_global_rect().end.y <= town.card_top() - 4.0 and town.card_top() <= town.card.line_label().get_global_rect().position.y,
+		"C-186#9: the toast sits over the greeting card, clear of her line, portrait and name (q(16), C-185 §3.5)")
 	_check(town.keys.size() == 1 and town.keys.has("trade") and town.keys.trade.text == "Trade", "Trade is still her one key (LOCK-16) (%s)" % [town.keys.keys()])
 	town.close()
 	await process_frame

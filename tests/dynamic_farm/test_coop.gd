@@ -407,7 +407,10 @@ func _animals() -> void:
 	var egg: Vector3 = host.drop_position(1)
 	var far := egg + Vector3(3, 0, 0)
 	_check(host.update(0.016, far, T0).is_empty(), "pickup: nothing out of reach")
-	_check(host.update(0.016, egg + Vector3(0.5, 0, 0), T0) == [1], "pickup: an egg 0.5 m away is in reach (0.8 m)")
+	# C-186#7: 1.2 m (was 0.8: an egg drawn against the player was still a cell out of reach under the farm's camera).
+	_check(host.update(0.016, egg + Vector3(1.4, 0, 0), T0).is_empty(), "pickup: 1.4 m away is still out of reach")
+	_check(host.update(0.016, egg + Vector3(1.0, 0, 0), T0) == [1], "pickup: an egg 1.0 m away is in reach (1.2 m, C-186#7)")
+	_check(host.update(0.016, egg + Vector3(0.5, 0, 0), T0) == [1], "pickup: an egg 0.5 m away is in reach")
 	_check(host.update(0.016, egg + Vector3(0.5, 0, 0), T0, true).is_empty(), "pickup: none while paused (another command out)")
 	host.fly(1, egg + Vector3(0.5, 0, 0))
 	_check(host.update(0.016, egg, T0).is_empty(), "pickup: a flying egg is not reported again")

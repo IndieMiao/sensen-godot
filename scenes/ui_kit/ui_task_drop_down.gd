@@ -10,6 +10,8 @@ extends VBoxContainer
 ##   complete(index)    the row's finishing beat (UiTaskRow.complete); one second on it fades out and the caller's next
 ##                      rows drop in
 ## Reduced motion (UiMotion.reduced): rows fade in and out over 120 without moving.
+## C-186 (C-185 F-12, C-T2): never more than three rows in all — with more tasks, `More…` takes the third row's place
+## (not a fourth): two task rows around the current one, then `More…`. complete() keeps the caller's indices.
 
 signal more_pressed
 signal folded
@@ -26,21 +28,31 @@ var more: UiTaskRow
 var showing := false
 var _timer: SceneTreeTimer
 var _stamp := 0
+## How many of the caller's leading rows are not shown (More… took a row's place): complete() maps indices by it.
+var _offset := 0
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_theme_constant_override(&"separation", int(UiTokens.SPACE_S2))
 	visible = false
 
-## Shows `list` (at most MAX_ROWS of it) and `More…` when `has_more`; restarts the 4 s fold.
+## Shows `list` (at most MAX_ROWS of it, MAX_ROWS − 1 with `More…`) and `More…` when `has_more`; restarts the 4 s fold.
 func open(list: Array, has_more: bool) -> void:
 	_clear()
 	showing = true
 	visible = true
 	modulate.a = 1.0
-	for i in mini(list.size(), MAX_ROWS):
+	# More… is the third row (C-T2): two task rows then, the window kept on the current task.
+	var room := MAX_ROWS - 1 if has_more else MAX_ROWS
+	var current := 0
+	for i in list.size():
+		if list[i].get("state") == UiTaskRow.State.CURRENT:
+			current = i
+			break
+	_offset = clampi(current - (room - 1), 0, maxi(0, list.size() - room))
+	for i in range(_offset, mini(list.size(), _offset + room)):
 		var row := UiTaskRow.new(str(list[i].title), list[i].state, UiTaskRow.Look.GLASS)
-		row.name = "Task%d" % i
+		row.name = "Task%d" % (i - _offset)
 		row.tappable = false
 		rows.append(row)
 		add_child(row)
@@ -84,6 +96,7 @@ func fold() -> void:
 
 ## Plays row `index`'s finishing beat; a second later it slides out and `after` (the caller's new rows) is shown.
 func complete(index: int, after: Callable = Callable()) -> void:
+	index -= _offset
 	if index < 0 or index >= rows.size() or not showing: return
 	var row := rows[index]
 	row.complete()

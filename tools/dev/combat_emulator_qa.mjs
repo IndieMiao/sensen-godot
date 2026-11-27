@@ -4,7 +4,8 @@ import { isDeepStrictEqual, promisify } from 'node:util';
 
 const execute = promisify(execFile);
 const base = 'http://127.0.0.1:3155/v1/qa/journey/scene';
-const serial = 'emulator-5560';
+// The session's serial (run_test.sh), else this Run's emulator (C-212), else the local default.
+const serial = process.env.JOURNEY_SERIAL || process.env.CARDIGAN_EMULATOR_SERIAL || 'emulator-5560';
 const output = 'output/combat-emulator-2026-09-15/actions';
 await mkdir(output, { recursive: true });
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));

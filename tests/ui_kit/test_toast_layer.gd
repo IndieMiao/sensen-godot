@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
 ## ToastLayer: one at a time, a new toast replaces the old, the same sentence within 2 s only stays up longer
-## (q(49) ⑤, SGODOT-233), the duration rule (WP7-B F-08 §3), the R1 tone look and action; placement above the
+## (q(49) ⑤, SGODOT-233), the duration rule (WP7-B F-08 §3), the v3 look (C-185 §3.5) and action; placement above the
 ## quick bar / a drawer's fixed decision area (WP2 D-01, SGODOT-202).
 
 var toasts: ToastLayer
@@ -41,17 +41,47 @@ func test_the_same_sentence_within_two_seconds_only_stays_up_longer() -> void:
 	toasts.show_toast("Not ready yet", ToastLayer.Severity.REFUSED)
 	assert_int(pops[0]).is_equal(2)   # gone, so the next one pops
 
-func test_tones_follow_toast_r1() -> void:
+## C-185 §3.5 (C-186): one white card for every tone, radius 16, no edge, the e3 shadow; the tone is the 24 disc's
+## colour (success action/primary, info phone/accent, refused / error action/danger). An item icon replaces the mark.
+func test_tones_follow_the_v3_skin() -> void:
 	for sev in [ToastLayer.Severity.SUCCESS, ToastLayer.Severity.INFO, ToastLayer.Severity.ERROR]:
 		toasts.show_toast("Sold out · restocks in 9h 12m %d" % sev, sev)
 		var box := toasts._panel.get_theme_stylebox(&"panel") as UiStyleBox
-		var want: Array = {ToastLayer.Severity.SUCCESS: [UiTokens.COLOR_PRIMARY_TINT, UiTokens.COLOR_PRIMARY],
-			ToastLayer.Severity.INFO: [UiTokens.COLOR_SURFACE, UiTokens.COLOR_BORDER],
-			ToastLayer.Severity.ERROR: [UiTokens.COLOR_DANGER_TINT, UiTokens.COLOR_DANGER]}[sev]
-		assert_str(box.bg_color.to_html()).is_equal((want[0] as Color).to_html())
-		assert_str(box.border_color.to_html()).is_equal((want[1] as Color).to_html())
-		assert_object(toasts._glyph.texture).is_same(ToastLayer.glyph(sev))
+		assert_str(box.bg_color.to_html()).is_equal(UiTokens.COLOR_SURFACE_RAISED.to_html())
+		assert_float(box.border_width).is_equal(0.0)
+		assert_float(box.corner_radius.x).is_equal(float(UiTokens.RADIUS_LG))
+		assert_str(box.shadow_color.to_html()).is_equal(UiTokens.ELEVATION_E3_COLOR.to_html())
+		var want: Color = {ToastLayer.Severity.SUCCESS: UiTokens.COLOR_ACTION_PRIMARY,
+			ToastLayer.Severity.INFO: UiTokens.COLOR_PHONE_ACCENT, ToastLayer.Severity.ERROR: UiTokens.COLOR_ACTION_DANGER}[sev]
+		assert_str(ToastLayer.disc_color(sev).to_html()).is_equal(want.to_html())
+		assert_int(toasts._disc.severity).is_equal(sev)
+		assert_bool(toasts._disc.item).is_false()
+		assert_object(toasts._glyph.texture).is_null()
+		assert_float(toasts._disc.custom_minimum_size.x).is_equal(float(UiTokens.SIZE_TOAST_ICON_V3))
 	assert_int(toasts.current_severity()).is_equal(ToastLayer.Severity.ERROR)
+	var seeds := P0Logic.icon("seed_carrot")
+	toasts.show_toast("Received Carrot Seeds ×3", ToastLayer.Severity.SUCCESS, "", 0.0, seeds)
+	assert_bool(toasts._disc.item).is_true()
+	assert_object(toasts._glyph.texture).is_same(seeds)
+
+## MS-18: the card's rect is the settled one at once (the motion is drawn), a dismissed toast says nothing at once while
+## it fades out, and a replaced one leaves a fading copy behind.
+func test_motion_never_moves_the_card_and_dismiss_is_immediate() -> void:
+	toasts.show_toast("Rest used today")
+	var settled := toasts._panel.position
+	assert_float(toasts._panel.modulate.a).is_less(1.0)   # fading in
+	toasts.show_toast("Bag full · free a slot first")
+	assert_int(toasts.find_children("LeavingToast", "", false, false).size()).is_equal(1)
+	assert_float(toasts._panel.position.x).is_equal(settled.x)
+	await get_tree().create_timer(UiTokens.MOTION_DURATION_BASE_MS / 1000.0 + 0.1).timeout
+	assert_float(toasts._panel.modulate.a).is_equal_approx(1.0, 0.001)
+	assert_int(toasts.find_children("LeavingToast", "", false, false).size()).is_equal(0)
+	toasts.dismiss()
+	assert_str(toasts.current_text()).is_empty()
+	assert_bool(toasts._panel.visible).is_true()   # still fading out
+	assert_int(toasts._panel.mouse_filter).is_equal(Control.MOUSE_FILTER_IGNORE)
+	await get_tree().create_timer(UiTokens.MOTION_DURATION_QUICK_MS / 1000.0 + 0.1).timeout
+	assert_bool(toasts._panel.visible).is_false()
 
 func test_the_action_line_emits_and_closes() -> void:
 	var got := []

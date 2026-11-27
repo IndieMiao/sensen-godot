@@ -37,6 +37,8 @@ func _run() -> void:
 	_store()
 	_model()
 	await _drawer()
+	await _turned(true)
+	await _turned(false)
 	await _drop()
 	_clean()
 	print("PARCEL_BOARD checks=%d failures=%d" % [checks, failures])
@@ -199,7 +201,10 @@ func _model() -> void:
 		"model: a dropped slot says `Next request 8h` (%s)" % [w.facts])
 
 ## The board opened from the room: the drawer, Track, Deliver (coins float, the slot refilled), the sheet.
+## C-186 (C-185 §3.6): a Coins row under the title, raised rows with status tags, Deliver primary / Track secondary; a
+## delivery's float is the v3 one. Reduced motion here (the Done row's hold and fold are timed animations).
 func _drawer() -> void:
+	UiMotion.reduced = true
 	var store := LocalStore.new(PARCEL, DIR)
 	var clock := [T0 + H]
 	store.now_ms = func() -> int: return clock[0]
@@ -215,19 +220,68 @@ func _drawer() -> void:
 	var key: UiCommandButton = board.cards[1].command_button()
 	_check(key.label == "Deliver" and key.reason == "", "the carrot row's key is Deliver")
 	_check(board.cards[2].command_button().reason == "Need 2 more Eggs", "the egg row carries its gap")
+	_check(board.coins.value == "0" and board.coins.icon == UiArt.COIN, "C-186: the Coins row under the title (the coins land there)")
+	_check(key.kind == UiCommandButton.Kind.PRIMARY and board.cards[1].get_parent() is PanelContainer,
+		"C-186: Deliver is the primary key, each request on its raised row")
+	_check(board.cards[1].status_label().has_theme_stylebox_override(&"normal"), "C-186: the status is a tag")
 	var sent: Dictionary = await town.board_command({"type": "deliver_request", "request": 1})
 	var farm: Dictionary = store.read().farm
 	_check(sent.ok and farm.coins == 46 and not farm.bag.has("crop_carrot") and farm.requests_done == 1, "Deliver: 3 carrots go, 46 coins come, the count is saved")
 	_check(farm.board.slots[0].req != null and int(farm.board.slots[0].req.id) == 3, "the delivered slot shows its new request at once")
 	await process_frame
 	_check(town.board.cards.has(3) and not town.board.cards.has(1), "the list follows: the new request in its row")
-	_check(host.find_children("*", "UiFloatText", true, false).size() == 1, "the coins float up from the key")
+	_check(host.find_children("*", "UiGainFloat", true, false).size() == 1, "the coins float up from the key (the v3 float, C-185 R-02)")
+	_check(town.board.coins.value == "46", "the Coins row follows: 46")
 	board.open_request(2)
 	_check(board.page == "request" and board.find_child("DropRequest", true, false) != null, "the tracked request's sheet offers Drop request")
 	var header: UiObjectHeader = board.find_children("*", "UiObjectHeader", true, false)[0]
 	_check(header.title == "Egg Basket" and header.state == "Tracked" and header.effect == "Bring the required eggs to the Request Board.",
 		"BOARD-1: title, state and what to bring where")
 	_check(town.step_back() and board.page == "list", "Back goes from the sheet to the list")
+	town.close()
+	await process_frame
+	host.queue_free()
+	_clean()
+	UiMotion.reduced = false
+
+## MS-16 with motion on: a delivery plays out (Done, hold, fold) and lets the board go; with `turn`, a page turned under
+## its Done row (another request's sheet, then Back) ends the motion and lets the board go at once (C-186#56): the list
+## follows the farm again, so 2 eggs in the bag make the egg row's key Deliver.
+func _turned(turn: bool) -> void:
+	UiMotion.reduced = false
+	var what := "turned" if turn else "played out"
+	var store := LocalStore.new(PARCEL, DIR)
+	var clock := [T0 + H]
+	store.now_ms = func() -> int: return clock[0]
+	store._save(_board_farm({"crop_carrot": 3}), 4)
+	var host := Control.new()
+	host.size = Vector2(360, 800)
+	root.add_child(host)
+	var town: Control = Town.open(host, Town.BOARD, store, PARCEL, DIR.path_join("met.json"))
+	await _settle(town)
+	var board = town.board
+	var sent: Dictionary = await town.board_command({"type": "deliver_request", "request": 1})
+	_check(sent.ok and board.hold, "motion (%s): the board holds its list while the delivery plays" % what)
+	if turn:
+		await create_timer(0.1).timeout
+		board.open_request(2)
+		board.back_to_list()
+	await create_timer(2.0).timeout
+	_check(not board.hold and board.page == "list" and board.cards.has(3) and not board.cards.has(1),
+		"motion (%s): the board is let go, the new request in its row" % what)
+	if not turn:
+		var rows: Array = board.page_box.get_children().filter(func(n): return n is PanelContainer)
+		var sep: int = board.page_box.get_theme_constant(&"separation")
+		_check(rows.size() == 2 and is_equal_approx(rows[1].position.y, rows[0].position.y + rows[0].size.y + sep) and rows[1].modulate.a == 1.0,
+			"motion: the new row rose to its own place in the list, below the row above (not where the list's first layout put it)")
+		_check(board.page_box.get_signal_connection_list(&"sort_children").is_empty(), "motion: the rise lets go of the list's sorts")
+	var saved := store.read()
+	var farm: Dictionary = saved.farm
+	farm.bag["egg"] = 2
+	store._save(farm, int(saved.farm_version))
+	await town._reload_board()
+	_check(town.board.cards.has(2) and town.board.cards[2].command_button().reason == "",
+		"motion (%s): the list follows the farm again: 2 eggs make the egg row Deliver" % what)
 	town.close()
 	await process_frame
 	host.queue_free()

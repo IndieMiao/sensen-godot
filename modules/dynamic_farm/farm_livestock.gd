@@ -17,7 +17,7 @@ const ART_PATH := "res://assets/farm/data/dynamic_farm_art.json"
 ## Placeholder ground sits just above the farm ground so the two never fight.
 const GROUND_LIFT := 0.004
 ## Pickup feel (C-154#19 design) when the file leaves it out.
-const PICKUP_DEFAULTS := {"reach_m": 0.8, "hop_m": 0.25, "flight_s": 0.35, "shrink": 0.6, "chest_m": 0.9}
+const PICKUP_DEFAULTS := {"reach_m": 1.2, "hop_m": 0.25, "flight_s": 0.35, "shrink": 0.6, "chest_m": 0.9}
 ## Laying (the owner on SEN-C-154#145, PM C-154#146) when a drop's art leaves `lay` out: the drop leaves the animal
 ## `from_m` above the ground, `toss_m` (horizontal) from where it lands, arcs `rise_m` above the straight line down over
 ## `fall_s`, then bounces once `bounce_m` high over `bounce_s`. The animal stands `toss_m` from the drop's spot to lay.

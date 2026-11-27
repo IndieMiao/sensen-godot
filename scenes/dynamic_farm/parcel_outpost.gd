@@ -181,41 +181,37 @@ func _build_hud() -> void:
 	_town_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(_town_root)
 
-## The dynamic farm's top bar (as on the parcel, C-74): the 44 round back of ProfileTopBar and a surface chip with the
-## place's name over the city, at the HUD's place.
+## The dynamic farm's top bar (as on the parcel, C-74; C-186 / C-185 §3.3A: the farm's v3 glass): a Ø36 glass back in
+## its 44 hit area and a glass capsule with the place's name over the city, at the HUD's place. No coins capsule (coins
+## are only spent at the counter and the sheets).
 func _top_bar() -> HBoxContainer:
 	var bar := HBoxContainer.new()
 	bar.name = "TopBar"
-	bar.add_theme_constant_override(&"separation", UiTokens.SPACE_WITHIN)
+	bar.theme = UiKit.theme()
+	bar.add_theme_constant_override(&"separation", UiTokens.SPACE_S3)
 	bar.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	bar.offset_left = UiTokens.SIZE_TODAY_PANEL_X
-	bar.offset_right = -UiTokens.SIZE_TODAY_PANEL_X
-	bar.offset_top = UiTokens.SIZE_HUD_TOP + _safe_top()
+	bar.offset_left = UiTokens.SIZE_SCREEN_EDGE - (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5
+	bar.offset_right = -UiTokens.SIZE_SCREEN_EDGE
+	bar.offset_top = UiTokens.SIZE_SCREEN_SAFE_INSET + _safe_top()
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var back := UiProfileTopBar._Round.new(UiProfileTopBar._Round.Glyph.BACK)
+	var back := UiGlassButton.new(null, UiGlassButton.Glyph.BACK)
 	back.name = "Back"
 	back.tooltip_text = "Back"
 	back.pressed.connect(func(): if not is_instance_valid(town): leave())
 	bar.add_child(back)
-	var chip := PanelContainer.new()
+	var chip := UiGlassCapsule.new()
 	chip.name = "Place"
-	chip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chip.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE, UiTokens.RADIUS_CHIP,
-		UiTokens.COLOR_BORDER, UiTokens.STROKE_DEFAULT).with_margins(12, 5, 12, 6))
-	bar.add_child(chip)
-	var labels := VBoxContainer.new()
-	labels.add_theme_constant_override(&"separation", 0)
-	labels.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	chip.add_child(labels)
-	var title := UiKit.label(place_name, UiTokens.STYLE_C14_XB)
+	chip.text = place_name
+	chip.detail = CITY
+	var title := chip.label()
 	title.name = "Title"
-	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	labels.add_child(title)
-	var city := UiKit.label(CITY, UiTokens.STYLE_CAPTION_B12, UiTokens.COLOR_SECONDARY)
-	city.name = "City"
-	labels.add_child(city)
+	title.theme_type_variation = UiTokens.STYLE_TYPE_LABEL_ON_DARK
+	chip.detail_label().name = "City"
+	# Two lines trim with … by default, which leaves a label no width of its own: the room's two short lines show whole.
+	title.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+	chip.detail_label().text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+	bar.add_child(chip)
 	return bar
 
 func _room_frame(view: Dictionary, dt: float) -> void:

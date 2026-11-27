@@ -10,7 +10,8 @@ import xml.etree.ElementTree as ET
 
 SERIAL = os.environ['JOURNEY_SERIAL']
 PACKAGE = os.environ['JOURNEY_PACKAGE']
-assert SERIAL == 'emulator-5580' and PACKAGE == 'com.sensen.farmpondremovalqa'
+# Any emulator, e.g. the Run's own (C-212); never a phone.
+assert SERIAL.startswith('emulator-') and PACKAGE == 'com.sensen.farmpondremovalqa'
 OUT = Path('output/farm-pond-removal-2026-09-25/android')
 OUT.mkdir(parents=True,exist_ok=True)
 

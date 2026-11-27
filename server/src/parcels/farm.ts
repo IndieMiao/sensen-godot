@@ -655,10 +655,11 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         const rule = Object.hasOwn(rules.buildings, b.type) ? rules.buildings[b.type].livestock : undefined;
         if (!rule || !b.animals?.length) return fail('NOT_LIVESTOCK', { building: c.building });
         // C-181：喂一次 feed_amount 个（牛 2 根胡萝卜，鸡 1 根）。
+        // C-186（C-186#8）：先查地上满没满，再查饲料——地上满了，手里有没有胡萝卜都喂不了，先提示捡。客户端 feed_refusal 同序。
         const portion = rule.feed_amount ?? 1;
-        if ((s.bag[rule.feed] ?? 0) < portion) return fail('NO_FEED', { item: rule.feed });
         const mine = s.drops.filter(d => d.building === b.id);
         if (mine.length >= rule.max_ground) return fail('GROUND_FULL', { max: rule.max_ground });
+        if ((s.bag[rule.feed] ?? 0) < portion) return fail('NO_FEED', { item: rule.feed });
         const waiting = new Set(mine.filter(d => d.ready_at > now).map(d => d.animal));
         const animal = b.animals.findIndex((_, i) => !waiting.has(i));
         if (animal < 0) return fail('ANIMALS_FED', { next_at: Math.min(...mine.filter(d => d.ready_at > now).map(d => d.ready_at)) });

@@ -2,7 +2,9 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { mkdir, writeFile } from 'node:fs/promises';
 const exec = promisify(execFile);
-const serial = process.env.JOURNEY_SERIAL ?? 'emulator-5560';
+// Same order as tools/android/run_test.sh (C-212).
+const serial = process.env.JOURNEY_SERIAL || process.env.ANDROID_SERIAL || process.env.CARDIGAN_EMULATOR_SERIAL ||
+  process.env.CARDIGAN_DEVICE_SERIAL || 'emulator-5560';
 const directory = 'output/online-2026-09-16/android';
 const adb = args => exec('adb', ['-s', serial, ...args], { encoding: 'buffer', maxBuffer: 16 * 1024 * 1024 });
 await mkdir(directory, { recursive: true });

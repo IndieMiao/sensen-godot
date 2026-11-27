@@ -71,5 +71,5 @@
     "wool": {"model": "res://assets/dynamic_farm/sheep_pen/wool.glb", "scale": 1.0,
       "lay": {"from_m": 0.3, "toss_m": 0.35, "rise_m": 0.15, "fall_s": 0.5, "bounce_m": 0.04, "bounce_s": 0.2}}
   },
-  "pickup": {"reach_m": 0.8, "hop_m": 0.25, "flight_s": 0.35, "shrink": 0.6, "chest_m": 0.9}
+  "pickup": {"reach_m": 1.2, "hop_m": 0.25, "flight_s": 0.35, "shrink": 0.6, "chest_m": 0.9}
 }

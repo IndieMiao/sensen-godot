@@ -12,6 +12,9 @@ const _GLYPH_SIZE := 24.0
 
 ## The ring's fill, 0..1 (a level's progress); the dynamic farm has none, so its ring is the bare track.
 var progress := 0.0: set = set_progress
+## C-186 (C-185 §3.1 B, the owner's attachment-1820): a 52 cream clay rounded square (radius 16) round a light-green
+## inner square instead of the ring, which had no data in the farm (F-02). Set before it enters the tree.
+var clay := false
 
 func _ready() -> void:
 	name = "Avatar"
@@ -69,6 +72,15 @@ func shows_head() -> bool:
 	return portrait != null and portrait.texture != _GLYPH
 
 func _draw() -> void:
+	if clay:
+		var rect := Rect2((size - Vector2.ONE * SIZE) * 0.5, Vector2.ONE * SIZE)
+		draw_style_box(UiClay.face(UiTokens.SIZE_HUD_CLAY_AVATAR_RADIUS), rect)
+		var inner := StyleBoxFlat.new()
+		inner.bg_color = UiTokens.COLOR_HUD_CLAY_AVATAR_FILL
+		inner.set_corner_radius_all(int(UiTokens.SIZE_HUD_CLAY_AVATAR_RADIUS - RING))
+		inner.anti_aliasing = true
+		draw_style_box(inner, rect.grow(-RING))
+		return
 	var c := size * 0.5
 	var r := SIZE * 0.5
 	# E1 under the disc, so the white avatar holds on a light scene.

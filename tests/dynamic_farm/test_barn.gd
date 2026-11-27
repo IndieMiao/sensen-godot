@@ -473,6 +473,12 @@ func _keys() -> void:
 	_check(ParcelFarm.feed_refusal(rules, state, b, T0) == "NO_FEED", "feed key: one carrot is not enough")
 	state.bag.crop_carrot = 2
 	_check(ParcelFarm.feed_refusal(rules, state, b, T0) == "", "feed key: two carrots feed")
+	# C-186#8: two milks on the ground and no carrots: the ground comes first (pick up), as on the server.
+	state.drops = [{"id": 1, "item": "milk", "amount": 1, "building": 1, "animal": 0, "spot": 0, "ready_at": T0 - 1},
+		{"id": 2, "item": "milk", "amount": 1, "building": 1, "animal": 1, "spot": 1, "ready_at": T0 - 1}]
+	state.bag.crop_carrot = 0
+	_check(ParcelFarm.feed_refusal(rules, state, b, T0) == "GROUND_FULL", "feed key: a full ground before the missing carrots")
+	state.drops = []
 	farming.farm = {"bag": {"wood": 12, "stone": 10}}
 	var dyn: Node = load("res://scenes/dynamic_farm/dynamic_farm.gd").new()
 	dyn._farming = farming

@@ -493,9 +493,11 @@ static func drops_in(state: Dictionary, building_id: int) -> Array:
 static func feed_refusal(rule_set: Dictionary, state: Dictionary, building: Dictionary, now: int) -> String:
 	var rule := livestock_of(rule_set, building)
 	if rule.is_empty() or not building.get("animals") is Array or building.animals.is_empty(): return "NOT_LIVESTOCK"
-	if int(state.get("bag", {}).get(rule.feed, 0)) < int(rule.get("feed_amount", 1)): return "NO_FEED"
+	# C-186#8: a full ground first (with or without the feed, nothing can be fed until some are picked up), then the feed;
+	# the server's feed checks in the same order (server/src/parcels/farm.ts).
 	var mine := drops_in(state, int(building.id))
 	if mine.size() >= int(rule.max_ground): return "GROUND_FULL"
+	if int(state.get("bag", {}).get(rule.feed, 0)) < int(rule.get("feed_amount", 1)): return "NO_FEED"
 	return "" if _free_animal(building, mine, now) >= 0 else "ANIMALS_FED"
 
 ## The first animal with no product on its way (laid ones do not count), or -1.

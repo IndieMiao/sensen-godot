@@ -6,7 +6,9 @@ import assert from 'node:assert/strict';
 const run=promisify(execFile);
 const output='output/movement-emulator-2026-09-15';
 await mkdir(output,{recursive:true});
-const adb=args=>run('adb',['-s','emulator-5560',...args],{maxBuffer:8*1024*1024,timeout:15000,encoding:'buffer'});
+// The session's serial (run_test.sh), else this Run's emulator (C-212), else the local default.
+const serial=process.env.JOURNEY_SERIAL||process.env.CARDIGAN_EMULATOR_SERIAL||'emulator-5560';
+const adb=args=>run('adb',['-s',serial,...args],{maxBuffer:8*1024*1024,timeout:15000,encoding:'buffer'});
 const snapshot=async()=> (await fetch('http://127.0.0.1:3155/v1/qa/journey/scene')).json();
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function waitFor(test){

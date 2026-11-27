@@ -36,8 +36,9 @@ const _CLOSE_MIN := 80.0      # … but at least this far
 const _FLING_MIN := 24.0      # or past this far …
 const _FLING_SPEED := 900.0   # … at least this fast down (px/s, 360 × 800 base)
 const _SPEED_MS := 100        # the release speed is measured over the last this many ms
-const _CLOSE_SECS := 0.18
-const _BACK_SECS := 0.22
+## Drag close / spring back (SGODOT-265's 0.18 / 0.22 s), read from the v3 motion tokens since C-186 (C-185 G-01): 200.
+const _CLOSE_SECS := UiTokens.MOTION_DURATION_BASE_MS / 1000.0
+const _BACK_SECS := UiTokens.MOTION_DURATION_BASE_MS / 1000.0
 
 ## Visible height in 360-wide logical px (the bag drawer is 546 of 800). Above the host height it is clipped
 ## to it.
@@ -52,6 +53,11 @@ var pad := _PAD: set = set_pad
 func action_area() -> Control: return null
 ## Slide up over MOTION_DRAWER_MS when entering the tree.
 var animate := true
+## C-185 MS-14 (C-186): enter by rising `motion/offset/sheetEnter` (40) and fading in over 260 (standard), the host's
+## scrim fading in over 200, after `enter_delay` ms (`motion/delay/handoff` 80 when a card hands over to the drawer);
+## play_out() sinks 40 and fades over 200 (cubic in). Off: the full-height slide (MOTION_DRAWER_MS), as before.
+var rise := false
+var enter_delay := 0.0
 ## Content column; separation 0, the caller adds its own gaps (the Bag layout uses explicit spacers).
 var body: VBoxContainer
 
@@ -94,9 +100,94 @@ func _ready() -> void:
 	for child in body.get_children(): _watch_content(child)
 	set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	_place()
-	if animate: _slide_in(_shown_height(), UiKit.secs(UiTokens.MOTION_DRAWER_MS))
+	if animate and rise: _rise_in()
+	elif animate: _slide_in(_shown_height(), UiKit.secs(UiTokens.MOTION_DRAWER_MS))
 
 var _slide: Tween
+var _enter_fade: Tween
+
+## MS-14: from 40 below its place, transparent, up and in over 260 after `enter_delay`; reduced: a 120 fade.
+func _rise_in() -> void:
+	modulate.a = 0.0
+	var delay := UiKit.secs(enter_delay)
+	var secs := UiKit.secs(UiTokens.MOTION_DURATION_FAST_MS if UiMotion.reduced else UiTokens.MOTION_DURATION_MODERATE_MS)
+	if not UiMotion.reduced:
+		var drop := float(UiTokens.MOTION_OFFSET_SHEET_ENTER)
+		offset_top += drop
+		offset_bottom += drop
+		_slide = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		_slide.tween_property(self, ^"offset_top", offset_top - drop, secs).set_delay(delay)
+		_slide.tween_property(self, ^"offset_bottom", offset_bottom - drop, secs).set_delay(delay)
+	_enter_fade = UiMotion.tween(self, UiTokens.MOTION_EASING_STANDARD)
+	_enter_fade.tween_interval(delay)
+	_enter_fade.tween_property(self, ^"modulate:a", 1.0, secs)
+	_fade_scrim_in.call_deferred(delay)   # the host sets `scrim` right after adding the drawer
+
+func _fade_scrim_in(delay: float) -> void:
+	if not is_instance_valid(scrim): return
+	var to := scrim.modulate.a
+	scrim.modulate.a = 0.0
+	var st := UiMotion.tween(scrim, UiTokens.MOTION_EASING_LINEAR)
+	st.tween_interval(delay)
+	st.tween_property(scrim, ^"modulate:a", to, UiKit.secs(UiTokens.MOTION_DURATION_BASE_MS))
+
+## MS-14 close: sinks `motion/offset/sheetEnter` and fades over 200 (cubic in), its scrim fading with it; `done` runs at
+## the end (the host frees both). Input is let go at once. Reduced: a 120 fade.
+func play_out(scrim_: CanvasItem, done: Callable) -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	set_process_input(false)
+	for t: Tween in [_slide, _enter_fade, _settle_tween]:
+		if t != null and t.is_valid(): t.kill()
+	var secs := UiKit.secs(UiTokens.MOTION_DURATION_FAST_MS if UiMotion.reduced else UiTokens.MOTION_DURATION_BASE_MS)
+	if is_instance_valid(scrim_):
+		var st := UiMotion.tween(scrim_, UiTokens.MOTION_EASING_LINEAR)
+		st.tween_property(scrim_, ^"modulate:a", 0.0, secs)
+	var tw := UiMotion.tween(self, UiTokens.MOTION_EASING_EXIT)
+	if not UiMotion.reduced:
+		var drop := float(UiTokens.MOTION_OFFSET_SHEET_ENTER)
+		tw.tween_property(self, ^"offset_top", offset_top + drop, secs)
+		tw.parallel().tween_property(self, ^"offset_bottom", offset_bottom + drop, secs)
+		tw.parallel().tween_property(self, ^"modulate:a", 0.0, secs)
+	else: tw.tween_property(self, ^"modulate:a", 0.0, secs)
+	tw.tween_callback(done)
+
+## MS-15 / MS-16 (C-185 §3.3 D, §3.6): up to `motion/limit/coinIcons` coins fly from `from` (global) to `to`'s centre, each
+## `motion/duration/coinFly` (420) on a quadratic arc whose control point sits `motion/offset/flyArc` above the midpoint
+## (arc easing), `motion/stagger/reward` apart; `landed` runs as the first one lands (the host bumps and rolls its Coins).
+## Reduced, or no target: nothing flies and `landed` runs at once (只计数).
+func fly_coins(coins: int, from: Vector2, to: Control, landed: Callable) -> void:
+	var host := get_parent() as Control
+	if UiMotion.reduced or coins <= 0 or host == null or to == null or not to.is_visible_in_tree() or not is_inside_tree():
+		if landed.is_valid(): landed.call()
+		return
+	var count := mini(UiTokens.MOTION_LIMIT_COIN_ICONS, coins)
+	var side := float(UiTokens.SIZE_HUD_COIN_ICON)
+	var end := to.get_global_rect().get_center()
+	var first := [true]
+	for i in count:
+		var coin := UiKit.icon(UiArt.COIN, side)
+		coin.name = "CoinFly"
+		coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		coin.top_level = true
+		coin.size = Vector2(side, side)
+		coin.modulate.a = 0.0
+		host.add_child(coin)
+		coin.global_position = from - coin.size * 0.5
+		var ctrl := (from + end) * 0.5 - Vector2(0, UiTokens.MOTION_OFFSET_FLY_ARC)
+		var tw := UiMotion.tween(coin, UiTokens.MOTION_EASING_ARC)
+		tw.tween_interval(UiKit.secs(UiTokens.MOTION_STAGGER_MS_REWARD * i))
+		tw.tween_callback(func(): coin.modulate.a = 1.0)
+		var along := func(t: float) -> void:
+			var a := from.lerp(ctrl, t)
+			var b := ctrl.lerp(end, t)
+			coin.global_position = a.lerp(b, t) - coin.size * 0.5
+		var arrive := func() -> void:
+			if first[0]:
+				first[0] = false
+				if landed.is_valid(): landed.call()
+			coin.queue_free()
+		tw.tween_method(along, 0.0, 1.0, UiKit.secs(UiTokens.MOTION_DURATION_COIN_FLY_MS))
+		tw.tween_callback(arrive)
 
 ## Start `drop` px below its place and slide up into it.
 func _slide_in(drop: float, secs: float) -> void:
