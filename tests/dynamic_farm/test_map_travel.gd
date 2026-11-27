@@ -376,8 +376,40 @@ func _map() -> void:
 	MapTravel.at = MapTravel.HOME
 	page._entry.open_card(); page._open_town()
 	_step(t, 500)
+	var opened := router.opened.size()
 	page._notification(Node.NOTIFICATION_APPLICATION_PAUSED)
 	_check(t.phase == MapTravel.Phase.IDLE and MapTravel.at == MapTravel.HOME, "a walk left for the background is called off")
+	page._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+	_step(t, 600)
+	await process_frame
+	var walk_back := [t.phase, MapTravel.at, t.iris.visible, t.token.visible, page._travel_card, router.opened.size()]
+	_check(walk_back == [MapTravel.Phase.IDLE, MapTravel.HOME, false, true, false, opened], "back from the background: home, nothing opened (%s)" % [walk_back])
+	# C-207: the same between the arrival and the iris closed (ARRIVE).
+	page._entry.open_card(); page._open_town()
+	_step(t, 1700)
+	_check(t.phase == MapTravel.Phase.ARRIVE and t.iris.visible, "at the pin, the iris closing")
+	page._notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+	_check(t.phase == MapTravel.Phase.IDLE and MapTravel.at == MapTravel.HOME and not t.iris.visible, "an arrival left for the background is called off")
+	page._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+	_step(t, 600)
+	await process_frame
+	var arrive_back := [t.phase, MapTravel.at, t.iris.visible, t.token.visible, page._travel_card, router.opened.size()]
+	_check(arrive_back == walk_back, "back from the background: as after a walk (%s)" % [arrive_back])
+	# Held at home for the farm read (Enter my farm): called off too; the read that lands later opens nothing.
+	MapTravel.at = page.TOWN
+	selector.busy = false
+	page._enter_farm()
+	_step(t, 2500)
+	_check(t.phase == MapTravel.Phase.ARRIVE and t.hold and selector.busy, "held at home for the farm")
+	page._notification(Node.NOTIFICATION_APPLICATION_PAUSED)
+	_check(t.phase == MapTravel.Phase.IDLE and MapTravel.at == page.TOWN and page._drop_farm, "the wait left for the background is called off")
+	page._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+	selector.busy = false
+	page._open_host({"dataset_version": "r8", "block_id": "p-home"})
+	_step(t, 600)
+	await process_frame
+	_check(router.opened.size() == opened and MapTravel.at == page.TOWN and t.phase == MapTravel.Phase.IDLE and not page._drop_farm,
+		"back from the background: at the pin, the late farm read opens nothing")
 	page.queue_free(); plugin.queue_free()
 	await process_frame
 	RouterFixture.restore(root, router, real_router)

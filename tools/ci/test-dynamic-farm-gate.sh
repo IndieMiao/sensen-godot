@@ -43,6 +43,9 @@ t test_read_retries_https '[[ $1 == https://127.0.0.1:* && -s $2 && -s $3 ]] || 
 curl -sS --cacert "$2" "$1/parcel-catalog.json" -o /dev/null -w "%{http_code}\n" | grep -qx 404 || exit 4
 echo "DYNAMIC HTTPS RETRIES 1/1"'
 for name in hang_a hang_b hang_c; do t "test_$name" 'echo "started"; exec sleep 60'; done
+# Ignores TERM (inherited by sleep): only the KILL kill_after later ends it.
+t test_hang_stubborn 'trap "" TERM; echo "started"; exec sleep 60'
+t test_exit3 'echo "DYNAMIC_WALK_TESTS checks=1 failures=0"; exit 3'
 
 pass=0
 # run <expected exit> <env assignments...> -- <test names...>
@@ -111,5 +114,35 @@ if ((took > 14)); then
   exit 1
 fi
 echo "ok: report written after ${took}s for an 8s budget"
+
+# C-207: macOS has no GNU timeout (and mac-mini no gtimeout); the script falls back to
+# perl. A PATH with every tool but those two runs the same limits through it.
+echo "== time limits without timeout or gtimeout (the perl fallback, as on macOS)"
+nt=$root/no-timeout
+mkdir -p "$nt"
+IFS=: read -ra path_dirs <<<"$PATH"
+for d in "${path_dirs[@]}"; do
+  for f in "$d"/*; do
+    n=${f##*/}
+    if [[ -f $f && -x $f && $n != timeout && $n != gtimeout && ! -e $nt/$n ]]; then ln -s "$f" "$nt/$n"; fi
+  done
+done
+if PATH=$nt command -v timeout >/dev/null || PATH=$nt command -v gtimeout >/dev/null; then
+  echo "FAIL: timeout still on the stripped PATH" >&2
+  exit 1
+fi
+start=$SECONDS
+run 1 PATH="$nt" DYNAMIC_FARM_TIMEOUT=3 DYNAMIC_FARM_TOTAL_TIMEOUT=60 -- test_ok test_exit3 test_hang_a test_hang_stubborn
+took=$((SECONDS - start))
+row test_ok PASS ''
+row test_exit3 FAIL 'exit 3'
+row test_hang_a TIMEOUT 'killed after 3s'
+row test_hang_stubborn TIMEOUT 'killed after 3s'
+if ((took > 24)); then
+  echo "FAIL: 3s + (3s and 10s to KILL) took ${took}s" >&2
+  exit 1
+fi
+run 0 PATH="$nt" DYNAMIC_FARM_TIMEOUT=10 -- test_ok test_ratio_ok
+row test_ratio_ok PASS ''
 
 echo "dynamic_farm gate controls: $pass rows as expected"
