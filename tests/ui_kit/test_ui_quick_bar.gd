@@ -561,3 +561,38 @@ func test_bag_end_icon_is_the_grey_bag_coloured_orange() -> void:
 	assert_float(c.r).is_greater(c.g)
 	assert_float(c.g).is_greater(c.b)
 	assert_float(img.get_pixel(0, 0).a).is_equal(grey.get_pixel(0, 0).a)   # its shape kept
+
+## Away (a placement, the bag) the bar keeps what it last showed; back on screen, it refills before the player's eyes.
+func test_farm_bar_refills_on_return_what_changed_while_away() -> void:
+	UiMotion.reduced = false
+	var farm := _farm_bar()
+	await await_idle_frame()
+	var cells := farm.cells()
+	var home: float = cells[0]._surface.position.x
+	farm.visible = false
+	farm.slots = [{id = "b", icon = T, title = "B", quantity = 2}, {id = "c", icon = T, title = "C", quantity = 3}]
+	assert_float(cells[0]._surface.position.x).is_equal(home)   # nothing moves unseen
+	farm.visible = true
+	await await_idle_frame()
+	assert_object(farm.get_node_or_null(^"RefillGhost")).is_not_null()
+	assert_float(cells[0]._surface.position.x).is_greater(home + 1.0)
+	await await_millis(700)
+	assert_float(cells[0]._surface.position.x).is_equal_approx(home, 0.5)
+	farm.visible = false
+	farm.visible = true
+	await await_idle_frame()
+	assert_object(farm.get_node_or_null(^"RefillGhost")).is_null()   # nothing changed: nothing plays again
+	farm.queue_free()
+
+## The bar's own drag moving slots (a swap) is not a refill: nothing pops, slides or fades for it.
+func test_farm_bar_own_swap_does_not_refill() -> void:
+	UiMotion.reduced = false
+	var farm := _farm_bar()
+	await await_idle_frame()
+	farm._own_change = true
+	farm.slots = [{id = "b", icon = T, title = "B", quantity = 2}, {id = "a", icon = T, title = "A", quantity = 1},
+		{id = "c", icon = T, title = "C", quantity = 3}]
+	assert_object(farm.get_node_or_null(^"RefillGhost")).is_null()
+	assert_vector(farm.cells()[0]._surface.scale).is_equal(Vector2.ONE)
+	assert_float(farm.cells()[0]._surface.position.x).is_equal(farm.cells()[2]._surface.position.x)
+	farm.queue_free()

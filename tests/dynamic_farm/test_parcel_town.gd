@@ -146,8 +146,12 @@ func _market() -> void:
 	_check(town.farm.coins == 36 and not town.farm.bag.has("crop_carrot") and counter.sellable() == ["wood"], "Sell All: 36 coins, no carrots left")
 	# C-211 MS-15: the sold-out card folds away in its place (clipped, shrinking), the carrot's grid icon fades.
 	var fold: Control = counter._fold
+	var ghost: Control = counter.find_child("SoldGhost", true, false)
 	_check(fold != null and fold.clip_contents and counter.sheet.get_parent() == fold and fold.get_index() == sheet_at
-		and counter.find_child("SoldGhost", true, false) != null, "sold out: the card folds in its place, the carrot's icon fades")
+		and ghost != null, "sold out: the card folds in its place, the carrot's icon fades")
+	await process_frame
+	_check(is_instance_valid(ghost) and ghost.size.x <= 64.0 and ghost.global_position.y > counter.sheet.get_global_rect().position.y,
+		"…the icon where its cell was, not stretched over the drawer (%s)" % (ghost.get_global_rect() if is_instance_valid(ghost) else Rect2()))
 	await create_timer(0.1).timeout
 	_check(is_instance_valid(fold) and fold.custom_minimum_size.y < counter.sheet.size.y and fold.custom_minimum_size.y > 0.0,
 		"…folding (%.0f of %.0f)" % [fold.custom_minimum_size.y, counter.sheet.size.y])

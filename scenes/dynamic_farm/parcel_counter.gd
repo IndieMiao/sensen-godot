@@ -183,9 +183,10 @@ func _fade_icon(cell: UiItemCell) -> void:
 	ghost.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	ghost.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	var at := cell._icon.get_global_rect()
-	ghost.position = at.position - get_global_rect().position
-	ghost.size = at.size
+	ghost.top_level = true   # the drawer is a container: a plain child would be stretched over it
 	add_child(ghost)
+	ghost.global_position = at.position
+	ghost.size = at.size
 	var tw := UiMotion.tween(ghost, UiTokens.MOTION_EASING_STANDARD)
 	tw.tween_property(ghost, "modulate:a", 0.0, UiMotion.secs(UiTokens.MOTION_DURATION_FAST_MS))
 	tw.tween_callback(ghost.queue_free)

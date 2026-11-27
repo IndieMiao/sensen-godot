@@ -100,8 +100,12 @@ var _seeds: Button
 var _seeds_icon: TextureRect
 var _seeds_label: Label
 var _shown_qty := {}
-## Farm style: the item ids the slots showed at the last refresh (MS-10 compares the next ones with them).
+## Farm style: the item ids and icons the slots last showed on screen (MS-10 compares the next ones with them). While
+## the bar is away (a placement, the bag) they stay as last seen, so the bar refills before the player's eyes on return.
 var _bar_ids: Array = []
+var _bar_icons: Array = []
+## A drop of the bar's own drag changed the slots (the owner's next `slots` follows it): that change does not refill.
+var _own_change := false
 
 ## UI v3 (C-Q1, C-105): the bar's dark glass, `radius/lg`, drawn this far outside the slots (it takes no room, so
 ## every placement keeps its layout); hidden while collapsed or bag-only.
@@ -304,9 +308,6 @@ func _build_handle() -> Button:
 
 func _refresh() -> void:
 	if _row == null: return
-	# MS-10: what the slots showed before this refresh (their items and icons), for the refill motion after it.
-	var before_ids := _bar_ids
-	var before_icons := _cells.map(func(c: UiItemCell): return c.icon) if farm_style else []
 	var shown := {}   # the counts now on the bar: an item that left it rolls no stale number when it comes back
 	for i in slot_count:
 		var cell := _cells[i]
@@ -336,13 +337,7 @@ func _refresh() -> void:
 		elif qty <= 0 and cell.pinned: cell.state = UiItemCell.State.ZERO
 		else: cell.state = UiItemCell.State.DEFAULT
 	_shown_qty = shown
-	if farm_style:
-		var now_ids := []
-		for i in slot_count: now_ids.append("" if i == _dragging else str(slot(i).get("id", "")))
-		if not before_ids.is_empty() and _dragging < 0 and not collapsed and not bag_only and not UiMotion.reduced \
-				and is_visible_in_tree():
-			_refill(before_ids, before_icons, now_ids)
-		_bar_ids = now_ids
+	if farm_style: _follow_items()
 	_handle.visible = collapsed and not bag_only
 	mouse_filter = Control.MOUSE_FILTER_IGNORE if collapsed or bag_only else Control.MOUSE_FILTER_STOP
 	# Collapsed or bag-only: the end stays at the right (BAR-1-2); the handle sits centred when collapsed.
@@ -359,6 +354,26 @@ func _refresh() -> void:
 
 # ------------------------------------------------------------------ MS-10 refill (C-185 §3.1 D / §4, C-211)
 
+## The slots' items now against the ones last on screen: on screen, they refill (MS-10); away, the last seen are kept.
+func _follow_items() -> void:
+	var now_ids := []
+	var now_icons := []
+	for i in slot_count:
+		now_ids.append(str(slot(i).get("id", "")))
+		now_icons.append(slot(i).get("icon", null))
+	# The bar's own drag (a swap, a removal, a pin) moves slots itself: nothing refills for it.
+	var quiet := _dragging >= 0 or _lifted >= 0 or _own_change or collapsed or bag_only or UiMotion.reduced
+	_own_change = false
+	if not quiet and not is_visible_in_tree(): return
+	if not quiet and not _bar_ids.is_empty() and now_ids != _bar_ids: _refill(_bar_ids, _bar_icons, now_ids)
+	_bar_ids = now_ids
+	_bar_icons = now_icons
+
+func _notification(what: int) -> void:
+	# Back on screen (after a placement, the bag): what changed meanwhile refills now.
+	if what == NOTIFICATION_VISIBILITY_CHANGED and farm_style and is_inside_tree() and is_visible_in_tree():
+		_follow_items.call_deferred()
+
 ## A slot's item used up: its icon fades out where it was (120), then the items after it slide left into the gap
 ## (`motion/duration/quickBarRefill`, 300, standard). A new item in a slot pops in 0.6 → 1 (200, pop). Reduced: the
 ## slots simply show their new items (the caller skips this).
@@ -372,6 +387,7 @@ func _refill(before: Array, icons: Array, now: Array) -> void:
 	var pitch: float = _cells[1].position.x - _cells[0].position.x if _cells.size() > 1 else UiTokens.SIZE_QUICK_SLOT_W
 	for i in now.size():
 		var id := str(now[i])
+		if id != "": _kill_empty(_cells[i]._surface)   # an item in a slot still fading in its empty frame shows at once
 		if id == "":
 			# A slot left empty by the slide shows its empty frame once the items have slid past it.
 			if i < before.size() and str(before[i]) != "": _empty_after(_cells[i], (UiTokens.MOTION_DURATION_FAST_MS if gone else 0.0) \
@@ -402,6 +418,8 @@ func _fade_away(cell: UiItemCell, icon: Texture2D) -> void:
 func _slide_in(cell: UiItemCell, offset: float, delay_ms: float) -> void:
 	var surface := cell._surface
 	UiMotion._kill(surface, &"_ui_refill")
+	UiMotion._kill(surface, &"_ui_enter")
+	surface.scale = Vector2.ONE
 	_kill_empty(surface)
 	var home: float = surface.get_meta(&"_refill_home", surface.position.x)
 	surface.set_meta(&"_refill_home", home)
@@ -585,6 +603,7 @@ func _drop(global_pos: Vector2) -> void:
 	var id := str(d.get("id", ""))
 	var centers := GestureArbiter.drop_zone_centers(get_global_rect(), zones_below)
 	var where := GestureArbiter.drop_on_bar(global_pos, from, _slot_rects(), centers[0], centers[1])
+	if where.kind in [&"pin_toggle", &"swap", &"remove"]: _own_change = true
 	match where.kind:
 		&"pin_toggle":
 			_fly_back(_FLY_HOME_MS)

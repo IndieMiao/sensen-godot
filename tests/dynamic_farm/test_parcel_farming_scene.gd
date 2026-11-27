@@ -461,6 +461,7 @@ func _profile_from_avatar(farming: Node) -> void:
 	_check(scene._canvas.visible and scene._controls.process_mode == Node.PROCESS_MODE_INHERIT, "the HUD and touches come back")
 	_check(is_instance_valid(leaving) and leaving.modulate.a < 1.0 and leaving.mouse_filter == Control.MOUSE_FILTER_IGNORE,
 		"the profile fades out over the parcel (MS-21), taking no touches")
+	_check(scene.open_profile() == null, "a new profile waits for the one fading out (its pages and locale still there)")
 	await create_timer(0.3).timeout
 	_check(not is_instance_valid(leaving) and scene.get_node_or_null(^"ProfileLayer") == null, "faded out, it and its layer are gone")
 	avatar.pressed.emit()

@@ -98,6 +98,8 @@ var _avatar: UiHudAvatar
 ## The profile and the pages opened from it, over the parcel (parcel_profile.gd), else null.
 var _profile: Control
 var _profile_layer: CanvasLayer
+## The profile closed but still fading out (MS-21), else null.
+var _profile_leaving: Control
 var _coins: Label
 var _coins_icon: TextureRect
 var _movement := Vector2.ZERO
@@ -970,7 +972,8 @@ func close_modal() -> bool:
 ## The profile over the parcel (C-108; C-85 ①: the HUD avatar opens it): the parcel's HUD hides and its touches stop
 ## until it closes; Settings and the dressing room open from it (parcel_profile.gd). The player stops where they are.
 func open_profile() -> Control:
-	if is_instance_valid(_profile) or _suspended or _back_sent: return null
+	# A profile still fading out (MS-21) is still on its pages and its locale: a new one waits for it to go.
+	if is_instance_valid(_profile) or is_instance_valid(_profile_leaving) or _suspended or _back_sent: return null
 	end_placement()
 	if not _route.is_empty(): _end_route("cancelled")
 	_movement = Vector2.ZERO
@@ -997,6 +1000,7 @@ func open_profile() -> Control:
 func profile_open() -> bool: return is_instance_valid(_profile) and not _profile.is_closing()
 
 func _profile_closed() -> void:
+	_profile_leaving = _profile
 	_profile = null
 	_profile_layer = null
 	_controls.process_mode = Node.PROCESS_MODE_INHERIT
