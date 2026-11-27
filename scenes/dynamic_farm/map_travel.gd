@@ -12,6 +12,7 @@ extends Control
 ##   skip()         a tap while walking: the avatar reaches the end in skip_ms.
 ##   cancel()       Back while walking: the avatar goes back to where it left (cancel_ms); `cancelled`.
 ##   come_back()    back on the map: the iris opens from the pin, the top fades in and the avatar lands.
+##   reset()        the app went to the background before the iris closed: the trip is off, as with cancel(false).
 ## UiMotion.reduced (the 减少动效 switch): no route, walk, pops, idle float or framing; the iris becomes a 120 ms fade.
 ## Every number is in CONFIG (motion spec table 4 and the PM's anchors).
 signal closed(place: String)
@@ -161,9 +162,10 @@ func come_back(iris_place: String, token_place: String) -> void:
 	_open_hold = int(cfg.open_hold_frames)
 	_set_iris(0.0, 1.0)
 
-## Drops a trip without a sound (the app went to the background mid-walk, the map is leaving).
+## Drops a trip without a sound (the app went to the background mid-walk, the map is leaving). C-207: the arrival, up to
+## the iris closing, is dropped the same way: back on the map the avatar stands where it left and nothing opens.
 func reset() -> void:
-	if walking() or phase == Phase.CANCEL: _finish_cancel(); return
+	if walking() or phase in [Phase.CANCEL, Phase.ARRIVE]: _finish_cancel(); return
 	if phase == Phase.OPEN: _end_open()
 
 func _go(next: Phase) -> void:
