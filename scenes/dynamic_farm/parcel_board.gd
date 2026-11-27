@@ -288,6 +288,9 @@ func celebrate_delivery(id: int, before: int, after: int, at: Vector2) -> void:
 	done.done = true
 	done.status = COPY.done
 	done["status_tone"] = "done"
+	# The Done row keeps its height until it folds (C-211): its card drops the needs, and the rows under it must not jump.
+	var held_row := c.get_parent() as Control
+	if held_row != null: held_row.custom_minimum_size.y = held_row.size.y
 	c.show_request(done)
 	var stamp := c.status_label()
 	stamp.pivot_offset = stamp.size * 0.5

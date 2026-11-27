@@ -264,6 +264,14 @@ func _turned(turn: bool) -> void:
 		await create_timer(0.1).timeout
 		board.open_request(2)
 		board.back_to_list()
+	# C-211: while the delivered row shows Done (its needs gone) it keeps its height: the egg row under it stays put.
+	if not turn:
+		var egg_at: float = board.page_box.get_node(^"Row_2").position.y
+		await create_timer(0.5).timeout
+		var done_row: Control = board.page_box.get_node_or_null(^"Row_1")
+		_check(done_row != null and board.cards[1].status_label().text == "Done"
+			and is_equal_approx(board.page_box.get_node(^"Row_2").position.y, egg_at),
+			"motion: the Done row keeps its height, the egg row does not jump")
 	# C-211 (C-186#82): the egg row under the delivered one, rebuilt with the list, slides to its new place.
 	var egg_ys := []
 	var end := Time.get_ticks_msec() + 2000
