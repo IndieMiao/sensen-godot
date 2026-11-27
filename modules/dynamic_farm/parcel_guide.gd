@@ -20,7 +20,7 @@ extends RefCounted
 ## (C-191), buy and build the barn (C-192: Lv2, coins, Timber and Stone), feed its cows while the sheep pen's blueprint
 ## waits on its requests, Lv3 and coins (C-182), build the pen and feed its sheep (Wild Herb from the yard's flowers).
 ## Wool once sold leaves no trace in the save, so feeding the sheep comes back as a step after it; the parcel passes
-## `finished` once this device saw every row done (ParcelTasks), which drops it.
+## `finished` once this device saw every row done (ParcelTasks), which drops it. Copy as PM finalised it on C-190#29 (C-45).
 
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const BLUEPRINT := "blueprint_cottage"
@@ -51,14 +51,14 @@ const TIPS := {
 	"upgrade": "Head back to the map and tap Washington Square. Scott upgrades your farm.",
 	"sell_for_coins": "Need more coins to upgrade. Sell carrots and eggs at Washington Square.",
 	"earn_coins": "Need more coins to upgrade. Grow carrots to sell.",
-	"request": "Head back to the map and tap Washington Square. Deliver a request at the Request Board.",
-	"barn_coins": "Save up coins for Scott's Barn Blueprint. Deliver requests and sell at Washington Square.",
+	"request": "Tap Washington Square on the map and deliver a request at the Request Board.",
+	"barn_coins": "Save up coins for the Barn Blueprint. Deliver requests and sell at Washington Square.",
 	"barn_blueprint": "Head back to the map and tap Washington Square. Scott sells the Barn Blueprint.",
 	"gather_barn": "Gather Timber from trees and Stone from rocks for your barn.",
 	"barn": "Tap Build Barn to place your barn.",
 	"feed_cows": "Walk up to the trough in your barn and press Feed.",
 	"pen_requests": "Deliver more requests at the Request Board to unlock the Sheep Pen.",
-	"pen_coins": "Save up coins for Scott's Sheep Pen Blueprint. Deliver requests and sell at Washington Square.",
+	"pen_coins": "Save up coins for the Sheep Pen Blueprint. Deliver requests and sell at Washington Square.",
 	"pen_blueprint": "Head back to the map and tap Washington Square. Scott sells the Sheep Pen Blueprint.",
 	"gather_pen": "Gather Timber from trees and Stone from rocks for your sheep pen.",
 	"sheep_pen": "Tap Build Sheep Pen to place your sheep pen.",

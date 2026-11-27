@@ -526,6 +526,11 @@ func _guide_046(lv2: Dictionary, now: int) -> void:
 	_check(Guide.step(state, now, true) == "", "guide 0.4.6: ... which a device that saw every row done does not show")
 	state.crops = {"10,10": {"crop": "crop_carrot", "planted_at": now - 120000, "ripe_at": now - 60000}}
 	_check(Guide.step(state, now, true) == "harvest", "guide 0.4.6: a ripe carrot still asks for Harvest past the rows")
+	# The three lines PM changed from the draft on C-190#29 (C-45).
+	_check(Guide.TIPS.request == "Tap Washington Square on the map and deliver a request at the Request Board."
+		and Guide.TIPS.barn_coins == "Save up coins for the Barn Blueprint. Deliver requests and sell at Washington Square."
+		and Guide.TIPS.pen_coins == "Save up coins for the Sheep Pen Blueprint. Deliver requests and sell at Washington Square.",
+		"guide 0.4.6: the card's lines as finalised (C-190#29)")
 	# Rules without the 0.4.6 content skip it.
 	var bare := rules.duplicate(true)
 	bare.requests = {}

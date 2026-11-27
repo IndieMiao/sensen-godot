@@ -6,7 +6,7 @@ extends RefCounted
 ## content after the blueprint: build the coop, feed a hen, sell an egg, upgrade the farm (gathering is part of that
 ## last one). No new step, reward or number: a row is done once the guide has moved past it. English only, as the
 ## parcel's UI; the new rows' copy is for PM to finalise (C-45). C-190 (0.4.6) adds REQUESTS & ANIMALS: the first
-## delivered request, the barn, the sheep pen and feeding its sheep.
+## delivered request, the barn, the sheep pen and feeding its sheep (copy finalised on C-190#29).
 
 const Guide = preload("res://modules/dynamic_farm/parcel_guide.gd")
 
