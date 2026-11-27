@@ -5,6 +5,9 @@
 #
 #   tools/dev/dynamic_farm/crash_repro.sh --port 5137 --serial emulator-5560 --out DIR [--package PKG] [--rounds N]
 #
+# In a Cardigan Run --port defaults to $ANDROID_ADB_SERVER_PORT and --serial to $ANDROID_SERIAL, else
+# $CARDIGAN_EMULATOR_SERIAL, else $CARDIGAN_DEVICE_SERIAL (C-212); without them both stay required.
+#
 # Paths (each round): pan and double-tap zoom over the map while buildings load; open the selected parcel in 3D and
 # go Back; Home then relaunch (background/foreground); screen off/on. Godot draws its own buttons, so taps use screen
 # fractions: override BUILDING_AT / PREVIEW_AT / RESET_AT ("x,y" in 0..1) after checking a screenshot.
@@ -13,7 +16,7 @@
 # pids.txt (one line per sample: the app pid; a change means the process died), events.txt and summary.txt.
 set -euo pipefail
 
-port='' serial='' out='' package='com.gensen.mapfarm.internal' rounds=10
+port=${ANDROID_ADB_SERVER_PORT:-} serial=${ANDROID_SERIAL:-${CARDIGAN_EMULATOR_SERIAL:-${CARDIGAN_DEVICE_SERIAL:-}}} out='' package='com.gensen.mapfarm.internal' rounds=10
 while (($#)); do
   case "$1" in
     --port) port=$2; shift 2 ;;

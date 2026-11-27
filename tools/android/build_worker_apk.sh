@@ -21,7 +21,10 @@ if [[ $variant == dynamic-farm-internal ]]; then
     python3 -B "$root/tools/android/dynamic_farm_export.py" check-target "$target" || exit 1
 fi
 [[ ! -e "$1" && ! -L "$1" ]] || fail 'output directory must be new'
-[[ "${ANDROID_ADB_SERVER_PORT:-5137}" == 5137 ]] || fail 'worker adb port must be 5137'
+# The Run's own adb port when the host assigns one (C-212), else the workers' shared 5137. Never 5037.
+adb_port=${ANDROID_ADB_SERVER_PORT:-5137}
+[[ $adb_port =~ ^[1-9][0-9]{3,4}$ ]] && ((adb_port <= 65535 && adb_port != 5037)) ||
+    fail 'ANDROID_ADB_SERVER_PORT must be a private adb port (1000..65535, not 5037)'
 sdk=${ANDROID_HOME:?shared Android SDK required}
 java=${JAVA_HOME:-/Applications/Android Studio.app/Contents/jbr/Contents/Home}
 bt=${ANDROID_BUILD_TOOLS:-$sdk/build-tools/36.1.0}
@@ -100,7 +103,7 @@ PY
 clean=(env -i "PATH=$java/bin:$PATH" "HOME=$home" "CFFIXED_USER_HOME=$home" "TMPDIR=$work/tmp" LANG=en_US.UTF-8
     "ANDROID_HOME=$sdk" "ANDROID_SDK_ROOT=$sdk" "JAVA_HOME=$java" "GODOT_TEMPLATES_DIR=$templates"
     "ANDROID_USER_HOME=$home/.android" "GRADLE_USER_HOME=$home/.gradle" 'GRADLE_OPTS=-Dorg.gradle.daemon=false'
-    "JAVA_TOOL_OPTIONS=-Duser.home=\"$home\"" ANDROID_ADB_SERVER_PORT=5137 ADB_SERVER_SOCKET=tcp:localhost:5137)
+    "JAVA_TOOL_OPTIONS=-Duser.home=\"$home\"" "ANDROID_ADB_SERVER_PORT=$adb_port" "ADB_SERVER_SOCKET=tcp:localhost:$adb_port")
 "${clean[@]}" bash "$p/tools/android/setup_android_build.sh"
 for plugin in voice webview google_signin notify; do
     "${clean[@]}" python3 "$p/tools/android/prepare_${plugin}_plugin.py"
