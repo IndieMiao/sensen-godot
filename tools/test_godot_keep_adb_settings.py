@@ -1,4 +1,4 @@
-"""python3 -m unittest tools/test_godot_keep_adb_settings.py (C-210, C-213).
+"""python3 -m unittest tools/test_godot_keep_adb_settings.py (C-210, C-213, C-217).
 
 The last case runs the real Godot (skipped without one on PATH) against a stub adb: an editor import under a
 private HOME stops "the" adb server without the helper and leaves it alone with it.
@@ -12,6 +12,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('godot_keep_adb_settings', ROOT / 'tools/godot_keep_adb_settings.py')
@@ -175,16 +176,31 @@ class LinkAdbKeysTest(unittest.TestCase):
         self.assertEqual(self.link(self.private), ('ok', ''))
         self.assertEqual(self.snapshot(self.keys), before)
 
-    def test_private_keys_adb_generated_are_replaced(self):
+    def test_private_keys_adb_generated_are_replaced_and_kept(self):
         d = self.private / '.android'
         d.mkdir(parents=True)
         (d / 'adbkey').write_text('OTHER\n')
         (d / 'adbkey.pub').symlink_to(self.tmp / 'elsewhere.pub')
         (d / 'adb_usb.ini').write_text('kept\n')
-        self.assertEqual(self.link(self.private)[0], 'linked')
+        result, log = self.link(self.private)
+        self.assertEqual(result, 'linked')
         self.assert_linked(self.private, self.keys)
         self.assertEqual((d / 'adb_usb.ini').read_text(), 'kept\n')
         self.assertFalse(any(p.name.endswith('.tmp') for p in d.iterdir()))
+        # The key file is kept beside the links (a link is only a pointer, so it is not).
+        backups = sorted(p.name for p in d.glob('*.bak'))
+        self.assertEqual(len(backups), 1)
+        self.assertRegex(backups[0], r'^adbkey\.[0-9a-f]{12}\.bak$')
+        self.assertEqual((d / backups[0]).read_text(), 'OTHER\n')
+        self.assertIn(f'kept as {backups[0]}', log)
+        # The same key replaced again adds no second copy; another one gets its own.
+        for text, count in (('OTHER\n', 1), ('NEWER\n', 2)):
+            (d / 'adbkey').unlink()
+            (d / 'adbkey').write_text(text)
+            self.assertEqual(self.link(self.private)[0], 'linked')
+            self.assertEqual(len(list(d.glob('adbkey.*.bak'))), count)
+        self.assertEqual(sorted(p.read_text() for p in d.glob('*.bak')), ['NEWER\n', 'OTHER\n'])
+        self.assert_linked(self.private, self.keys)
 
     def test_account_home_is_left_alone(self):
         before = self.snapshot(self.keys)
@@ -209,6 +225,151 @@ class LinkAdbKeysTest(unittest.TestCase):
         self.assertEqual(result, 'no_keys')
         self.assertIn('no adbkey and adbkey.pub', log)
         self.assertFalse(self.private.exists())
+
+    def test_links_to_deleted_account_keys_are_removed(self):
+        """Through a dangling link adb would create a new key in the account's directory."""
+        self.assertEqual(self.link(self.private)[0], 'linked')
+        (self.keys / 'adbkey').unlink()
+        d = self.private / '.android'
+        (d / 'adb_usb.ini').write_text('kept\n')
+        before = self.snapshot(self.keys)
+        result, log = self.link(self.private)
+        self.assertEqual(result, 'no_keys')
+        self.assertIn('removed adbkey and adbkey.pub, which linked there', log)
+        self.assertEqual(sorted(p.name for p in d.iterdir()), ['adb_usb.ini'])
+        self.assertEqual(self.snapshot(self.keys), before)
+        # A private key of its own (not a link there) stays.
+        (d / 'adbkey').write_text('OWN\n')
+        self.assertEqual(self.link(self.private)[0], 'no_keys')
+        self.assertEqual((d / 'adbkey').read_text(), 'OWN\n')
+
+    def test_account_home_with_another_key_directory_is_left_alone(self):
+        other = self.tmp / 'other-keys'
+        other.mkdir()
+        (other / 'adbkey').write_text('K\n')
+        (other / 'adbkey.pub').write_text('K.pub\n')
+        before = self.snapshot(self.keys)
+        self.assertEqual(self.link(self.account, SENSEN_ADB_KEY_DIR=str(other)), ('not_private', ''))
+        self.assertEqual(self.snapshot(self.keys), before)
+
+    @unittest.skipIf(os.getuid() == 0, 'root writes read-only directories')
+    def test_unwritable_private_home_only_notes(self):
+        for name, existing in (('ro-home', False), ('ro-android', True)):
+            with self.subTest(name):
+                home = self.tmp / name
+                home.mkdir()
+                locked = home
+                if existing:
+                    locked = home / '.android'
+                    locked.mkdir()
+                    (locked / 'adbkey').write_text('OWN\n')
+                locked.chmod(0o500)
+                self.addCleanup(locked.chmod, 0o700)
+                before = self.snapshot(self.keys)
+                result, log = self.link(home)
+                self.assertEqual(result, 'failed')
+                self.assertIn('cannot link the adb keys', log)
+                self.assertIn('uses keys of its own', log)
+                self.assertEqual(self.snapshot(self.keys), before)
+                self.assertEqual(sorted(p.name for p in home.rglob('*')), ['.android', 'adbkey'] if existing else [])
+                if existing:
+                    self.assertEqual((locked / 'adbkey').read_text(), 'OWN\n')
+
+    def test_another_users_directory_is_left_alone(self):
+        """sudo keeping someone else's HOME: their .android (or their HOME) is not this user's to change."""
+        d = self.private / '.android'
+        d.mkdir(parents=True)
+        (d / 'adbkey').write_text('THEIRS\n')
+        fresh = self.tmp / 'their-home'
+        fresh.mkdir()
+        before, uid = self.snapshot(self.keys), os.getuid()
+        with patch.object(helper.os, 'getuid', return_value=uid + 1):
+            for home in (self.private, fresh):
+                result, log = self.link(home)
+                self.assertEqual(result, 'not_owner')
+                self.assertIn(f'belongs to uid {uid}, not to this user', log)
+        self.assertEqual(sorted(p.name for p in d.iterdir()), ['adbkey'])
+        self.assertEqual((d / 'adbkey').read_text(), 'THEIRS\n')
+        self.assertFalse((fresh / '.android').exists())
+        self.assertEqual(self.snapshot(self.keys), before)
+
+    def test_a_run_linking_the_same_home_in_between_does_not_break_this_one(self):
+        """Another run's temporary link has a name of its own (it was adbkey.tmp for both, C-213)."""
+        replace, nested = os.replace, []
+
+        def interleaved(src, dst):
+            if not nested:
+                nested.append(None)
+                nested[0] = self.link(self.private)  # the other run, between this one's link and rename
+            replace(src, dst)
+        with patch.object(helper.os, 'replace', interleaved):
+            self.assertEqual(self.link(self.private)[0], 'linked')
+        self.assertEqual(nested[0][0], 'linked')
+        self.assert_linked(self.private, self.keys)
+        self.assertEqual(sorted(p.name for p in (self.private / '.android').iterdir()), ['adbkey', 'adbkey.pub'])
+
+
+class ConcurrentRunsTest(unittest.TestCase):
+    """Two runs of the script at once on the same fresh private HOME both succeed (C-217)."""
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.tmp)
+        self.godot = self.tmp / 'bin/godot'
+        self.godot.parent.mkdir()
+        self.godot.write_text('#!/bin/sh\necho 4.7.2.stable.official.test\n')
+        self.godot.chmod(0o755)
+        self.keys = self.tmp / 'keys'
+        self.keys.mkdir()
+        (self.keys / 'adbkey').write_text('PRIVATE\n')
+        (self.keys / 'adbkey.pub').write_text('PUBLIC user@host\n')
+
+    def test_two_runs_at_once(self):
+        for round in range(10):
+            home = self.tmp / f'home{round}'
+            env = {k: v for k, v in os.environ.items() if not k.startswith('XDG_')}
+            env.update(HOME=str(home), SENSEN_ADB_KEY_DIR=str(self.keys))
+            runs = [subprocess.Popen(['python3', '-I', str(ROOT / 'tools/godot_keep_adb_settings.py'), str(self.godot)],
+                                     env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                    for _ in range(2)]
+            for run in runs:
+                _, err = run.communicate(timeout=60)
+                self.assertEqual(run.returncode, 0, err)
+                self.assertNotIn('Traceback', err)
+            for name in ('adbkey', 'adbkey.pub'):
+                self.assertEqual(os.readlink(home / '.android' / name), os.path.realpath(self.keys / name))
+            self.assertFalse([p for p in home.rglob('*.tmp')])
+            settings = next(home.rglob('editor_settings-4.7.tres'))
+            self.assertIn(KEY + ' = false', settings.read_text())
+
+
+class MainTest(unittest.TestCase):
+    @unittest.skipIf(os.getuid() == 0, 'root writes read-only directories')
+    def test_unwritable_home_with_settings_in_place_exits_0(self):
+        """V-677: HOME read-only, settings already false (or in a writable XDG_CONFIG_HOME): the caller goes on."""
+        tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, tmp)
+        godot = tmp / 'bin/godot'
+        godot.parent.mkdir()
+        godot.write_text('#!/bin/sh\necho 4.7.2.stable.official.test\n')
+        godot.chmod(0o755)
+        keys = tmp / 'keys'
+        keys.mkdir()
+        (keys / 'adbkey').write_text('PRIVATE\n')
+        (keys / 'adbkey.pub').write_text('PUBLIC\n')
+        home = tmp / 'home'
+        sub = 'Library/Application Support/Godot' if platform.system() == 'Darwin' else '.config/godot'
+        (home / sub).mkdir(parents=True)
+        (home / sub / 'editor_settings-4.7.tres').write_text(helper.MINIMAL + KEY + ' = false\n')
+        home.chmod(0o500)
+        self.addCleanup(home.chmod, 0o700)
+        env = {k: v for k, v in os.environ.items() if not k.startswith('XDG_')}
+        env.update(HOME=str(home), SENSEN_ADB_KEY_DIR=str(keys))
+        run = subprocess.run(['python3', '-I', str(ROOT / 'tools/godot_keep_adb_settings.py'), str(godot)],
+                             env=env, capture_output=True, text=True)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertIn('cannot link the adb keys', run.stderr)
+        self.assertFalse((home / '.android').exists())
 
 
 @unittest.skipUnless(shutil.which('godot'), 'no godot on PATH')
