@@ -69,7 +69,7 @@ var _args := {}
 var _data := {}
 var _walk: RefCounted
 var _ground_paint: GroundPaint
-var _work_grid: Array[Node] = []
+var _placement_grid: Array[Node] = []
 var _ground: Node3D
 var _props: Node3D
 var _plan := {}
@@ -167,7 +167,7 @@ func _ready() -> void:
 	for chunk: Dictionary in _ground.get_meta("shade_chunks"):
 		for part: MeshInstance3D in chunk.meshes:
 			part.material_override.set_shader_parameter("field_mask", _ground_paint.texture)
-	_work_grid = _ground.find_children("CoreGrid_*", "MeshInstance3D", false, false)
+	_placement_grid = _ground.find_children("CoreGrid_*", "MeshInstance3D", false, false)
 	add_child(Fieldkit.meadow(_data, _walk))
 	var art := Scenery.build(_plan,_walk,_plan.recipe)
 	if not art.ok:
@@ -299,8 +299,8 @@ func _refresh_build() -> void:
 	_build.visible = _build_type != ""
 	if _build.visible: _build.label = "Build %s" % Building.kind(_build_type).name
 
-func _show_work_grid(shown: bool) -> void:
-	for part: MeshInstance3D in _work_grid: part.visible = shown
+func _show_placement_grid(shown: bool) -> void:
+	for part: MeshInstance3D in _placement_grid: part.visible = shown
 
 func begin_placement() -> void:
 	if not _build.visible: return
@@ -320,7 +320,7 @@ func begin_placement() -> void:
 	var start = Building.start_spot(_data, _walk.cell_at(_actor.position), base, taken, path, walk_blocked, type, obstacles,
 		cleared.taken, cleared.walk_blocked)
 	_placement = Placement.new()
-	_show_work_grid(true)
+	_show_placement_grid(true)
 	add_child(_placement)
 	_placement.setup(type, base, _data, _walk, _camera, _canvas, taken, path, walk_blocked,
 		start.at if start != null else _walk.cell_at(_actor.position) - Building.middle(base), cleared,
@@ -345,7 +345,7 @@ func end_placement() -> void:
 	if _placement == null: return
 	_placement.queue_free()
 	_placement = null
-	_show_work_grid(false)
+	_show_placement_grid(false)
 	_sending = false
 	_farming.held = false
 	_controls.process_mode = Node.PROCESS_MODE_INHERIT
@@ -459,6 +459,7 @@ const PARCEL_AA_LEASE := &"sensen_dynamic_farm_aa_lease"
 var _aa_view: Viewport
 
 func _take_parcel_aa() -> void:
+	if is_instance_valid(_aa_view): return
 	var view := get_viewport()
 	if view.has_meta(PARCEL_AA_LEASE):
 		view.get_meta(PARCEL_AA_LEASE).users += 1
@@ -470,6 +471,9 @@ func _take_parcel_aa() -> void:
 	_aa_view = view
 
 func _exit_tree() -> void:
+	_release_parcel_aa()
+
+func _release_parcel_aa() -> void:
 	if not is_instance_valid(_aa_view) or not _aa_view.has_meta(PARCEL_AA_LEASE): return
 	var lease: Dictionary = _aa_view.get_meta(PARCEL_AA_LEASE)
 	lease.users -= 1
@@ -490,15 +494,15 @@ func _setup_world() -> void:
 	env.background_mode = Environment.BG_SKY
 	env.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.84,0.88,0.90)
+	env.ambient_light_color = Color(0.90,0.88,0.84)
 	env.ambient_light_energy = 0.42
 	_environment = WorldEnvironment.new()
 	_environment.environment = env
 	add_child(_environment)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Shade.SUN_DEGREES
-	sun.light_color = Color(1.0,0.937,0.81)
-	sun.light_energy = 1.12
+	sun.light_color = Color(1.0,0.905,0.755)
+	sun.light_energy = 1.16
 	sun.shadow_enabled = RenderingServer.get_current_rendering_method() != "gl_compatibility"
 	sun.shadow_opacity = 0.64
 	sun.shadow_bias = 0.1
@@ -555,7 +559,6 @@ func _process(delta: float) -> void:
 		if _labour_left <= 0.0:
 			_play("idle")
 			_put_pail_away()
-			_show_work_grid(false)
 	else:
 		if steering and not _route.is_empty(): _end_route("cancelled")
 		if not _route.is_empty():
@@ -630,7 +633,6 @@ func approach(cells: Array) -> String:
 func labour(verb: String, cells: Array, seconds: float) -> void:
 	_face_cells(cells)
 	_labour_left = seconds
-	_show_work_grid(verb == "till")
 	if PAIL_MOTIONS.has(verb) and _take_pail():
 		_clip = ""   # the same action twice in a row (watering cell after cell) starts again
 		_play("%s/%s" % [PAIL_LIBRARY, PAIL_MOTIONS[verb]])
@@ -962,6 +964,8 @@ static func _crop_name(id: String) -> String:
 	return n if n != "" else id.trim_prefix("crop_").capitalize()
 
 func suspend() -> void:
+	if _suspended: return
+	_release_parcel_aa()
 	_suspended = true
 	end_placement()
 	if not _route.is_empty(): _end_route("cancelled")
@@ -978,6 +982,8 @@ func suspend() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 
 func resume() -> void:
+	if not _suspended: return
+	if _environment != null: _take_parcel_aa()
 	process_mode = Node.PROCESS_MODE_INHERIT
 	_suspended = false
 	_back_sent = false
