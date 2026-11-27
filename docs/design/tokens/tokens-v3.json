@@ -570,6 +570,241 @@
       "gameUi": "—",
       "designTokens": "—",
       "concept": "—"
+    },
+    "hud/clay/face": {
+      "value": "#F7F3EC",
+      "use": "农场主界面奶白泥件面（体力、金币胶囊，头像框，圆钮，快捷栏两端）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/edge": {
+      "value": "#E2DDD4",
+      "use": "奶白泥件底边 2.5 暗边",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/ink": {
+      "value": "#55534D",
+      "use": "奶白泥件上的数字与名字",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/inkSoft": {
+      "value": "#8F8B83",
+      "use": "奶白泥件上的次要字（回复时间）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/avatarFill": {
+      "value": "#DDEED8",
+      "use": "头像框里的浅绿底",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/shadow": {
+      "value": "#5A3C1E33",
+      "use": "奶白泥件软投影（暖棕 20%）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/energyBar": {
+      "value": "#62D195",
+      "use": "奶白体力胶囊里的进度条",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/pin": {
+      "value": "#F0645A",
+      "use": "位置条红色定位图标",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "glass/dark": {
+      "value": "#3E453CBF",
+      "use": "位置条、引导条深色玻璃（75%）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "bar/frost": {
+      "value": "#FFFFFF5C",
+      "use": "磨砂白快捷栏底（白 36%）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "bar/frostEdge": {
+      "value": "#FFFFFFCC",
+      "use": "磨砂白快捷栏 1.2 白描边",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "bar/frostSlot": {
+      "value": "#FFFFFF8C",
+      "use": "磨砂白物品格（白 55%）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "bar/endTile": {
+      "value": "#FAF7F1",
+      "use": "快捷栏两端奶白泥格",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "bar/sparkle": {
+      "value": "#FFDE37",
+      "use": "快捷栏两端与行动按钮的黄色高光",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "bar/selected": {
+      "value": "#F2C94C",
+      "use": "快捷栏选中金色描边（M-03）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/pill": {
+      "value": "#FEEEDB",
+      "use": "行动按钮第二行奶白药丸",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/pillShort": {
+      "value": "#3A2C26",
+      "use": "行动按钮体力不够时的深色药丸",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/verb": {
+      "value": "#FFF6EC",
+      "use": "行动按钮动词奶白字",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/verbShadow": {
+      "value": "#00000038",
+      "use": "行动按钮动词 2 px 深色字影",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/shadow": {
+      "value": "#6B3F1F45",
+      "use": "行动按钮投影（暖棕 27%）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/sparkle": {
+      "value": "#FFDE37",
+      "use": "行动按钮可做时的 3 条黄色高光",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/earth/base": {
+      "value": "#EE9A5E",
+      "use": "行动按钮 earth 组本色",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/earth/shade": {
+      "value": "#D67C42",
+      "use": "行动按钮 earth 组暗部与底部厚度",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/earth/light": {
+      "value": "#F8BE8E",
+      "use": "行动按钮 earth 组左上高光",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/earth/ink": {
+      "value": "#7A3E14",
+      "use": "行动按钮 earth 组药丸字（深色）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/sow/base": {
+      "value": "#FF8877",
+      "use": "行动按钮 sow 组本色",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/sow/shade": {
+      "value": "#EF7469",
+      "use": "行动按钮 sow 组暗部与底部厚度",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/sow/light": {
+      "value": "#FFB2A6",
+      "use": "行动按钮 sow 组左上高光",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/sow/ink": {
+      "value": "#8A2F25",
+      "use": "行动按钮 sow 组药丸字（深色）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/water/base": {
+      "value": "#62B4EA",
+      "use": "行动按钮 water 组本色",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/water/shade": {
+      "value": "#4596D0",
+      "use": "行动按钮 water 组暗部与底部厚度",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/water/light": {
+      "value": "#9AD2F6",
+      "use": "行动按钮 water 组左上高光",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/water/ink": {
+      "value": "#1D4F75",
+      "use": "行动按钮 water 组药丸字（深色）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/harvest/base": {
+      "value": "#8CC65A",
+      "use": "行动按钮 harvest 组本色",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/harvest/shade": {
+      "value": "#6FAA3E",
+      "use": "行动按钮 harvest 组暗部与底部厚度",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/harvest/light": {
+      "value": "#B6E08C",
+      "use": "行动按钮 harvest 组左上高光",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/harvest/ink": {
+      "value": "#2B3A1A",
+      "use": "行动按钮 harvest 组药丸字（深色）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/rest/base": {
+      "value": "#A894E2",
+      "use": "行动按钮 rest 组本色",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/rest/shade": {
+      "value": "#8C76CC",
+      "use": "行动按钮 rest 组暗部与底部厚度",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/rest/light": {
+      "value": "#CBBDF2",
+      "use": "行动按钮 rest 组左上高光",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/rest/ink": {
+      "value": "#43357A",
+      "use": "行动按钮 rest 组药丸字（深色）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/off/base": {
+      "value": "#D6D2C8",
+      "use": "行动按钮 off 组本色",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/off/shade": {
+      "value": "#BDB8AC",
+      "use": "行动按钮 off 组暗部与底部厚度",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/off/light": {
+      "value": "#E8E5DE",
+      "use": "行动按钮 off 组左上高光",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/off/ink": {
+      "value": "#8A8478",
+      "use": "行动按钮 off 组药丸字（深色）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/sow/glyph": {
+      "value": "#03E4A2",
+      "use": "种组动作小图标（参考图原色）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "action/clay/harvest/sideInk": {
+      "value": "#2B3A1A",
+      "use": "场景侧键（Build 等）收获组绿色药丸上的深绿字（6.0:1）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
     }
   },
   "colorInheritedFromV2": {
@@ -938,6 +1173,186 @@
       "value": 2.5,
       "use": "地块虚线框线宽（虚线 8 / 间隔 5）",
       "v2": "DASH_DROP_TARGET 4/3"
+    },
+    "clayKey/w": {
+      "value": 104,
+      "use": "行动按钮泥团宽",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/h": {
+      "value": 96,
+      "use": "行动按钮泥团高",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/groupW": {
+      "value": 112,
+      "use": "行动按钮整组宽（95→112）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/toolBadge": {
+      "value": 34,
+      "use": "工具徽标奶白泥圆片",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/toolIcon": {
+      "value": 22,
+      "use": "工具徽标里的工具图标",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/switch": {
+      "value": 44,
+      "use": "切换键深色玻璃圆（点击区仍 48）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/icon": {
+      "value": 26,
+      "use": "动作小图标",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/verbFont": {
+      "value": 25,
+      "use": "动词 Nunito Black 字号",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/verbFontMin": {
+      "value": 17,
+      "use": "动词放不下时最小字号",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/pillH": {
+      "value": 20,
+      "use": "第二行药丸高",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/pillMaxW": {
+      "value": 84,
+      "use": "第二行药丸最宽",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/pillFont": {
+      "value": 11,
+      "use": "药丸字号",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/pillFontMin": {
+      "value": 10,
+      "use": "药丸字号下限（PM C-186#13：取 10，不用 8.5）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/thickness": {
+      "value": 4,
+      "use": "泥团底部厚度",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/aboveBar": {
+      "value": 10,
+      "use": "泥团底边在快捷栏上方",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "clayKey/right": {
+      "value": 8,
+      "use": "泥团右边距",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/energyW": {
+      "value": 112,
+      "use": "奶白体力胶囊宽",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/energyH": {
+      "value": 40,
+      "use": "奶白体力胶囊高",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/radius": {
+      "value": 14,
+      "use": "奶白胶囊、快捷栏格圆角",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/edge": {
+      "value": 2.5,
+      "use": "奶白泥件底边厚度",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/barW": {
+      "value": 46,
+      "use": "体力进度条宽",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/barH": {
+      "value": 6,
+      "use": "体力进度条高",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/avatarRadius": {
+      "value": 16,
+      "use": "头像奶白圆角方框圆角",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/clay/button": {
+      "value": 36,
+      "use": "返回键、任务入口奶白泥圆钮",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/placeH": {
+      "value": 30,
+      "use": "位置条一行高",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "hud/placePin": {
+      "value": 14,
+      "use": "位置条定位图标",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "guide/h": {
+      "value": 50,
+      "use": "引导条高（62→50）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "guide/radius": {
+      "value": 18,
+      "use": "引导条圆角",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "guide/dot": {
+      "value": 8,
+      "use": "引导条左侧绿点",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "quick/frostRadius": {
+      "value": 20,
+      "use": "磨砂白快捷栏圆角",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "quick/frostEdge": {
+      "value": 1.2,
+      "use": "磨砂白快捷栏白描边",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "quick/slotsFarm": {
+      "value": 4,
+      "use": "农场快捷栏中间格数（Seeds 端 + 4 格 + Bag 端）",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "quick/endFarmW": {
+      "value": 56,
+      "use": "快捷栏两端泥格宽",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "toast/icon": {
+      "value": 24,
+      "use": "Toast 左侧状态圆",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "toast/aboveCard": {
+      "value": 8,
+      "use": "问候卡打开时 Toast 在卡片上沿上方",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+    },
+    "badge/newDot": {
+      "value": 8,
+      "use": "背包“新获得”点",
+      "source": "C-185 D-489 §5（所有者 Q-307 验收）"
     }
   },
   "elevation": {
@@ -1021,6 +1436,71 @@
         "ms": 1600,
         "use": "气泡待机浮动周期",
         "v2": "—"
+      },
+      "coinFly": {
+        "ms": 420,
+        "use": "金币飞入（卖出、交委托）",
+        "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+      },
+      "rewardHold": {
+        "ms": 120,
+        "use": "奖励图标原地停留",
+        "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+      },
+      "doneHold": {
+        "ms": 600,
+        "use": "委托 Done 行停留",
+        "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+      },
+      "keySquash": {
+        "ms": 90,
+        "use": "行动按钮切换：压扁",
+        "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+      },
+      "keySpring": {
+        "ms": 240,
+        "use": "行动按钮切换：回弹",
+        "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+      },
+      "keyContent": {
+        "ms": 200,
+        "use": "行动按钮切换：新内容弹入",
+        "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+      },
+      "keyTint": {
+        "ms": 160,
+        "use": "行动按钮底色淡换",
+        "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+      },
+      "keyRepeatGuard": {
+        "ms": 250,
+        "use": "250 ms 内第二次切换只淡换",
+        "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+      },
+      "quickBarRefill": {
+        "ms": 300,
+        "use": "快捷栏补位",
+        "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+      },
+      "upgradeGlow": {
+        "ms": 8000,
+        "use": "升级卡背后光芒一圈",
+        "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+      },
+      "gatherShake": {
+        "ms": 200,
+        "use": "树石按下摇两下",
+        "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+      },
+      "gatherFade": {
+        "ms": 300,
+        "use": "采过的灰色渐变",
+        "source": "C-185 D-489 §5（所有者 Q-307 验收）"
+      },
+      "dotsLoop": {
+        "ms": 1600,
+        "use": "问候卡台词三点循环",
+        "source": "C-185 D-489 §5（所有者 Q-307 验收）"
       }
     },
     "easing": {
@@ -1070,7 +1550,52 @@
     "staggerMs": {
       "grid": 20,
       "list": 40,
-      "float": 90
+      "float": 90,
+      "reward": 60,
+      "upgradeRow": 40
+    },
+    "delay": {
+      "handoff": 80,
+      "loadingGrace": 300,
+      "keyTint": 60,
+      "upgradeHero": 80,
+      "upgradeTitle": 200,
+      "upgradeRows": 260,
+      "upgradeButton": 300
+    },
+    "offset": {
+      "sheetEnter": 40,
+      "toastEnter": 12,
+      "toastExit": 8,
+      "guideEnter": 8,
+      "boardEnter": 16,
+      "flyArc": 60
+    },
+    "scale": {
+      "landBump": 1.15,
+      "rewardFrom": 0.0,
+      "rewardPop": 1.15,
+      "flyEnd": 0.6,
+      "keySquashX": 1.1,
+      "keySquashY": 0.84,
+      "keyOvershootX": 0.95,
+      "keyOvershootY": 1.07,
+      "keyPressX": 1.04,
+      "keyPressY": 0.92,
+      "keyContentFrom": 0.6,
+      "keyContentPop": 1.1,
+      "toastEnter": 0.96,
+      "doneStamp": 1.3,
+      "keyHide": 0.9
+    },
+    "angle": {
+      "gatherShake": 3,
+      "switchSpin": 180
+    },
+    "limit": {
+      "rewardIcons": 5,
+      "coinIcons": 3,
+      "floatLines": 4
     }
   }
 }
