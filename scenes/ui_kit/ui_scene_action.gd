@@ -376,7 +376,8 @@ func _refresh_clay() -> void:
 	_cost.add_theme_color_override(&"font_color", UiTokens.COLOR_HUD_ENERGY_LOW if short else pal[3])
 	_bolt.visible = short
 	_bolt.modulate = UiTokens.COLOR_HUD_ENERGY_LOW
-	if not (_switch != null and _switch.is_valid()): _cost.text = cost
+	# The second line always follows `cost` (a set_cost cross-fade writes the same text at its midpoint).
+	_cost.text = cost
 	_pill.visible = cost != ""
 	_place_clay()
 	_content.modulate.a = _CLAY_CONTENT_ALPHA_PENDING if s == State.PENDING else 1.0
