@@ -6,6 +6,8 @@ cd "$(dirname "$0")/.."
 export GODOT_BIN="${GODOT_BIN:-$(command -v godot)}"
 # Historical text assertions use English; localization suites exercise both locales.
 export SENSEN_LANGUAGE=en
+# An editor run (the imports below) must not stop the shared adb server under a private HOME (C-210).
+keep_adb() { python3 -I tools/godot_keep_adb_settings.py "$GODOT_BIN"; }
 
 if [[ ${1:-} == --ci-import || ${1:-} == --ci-headless ]]; then
   log=$(mktemp)
@@ -20,6 +22,7 @@ check_autoloads() {
   fi
 }
 if [[ ${1:-} == --ci-import ]]; then
+  keep_adb
   "$GODOT_BIN" --headless --path . --import 2>&1 | tee "$log"
   check_autoloads import
   # Godot 4.7.2 exits 0 even for a corrupt image. Match terminal import/script
@@ -49,5 +52,6 @@ if [[ ${1:-} == --ci-headless ]]; then
   exit 0
 fi
 
+keep_adb
 "$GODOT_BIN" --headless --path . --import > /dev/null 2>&1 || true
 exec ./addons/gdUnit4/runtest.sh -a "${1:-res://tests}"

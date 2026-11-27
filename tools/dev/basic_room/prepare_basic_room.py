@@ -69,10 +69,11 @@ textures/vram_compression/import_s3tc_bptc=true
 textures/vram_compression/import_etc2_astc=true
 renderer/rendering_method.web="gl_compatibility"
 ''')
+# Not runnable (C-210): the editor then never polls or stops adb; a CLI export does not need it.
 (PROJECT/"export_presets.cfg").write_text('''[preset.0]
 name="Android Basic Room QA"
 platform="Android"
-runnable=true
+runnable=false
 advanced_options=false
 dedicated_server=false
 custom_features=""

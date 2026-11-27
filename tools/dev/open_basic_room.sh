@@ -4,6 +4,7 @@ set -euo pipefail
 ROOM_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOM_ROOT"
 ROOM_GODOT="${GODOT:-godot}"
+python3 -I tools/godot_keep_adb_settings.py "$ROOM_GODOT"  # editor imports below keep the shared adb server (C-210)
 if [[ ! -f output/basic-room-2026-10-06/avatar-dependencies.json ]]; then
   mkdir -p output/basic-room-2026-10-06
   touch output/.gdignore

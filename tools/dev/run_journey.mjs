@@ -16,6 +16,8 @@ const run = (command, args, options = {}) => new Promise((resolve, reject) => {
   child.on('error', reject);
   child.on('exit', code => code === 0 ? resolve() : reject(new Error(`${command} exited ${code}`)));
 });
+// The editor import must not stop the shared adb server under a private HOME (C-210).
+await run('python3', ['-I', path.join(root, 'tools/godot_keep_adb_settings.py'), godot]);
 await run(godot, ['--headless', '--path', root, '--editor', '--import', '--quit']);
 await run(godot, ['--headless', '--path', root, '--script', 'res://tools/dev/prepare_journey_playtest.gd', '--', ...process.argv.slice(2)]);
 const server = spawn(process.execPath, ['--import', 'tsx', 'tools/journey_playtest_server.ts'],

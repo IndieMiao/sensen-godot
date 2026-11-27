@@ -5,7 +5,7 @@ cd "$(dirname "$0")/../.."
 project=$(mktemp -d)
 trap 'rm -rf "$project"' EXIT
 mkdir -p "$project"/{tools,addons,tests/{p0,ui_kit}}
-cp tools/run_tests.sh "$project/tools/"
+cp tools/run_tests.sh tools/godot_keep_adb_settings.py "$project/tools/"
 cp -R addons/gdUnit4 "$project/addons/"
 cd "$project"
 cat > project.godot <<'EOF'
