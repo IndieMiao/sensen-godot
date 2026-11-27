@@ -49,13 +49,18 @@ static func kind(type: String) -> Dictionary:
 ## The type's model in its own frame (pivot on the footprint's middle, +Z the front), or null without art here.
 static func model(type: String, base: Vector2i, cell_m: float) -> Node3D:
 	var k := kind(type)
-	if type in ["well", "cottage"]:
-		var standing := MeshInstance3D.new()
-		standing.name = str(k.asset).to_pascal_case()
-		standing.mesh = Kit.mesh("WellPails" if type == "well" else "CottageSill")
-		standing.material_override = Art.material()
+	if k.get("asset") is String:
+		var standing := Art.instance(k.asset)
+		# Keep the exact authored doors, shutters, winch and stone courses. Only
+		# the loose dressing is joined into a single additional opaque surface.
+		if type in ["well", "cottage"]:
+			var dressing := MeshInstance3D.new()
+			dressing.name = "FootprintProps"
+			dressing.mesh = Kit.mesh("WellPails" if type == "well" else "CottageSill")
+			dressing.material_override = Art.material()
+			dressing.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			standing.add_child(dressing)
 		return standing
-	if k.get("asset") is String: return Art.instance(k.asset)
 	if k.get("livestock", false): return Livestock.model(type, base, cell_m)
 	return null
 

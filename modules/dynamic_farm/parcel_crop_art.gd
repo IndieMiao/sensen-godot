@@ -24,6 +24,7 @@ const SOIL_COLORS := {DRY: Color.WHITE, WET: Color(0.56, 0.51, 0.49)}
 ## Mesh names in stage order. Stage zero uses the soil layer, never a second copy.
 const PLANTS := [&"Sowing", &"Emergence", &"LeafGrowth", &"Shoulders", &"Thickening", &"Maturity"]
 
+const Kit = preload("res://modules/dynamic_farm/parcel_fieldkit.gd")
 var _contact: MultiMeshInstance3D
 var _point: Callable
 var _cell_m := 1.0
@@ -35,24 +36,19 @@ var _counts := {}
 func _init(point: Callable, cell_m: float) -> void:
 	_point = point
 	_cell_m = cell_m
-	# One small feathered contact pad per bed in one shadowless batch. The
-	# original 296-triangle soil block and carrot roots retain their pivots.
-	var pad := PlaneMesh.new()
-	pad.size = Vector2(1.17,1.17)
-	pad.center_offset = Vector3(0,0.005,0)
-	_contact = _layer(pad)
-	var contact_material := ShaderMaterial.new()
-	contact_material.shader = preload("res://modules/dynamic_farm/soil_contact.gdshader")
-	contact_material.set_shader_parameter("pigments",preload("res://assets/dynamic_farm/fieldkit/field_pigments.png"))
-	_contact.material_override = contact_material
+	# One opaque collar/clod batch. Instance tint follows the soil state, not a
+	# transparent decal hidden under the existing soil mesh.
+	_contact = _layer(Kit.mesh("BedFoot"))
+	_contact.multimesh.use_colors = true
+	_contact.material_override = Kit.Art.material()
 	var library := GARDEN.instantiate()
 	var earth := (library.get_node("Tilled") as MeshInstance3D).mesh
 	_soil[DRY] = _layer(earth)
 	_soil[WET] = _layer(earth)
 	var wet := earth.surface_get_material(0).duplicate() as StandardMaterial3D
 	wet.albedo_color = SOIL_COLORS[WET]
-	wet.roughness = 0.57
-	wet.metallic_specular = 0.28
+	wet.roughness = 0.36
+	wet.metallic_specular = 0.48
 	_soil[WET].material_override = wet
 	_stages.append(null)
 	for plant: StringName in PLANTS:
@@ -81,7 +77,10 @@ func sync(soil: Dictionary, crops: Dictionary, now_ms: int) -> void:
 		var crop = crops.get(key)
 		var stage := stage_of(crop, now_ms) if crop is Dictionary and crop.get("crop") == CARROT else 0
 		stages[stage].append(cell)
-	_fill(_contact, blocks[DRY] + blocks[WET], false)
+	var collars: Array = blocks[DRY] + blocks[WET]
+	_fill(_contact, collars, false)
+	for i in collars.size():
+		_contact.multimesh.set_instance_color(i, Color.WHITE if i < blocks[DRY].size() else Color(0.41, 0.34, 0.27))
 	for state: String in blocks:
 		_fill(_soil[state], blocks[state], false)
 	for stage in stages.size():

@@ -72,6 +72,8 @@ func setup(building: String, footprint: Vector2i, data: Dictionary, walk: RefCou
 		see_through.albedo_color.a = 0.6
 		see_through.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		model.material_override = see_through
+		for prop: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
+			prop.material_override = see_through
 	elif Building.kind(type).get("livestock", false):
 		# C-154: the coop's yard (its scene or placeholder), see-through by each mesh's own transparency.
 		var yard := Building.model(type, base, walk.cell_m)

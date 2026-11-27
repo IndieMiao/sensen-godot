@@ -452,7 +452,35 @@ func _step_out(from: Vector3) -> Vector3:
 			if _walk.clear_position(p): return p
 	return _walk.point(_data.spawn)
 
+# For the parcel's opaque silhouettes use two coverage samples instead of four;
+# never raise a player's lower setting. This is viewport-local, not a project
+# default. Multiple previews in one viewport release the original setting last.
+const PARCEL_AA_LEASE := &"sensen_dynamic_farm_aa_lease"
+var _aa_view: Viewport
+
+func _take_parcel_aa() -> void:
+	var view := get_viewport()
+	if view.has_meta(PARCEL_AA_LEASE):
+		view.get_meta(PARCEL_AA_LEASE).users += 1
+	elif view.msaa_3d > Viewport.MSAA_2X:
+		view.set_meta(PARCEL_AA_LEASE, {"original": view.msaa_3d, "users": 1})
+		view.msaa_3d = Viewport.MSAA_2X
+	else:
+		return
+	_aa_view = view
+
+func _exit_tree() -> void:
+	if not is_instance_valid(_aa_view) or not _aa_view.has_meta(PARCEL_AA_LEASE): return
+	var lease: Dictionary = _aa_view.get_meta(PARCEL_AA_LEASE)
+	lease.users -= 1
+	if lease.users == 0:
+		if _aa_view.msaa_3d == Viewport.MSAA_2X:
+			_aa_view.msaa_3d = lease.original
+		_aa_view.remove_meta(PARCEL_AA_LEASE)
+	_aa_view = null
+
 func _setup_world() -> void:
+	_take_parcel_aa()
 	var env := Environment.new()
 	_clouds = ShaderMaterial.new()
 	_clouds.shader = SKY_SHADER

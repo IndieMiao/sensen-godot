@@ -17,7 +17,7 @@ static func mesh(key: String) -> Mesh:
 	return _meshes.get(key)
 
 ## Small ambient tufts and three flowers grow in little drifts, not evenly spaced
-## dots. Noninteractive, no proxies, no per-frame work. Max 360 instances per island.
+## dots. Noninteractive, no proxies, no per-frame work. Max 240 instances per island.
 static func meadow(data: Dictionary, walk: RefCounted) -> Node3D:
 	var root := Node3D.new()
 	root.name = "MeadowDrifts"
@@ -31,7 +31,7 @@ static func meadow(data: Dictionary, walk: RefCounted) -> Node3D:
 		var anchor := pool[rng.randi_range(0, pool.size()-1)]
 		var center: Vector3 = walk.point(anchor)
 		var kind: String = ["Chamomile", "Buttercup", "Lilac"][rng.randi_range(0, 2)]
-		for j in 6:
+		for j in 4:
 			var p := center + Vector3(rng.randf_range(-0.7,0.7), 0.012, rng.randf_range(-0.55,0.55))
 			var at: Vector2i = walk.cell_at(p)
 			var cell: Dictionary = data.by_cell.get(at,{})
