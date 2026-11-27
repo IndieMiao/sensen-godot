@@ -240,7 +240,13 @@ func _timeline() -> void:
 	_check(t.phase == MapTravel.Phase.ARRIVE, "and it is there skip_ms later")
 	_step(t, 600)
 	_check(log[-1] == ["closed", "home"] and MapTravel.at == "home", "the iris closes on home")
-	t.come_back("home", "home"); _step(t, 600)
+	# Long frames back on the map (the scene switch, a slow phone): shut for open_hold_frames, then max_step_ms a frame.
+	t.come_back("home", "home")
+	t._process(1.0)
+	_check(t.phase == MapTravel.Phase.OPEN and (t.iris.material as ShaderMaterial).get_shader_parameter("radius") == 0.0, "the first frames back keep the iris shut (open_hold_frames)")
+	t._process(1.0); t._process(1.0)
+	_check(t.phase == MapTravel.Phase.OPEN and is_equal_approx(t._t, 100.0), "a 1 s frame moves the iris on by max_step_ms only")
+	_step(t, 600)
 	# Back while walking: back where it left.
 	_check(t.depart("town"), "out again")
 	_step(t, 900)

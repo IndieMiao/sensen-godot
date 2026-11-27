@@ -53,6 +53,8 @@ var _to := HOME
 var _t := 0.0
 ## The iris's own time in ARRIVE: it waits while `hold` is on, the pin's pop does not.
 var _iris_t := 0.0
+## Frames the iris stays shut after come_back (open_hold_frames): the map's native view draws its first frame under it.
+var _open_hold := 0
 var _walk_ms := 0.0
 var _wk := 0.0
 var _wk0 := 0.0
@@ -156,6 +158,7 @@ func come_back(iris_place: String, token_place: String) -> void:
 	_card_done()
 	for item in fade_in: item.modulate.a = 0.0
 	_go(Phase.OPEN)
+	_open_hold = int(cfg.open_hold_frames)
 	_set_iris(0.0, 1.0)
 
 ## Drops a trip without a sound (the app went to the background mid-walk, the map is leaving).
@@ -171,7 +174,9 @@ func _go(next: Phase) -> void:
 func _process(dt: float) -> void:
 	_clock += dt * 1000.0
 	if not enabled(): return
-	_t += dt * 1000.0
+	# A long frame (the scene switch, a slow phone) slows the trip down instead of skipping its steps.
+	var ms := minf(dt * 1000.0, float(cfg.max_step_ms))
+	_t += ms
 	# A place gone mid-walk (the pin hidden, the home given up): the trip is off.
 	if (walking() or phase == Phase.CANCEL) and not (places.has(_from) and places.has(_to)):
 		_finish_cancel(); return
@@ -195,8 +200,9 @@ func _process(dt: float) -> void:
 			_wk = lerpf(_wk0, 0.0, standard(clampf(_t / float(cfg.cancel_ms), 0.0, 1.0)))
 			if _t >= float(cfg.cancel_ms): _finish_cancel()
 		Phase.ARRIVE:
-			_step_arrive(dt * 1000.0)
+			_step_arrive(ms)
 		Phase.OPEN:
+			if _open_hold > 0: _open_hold -= 1; _t = 0.0
 			_step_open()
 	_place()
 

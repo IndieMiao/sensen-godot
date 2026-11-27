@@ -34,6 +34,8 @@
   "skip_ms": 120,
   "cancel_ms": 200,
   "reduced_fade_ms": 120,
+  "max_step_ms": 100,
+  "open_hold_frames": 2,
   "fit_padding": {"top": 140, "bottom": 160, "left": 48, "right": 48},
   "fit_zoom": [15, 18],
   "token_idle_ms": 1600,
