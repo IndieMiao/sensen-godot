@@ -64,7 +64,7 @@ func setup(building: String, footprint: Vector2i, data: Dictionary, walk: RefCou
 	_ghost.name = "BuildingPreview"
 	var asset = Building.kind(type).get("asset")
 	if asset is String:
-		var model := Art.instance(asset)
+		var model := Building.model(type, base, walk.cell_m) as MeshInstance3D
 		model.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		_ghost.add_child(model)
 		# See-through, so the cells' green / red under it reads; its own copy of the shared material.

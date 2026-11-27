@@ -9,6 +9,8 @@ signal approach_finished(result: String)
 
 const Data = preload("res://modules/dynamic_farm/farm_data.gd")
 const Walk = preload("res://modules/dynamic_farm/farm_walk.gd")
+const Fieldkit = preload("res://modules/dynamic_farm/parcel_fieldkit.gd")
+const GroundPaint = preload("res://modules/dynamic_farm/parcel_ground_paint.gd")
 const Ground = preload("res://modules/dynamic_farm/farm_mesh.gd")
 const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
 const Shade = preload("res://modules/dynamic_farm/farm_shade.gd")
@@ -66,6 +68,8 @@ const PLACE_ROW_H := 36.0
 var _args := {}
 var _data := {}
 var _walk: RefCounted
+var _ground_paint: GroundPaint
+var _work_grid: Array[Node] = []
 var _ground: Node3D
 var _props: Node3D
 var _plan := {}
@@ -159,6 +163,12 @@ func _ready() -> void:
 	_ground = Ground.build(_data,_walk,_plan.recipe,true,Shade.can_widen(_plan,_data,_walk),
 		1.0 if bool(_args.get("original_slope_material",false)) else 0.65)
 	add_child(_ground)
+	_ground_paint = GroundPaint.new(_data)
+	for chunk: Dictionary in _ground.get_meta("shade_chunks"):
+		for part: MeshInstance3D in chunk.meshes:
+			part.material_override.set_shader_parameter("field_mask", _ground_paint.texture)
+	_work_grid = _ground.find_children("CoreGrid_*", "MeshInstance3D", false, false)
+	add_child(Fieldkit.meadow(_data, _walk))
 	var art := Scenery.build(_plan,_walk,_plan.recipe)
 	if not art.ok:
 		_fail(art.error)
@@ -263,6 +273,7 @@ func _on_farm_changed(farm: Dictionary) -> void:
 	_coins.text = str(int(farm.get("coins", 0)))
 	_coins_capsule.visible = true
 	_sync_buildings(farm)
+	_ground_paint.update(farm)
 	_refresh_build()
 
 ## The saved buildings (ParcelFarm.buildings_of), or [] without the owner's farm.
@@ -288,6 +299,9 @@ func _refresh_build() -> void:
 	_build.visible = _build_type != ""
 	if _build.visible: _build.label = "Build %s" % Building.kind(_build_type).name
 
+func _show_work_grid(shown: bool) -> void:
+	for part: MeshInstance3D in _work_grid: part.visible = shown
+
 func begin_placement() -> void:
 	if not _build.visible: return
 	var type := _build_type
@@ -306,6 +320,7 @@ func begin_placement() -> void:
 	var start = Building.start_spot(_data, _walk.cell_at(_actor.position), base, taken, path, walk_blocked, type, obstacles,
 		cleared.taken, cleared.walk_blocked)
 	_placement = Placement.new()
+	_show_work_grid(true)
 	add_child(_placement)
 	_placement.setup(type, base, _data, _walk, _camera, _canvas, taken, path, walk_blocked,
 		start.at if start != null else _walk.cell_at(_actor.position) - Building.middle(base), cleared,
@@ -330,6 +345,7 @@ func end_placement() -> void:
 	if _placement == null: return
 	_placement.queue_free()
 	_placement = null
+	_show_work_grid(false)
 	_sending = false
 	_farming.held = false
 	_controls.process_mode = Node.PROCESS_MODE_INHERIT
@@ -453,14 +469,14 @@ func _setup_world() -> void:
 	add_child(_environment)
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Shade.SUN_DEGREES
-	sun.light_color = Color(1,0.95,0.84)
+	sun.light_color = Color(1.0,0.937,0.81)
 	sun.light_energy = 1.12
 	sun.shadow_enabled = RenderingServer.get_current_rendering_method() != "gl_compatibility"
-	sun.shadow_opacity = 0.58
+	sun.shadow_opacity = 0.64
 	sun.shadow_bias = 0.1
 	sun.shadow_normal_bias = 1.0
 	sun.shadow_blur = 1.4
-	sun.directional_shadow_max_distance = 0.0
+	sun.directional_shadow_max_distance = 30.0
 	sun.directional_shadow_fade_start = 1.0
 	sun.directional_shadow_pancake_size = 4.0
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
@@ -511,6 +527,7 @@ func _process(delta: float) -> void:
 		if _labour_left <= 0.0:
 			_play("idle")
 			_put_pail_away()
+			_show_work_grid(false)
 	else:
 		if steering and not _route.is_empty(): _end_route("cancelled")
 		if not _route.is_empty():
@@ -585,6 +602,7 @@ func approach(cells: Array) -> String:
 func labour(verb: String, cells: Array, seconds: float) -> void:
 	_face_cells(cells)
 	_labour_left = seconds
+	_show_work_grid(verb == "till")
 	if PAIL_MOTIONS.has(verb) and _take_pail():
 		_clip = ""   # the same action twice in a row (watering cell after cell) starts again
 		_play("%s/%s" % [PAIL_LIBRARY, PAIL_MOTIONS[verb]])
