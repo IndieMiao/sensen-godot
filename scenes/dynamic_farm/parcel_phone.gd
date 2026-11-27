@@ -196,8 +196,9 @@ func _segment(labels: Array, chosen: int, dot: bool, pick: Callable) -> Control:
 	var bar := PanelContainer.new()
 	bar.name = "Segment"
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# C-185 P-02: the segmented control's padding is `space/s2` (4) and its text `type/micro` (10).
 	bar.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_PHONE_ROW, UiTokens.RADIUS_PILL)
-		.with_margins(UiTokens.SPACE_S1 + 1, UiTokens.SPACE_S1 + 1, UiTokens.SPACE_S1 + 1, UiTokens.SPACE_S1 + 1))
+		.with_margins(UiTokens.SPACE_S2, UiTokens.SPACE_S2, UiTokens.SPACE_S2, UiTokens.SPACE_S2))
 	var row := HBoxContainer.new()
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_theme_constant_override(&"separation", 0)
@@ -214,7 +215,7 @@ func _segment(labels: Array, chosen: int, dot: bool, pick: Callable) -> Control:
 		for slot in [&"font_color", &"font_hover_color", &"font_pressed_color", &"font_hover_pressed_color", &"font_focus_color"]:
 			part.add_theme_color_override(slot, UiTokens.COLOR_PHONE_TEXT if on else UiTokens.COLOR_PHONE_TEXT_MUTED)
 		part.add_theme_font_override(&"font", UiKit.theme().get_font(&"font", UiTokens.STYLE_TYPE_MICRO))
-		part.add_theme_font_size_override(&"font_size", UiKit.theme().get_font_size(&"font_size", UiTokens.STYLE_TYPE_MICRO) + 1)
+		part.add_theme_font_size_override(&"font_size", UiKit.theme().get_font_size(&"font_size", UiTokens.STYLE_TYPE_MICRO))
 		part.custom_minimum_size.y = UiTokens.SIZE_TODO_ROW_H
 		part.pressed.connect(func(): if i != chosen and not closing: pick.call(i))
 		row.add_child(part)
@@ -253,7 +254,7 @@ func _card(c: Dictionary, index: int) -> Control:
 	card.name = "Card_" + str(c.get("id", index))
 	card.focus_mode = Control.FOCUS_NONE
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var box := UiStyleBox.make(UiTokens.COLOR_PHONE_ROW, UiTokens.RADIUS_LG - 2)
+	var box := UiStyleBox.make(UiTokens.COLOR_PHONE_ROW, UiTokens.RADIUS_LG)   # C-185 P-02: `radius/lg` 16, not 14
 	for st in [&"normal", &"hover", &"pressed", &"hover_pressed", &"focus"]: card.add_theme_stylebox_override(st, box)
 	var pad := MarginContainer.new()
 	pad.mouse_filter = Control.MOUSE_FILTER_IGNORE

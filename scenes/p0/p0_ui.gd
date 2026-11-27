@@ -1843,7 +1843,7 @@ static func break_in_chinese() -> bool: return TranslationServer.get_locale().be
 ## test_p0_pond_request_hints checks it against the laid-out label.
 func toast_text_width() -> float:
 	var panel: float = minf(_toasts._width, _toasts.size.x - UiTokens.SPACE_PAGE * 2.0) if _toasts.size.x > 0.0 else _toasts._width
-	return panel - UiTokens.SIZE_TOAST_PAD_LEFT - UiTokens.SIZE_TOAST_PAD_RIGHT - UiTokens.SIZE_TOAST_ICON - ToastLayer._ICON_GAP
+	return panel - UiTokens.SIZE_TOAST_PAD_LEFT - UiTokens.SIZE_TOAST_PAD_RIGHT - UiTokens.SIZE_TOAST_ICON_V3 - ToastLayer._ICON_GAP   # C-186: the 24 status disc
 
 ## A toast that opts in breaks its two lines at a " · " (UiKit.break_at_dot), measured with the toast's own label font
 ## at its current width; the toast itself still wraps by words. Measured and broken as it will read: under 中文 the

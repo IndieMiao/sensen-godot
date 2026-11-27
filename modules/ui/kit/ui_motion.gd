@@ -121,6 +121,87 @@ static func bar_shown(c: Control, shown: bool, rest_y: float) -> Tween:
 	c.set_meta(&"_ui_bar", tw)
 	return tw
 
+## MS-03 (C-185 §4): a number rolls from `from` to `to` over 400 (standard); `fmt` formats each step ("%d",
+## "%d/200"). Rising, `bump` (default: the label) pops 1 → 1.15 → 1 in 200; falling, the number flashes
+## `hud/energyLow` for 120 and nothing pops. Reduced: the number is set at once. Returns the roll's tween or null.
+static func roll(l: Label, from: float, to: float, fmt := "%d", bump: Control = null) -> Tween:
+	if l == null: return null
+	_kill(l, &"_ui_roll")
+	if reduced or not l.is_inside_tree() or is_equal_approx(from, to):
+		l.text = fmt % roundi(to)
+		return null
+	var tw := tween(l, UiTokens.MOTION_EASING_STANDARD)
+	tw.tween_method(func(v: float): l.text = fmt % roundi(v), from, to, secs(UiTokens.MOTION_DURATION_SLOW_MS))
+	l.set_meta(&"_ui_roll", tw)
+	if to > from: land(bump if bump != null else l)
+	else: flash(l, UiTokens.COLOR_HUD_ENERGY_LOW)
+	return tw
+
+## Whether a roll() is still counting on `l`.
+static func rolling(l: Object) -> bool:
+	if l == null or not l.has_meta(&"_ui_roll"): return false
+	var tw = l.get_meta(&"_ui_roll")
+	return tw is Tween and (tw as Tween).is_valid() and (tw as Tween).is_running()
+
+## The landing bump (MS-04 / MS-03): 1 → `motion/scale/landBump` → 1 in 200 (pop), pivot at the centre.
+static func land(c: Control) -> void:
+	if c == null or not c.is_inside_tree() or reduced: return
+	_kill(c, &"_ui_land")
+	c.pivot_offset = c.size * 0.5
+	var half := secs(UiTokens.MOTION_DURATION_BASE_MS * 0.5)
+	var tw := tween(c, UiTokens.MOTION_EASING_STANDARD)
+	tw.tween_property(c, "scale", Vector2.ONE * UiTokens.MOTION_SCALE_LAND_BUMP, half)
+	tw.tween_property(c, "scale", Vector2.ONE, half).set_trans(Tween.TRANS_BACK)
+	c.set_meta(&"_ui_land", tw)
+
+## A label's colour flashes to `color` and back (120, MS-02's missing item, MS-03's falling number).
+static func flash(l: Control, color: Color) -> void:
+	if l == null or not l.is_inside_tree(): return
+	_kill(l, &"_ui_flash")
+	var base: Color = l.get_theme_color(&"font_color") if l is Label else Color.WHITE
+	if l.has_meta(&"_ui_flash_base"): base = l.get_meta(&"_ui_flash_base")
+	l.set_meta(&"_ui_flash_base", base)
+	var prop := "theme_override_colors/font_color" if l is Label else "self_modulate"
+	l.set(prop, color)
+	var tw := tween(l, UiTokens.MOTION_EASING_LINEAR)
+	tw.tween_interval(secs(UiTokens.MOTION_DURATION_FAST_MS))
+	tw.tween_callback(func():
+		l.set(prop, base)
+		l.remove_meta(&"_ui_flash_base"))
+	l.set_meta(&"_ui_flash", tw)
+
+## M-02 / MS-02: a refused (grey) key shakes ±4 three times in 200 (linear) and comes back where it was. Reduced:
+## no shake (the caller still flashes what is missing).
+static func shake(c: Control) -> void:
+	if c == null or not c.is_inside_tree() or reduced: return
+	var home: float = c.get_meta(&"_ui_shake_home") if c.has_meta(&"_ui_shake_home") else c.position.x
+	_kill(c, &"_ui_shake")
+	c.position.x = home
+	c.set_meta(&"_ui_shake_home", home)
+	var a := float(UiTokens.MOTION_SHAKE_AMPLITUDE)
+	var step := secs(UiTokens.MOTION_DURATION_BASE_MS / 6.0)
+	var tw := tween(c, UiTokens.MOTION_EASING_LINEAR)
+	for i in 3:
+		tw.tween_property(c, "position:x", home + a, step)
+		tw.tween_property(c, "position:x", home - a, step)
+	tw.tween_property(c, "position:x", home, 0.0)
+	tw.tween_callback(func(): c.remove_meta(&"_ui_shake_home"))
+	c.set_meta(&"_ui_shake", tw)
+
+## Cross-fade a label's text (MS-22's second line, the counter's clerk line): out and in within 120.
+static func swap_text(l: Label, text: String) -> void:
+	if l == null or l.text == text: return
+	if reduced or not l.is_inside_tree() or l.text == "":
+		l.text = text
+		return
+	_kill(l, &"_ui_swap")
+	var half := secs(UiTokens.MOTION_DURATION_FAST_MS * 0.5)
+	var tw := tween(l, UiTokens.MOTION_EASING_STANDARD)
+	tw.tween_property(l, "modulate:a", 0.0, half)
+	tw.tween_callback(func(): l.text = text)
+	tw.tween_property(l, "modulate:a", 1.0, half)
+	l.set_meta(&"_ui_swap", tw)
+
 static func _kill(c: Object, key: StringName) -> void:
 	if c.has_meta(key):
 		var old = c.get_meta(key)

@@ -73,7 +73,7 @@ func _init(tabs: Array = []) -> void:
 	frame.custom_minimum_size = frame.size
 	var bezel := UiStyleBox.make(UiTokens.COLOR_PHONE_BEZEL, UiTokens.RADIUS_DEVICE)
 	bezel.shadow_color = UiTokens.ELEVATION_E2_COLOR
-	bezel.shadow_size = UiTokens.ELEVATION_E2_BLUR
+	bezel.shadow_size = UiTokens.ELEVATION_E2_BLUR * 0.5   # C-185 P-02: e2 as the modal panel draws it (shadow 12)
 	bezel.shadow_offset = Vector2(0, UiTokens.ELEVATION_E2_OFFSET_Y)
 	var b := float(UiTokens.SIZE_PHONE_BEZEL)
 	frame.add_theme_stylebox_override(&"panel", bezel.with_margins(b, b, b, b))
@@ -116,7 +116,7 @@ func _init(tabs: Array = []) -> void:
 	_back.custom_minimum_size = Vector2(_BACK_W, 0)
 	_back.pressed.connect(func(): if not closing: back_pressed.emit())
 	head.add_child(_back)
-	_title = UiKit.label("", UiTokens.STYLE_TYPE_HEADLINE, UiTokens.COLOR_PHONE_TEXT)
+	_title = UiKit.label("", UiTokens.STYLE_TYPE_TITLE, UiTokens.COLOR_PHONE_TEXT)   # C-185 P-02: `type/title` 20
 	_title.name = "Title"
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

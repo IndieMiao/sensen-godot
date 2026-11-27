@@ -10,6 +10,9 @@ extends PanelContainer
 ##   strip   a one-time reward: First catch! +15 XP · First cooked · +20 Cooking XP · Cookbook 2/48; a strip too long
 ##           for a line breaks between its rewards at « · », never inside one (strip_lines)
 ##   actions primary (Eat · +45 Energy) / secondary (Keep) / grey note (Gift later from your bag)
+## Level-up card (C-185 §3.4 / MS-17, C-186): `hero` (a C-86 hero, `hero_home`) stands over the card's top edge and
+## `rows` ({icon, label, value}: `Max Energy  200 → 210`) list what changes under the event; play_level_in() runs M-12
+## (scrim, card, hero, title, rows, button) and Glow turns behind it. An empty item (no icon, name or art) hides its row.
 ## Every empty field hides its part (Figma Show* switches). Catch cards have no buttons and fold away after 1.5 s:
 ## the caller times that. Tapping outside a dish card is Keep: the caller's scrim decides.
 
@@ -71,6 +74,10 @@ var primary := "": set = set_primary
 var primary_reason := "": set = set_primary_reason
 var secondary := "": set = set_secondary
 var note := "": set = set_note
+## C-186: the hero art over the card's top edge (level-up card); null: none.
+var hero: Texture2D: set = set_hero
+## C-186: what-changes rows under the event, each {icon: Texture2D, label, value}; [] hides them.
+var rows: Array = []: set = set_rows
 
 var _event: Label
 var _disc: PanelContainer
@@ -88,6 +95,13 @@ var _actions: VBoxContainer
 var _primary: UiCommandButton
 var _secondary: UiCommandButton
 var _note: Label
+var _item_row: Control
+var _rows: VBoxContainer
+var _hero: TextureRect
+var _hero_anchor: Control
+## The hero's side and how far it stands over the card's top edge (fig-06: the house over the card).
+const HERO_SIDE := 96.0
+const HERO_OVER := 64.0
 
 func _init() -> void:
 	custom_minimum_size.x = WIDTH
@@ -101,10 +115,26 @@ func _init() -> void:
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.add_theme_constant_override(&"separation", int(_GAP))
 	add_child(v)
+	# The hero stands over the card's top edge: a plain anchor (a container would stretch it) whose height is the part of
+	# the hero inside the card, so the event starts under it.
+	_hero_anchor = Control.new()
+	_hero_anchor.name = "HeroAnchor"
+	_hero_anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hero_anchor.custom_minimum_size.y = maxf(0.0, HERO_SIDE - HERO_OVER - _PAD_Y)
+	_hero_anchor.visible = false
+	_hero_anchor.resized.connect(_place_hero)
+	v.add_child(_hero_anchor)
 	_event = UiKit.label("", UiTokens.STYLE_TITLE_XB20)
 	_event.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(_event)
-	v.add_child(_build_item())
+	_item_row = _build_item()
+	v.add_child(_item_row)
+	_rows = VBoxContainer.new()
+	_rows.name = "Rows"
+	_rows.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_rows.add_theme_constant_override(&"separation", int(UiTokens.SPACE_S2))
+	_rows.visible = false
+	v.add_child(_rows)
 	_rewards = HBoxContainer.new()
 	_rewards.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_rewards.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -113,6 +143,12 @@ func _init() -> void:
 	v.add_child(_build_strip())
 	v.add_child(_build_actions())
 	minimum_size_changed.connect(_shrink_wrap)
+	_hero = TextureRect.new()
+	_hero.name = "Hero"
+	_hero.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hero.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_hero.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_hero_anchor.add_child(_hero)
 	_refresh()
 
 ## Placed freely (not in a container), the card follows its minimum size back down: wrapped labels report a tall
@@ -219,6 +255,125 @@ func set_primary(v: String) -> void: primary = v; _refresh()
 func set_primary_reason(v: String) -> void: primary_reason = v; _refresh()
 func set_secondary(v: String) -> void: secondary = v; _refresh()
 func set_note(v: String) -> void: note = v; _refresh()
+func set_hero(v: Texture2D) -> void:
+	hero = v
+	if _hero == null: return
+	_hero.texture = v
+	_hero_anchor.visible = v != null
+	_place_hero()
+func set_rows(v: Array) -> void:
+	rows = v
+	if _rows == null: return
+	for c in _rows.get_children():
+		_rows.remove_child(c)
+		c.queue_free()
+	for r: Dictionary in v: _rows.add_child(_row(r))
+	_rows.visible = not v.is_empty()
+	_refresh()
+
+## One what-changes row: icon 16 · label (fills) · value right (`200 → 210`), as fig-06.
+static func _row(r: Dictionary) -> Control:
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override(&"separation", int(UiTokens.SPACE_S2))
+	row.custom_minimum_size.y = 24
+	var icon := UiKit.icon(r.get("icon", null), 16)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.visible = r.get("icon", null) != null
+	row.add_child(icon)
+	var label := UiKit.label(str(r.get("label", "")), UiTokens.STYLE_C12_XB)
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(label)
+	var value := UiKit.label(str(r.get("value", "")), UiTokens.STYLE_C12_XB)
+	value.name = "Value"
+	value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(value)
+	return row
+
+## The hero centred over the card's top edge, its top HERO_OVER above it (the anchor sits at the card's top padding).
+func _place_hero() -> void:
+	if _hero == null: return
+	_hero.size = Vector2(HERO_SIDE, HERO_SIDE)
+	_hero.position = Vector2((_hero_anchor.size.x - HERO_SIDE) * 0.5, -HERO_OVER - _PAD_Y)
+
+func row_controls() -> Array: return _rows.get_children() if _rows != null else []
+func event_label() -> Label: return _event
+func hero_rect() -> TextureRect: return _hero
+
+## M-12 (C-185 MS-17): the card 0.6 → 1 in 320 (back out) as `scrim` fades 0 → 1 in 200 (linear; its colour holds the
+## darkness); the hero pops in after `motion/delay/upgradeHero` (80) from y+12 at 0.6, the title drops from y−12 after
+## `motion/delay/upgradeTitle` (200), each row fades in from `motion/delay/upgradeRows` (260) `motion/stagger/upgradeRow`
+## (40) apart, the actions after `motion/delay/upgradeButton` (300). Reduced: the card fades in over 120, nothing moves.
+## Call once the card is in the tree and laid out (centred by the caller).
+func play_level_in(scrim: CanvasItem = null) -> void:
+	if scrim != null:
+		scrim.modulate.a = 0.0
+		UiMotion.tween(scrim, UiTokens.MOTION_EASING_LINEAR).tween_property(scrim, ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_BASE_MS))
+	modulate.a = 0.0
+	if UiMotion.reduced:
+		UiMotion.tween(self, UiTokens.MOTION_EASING_LINEAR).tween_property(self, ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_FAST_MS))
+		return
+	pivot_offset = size * 0.5
+	scale = Vector2.ONE * UiTokens.MOTION_SCALE_KEY_CONTENT_FROM
+	var card := UiMotion.tween(self, UiTokens.MOTION_EASING_POP)
+	card.tween_property(self, ^"scale", Vector2.ONE, UiKit.secs(UiTokens.MOTION_DURATION_EMPHASIS_MS))
+	card.parallel().tween_property(self, ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_FAST_MS))
+	if _hero != null and _hero_anchor.visible:
+		_hero.pivot_offset = _hero.size * 0.5
+		_hero.scale = Vector2.ONE * UiTokens.MOTION_SCALE_KEY_CONTENT_FROM
+		_hero.modulate.a = 0.0
+		var home := _hero.position.y
+		_hero.position.y = home + 12.0
+		var h := UiMotion.tween(_hero, UiTokens.MOTION_EASING_POP)
+		h.tween_interval(UiKit.secs(UiTokens.MOTION_DELAY_UPGRADE_HERO))
+		h.tween_property(_hero, ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_FAST_MS))
+		h.parallel().tween_property(_hero, ^"scale", Vector2.ONE, UiKit.secs(UiTokens.MOTION_DURATION_EMPHASIS_MS))
+		h.parallel().tween_property(_hero, ^"position:y", home, UiKit.secs(UiTokens.MOTION_DURATION_EMPHASIS_MS))
+	_fade_in(_event, UiTokens.MOTION_DELAY_UPGRADE_TITLE, UiTokens.MOTION_DURATION_BASE_MS)
+	var i := 0
+	for r in row_controls():
+		_fade_in(r, UiTokens.MOTION_DELAY_UPGRADE_ROWS + UiTokens.MOTION_STAGGER_MS_UPGRADE_ROW * i, UiTokens.MOTION_DURATION_QUICK_MS)
+		i += 1
+	if _strip.visible:
+		_fade_in(_strip, UiTokens.MOTION_DELAY_UPGRADE_ROWS + UiTokens.MOTION_STAGGER_MS_UPGRADE_ROW * i, UiTokens.MOTION_DURATION_QUICK_MS)
+	_fade_in(_actions, UiTokens.MOTION_DELAY_UPGRADE_BUTTON, UiTokens.MOTION_DURATION_QUICK_MS)
+
+## A part of the column fades in after `delay_ms` (its place is kept: modulate only, as a container lays it out).
+static func _fade_in(c: CanvasItem, delay_ms: float, ms: float) -> void:
+	if c == null: return
+	c.modulate.a = 0.0
+	var tw := UiMotion.tween(c, UiTokens.MOTION_EASING_STANDARD)
+	tw.tween_interval(UiKit.secs(delay_ms))
+	tw.tween_property(c, ^"modulate:a", 1.0, UiKit.secs(ms))
+
+## The light behind a level-up card (M-12): soft rays round its centre, one turn per `motion/duration/upgradeGlow` (8 s).
+## Reduced: none (the caller leaves it out). Display only.
+class Glow extends Control:
+	const RAYS := 10
+	var color := UiTokens.COLOR_UPGRADE_GLOW
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		set_process(true)
+
+	func _process(delta: float) -> void:
+		rotation += TAU * delta / UiKit.secs(UiTokens.MOTION_DURATION_UPGRADE_GLOW_MS)
+		pivot_offset = size * 0.5
+
+	## Soft rays round the card's middle, fading out by `RADIUS` × the shorter side (C-185 fig-06: a glow behind the
+	## card, not beams across the screen).
+	const RADIUS := 0.62
+
+	func _draw() -> void:
+		var c := size * 0.5
+		var r := minf(size.x, size.y) * RADIUS
+		var clear := Color(color, 0.0)
+		for i in RAYS:
+			var a := TAU * i / RAYS
+			var w := TAU / RAYS * 0.22
+			draw_polygon(PackedVector2Array([c, c + Vector2.from_angle(a - w) * r, c + Vector2.from_angle(a + w) * r]),
+				PackedColorArray([color, clear, clear]))
 
 func set_rewards(v: Array) -> void:
 	rewards = v
@@ -304,3 +459,4 @@ func _refresh() -> void:
 	_note.text = note
 	_note.visible = note != ""
 	_rewards.visible = not _rewards.get_children().is_empty()
+	_item_row.visible = icon != null or item_name != "" or art

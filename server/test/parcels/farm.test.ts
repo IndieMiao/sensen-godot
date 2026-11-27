@@ -958,6 +958,9 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
     const again = run(one, [feed()], T0 + LAY);
     expect(again.drops.map(d => [d.id, d.animal])).toEqual([[2, 1], [3, 0]]);
     expect(tryIt(again, [feed()], T0 + LAY)).toMatchObject({ ok: false, code: 'GROUND_FULL' });
+    // C-186#8: with the ground full and no carrots in hand the refusal is the ground, not the feed (pick up first).
+    const empty = { ...s, bag: { ...s.bag, crop_carrot: 0 } };
+    expect(tryIt(empty, [feed()], T0 + 3 * LAY)).toEqual({ ok: false, index: 0, code: 'GROUND_FULL', detail: { max: 2 } });
   });
 
   it('an older save (coop, eggs, claimed coop blueprint) reads and plays as before; Scott sells it the barn blueprint once at level 2', () => {
