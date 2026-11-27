@@ -617,14 +617,14 @@ func _watering_space() -> void:
 		and Space.action(rules, data, path, {}, no_pail, Vector2i(36, 18), T0).refusal == Space.NO_PAIL, "no pail: Need a pail")
 	_check(Space.till_refusal(data, path, state, Vector2i(36, 16)) == Space.HOUSE, "no tilling under the well")
 
-## C-152: the shipped levels (SEN-C-152#14, for the owner to confirm), Max Energy and wells by level, the save's level,
+## C-152: the shipped levels (coins 100 / 300 / 600 / 1,000 since Q-282), Max Energy and wells by level, the save's level,
 ## the rules' bounds (server rules.ts parseFarmLevels) and upgrade_farm as the server (farm.test.ts 'farm levels (C-152)').
 func _levels() -> void:
 	var rules := ParcelFarm.rules()
-	_check(_ints(rules.farm_levels) == [{"level": 2, "coins": 40, "items": {"wood": 6, "stone": 4}},
-		{"level": 3, "coins": 60, "items": {"wood": 10, "stone": 8}, "buildings": {"well": 2}, "gift": {"blueprint_well": 1}},
-		{"level": 4, "coins": 70, "items": {"wood": 14, "stone": 12}},
-		{"level": 5, "coins": 80, "items": {"wood": 20, "stone": 16}, "buildings": {"well": 3}, "gift": {"blueprint_well": 1}}],
+	_check(_ints(rules.farm_levels) == [{"level": 2, "coins": 100, "items": {"wood": 6, "stone": 4}},
+		{"level": 3, "coins": 300, "items": {"wood": 10, "stone": 8}, "buildings": {"well": 2}, "gift": {"blueprint_well": 1}},
+		{"level": 4, "coins": 600, "items": {"wood": 14, "stone": 12}},
+		{"level": 5, "coins": 1000, "items": {"wood": 20, "stone": 16}, "buildings": {"well": 3}, "gift": {"blueprint_well": 1}}],
 		"levels: Lv2–5 as shipped")
 	var at := func(level: int) -> Dictionary:
 		var s := ParcelFarm.empty_state()
@@ -632,12 +632,17 @@ func _levels() -> void:
 		return s
 	_check([1, 2, 3, 4, 5].map(func(l): return ParcelFarm.max_energy(rules, at.call(l))) == [200, 210, 220, 230, 240], "levels: Max Energy +10 a level")
 	_check([1, 2, 3, 4, 5].map(func(l): return ParcelFarm.building_max(rules, "well", l)) == [1, 1, 2, 2, 3], "levels: wells 1 / 2 / 3 at Lv1 / 3 / 5")
-	_check(ParcelFarm.next_level(rules, 5).is_empty() and int(ParcelFarm.next_level(rules, 1).coins) == 40, "levels: Lv5 is the top")
+	_check(ParcelFarm.next_level(rules, 5).is_empty() and int(ParcelFarm.next_level(rules, 1).coins) == 100, "levels: Lv5 is the top")
 	_check(ParcelFarm.empty_state().level == 1, "levels: a new farm is Lv1")
 	var old := {"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {}, "welcomed_at": T0}
 	_check(ParcelFarm.normalize(old).level == 1 and ParcelFarm.normalize(old.merged({"level": 0})).level == 1, "levels: no level (or a bad one) reads as Lv1")
 	var three := ParcelFarm.normalize(JSON.parse_string(JSON.stringify(old.merged({"level": 3}))))
 	_check(three.level == 3 and ParcelFarm.normalize(JSON.parse_string(JSON.stringify(three))) == three, "levels: a JSON round trip keeps the level")
+	# Q-282: a farm upgraded at the old prices reads back at its level with its coins, nothing taken or given back.
+	var paid_old := ParcelFarm.normalize(JSON.parse_string(JSON.stringify(old.merged({"level": 3, "coins": 25}))))
+	_check(paid_old.level == 3 and paid_old.coins == 25, "levels: an old Lv3 save keeps its level and coins")
+	var asked := ParcelFarm.apply(rules, paid_old.merged({"bag": {"wood": 14, "stone": 12}}, true), [{"type": "upgrade_farm"}], T0)
+	_check(asked.code == "NOT_ENOUGH_COINS" and _ints(asked.detail) == {"coins": 25, "need": 600}, "levels: its next level asks the new price")
 	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH))
 	var bad := func(levels: Variant) -> bool:
 		var copy: Dictionary = raw.duplicate(true)
@@ -657,15 +662,15 @@ func _levels() -> void:
 	var start := ParcelFarm.welcome(rules, ParcelFarm.empty_state(), T0) as Dictionary
 	var paid: Dictionary = start.duplicate(true)
 	paid.bag.merge({"wood": 6, "stone": 4})
-	paid.coins = 40
+	paid.coins = 100
 	var up := ParcelFarm.apply(rules, paid, [{"type": "upgrade_farm"}], T0)
 	_check(up.ok and up.state.level == 2 and up.state.coins == 0 and up.state.bag == start.bag and up.state.energy.value == 200,
-		"levels: Lv2 takes 40 coins, 6 Timber and 4 Stone, no Energy")
+		"levels: Lv2 takes 100 coins, 6 Timber and 4 Stone, no Energy")
 	_check(ParcelFarm.max_energy(rules, up.state) == 210 and ParcelFarm.next_tick_in(rules, up.state, T0) != null, "levels: Lv2 tops at 210, filling from now")
-	var short := ParcelFarm.apply(rules, start.merged({"coins": 40}, true), [{"type": "upgrade_farm"}], T0)
+	var short := ParcelFarm.apply(rules, start.merged({"coins": 100}, true), [{"type": "upgrade_farm"}], T0)
 	_check(short.code == "NOT_ENOUGH" and short.detail == {"item": "wood", "have": 0, "need": 6}, "levels: no Timber, refused naming it")
 	var poor: Dictionary = paid.duplicate(true)
-	poor.coins = 39
+	poor.coins = 99
 	_check(ParcelFarm.apply(rules, poor, [{"type": "upgrade_farm"}], T0).code == "NOT_ENOUGH_COINS", "levels: a coin short")
 	_check(ParcelFarm.apply(rules, paid, [{"type": "upgrade_farm"}, {"type": "upgrade_farm"}], T0).index == 1 and paid.get("level", 1) == 1,
 		"levels: a refused batch changes nothing")
@@ -706,12 +711,12 @@ func _upgrade_sheet() -> void:
 	var m: Dictionary = Upgrade.model(rules, farm)
 	_check(m.title == "Farm Lv1 → Lv2" and not m.top, "sheet: Farm Lv1 → Lv2")
 	_check(m.tiles == [{"id": "wood", "name": "Timber", "have": 2, "need": 6}, {"id": "stone", "name": "Stone", "have": 9, "need": 4},
-		{"id": "coins", "name": "Coins", "have": 12, "need": 40}], "sheet: Timber, Stone, then Coins, have / need")
+		{"id": "coins", "name": "Coins", "have": 12, "need": 100}], "sheet: Timber, Stone, then Coins, have / need")
 	_check(m.reason == "Need 4 more Timber", "sheet: the first gap on the key, materials first: " + str(m.reason))
 	_check(m.changes == [{"icon": "energy", "text": "Max Energy 210", "note": "now 200"}], "sheet: Lv2 adds Max Energy only")
 	farm.bag.wood = 6
-	_check(Upgrade.model(rules, farm).reason == "Need 28 more coins", "sheet: then the coins")
-	farm.coins = 40
+	_check(Upgrade.model(rules, farm).reason == "Need 88 more coins", "sheet: then the coins")
+	farm.coins = 100
 	_check(Upgrade.model(rules, farm).reason == "", "sheet: enough, the key can go")
 	farm.level = 2
 	_check(Upgrade.model(rules, farm).changes == [{"icon": "energy", "text": "Max Energy 220", "note": "now 210"},
@@ -725,6 +730,6 @@ func _upgrade_sheet() -> void:
 	farm.level = 1
 	farm.coins = 0
 	sheet.refresh(farm)
-	_check(sheet.button.visible and sheet.button.reason == "Need 40 more coins" and sheet._tiles.get_child_count() == 3,
+	_check(sheet.button.visible and sheet.button.reason == "Need 100 more coins" and sheet._tiles.get_child_count() == 3,
 		"sheet: refreshed to Lv1, three tiles and the gap on the key")
 	sheet.free()
