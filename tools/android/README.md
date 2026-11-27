@@ -107,8 +107,16 @@ or export as well. Repository scripts already do it:
   say `false` through `tools/p0/godot_keep_adb.sh`.
 
 The repository's own `export_presets.cfg` keeps its runnable presets, so an import or export of the
-game project still polls `adb devices`: keep the shared server running, and if it is down, let the
-host's own account restart it rather than a run under a private `HOME`.
+game project still polls `adb devices`, and if the shared server is down at that moment the editor's
+adb starts one under the private `HOME` (C-213). adb takes its keys only from `$HOME/.android`
+(`ANDROID_USER_HOME` is ignored, checked with platform-tools 37), so the same helper also makes
+`$HOME/.android/adbkey` and `adbkey.pub` of a private `HOME` symlinks to the account's own
+`~/.android` keys: a server restarted there offers the account's key and the devices stay
+authorized. The account's `~/.android` is only read, and a `HOME` whose `.android` is the account's
+is left alone. `SENSEN_ADB_KEY_DIR=<directory>` links another key pair instead and
+`SENSEN_ADB_KEY_DIR=none` turns the links off.
+Symlinks rather than `ADB_VENDOR_KEYS` because every caller already hands Godot the `HOME` it ran
+the helper with, whereas an environment variable would have to be exported into each Godot process.
 
 Tests: `python3 -m unittest tools/test_godot_keep_adb_settings.py` (its last case runs the real
 Godot against a stub adb: without the helper the import calls `kill-server`, with it it does not).

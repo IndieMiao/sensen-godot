@@ -1,4 +1,4 @@
-"""python3 -m unittest tools/test_godot_keep_adb_settings.py (C-210).
+"""python3 -m unittest tools/test_godot_keep_adb_settings.py (C-210, C-213).
 
 The last case runs the real Godot (skipped without one on PATH) against a stub adb: an editor import under a
 private HOME stops "the" adb server without the helper and leaves it alone with it.
@@ -135,6 +135,80 @@ class EnsureTest(unittest.TestCase):
         with self.assertRaises(SystemExit):
             self.ensure(self.private)
         self.assertEqual(f.read_text(), '[gd_resource type="EditorSettings" format=3]\n')
+
+
+class LinkAdbKeysTest(unittest.TestCase):
+    """A private HOME's adb keys link to the account's, so a server adb starts there is authorized (C-213)."""
+
+    def setUp(self):
+        self.tmp = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.tmp)
+        self.account = self.tmp / 'account'
+        self.keys = self.account / '.android'
+        self.keys.mkdir(parents=True)
+        (self.keys / 'adbkey').write_text('PRIVATE\n')
+        (self.keys / 'adbkey.pub').write_text('PUBLIC user@host\n')
+        (self.keys / 'emu-update-last-check.ini').write_text('x\n')
+        self.private = self.tmp / 'private'
+
+    def link(self, home, **env):
+        log = io.StringIO()
+        return helper.link_adb_keys({'HOME': str(home), **env}, str(self.account), log), log.getvalue()
+
+    def snapshot(self, directory):
+        return {p.name: (p.read_bytes(), p.stat().st_mtime_ns) for p in sorted(directory.iterdir())}
+
+    def assert_linked(self, home, source):
+        for name in ('adbkey', 'adbkey.pub'):
+            link = home / '.android' / name
+            self.assertTrue(link.is_symlink(), name)
+            self.assertEqual(os.readlink(link), os.path.realpath(source / name))
+            self.assertEqual(link.read_bytes(), (source / name).read_bytes())
+
+    def test_private_home_links_the_account_keys(self):
+        before = self.snapshot(self.keys)
+        result, log = self.link(self.private)
+        self.assertEqual(result, 'linked')
+        self.assertIn('link to', log)
+        self.assert_linked(self.private, self.keys)
+        self.assertEqual(sorted(p.name for p in (self.private / '.android').iterdir()), ['adbkey', 'adbkey.pub'])
+        self.assertEqual(self.link(self.private), ('ok', ''))
+        self.assertEqual(self.snapshot(self.keys), before)
+
+    def test_private_keys_adb_generated_are_replaced(self):
+        d = self.private / '.android'
+        d.mkdir(parents=True)
+        (d / 'adbkey').write_text('OTHER\n')
+        (d / 'adbkey.pub').symlink_to(self.tmp / 'elsewhere.pub')
+        (d / 'adb_usb.ini').write_text('kept\n')
+        self.assertEqual(self.link(self.private)[0], 'linked')
+        self.assert_linked(self.private, self.keys)
+        self.assertEqual((d / 'adb_usb.ini').read_text(), 'kept\n')
+        self.assertFalse(any(p.name.endswith('.tmp') for p in d.iterdir()))
+
+    def test_account_home_is_left_alone(self):
+        before = self.snapshot(self.keys)
+        self.assertEqual(self.link(self.account), ('not_private', ''))
+        self.assertEqual(self.link(''), ('not_private', ''))  # adb falls back to the account's home
+        self.assertEqual(self.snapshot(self.keys), before)
+        self.assertFalse((self.keys / 'adbkey').is_symlink())
+
+    def test_key_directory_is_configurable(self):
+        other = self.tmp / 'other-keys'
+        other.mkdir()
+        (other / 'adbkey').write_text('K\n')
+        (other / 'adbkey.pub').write_text('K.pub\n')
+        self.assertEqual(self.link(self.private, SENSEN_ADB_KEY_DIR=str(other))[0], 'linked')
+        self.assert_linked(self.private, other)
+        self.assertEqual(self.link(self.tmp / 'off', SENSEN_ADB_KEY_DIR='none'), ('off', ''))
+        self.assertFalse((self.tmp / 'off').exists())
+
+    def test_missing_account_keys_leave_the_private_home_alone(self):
+        (self.keys / 'adbkey.pub').unlink()
+        result, log = self.link(self.private)
+        self.assertEqual(result, 'no_keys')
+        self.assertIn('no adbkey and adbkey.pub', log)
+        self.assertFalse(self.private.exists())
 
 
 @unittest.skipUnless(shutil.which('godot'), 'no godot on PATH')

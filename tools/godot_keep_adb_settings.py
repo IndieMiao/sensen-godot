@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Keep a Godot editor run from stopping the shared adb server (C-210).
+"""Keep a Godot editor run from stopping the shared adb server (C-210) or restarting it with other keys (C-213).
 
 Godot's editor setting export/android/shutdown_adb_on_exit defaults to true. Any editor-mode run
 (--import, --export-*, --editor) of a project with a runnable Android preset ends with
@@ -9,8 +9,10 @@ adb honours $ANDROID_ADB_SERVER_PORT, so on the Cardigan workers it stops the sh
 account's settings, but a run under a private HOME (or private XDG_CONFIG_HOME on Linux) reads other
 settings: fresh ones, where the default applies. Script-mode runs (--script, running a scene) open no
 editor settings and never call adb. The key does not stop the editor from polling `adb devices` while a
-runnable Android preset exists, which starts a server under the run's HOME if the shared one is down;
-staging projects a script generates should use non-runnable presets (see tools/android/README.md).
+runnable Android preset exists (the game project's own presets are runnable), which starts a server under
+the run's HOME if the shared one is down. adb reads its keys from $HOME/.android only (it ignores
+ANDROID_USER_HOME), so such a server would offer fresh keys and the devices would be unauthorized
+(SEN-C-186#16); a private HOME's adbkey and adbkey.pub therefore link to the account's (C-213).
 
 Run this right before an editor-mode run, with the same environment and Godot binary:
 
@@ -22,6 +24,9 @@ It finds the settings file that Godot will read (as Godot's EditorPaths do) and:
     itself would migrate them);
   * the account's own settings, or a self-contained Godot's settings: never written; a note on
     stderr if the key is not false there.
+When $HOME/.android is not $SENSEN_ADB_KEY_DIR (default: the account's ~/.android) it also makes
+$HOME/.android/adbkey and adbkey.pub symlinks to the files there, replacing private ones; the key directory
+itself is never written. SENSEN_ADB_KEY_DIR=none turns this off; a note on stderr if it has no keys.
 Exit status 0 unless Godot or its settings cannot be read, in which case nothing is written.
 """
 import os
@@ -34,6 +39,7 @@ import sys
 from pathlib import Path
 
 KEY = 'export/android/shutdown_adb_on_exit'
+ADB_KEYS = ('adbkey', 'adbkey.pub')
 MINIMAL = '[gd_resource type="EditorSettings" format=3]\n\n[resource]\n'
 
 
@@ -120,11 +126,38 @@ def ensure(binary, env, account_home, system, log=sys.stderr):
     return 'written'
 
 
+def link_adb_keys(env, account_home, log=sys.stderr):
+    """Returns 'linked', 'ok', 'not_private', 'off' or 'no_keys' (the latter with a note on log)."""
+    source = env.get('SENSEN_ADB_KEY_DIR') or str(Path(account_home) / '.android')
+    if source == 'none':
+        return 'off'
+    directory = Path(env.get('HOME') or account_home) / '.android'  # adb falls back to the passwd entry too
+    if same_path(directory, source):
+        return 'not_private'
+    source = Path(os.path.realpath(source))
+    if not all((source / name).is_file() for name in ADB_KEYS):
+        print(f'godot_keep_adb_settings: note: no adbkey and adbkey.pub in {source}; an adb server started '
+              f'under HOME={directory.parent} uses keys of its own', file=log)
+        return 'no_keys'
+    if all(os.path.islink(directory / name) and os.readlink(directory / name) == str(source / name) for name in ADB_KEYS):
+        return 'ok'
+    directory.mkdir(mode=0o750, parents=True, exist_ok=True)
+    for name in ADB_KEYS:
+        tmp = directory / f'{name}.tmp'
+        tmp.unlink(missing_ok=True)
+        tmp.symlink_to(source / name)
+        os.replace(tmp, directory / name)
+    print(f'godot_keep_adb_settings: {directory}/adbkey and adbkey.pub link to {source}', file=log)
+    return 'linked'
+
+
 def main(argv):
     if len(argv) > 2 or (len(argv) == 2 and argv[1].startswith('-')):
         raise SystemExit('usage: godot_keep_adb_settings.py [GODOT]')
     name = argv[1] if len(argv) == 2 else (os.environ.get('GODOT_BIN') or 'godot')
-    ensure(resolve_godot(name), os.environ, pwd.getpwuid(os.getuid()).pw_dir, platform.system())
+    account_home = pwd.getpwuid(os.getuid()).pw_dir
+    ensure(resolve_godot(name), os.environ, account_home, platform.system())
+    link_adb_keys(os.environ, account_home)
 
 
 if __name__ == '__main__':
