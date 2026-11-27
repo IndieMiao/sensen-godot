@@ -3,7 +3,7 @@
 ## 当前基准
 
 1. [玩法方案 v2](product/gameplay-plan-v2-2026-10-02.md)：玩法、数值、文案、操作与 P0/P1/P2/P3 分期的唯一来源，采用正文最新修订。
-2. [Figma 页面 14 · UI semantic refactor](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-4)：当前游戏 UI 设计稿（R1 修订中，锁定项以 [SGODOT-197](https://plane.sensenjoy.cn/zili/browse/SGODOT-197/) 为准）；旧 [Figma · Prototype](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-3) 为 Archive，截至 2026-10-06。[本地设计索引](design/README.md) 标出有效稿与素材来源。
+2. [Figma 页面 14 · UI semantic refactor](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-4)：当前游戏 UI 设计稿（R1 修订中，锁定项以 [锁定组件清单](governance/locked-components.md) 为准）；旧 [Figma · Prototype](https://www.figma.com/design/5SVgfevrLzZXqD83uyPgmV/Gensen_US_2026?node-id=5-3) 为 Archive，截至 2026-10-06。[本地设计索引](design/README.md) 标出有效稿与素材来源。
 3. [P0 进度核查](qa/p0-progress-audit-2026-10-05.md)：实现证据、剩余范围和 SGODOT-131/150/153–170 卡片。
 
 方案中的 P1/P2/P3 设计仍有效，只是不属于 P0；不能因尚未开发而删除。当前文档内部的待收口矛盾按 SGODOT-153 处理，不用旧方案补写新规则。

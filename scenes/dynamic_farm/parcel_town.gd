@@ -11,6 +11,13 @@ extends Control
 ##   question 5); it only goes into the bag, building comes later (0.4.4).
 ## - Since C-152 Scott also upgrades the farm: his greeting's `Upgrade Farm` opens the upgrade sheet (parcel_upgrade.gd,
 ##   P0's HOME-1 in the kit), whose Upgrade sends `upgrade_farm` (coins, Timber and Stone; more Max Energy and wells).
+## - Since C-191 the room's Request Board opens here too (who = BOARD): no keeper and no greeting, the board drawer
+##   (parcel_board.gd) straight away; its keys send `accept_request` / `deliver_request` / `drop_request`, and closing
+##   it leaves.
+## - C-197 seed aid (owner SEN-Q-281): when her greeting opens and the read save has no coins for a seed, no seeds and no
+##   crops, the town sends `claim_seed_aid` once (ParcelFarm.seed_aid_refusal decides whether to ask; the server decides);
+##   given, her greeting line says so and the existing `Received … ×N` toast names the seeds. Nothing else on the card
+##   changes (LOCK-16: Trade stays the one key). A refusal is silent: the greeting stays as it was.
 ## The parcel save (store: read / send, parcel_farm_remote_store.gd or the local stand-in) is authoritative; this
 ## node draws what it answers. Coins are the parcel's own, separate from the main farm's.
 signal closed
@@ -19,9 +26,12 @@ const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const ParcelItems = preload("res://modules/dynamic_farm/parcel_items.gd")
 const Counter = preload("res://scenes/dynamic_farm/parcel_counter.gd")
 const Upgrade = preload("res://scenes/dynamic_farm/parcel_upgrade.gd")
+const Board = preload("res://scenes/dynamic_farm/parcel_board.gd")
 const Portraits = preload("res://modules/p0/p0_keeper_portraits.gd")
 const MARKET := "market"
 const CARPENTER := "carpenter"
+## C-191: the Request Board, a facility rather than a keeper.
+const BOARD := "board"
 const BLUEPRINT := "coop"
 ## Looks from catalogue parts (no NPC-only part of another keeper, no hairHat + cloth pair another NPC wears).
 const NPCS := {
@@ -44,6 +54,8 @@ const LINES := {
 	"upgrade_key": "Upgrade Farm",
 	"upgraded": "Farm Lv%d",
 	"upgraded_gift": "Farm Lv%d · +%d %s",
+	# C-197 seed aid: Jasmine's line when she gives the seeds (count, seed name), awaiting PM's C-45 final on SEN-C-197.
+	"seed_aid": "Out of coins and seeds? Here are %d %s, on me.",
 }
 const MET_PATH := "user://dynamic_farm_local/town.json"
 
@@ -57,13 +69,18 @@ var stack: ModalStack
 var card: UiNpcCard
 var counter: Counter
 var upgrade_sheet: Upgrade
+var board: Board
+## Server time minus this device's clock at the last answer (the board's countdowns and day run on the server's clock).
+var server_offset := 0
 var toast: ToastLayer
 ## A greeting's keys, by name (tests and the map read them).
 var keys := {}
 var _switching := false   # the card closes because the counter opens over it
+## C-197: what the seed aid gave this visit ({item, amount}); her greeting line says so while it is set.
+var aid_given := {}
 var _met_path := MET_PATH
 
-## who: MARKET or CARPENTER; store answers read() and send(); parcel_id names the player's parcel (the met record).
+## who: MARKET, CARPENTER or BOARD; store answers read() and send(); parcel_id names the player's parcel (the met record).
 static func open(parent: Node, who_: String, store_: RefCounted, parcel_id_: String, met_path := MET_PATH) -> Control:
 	var town: Control = load("res://scenes/dynamic_farm/parcel_town.gd").new()
 	town.who = who_
@@ -96,6 +113,9 @@ func _ready() -> void:
 
 ## Reads the parcel save and greets again; a failed read says so and offers Retry.
 func reload() -> void:
+	if who == BOARD:
+		await _reload_board()
+		return
 	busy = true
 	_greet()
 	var result: Dictionary = await store.read()
@@ -110,15 +130,57 @@ func reload() -> void:
 		keys.retry = retry
 		return
 	_greet()
+	if who == MARKET and aid_given.is_empty() and ParcelFarm.seed_aid_refusal(ParcelFarm.rules(), farm, server_now()).code == "":
+		await claim_seed_aid()
 
 func _adopt(result: Dictionary) -> bool:
 	var next := ParcelFarm.normalize(result.get("farm"))
 	if next.is_empty(): return false
 	farm = next
 	farm_version = int(result.get("farm_version", farm_version))
+	if result.has("server_time"): server_offset = int(result.server_time) - _device_ms()
 	if counter != null and is_instance_valid(counter): counter.refresh(farm)
 	if upgrade_sheet != null and is_instance_valid(upgrade_sheet): upgrade_sheet.refresh(farm)
+	if board != null and is_instance_valid(board): board.refresh(farm)
 	return true
+
+func _device_ms() -> int: return int(Time.get_unix_time_from_system() * 1000.0)
+
+## The server's clock now (the last answer's server_time carried forward on this device's clock).
+func server_now() -> int: return _device_ms() + server_offset
+
+# ---------------------------------------------------------------- the Request Board (C-191)
+## The board drawer at once (`…` until the save is read), then the save; a failed read says so and offers Retry.
+func _reload_board() -> void:
+	if board == null or not is_instance_valid(board): _open_board()
+	busy = true
+	if farm.is_empty(): board.show_status(Board.COPY.loading)
+	var result: Dictionary = await store.read()
+	busy = false
+	if not is_inside_tree() or board == null or not is_instance_valid(board): return
+	if not _adopt(result) and farm.is_empty(): board.show_status(Board.COPY.unreachable, reload)
+
+func _open_board() -> void:
+	board = Board.new(farm)
+	board.now_ms = server_now
+	board.close_requested.connect(func(): stack.close_drawer())
+	board.command_requested.connect(board_command)
+	board.refill_due.connect(func(): if not busy: _reload_board())
+	stack.open_drawer(board)
+	toast.anchor_above(board)
+
+## A board key's command. A delivery floats its coins up from its key; a drop shows BOARD-DROPPED. A refusal toasts
+## what the server said (the keys already carry the gaps it checks).
+func board_command(command: Dictionary) -> Dictionary:
+	if busy or board == null or not is_instance_valid(board): return {}
+	var at := board.key_point(int(command.get("request", 0)))
+	var coins := int(farm.get("coins", 0))
+	var result := await _send(command)
+	if not result.get("ok", false) or board == null or not is_instance_valid(board): return result
+	match str(command.type):
+		"deliver_request": if at != Vector2.INF: board.float_coins(int(farm.coins) - coins, at)
+		"drop_request": board.dropped()
+	return result
 
 ## The keeper's greeting card: a fresh one each time it is shown (the read, a sale, the blueprint).
 func _greet() -> void:
@@ -141,7 +203,11 @@ func _greet() -> void:
 	else: _greet_carpenter()
 
 func _greet_market() -> void:
-	if not met(MARKET):
+	if not aid_given.is_empty():
+		var seed := ParcelItems.name_of(str(aid_given.item))
+		var amount := int(aid_given.amount)
+		card.line = LINES.seed_aid % [amount, P0Logic.plural(seed) if amount > 1 else seed]
+	elif not met(MARKET):
 		card.line = LINES.intro
 		mark_met(MARKET)
 	elif card.line == "" or card.line == "…" or card.line == LINES.intro: card.line = LINES.hello
@@ -232,6 +298,23 @@ func buy(item: String, count: int) -> Dictionary:
 		toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(item), count], ToastLayer.Severity.SUCCESS)
 	return result
 
+## C-197: Jasmine's seed aid, asked once as her greeting opens when the save qualifies. Given: her line says so and a toast
+## names what came in. Refused (another device took it, or the save changed): nothing is said; the greeting stays.
+func claim_seed_aid() -> Dictionary:
+	if busy: return {}
+	var aid: Dictionary = ParcelFarm.rules().get("seed_aid", {})
+	if aid.is_empty(): return {}
+	busy = true
+	var result: Dictionary = await store.send(farm_version, [{"type": "claim_seed_aid"}])
+	busy = false
+	if not is_inside_tree(): return result
+	_adopt(result)
+	if not result.get("ok", false): return result
+	aid_given = {"item": aid.item, "amount": int(aid.amount)}
+	toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(str(aid.item)), int(aid.amount)], ToastLayer.Severity.SUCCESS)
+	if card != null and is_instance_valid(card): _greet()
+	return result
+
 func claim_blueprint() -> Dictionary:
 	if busy: return {}
 	var rule: Dictionary = ParcelFarm.rules().economy.blueprints[BLUEPRINT]
@@ -271,12 +354,14 @@ func _met() -> Dictionary:
 	var raw = JSON.parse_string(FileAccess.get_file_as_string(_met_path)) if FileAccess.file_exists(_met_path) else null
 	return raw if raw is Dictionary else {}
 
-## The counter closing goes back to the greeting; the greeting closing leaves.
+## The counter closing goes back to the greeting; the greeting closing leaves. The board has no greeting: closing it leaves.
 func _on_layer_closed(layer: int, _content: Control) -> void:
 	if layer == ModalStack.Layer.DRAWER:
 		counter = null
 		upgrade_sheet = null
-		if is_inside_tree(): _greet_again.call_deferred()
+		board = null
+		if who == BOARD: close()
+		elif is_inside_tree(): _greet_again.call_deferred()
 	elif layer == ModalStack.Layer.CARD:
 		card = null
 		if not _switching and not stack.has_drawer(): close()
@@ -289,7 +374,16 @@ func close() -> void:
 	queue_free()
 	closed.emit()
 
+## Back: a board sheet goes back a page (BOARD-3 to its request, the others to the list), else the top layer closes;
+## false when nothing was open.
+func step_back() -> bool:
+	if board != null and is_instance_valid(board) and board.page != "list":
+		if board.page == "drop": board.open_request(int(board.focus.get("id", 0)))
+		else: board.back_to_list()
+		return true
+	return stack.back()
+
 func _unhandled_input(e: InputEvent) -> void:
 	if e.is_action_pressed(&"ui_cancel"):
-		if not stack.back(): close()
+		if not step_back(): close()
 		get_viewport().set_input_as_handled()

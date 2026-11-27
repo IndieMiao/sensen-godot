@@ -1,9 +1,9 @@
 extends SceneTree
 ## C-107 the in-game phone on one's own parcel (design C-85 ⑦ / ⑧):
-## - ParcelTasks: the guide's eight steps as rows, done / current / todo from the save alone, at every stage of the
-##   first visit (a growing carrot waits on Harvest, as does one sown dry while the guide asks for the well and water,
-##   C-151; the coop blueprint ends the list), and gathering again after
-##   selling what was gathered not taking the rows back once the device saw them further on;
+## - ParcelTasks: the guide's ten milestones as rows (C-175), done / current / todo from the save alone, at every stage
+##   of the first visit (a growing carrot waits on Harvest, as does one sown dry while the guide asks for the well and
+##   water, C-151; the first upgrade ends the list), and feeding again after selling the first egg not taking the rows
+##   back once the device saw them further on;
 ## - the kit: UiTaskRow's finishing beat, UiTaskDropDown's rows / More… / fold, UiPhone's tabs, badge and head;
 ## - the phone's pages over data: tasks with groups and only the current row tappable, the inbox's rows and Claim all,
 ##   empty Parcels / Updates, collection cards opening their grid (silhouettes for what is not got) and ‹ back;
@@ -55,11 +55,15 @@ func _farm(changes: Dictionary) -> Dictionary:
 	return f
 
 const HOUSE := {"model": "cottage", "x": 2, "y": 2, "width": 3, "depth": 3, "rotation": 0, "built_at": 0, "id": 1, "type": "cottage"}
+const COOP := {"model": "chicken_yard", "x": 20, "y": 20, "width": 7, "depth": 5, "rotation": 0, "built_at": 0, "id": 2, "type": "coop"}
+const EGG := {"id": 1, "item": "egg", "amount": 1, "building": 2, "animal": 0, "spot": 0, "ready_at": 0}
 
 func _task_progress() -> void:
-	_check(Tasks.TASKS.size() == 8 and Tasks.keys() == ["build", "till", "sow", "harvest", "sell", "gather", "sell_gathered", "blueprint"],
-		"eight tasks in the guide's order")
+	_check(Tasks.TASKS.size() == 10 and Tasks.keys() == ["build", "till", "sow", "harvest", "sell", "blueprint", "coop", "feed",
+		"sell_egg", "upgrade"], "ten tasks in the guide's order (C-175)")
 	_check(Tasks.done_count({}, NOW) == 0 and Tasks.current({}, NOW) == "", "no save: nothing done, no current task")
+	var claimed := {"buildings": [HOUSE], "sales": 1, "blueprints_claimed": {"coop": NOW}}
+	var with_coop: Dictionary = claimed.merged({"buildings": [HOUSE, COOP]}, true)
 	var cases := [
 		["a blueprint, no house: Build", {"bag": {"blueprint_cottage": 1, "seed_carrot": 3, "hoe_starter": 1}}, 0],
 		["a house and seeds: Till", {"buildings": [HOUSE], "bag": {"seed_carrot": 3, "hoe_starter": 1}}, 1],
@@ -67,10 +71,13 @@ func _task_progress() -> void:
 		["a carrot growing: Harvest waits", {"buildings": [HOUSE], "tilled": ["7,7"], "crops": {"7,7": {"crop": "crop_carrot", "planted_at": NOW, "ripe_at": NOW + 60000}}}, 3],
 		["a ripe carrot: Harvest", {"buildings": [HOUSE], "tilled": ["7,7"], "crops": {"7,7": {"crop": "crop_carrot", "planted_at": NOW - 90000, "ripe_at": NOW - 30000}}}, 3],
 		["a carrot in the bag: Sell", {"buildings": [HOUSE], "bag": {"crop_carrot": 1}}, 4],
-		["sold, nothing gathered: Gather", {"buildings": [HOUSE], "sales": 1, "coins": 12}, 5],
-		["gathered something sellable: Sell it", {"buildings": [HOUSE], "sales": 1, "bag": {"wood": 1}, "gathered": {"x": NOW}}, 6],
-		["gathered and sold: the blueprint", {"buildings": [HOUSE], "sales": 2, "gathered": {"x": NOW}}, 7],
-		["the coop blueprint taken: all done", {"buildings": [HOUSE], "sales": 2, "gathered": {"x": NOW}, "blueprints_claimed": {"coop": NOW}}, 8],
+		["sold: Scott's blueprint", {"buildings": [HOUSE], "sales": 1, "coins": 12}, 5],
+		["the blueprint taken: the coop", claimed.merged({"bag": {"blueprint_coop": 1}}, true), 6],
+		["a coop: feed a hen", with_coop.merged({"bag": {"seed_carrot": 1}}, true), 7],
+		["a hen fed: sell an egg", with_coop.merged({"drop_seq": 1, "drops": [EGG]}, true), 8],
+		["an egg in the bag: sell it", with_coop.merged({"drop_seq": 1, "bag": {"egg": 1}}, true), 8],
+		["the egg sold: upgrade", with_coop.merged({"drop_seq": 1}, true), 9],
+		["upgraded: all done", with_coop.merged({"drop_seq": 1, "level": 2}, true), 10],
 	]
 	for c: Array in cases:
 		var f := _farm(c[1])
@@ -80,17 +87,23 @@ func _task_progress() -> void:
 		var want := []
 		for i in rows.size(): want.append("done" if i < c[2] else "current" if i == c[2] else "todo")
 		_check(states == want, c[0] + ": row states follow the count")
-	_check(Tasks.current(_farm(cases[9][1]), NOW) == "", "all done: no current task")
-	# Gathering again after selling what was gathered: the guide asks to sell it again, the rows do not go back.
-	var again := _farm({"buildings": [HOUSE], "sales": 2, "bag": {"wood": 1}, "gathered": {"x": NOW, "y": NOW}})
-	_check(Tasks.done_count(again, NOW) == 6, "gathered again, nothing seen further on this device: Sell it")
-	_check(Tasks.done_count(again, NOW, 7) == 7 and Tasks.current(again, NOW, 7) == "blueprint"
-		and Tasks.rows(again, NOW, 7)[6].state == "done", "gathered again after the blueprint row: still the blueprint")
-	_check(Tasks.done_count(again, NOW, 6) == 6, "the first sale of what was gathered is still to do")
-	_check(Tasks.done_count(_farm(cases[6][1]), NOW, 7) == 5, "only Sell what you gathered keeps what the device saw")
+	_check(Tasks.current(_farm(cases[12][1]), NOW) == "", "all done: no current task")
+	# Feeding again after selling the first egg: the guide asks about the new egg, the rows do not go back.
+	var again := _farm(with_coop.merged({"drop_seq": 2, "drops": [EGG]}, true))
+	_check(Tasks.done_count(again, NOW) == 8, "fed again, nothing seen further on this device: Sell an egg")
+	_check(Tasks.done_count(again, NOW, 9) == 9 and Tasks.current(again, NOW, 9) == "upgrade"
+		and Tasks.rows(again, NOW, 9)[8].state == "done", "fed again after the upgrade row: still the upgrade")
+	_check(Tasks.done_count(again, NOW, 8) == 8, "the first egg is still to sell")
+	_check(Tasks.done_count(_farm(cases[8][1]), NOW, 9) == 7, "only Sell an egg keeps what the device saw")
+	# Upgraded before feeding the hens: the coop rows still wait; an upgraded farm with eggs stays done.
+	_check(Tasks.done_count(_farm(with_coop.merged({"level": 2}, true)), NOW) == 7, "upgraded, coop never fed: Feed a hen")
+	_check(Tasks.done_count(_farm(with_coop.merged({"level": 2, "drop_seq": 3, "drops": [EGG]}, true)), NOW) == 10,
+		"upgraded with an egg on the ground: all done")
 	_check(Tasks.rows({}, NOW)[0].state == "current" and Tasks.rows({}, NOW)[0].group == "GET STARTED"
-		and Tasks.rows({}, NOW)[4].group == "TOWN", "groups: GET STARTED then TOWN")
+		and Tasks.rows({}, NOW)[4].group == "TOWN" and Tasks.rows({}, NOW)[6].group == "YOUR FARM",
+		"groups: GET STARTED, TOWN, then YOUR FARM")
 	_check(Tasks.title("sell") == "Sell to Jasmine" and Tasks.title("blueprint") == "Take Scott's blueprint", "design copy")
+	_check(Tasks.title("coop") == "Build the Coop" and Tasks.title("upgrade") == "Upgrade your farm", "C-175 rows")
 	# C-151's well and water asks have no row: the carrot sown dry waits on Harvest, as one growing does.
 	var rules := ParcelFarm.rules()
 	var state: Dictionary = ParcelFarm.grant(rules, ParcelFarm.welcome(rules, ParcelFarm.empty_state(), NOW), NOW).state
@@ -109,10 +122,10 @@ func _task_progress() -> void:
 		_check(Tasks.done_count(state, NOW) == pair[1] and Tasks.current(state, NOW) == Tasks.TASKS[pair[1]].key,
 			"watering walk: after %s, %d done (got %d)" % [pair[0].type, pair[1], Tasks.done_count(state, NOW)])
 	# A farm past the first carrot with a dry one: the rows stay where the save says, the device's count kept.
-	var veteran := _farm({"buildings": [HOUSE], "sales": 2, "bag": {"wood": 1, "blueprint_well": 1}, "gathered": {"x": NOW, "y": NOW},
-		"tilled": ["7,7"], "crops": {"7,7": {"crop": "crop_carrot", "planted_at": NOW, "ripe_at": ParcelFarm.NEVER, "watered_at": null}}})
+	var veteran := _farm(with_coop.merged({"sales": 2, "bag": {"wood": 1, "blueprint_well": 1}, "gathered": {"x": NOW, "y": NOW},
+		"tilled": ["7,7"], "crops": {"7,7": {"crop": "crop_carrot", "planted_at": NOW, "ripe_at": ParcelFarm.NEVER, "watered_at": null}}}, true))
 	_check(preload("res://modules/dynamic_farm/parcel_guide.gd").step(veteran, NOW) == "well"
-		and Tasks.done_count(veteran, NOW, 7) == 7 and Tasks.done_count(veteran, NOW) == 6,
+		and Tasks.done_count(veteran, NOW, 9) == 7 and Tasks.done_count(veteran, NOW) == 7,
 		"a dry carrot on a veteran farm asks for the well; the rows do not move")
 
 func _host(c: Control) -> Control:
@@ -393,7 +406,7 @@ func _scene() -> void:
 	_check(farming._seen() == "till" and farming._reached() == 1, "reopening reads the seen task and the rows done")
 	_check(Tasks.current(farming.farm, farming.server_now()) == "till" and not farming.task_button.badge,
 		"the cottage stands, Till already seen: no dot")
-	# Rows kept from before the parcel was reset do not hold a later Sell what you gathered done.
+	# Rows kept from before the parcel was reset do not hold a later Sell an egg done.
 	farming.tasks_reached = 7
 	farming._refresh_tasks()
 	_check(farming._reached() == 1 and int(JSON.parse_string(FileAccess.get_file_as_string(farming.phone_seen_path))[raw.block_id].reached) == 1,

@@ -8,6 +8,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { PlayerRow } from '../http/store.js';
 import { energyOf } from './energy.js';
 import { applyFarmCommands, emptyFarm, grant, parseFarmCommands, rebaseFarm, welcome, withEconomy } from './farm.js';
+import { settleBoard } from './requests.js';
 import { communityOf, isNewerDataset, type ParcelRules } from './rules.js';
 import { activeZone, zoneView, type StarterZones } from './starter_zone.js';
 import { DEFAULT_LAYER, sameParcel, type OwnedParcel, type ParcelStore } from './store.js';
@@ -60,10 +61,14 @@ function parseBbox(raw: unknown): [number, number, number, number] | null {
   return [w, s, e, n];
 }
 
-/** 农场按当前字段补齐后给客户端：缺的经济字段补开局值，缺的体力补满（C-148，energyOf；只补显示，不写回）。 */
+/**
+ * 农场按当前字段补齐后给客户端：缺的经济字段补开局值，缺的体力补满（C-148，energyOf）；委托板补到现在（C-191，settleBoard：
+ * 到点的空格抽上单子、过期的换掉，抽到的和下一条命令补位抽到的是同一张）。只补显示，不写回。
+ */
 const farmView = (rules: ParcelRules, farm: OwnedParcel['farm'], at: number) => {
   const f = withEconomy(farm);
   f.energy = energyOf(rules, f, at);
+  settleBoard(rules, f, at);
   return f;
 };
 

@@ -58,8 +58,9 @@ Notes: `docs/plans/C-151.md`.
 
 ## Farm levels (C-152, 0.4.5)
 
-As P0's Homestead levels, Lv1 to Lv5 for now (`farm_levels` in `assets/farm/data/dynamic_farm.json`; the costs are the
-author's defaults on SEN-C-152#14 for the owner to confirm). Scott's greeting has `Upgrade Farm`, which opens the upgrade
+As P0's Homestead levels, Lv1 to Lv5 for now (`farm_levels` in `assets/farm/data/dynamic_farm.json`; Lv2–5 cost 100 /
+300 / 600 / 1,000 coins since owner decision SEN-Q-282 (C-198, 0.4.6), materials as on SEN-C-152#14; a farm upgraded at
+the earlier 40 / 60 / 70 / 80 keeps its level and coins). Scott's greeting has `Upgrade Farm`, which opens the upgrade
 sheet (`parcel_upgrade.gd`, P0's HOME-1 in the kit: NEED-TILEs for Timber, Stone and Coins, What changes, the first gap on
 the Upgrade key per LOCK-10); Upgrade sends `upgrade_farm`. The server takes the next level's coins and materials (no
 Energy) or refuses the whole batch (`NOT_ENOUGH` naming the first short material, then `NOT_ENOUGH_COINS`; `MAX_LEVEL`
@@ -93,7 +94,10 @@ see-through model (its middle cell under the finger); its cells fill green or re
 cells round it, and the protected path's cells in reach show sand. The bottom is the shared `UiPlaceBar`
 (`Cancel · Rotate · Build`, the three-key bar P0's Decorate uses); Rotate turns the preview a quarter in place
 (0, 90, 180, 270°, the owner's SEN-C-134#22 question 3), a turn swapping the footprint's width and depth; the reason a
-spot is refused shows above the bar. The preview starts unturned on the valid spot nearest the player. Build sends
+spot is refused shows above the bar. The preview starts unturned on the valid spot nearest the player, else turned (C-175). A fresh yard often has no room
+for the 7×5 coop until some trees, bushes, rocks and weeds are cleared: with no valid spot the preview starts on the one
+needing the fewest of them cleared (`FarmBuilding.start_spot`), and a spot refused only for core obstacles reads
+`Clear the plants and rocks here first` instead of `Space taken`. Build sends
 `place_building` (type, cell, turn) through `ParcelFarming.send`; it stands at once (no construction time). A refused
 Build (`CELL_OCCUPIED`, `BUILDING_OVERLAP`) keeps the preview, judged again on the farm the reply brought. A
 successful Build (C-114) pops the building in and puffs dust with the main farm's look-swap effect (`P0Fence.pop_in` /
@@ -135,6 +139,29 @@ into the Bag (`+1 Egg`). Numbers, the pickup and the copy await the owner (SEN-C
 `docs/plans/C-154.md`. Tests: `tests/dynamic_farm/test_coop.gd` (shared cases `fixtures/coop_cases.json` with the
 server, walls, hens, pickup); captures: `tools/dev/dynamic_farm/coop_probe.gd`.
 
+## Request Board (C-191, 0.4.6)
+
+P0's system board at the Washington Square Travel Post: the room's board on the left wall (the kit's Fare Board,
+`use_fee_board`) is a facility named `Request Board` (LOCK-07 v2). Tapping it walks there and opens the board drawer
+(`parcel_board.gd`, through `parcel_town.gd` with no greeting): the page facts and one P0 `UiBoardCard` per request —
+Track (`accept_request`), Deliver (`deliver_request`, tracked or not, once the bag holds enough) or the gap on the key
+(LOCK-10) — and the request sheets after P0's BOARD-1 / 3 / DROPPED (`drop_request`). The rules are the `requests` of
+`dynamic_farm.json` (server `server/src/parcels/requests.ts`, client `parcel_farm.gd`): 2 slots, refilled at once after
+a delivery and 8 h after a drop, an open request swapped after 72 h, at most 6 a player day and 100 coins of completion
+bonus; pay is Jasmine's price × count plus the completion bonus (C-197, owner SEN-Q-281 over SEN-Q-278: `floor_percent`
+100); count and bonus by item and farm level (Lv3 and below / Lv4 on, `item_tiers`; a template may still carry its own
+`tiers`, an item with none takes the shared ones); eggs only with a coop. The save's `board` and `requests_done` (the
+sheep pen's unlock). Draws are a shared hash of the slot's own time, so a read and the next command see the same
+requests. Copy: SEN-C-191#29; notes in `docs/plans/C-191.md` and `docs/plans/C-197.md`. Tests:
+`tests/dynamic_farm/test_parcel_board.gd` (shared cases `fixtures/request_cases.json` with the server); emulator
+package: `gather_qa_apk.sh` with `GATHER_QA_ENTRY=board`.
+
+Seed aid (C-197, SEN-Q-281): with too few coins for one carrot seed, no seeds and no crops (bag or ground), opening
+Jasmine's greeting sends `claim_seed_aid` once; the server gives 3 Carrot Seeds once a player day (`seed_aid` in
+`dynamic_farm.json`, save `seed_aid_day`). Her greeting line says so; Trade stays her one key. Tests:
+`tests/dynamic_farm/test_parcel_town.gd` (shared cases `fixtures/seed_aid_cases.json`); emulator package:
+`GATHER_QA_ENTRY=aid`.
+
 ## First-visit guide (C-35, 0.4.2; C-61, 0.4.3)
 
 `modules/dynamic_farm/parcel_guide.gd` reads the next step of the first ten minutes from the save alone, so a parcel
@@ -153,6 +180,15 @@ shows the preview's `Explore and walk. Farming actions come later.` Copy and scr
 parcel's card says where to go; the map reads the home's save (`GET /parcels/mine`, no gift) on each return, and its
 bottom card names the step done off the parcel (`Tap Washington Square to sell your carrot.` … since C-115), with nothing
 selected or added under `Your home`. Copy and screenshots: `docs/plans/C-61.md`.
+
+0.4.5 (C-175, the run-through of 0.4.5's content) replaces C-61's gathering loop after the first sale, since selling
+what was gathered sold the Timber and Stone the farm upgrade needs: sold -> `blueprint`; the coop blueprint in the bag
+-> `coop`; a coop never fed -> `feed` (with no carrot in the bag: `sow` / `till` with seeds, `buy_seeds` without);
+a hen fed or an egg in the bag on a Lv1 farm -> `egg` (laid or not) / `sell_egg`; then `gather_upgrade` until the bag
+holds Lv2's Timber and Stone, `upgrade` (at Scott's) after; nothing once the farm is past Lv1. A ripe carrot asks for
+`harvest` before anything, a dry one with water left in the pail for `water_pail`. `ParcelGuide.stage` is the milestone
+the phone's task rows follow (`ParcelTasks`: GET STARTED, TOWN, YOUR FARM). A tap on the coop's floor offers the
+nearest feeder's Feed and walks there on the press. Copy: `docs/plans/C-175.md`.
 
 ## Washington Square room (C-115)
 
