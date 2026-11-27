@@ -316,11 +316,20 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	page._render()
 	check(page._message.text == page.PICK_HOME, "a save of another parcel says nothing about this home")
 	page._farm_parcel = home
+	# C-175: past the first sale, 0.4.5's steps (the coop, its egg, Scott's upgrade); those done on the parcel say PICK_HOME.
+	var coop := {"id": 2, "type": "coop", "model": "chicken_yard", "x": 20, "y": 20, "width": 7, "depth": 5, "rotation": 0, "built_at": 1}
+	var claimed := {"sales": 1, "bag": {}, "blueprints_claimed": {"coop": 1}}
 	var lines := [[{}, "Tap Washington Square to sell your carrot."],
-		[{"sales": 1, "bag": {}}, "Enter my farm and gather from trees, flowers and rocks."],
-		[{"sales": 1, "bag": {"wood": 2}, "gathered": {"x": 1}}, "Tap Washington Square to sell what you gathered."],
-		[{"sales": 2, "bag": {}, "gathered": {"x": 1}}, "Tap Washington Square to get your coop blueprint."],
-		[{"sales": 2, "bag": {}, "gathered": {"x": 1}, "blueprints_claimed": {"coop": 1}}, page.PICK_HOME]]
+		[{"sales": 1, "bag": {}}, "Tap Washington Square to get your coop blueprint."],
+		[claimed.merged({"bag": {"blueprint_coop": 1}}, true), page.PICK_HOME],
+		[claimed.merged({"buildings": [coop]}, true), "Tap Washington Square to buy Carrot Seeds."],
+		[claimed.merged({"buildings": [coop], "bag": {"crop_carrot": 1}}, true), page.PICK_HOME],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"egg": 1}}, true), "Tap Washington Square to sell your egg."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1}, true), "Enter my farm and gather Timber and Stone."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4}, "coins": 35}, true), "Enter my farm and grow carrots to sell."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4, "crop_carrot": 2}, "coins": 35}, true), "Tap Washington Square to sell carrots and eggs."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4}, "coins": 40}, true), "Tap Washington Square to upgrade your farm."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "level": 2}, true), page.PICK_HOME]]
 	for row: Array in lines:
 		var save: Dictionary = carrot.duplicate(true)
 		save.merge(row[0], true)
@@ -739,13 +748,17 @@ func _account_gate() -> void:
 	check(not net.account.signed_in() and panels.size() == 1 and panels[0].gate, "after signing out the sign-in panel is back, with no ✕")
 	check(selector.paused == 1 and not page._claims.mine_known and page._claims.mine.is_empty() and not page._hud.visible, "the map's parcels and the player's home are gone")
 	check(not page._camera.input_enabled, "the map does not move behind the panel")
-	page.resume() # back from the background meanwhile
-	check(selector.activated == 0 and page._gated, "returning to the app keeps the panel and does not load the map")
+	root.transparent_bg = true
+	page._notification(Node.NOTIFICATION_APPLICATION_PAUSED) # Google's account picker covers the app (C-175)
+	check(page._suspended and not root.transparent_bg, "leaving the app behind the panel suspends the map")
+	page._notification(Node.NOTIFICATION_APPLICATION_RESUMED) # back from the picker (or the background) meanwhile
+	check(selector.activated == 0 and page._gated and not page._suspended, "returning to the app keeps the panel and does not load the map")
 	net.account.adopt({"token": "gate-token", "user_id": "u1", "player_id": "p1", "display_name": "Ash"}, path)
 	net.client.token = "gate-token"
 	panels[0].dismiss()
 	for i in 5: await process_frame
 	check(out.done and selector.activated == 1 and bridge.visible_calls.has(true) and page._hud.visible and not page._gated, "signing in again loads the map for that account")
+	check(root.transparent_bg, "a sign-in that left the app (Google) shows the map through the viewport, not a grey screen (C-175)")
 	check(not calls.any(func(c): return c[1] == "/auth/anonymous"), "no guest sign-in at any point")
 	ProjectSettings.set_setting(RESTORE, null)
 	page.queue_free(); selector.queue_free()

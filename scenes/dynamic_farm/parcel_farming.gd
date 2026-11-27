@@ -21,8 +21,9 @@ extends Node3D
 ## Livestock (C-154, ParcelLivestock): near a coop's feeder the key reads `Feed` (`1 Energy`); a carrot goes in, and
 ## the hen lays an egg on the ground `produce_seconds` later. Walking within reach of a laid egg picks it up by
 ## itself: it flies into the player and on into the Bag (`+1 Egg`), the server checking each egg is taken once.
-## The coop's own floor is walked, never farmed: its cells show no key. The barn (C-181) works the same way: two
-## carrots a feeding (`Need 2 more Carrot` when short), a cow gives milk on the ground 15 minutes later.
+## The coop's own floor is walked, never farmed: its cells show no key of their own; since C-175 a tap on it offers the
+## nearest feeder's Feed, and the press walks there first. The barn (C-181) works the same way: two carrots a feeding
+## (`Need 2 more Carrot` when short), a cow gives milk on the ground 15 minutes later.
 ## The in-game phone (C-107, design C-85 ⑧): the top bar's task button drops the guide's steps under the bar (C-T1–T3)
 ## and the phone button at the right opens the phone (Tasks / Inbox / Collection, ParcelPhone); both read the save.
 signal state_changed(farm: Dictionary)
@@ -40,6 +41,9 @@ const LivestockArt = preload("res://modules/dynamic_farm/farm_livestock.gd")
 ## How near a feeder (m, its centre on the ground) the key offers Feed (C-154): the bowl is solid, so the player
 ## stands at least ~0.5 m from its centre.
 const FEED_REACH_M := 1.1
+## C-175: a tap on a coop's floor offers its nearest feeder within this distance (m; a coop is 7×5 cells), and the
+## press walks the player up to it first, as Fill walks up to the well.
+const FEED_TAP_M := 8.0
 const Tasks = preload("res://modules/dynamic_farm/parcel_tasks.gd")
 const Phone = preload("res://scenes/dynamic_farm/parcel_phone.gd")
 ## Which task the player last saw in the drop-down or the phone, per parcel on this device: a newer one marks the task
@@ -386,8 +390,13 @@ func _refresh_key() -> void:
 	# C-154: a coop's floor is never farmed (no key there); at its feeder the key feeds.
 	# C-171: a tapped cell with a step to do (Fill at a well, Till) wins over the feeder, as a tapped object does.
 	if not farm.is_empty() and livestock != null:
-		if livestock.covers(target): current = {}
+		var on_coop := livestock.covers(target)
+		if on_coop: current = {}
 		var feeder := livestock.feeder_near(_player, FEED_REACH_M) if _placed else {}
+		# C-175: a tapped coop floor cell offers the feeder nearest to it, walked up to on the press.
+		if feeder.is_empty() and on_coop and picked != null and _placed:
+			feeder = livestock.feeder_near(_walk.point(target), FEED_TAP_M)
+			if not feeder.is_empty(): feeder.approach = true
 		if not feeder.is_empty() and (picked == null or current.is_empty() or not str(current.refusal).is_empty()):
 			current = _feed_action(feeder)
 	# A tapped object wins; a nearby one only when no cell was tapped and the cell in front has no step to do.
@@ -495,7 +504,8 @@ func _feed_action(near: Dictionary) -> Dictionary:
 		"NOT_LIVESTOCK": text = "That didn't work."
 	return {"verb": "feed", "refusal": refusal, "refusal_text": text, "key_text": key_copy(text, short),
 		"feed_item": str(rule.get("feed", "")),
-		"command": {"type": "feed", "building": int(b.id)} if refusal.is_empty() else {}, "feeder": near.point}
+		"command": {"type": "feed", "building": int(b.id)} if refusal.is_empty() else {}, "feeder": near.point,
+		"approach": bool(near.get("approach", false))}
 
 ## The main key's second line for `text`: itself when it shows whole on the key, else `short` (when there is one).
 static func key_copy(text: String, short: String) -> String:
@@ -512,10 +522,20 @@ func feed_gap(rule: Dictionary, have: int, short := false) -> String:
 	return "Need %d more" % (need - have) if short else "Need %d more %s" % [need - have, name_]
 
 ## One feed press (C-154): the feeder is already in reach, so the player faces it and plays the labour clip while
-## the command goes out; the fed hen then comes to peck (ParcelLivestock).
+## the command goes out; the fed hen then comes to peck (ParcelLivestock). C-175: offered for a tapped coop floor cell,
+## the player first walks up beside the feeder (as `work` does).
 func feed(action: Dictionary) -> Dictionary:
 	if _body == null: return await send(action.command)
-	_body.labour("harvest", [_walk.cell_at(action.feeder)], LABOUR_S)
+	var cells: Array[Vector2i] = [_walk.cell_at(action.feeder)]
+	if action.get("approach", false):
+		busy = true
+		var reached: String = await _body.approach(cells)
+		if not is_inside_tree(): return {"ok": false, "code": "LEFT"}
+		if reached != "ok":
+			busy = false
+			if reached == "unreachable": _toast.show_toast(UNREACHABLE, ToastLayer.Severity.REFUSED)
+			return {"ok": false, "code": reached.to_upper()}
+	_body.labour("harvest", cells, LABOUR_S)
 	return await send(action.command, LABOUR_S)
 
 ## Picks up the drops in reach (C-154): each flies into the player as the pick_up goes out; with the reply the items
@@ -1243,10 +1263,12 @@ func _place_phone() -> void:
 	var glass_top := phone_button.position.y + (UiTokens.SIZE_TOUCH_MIN - UiTokens.SIZE_HUD_SIDE_BUTTON) * 0.5
 	phone.place(Vector2(_ui.size.x - PHONE_RIGHT, glass_top - PHONE_ABOVE_BUTTON), UiTokens.SIZE_SCREEN_SAFE_INSET + _safe_top())
 
-## The current row tapped in the phone: the phone closes and that step's tip shows again (C-85 ⑧-B), nothing more.
+## The current row tapped in the phone: the phone closes and the guide's tip for it shows again (C-85 ⑧-B), nothing
+## more. C-175: a row is a milestone and the tip its next step (Feed a hen may first ask to sow a carrot), so the row
+## is matched against the current row, not the tip.
 func _on_task_pressed(key: String) -> void:
 	close_phone()
-	if key == Guide.step(farm, server_now()):
+	if key == Tasks.current(farm, server_now(), _reached()):
 		_tip_closed = ""
 		tip_step = ""
 		_refresh_tip()
@@ -1260,7 +1282,7 @@ func _refresh_tasks() -> void:
 	phone_button.visible = ready
 	if not ready: return
 	var done := Tasks.done_count(farm, server_now(), _reached())
-	# Follows the count both ways: it holds itself up only on Sell what you gathered, so a lower count is a reset parcel.
+	# Follows the count both ways: it holds itself up only on Sell an egg (C-175), so a lower count is a reset parcel.
 	if done != tasks_reached:
 		tasks_reached = done
 		_keep_local()

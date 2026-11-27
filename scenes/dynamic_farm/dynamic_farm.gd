@@ -314,22 +314,29 @@ func begin_placement() -> void:
 	var taken := Building.blocked(obstacles, _farming.farm)
 	var walk_blocked := _walk_blocked(obstacles)
 	var path: Dictionary = _farming.protected_path()
-	var start = Building.nearest(_data, _walk.cell_at(_actor.position), base, taken, path, walk_blocked, 0, type)
+	var cleared := _cleared()
+	var start = Building.start_spot(_data, _walk.cell_at(_actor.position), base, taken, path, walk_blocked, type, obstacles,
+		cleared.taken, cleared.walk_blocked)
 	_placement = Placement.new()
 	add_child(_placement)
 	_placement.setup(type, base, _data, _walk, _camera, _canvas, taken, path, walk_blocked,
-		start if start != null else _walk.cell_at(_actor.position) - Building.middle(base))
+		start.at if start != null else _walk.cell_at(_actor.position) - Building.middle(base), cleared,
+		start.rotation if start != null else 0)
 	_placement.confirmed.connect(_on_place_confirmed)
 	_placement.cancelled.connect(end_placement)
 	_refresh_build()
 	_play("idle")
-	_focus = Building.center(_walk, _placement.at, base)
+	_focus = Building.center(_walk, _placement.at, base, _placement.rotation_steps)
 	_overview = false
 	_place_camera()
 
 ## Cells walking cannot use besides a new footprint: solid core obstacles, the buildings standing and reserved cells.
 func _walk_blocked(obstacles: Dictionary) -> Dictionary:
 	return Building.solid(_plan.core_obstacles.layout, obstacles).merged(_walk.reserved).merged(ParcelFarm.building_cells(_farming.farm))
+
+## Building.reason's `taken` and `walk_blocked` with every core obstacle cleared (C-175: what clearing would allow).
+func _cleared() -> Dictionary:
+	return {"taken": Building.blocked({}, _farming.farm), "walk_blocked": _walk_blocked({})}
 
 func end_placement() -> void:
 	if _placement == null: return
@@ -359,7 +366,7 @@ func _on_place_confirmed(at: Vector2i, rotation_steps: int) -> void:
 		end_placement()
 	else:
 		var obstacles: Dictionary = _farming.obstacle_cells()
-		_placement.retake(Building.blocked(obstacles, _farming.farm), _walk_blocked(obstacles))
+		_placement.retake(Building.blocked(obstacles, _farming.farm), _walk_blocked(obstacles), _cleared())
 
 ## Build succeeded (C-114): the building the reply just built grows in with the main farm's overshoot and puffs
 ## dust round its footprint. One that comes with the save (reopening, a refused Build) only stands there.
