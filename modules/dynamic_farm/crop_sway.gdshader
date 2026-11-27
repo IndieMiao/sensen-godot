@@ -3,8 +3,11 @@
 // One material per plant stage layer of ParcelCropArt (C-139's painted carrot meshes, one MultiMesh per stage).
 // Mesh local space: the plant stands on y = plant_base .. plant_top; instance transform = a turn about Y × the cell's
 // scale, origin on the ground. INSTANCE_CUSTOM: xy = push direction (world XZ; its length is the stage's amplitude
-// factor, 0 = no shake), z = trigger time on crop_clock (s), w unused. The ripe sway is this layer's `ripe` (only the
-// Maturity layer has it on): every instance on one stage layer shares that flag, so it is not written per plant.
+// factor, 0 = no shake), z = trigger time on shake_clock (s), w unused. GLES3 keeps custom data as truncated half
+// floats (V-652), so shakes run on their own clock wrapping every 64 s and the CPU writes trigger times on a 1/32 s
+// grid (ParcelCropArt.shake_stamp), exact in a half float; the ripe sway keeps the unbounded float32 crop_clock.
+// The ripe sway is this layer's `ripe` (only the Maturity layer has it on): every instance on one stage layer shares
+// that flag, so it is not written per plant.
 // The fragment draws what the imported StandardMaterial3D draws (painted atlas, roughness 0.9, both faces).
 shader_type spatial;
 // The imported StandardMaterial3D's render modes, spelled out so the defaults cannot drift apart.
@@ -15,7 +18,9 @@ uniform sampler2D albedo_tex : source_color, filter_linear_mipmap, repeat_enable
 uniform vec4 albedo : source_color = vec4(1.0);
 uniform float roughness = 0.9;
 
-uniform float crop_clock = 0.0;          // written by the CPU every frame; the trigger times use the same clock
+uniform float crop_clock = 0.0;          // written by the CPU every frame (s), drives the ripe sway
+uniform float shake_clock = 0.0;         // crop_clock wrapped to [0, shake_wrap): the trigger times use this clock
+uniform float shake_wrap = 64.0;         // = ParcelCropArt.SHAKE_WRAP_S
 uniform bool sway_enabled = true;
 uniform bool ripe = false;               // this layer's plants are ripe: they sway
 uniform float plant_base = 0.0;          // this stage mesh's lowest local y
@@ -34,7 +39,7 @@ void vertex() {
 	if (sway_enabled) {
 		vec4 c = INSTANCE_CUSTOM;
 		vec2 lean = vec2(0.0);
-		float t = crop_clock - c.z;
+		float t = mod(shake_clock - c.z, shake_wrap);
 		if (t >= 0.0 && t < shake_len) {
 			lean += c.xy * shake_amp * exp(-shake_decay * t) * sin(6.2831853 * shake_freq * t);
 		}

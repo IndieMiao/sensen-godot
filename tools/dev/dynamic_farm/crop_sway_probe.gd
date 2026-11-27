@@ -5,10 +5,12 @@ extends SceneTree
 ##   sway-{all,young,ripe}-{a,b}  sway on, no shakes, two clocks half a sway period apart, with every plant stage,
 ##           only the young stages (west of the focus column) or only the mature one: young carrots must not move
 ##   shake   one young and one ripe carrot shaken, at the shake's first peak (0.11 s), against shake-none
+##   shake-late  the same at clock 3000.37 s (V-652: GLES3 custom data is half float), against shake-late-none
 ## Frame differences go to <out>/crop-sway.json, difference images (×4) to <out>/*-diff.png.
 ##   godot --path "$QA" [--rendering-method mobile|gl_compatibility] --script res://tools/dev/dynamic_farm/crop_sway_probe.gd -- <farm.json> <out>
 ## Scripted desktop renders, not touch, device or frame-rate evidence (crop_sway_qa.tscn on the emulator is).
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
+const LATE_S := 3000.37
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const CropArt = preload("res://modules/dynamic_farm/parcel_crop_art.gd")
@@ -100,11 +102,24 @@ func _run() -> void:
 	art.set_sway(true)
 	art.set_clock(10.11)
 	await _shot("shake-none")
+	# V-652: the same two shakes 50 minutes into the scene (clock 3000.37 s, where a half float steps by 2 s): the
+	# first peak must still show, on Compatibility (GLES3) as on Mobile.
+	art.set_clock(LATE_S)
+	art.shake(young, Vector2(1, 0) * float(amp[CropArt.stage_of(farming.farm.crops[ParcelFarm.key(young)], farming.server_now())]))
+	art.shake(ripe, Vector2(1, 0) * float(amp[CropArt.stage_of(farming.farm.crops[ParcelFarm.key(ripe)], farming.server_now())]))
+	art.set_clock(LATE_S + 0.11)
+	await _shot("shake-late")
+	art.set_sway(false)
+	art.set_sway(true)
+	art.set_clock(LATE_S + 0.11)
+	await _shot("shake-late-none")
 	if DisplayServer.get_name() != "headless":
 		report.noise = _diff("plain", "plain-again")
 		report.parity = _diff("plain", "off")
 		for only in ["all", "young", "ripe"]: report["sway_" + only] = _diff("sway-%s-a" % only, "sway-%s-b" % only)
 		report.shake = _diff("shake-none", "shake")
+		report.shake_late = _diff("shake-late-none", "shake-late")
+		report.shake_late.clock = LATE_S
 		report.shaken = {"young": ParcelFarm.key(young), "ripe": ParcelFarm.key(ripe)}
 	FileAccess.open(out.path_join("crop-sway.json"), FileAccess.WRITE).store_string(JSON.stringify(report, "\t"))
 	print("CROP_SWAY_PROBE ", JSON.stringify(report))

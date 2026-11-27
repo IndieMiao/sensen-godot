@@ -29,6 +29,11 @@ const PLANTS := [&"Sowing", &"Emergence", &"LeafGrowth", &"Shoulders", &"Thicken
 const SWAY_SHADER = preload("res://modules/dynamic_farm/crop_sway.gdshader")
 ## A shake is over this long after its trigger (the shader's shake_len); its record is dropped then.
 const SHAKE_S := 1.2
+## Shake timing rides a clock wrapping every SHAKE_WRAP_S, with trigger times on a SHAKE_STEP_S grid (V-652): the
+## Compatibility (GLES3) renderer keeps MultiMesh custom data as half floats, truncated, so an unbounded trigger time
+## would lose the shake minutes into the scene. Every multiple of 1/32 below 64 is exact in a half float.
+const SHAKE_WRAP_S := 64.0
+const SHAKE_STEP_S := 1.0 / 32.0
 
 const Kit = preload("res://modules/dynamic_farm/parcel_fieldkit.gd")
 var _contact: MultiMeshInstance3D
@@ -144,11 +149,26 @@ func shake(cell: Vector2i, push: Vector2) -> void:
 	var slot: Vector2i = _slots[cell]
 	_write_shake(slot.x, slot.y, cell)
 
-## Advance the sway's clock (s); the shader reads it every frame.
+## Advance the sway's clock (s); the shader reads it every frame. Shakes over by now are dropped and their plants
+## written still, so a stale trigger time can never come round again on the wrapping shake clock.
 func set_clock(seconds: float) -> void:
 	clock = seconds
+	var wrapped := fposmod(clock, SHAKE_WRAP_S)
 	for mat in _materials:
-		if mat != null: mat.set_shader_parameter(&"crop_clock", clock)
+		if mat != null:
+			mat.set_shader_parameter(&"crop_clock", clock)
+			mat.set_shader_parameter(&"shake_clock", wrapped)
+	for cell in _shakes.keys():
+		if clock - float(_shakes[cell].at) < SHAKE_S: continue
+		_shakes.erase(cell)
+		if _slots.has(cell):
+			var slot: Vector2i = _slots[cell]
+			_write_shake(slot.x, slot.y, cell)
+
+## A trigger time as the shader stores it: on the SHAKE_STEP_S grid (rounded down, so the shake never starts late)
+## and wrapped to the shake clock; exact in the half floats GLES3 keeps custom data in.
+static func shake_stamp(seconds: float) -> float:
+	return fposmod(floorf(seconds / SHAKE_STEP_S) * SHAKE_STEP_S, SHAKE_WRAP_S)
 
 ## Sway on or off; off draws the plants still, as before C-141.
 func set_sway(on: bool) -> void:
@@ -169,9 +189,12 @@ func ripe_layer(stage: int) -> bool:
 
 ## Every instance is written each sync: resizing a MultiMesh does not promise zeroed custom data.
 func _write_shake(stage: int, index: int, cell: Vector2i) -> void:
+	_stages[stage].multimesh.set_instance_custom_data(index, shake_data(cell))
+
+## The custom data `cell`'s plant carries: push direction and stamped trigger time while it shakes, else zero.
+func shake_data(cell: Vector2i) -> Color:
 	var live = _shakes.get(cell)
-	var data := Color(live.push.x, live.push.y, live.at, 0.0) if live is Dictionary else Color(0, 0, 0, 0)
-	_stages[stage].multimesh.set_instance_custom_data(index, data)
+	return Color(live.push.x, live.push.y, shake_stamp(live.at), 0.0) if live is Dictionary else Color(0, 0, 0, 0)
 
 ## The stage's own copy of the sway material: the painted atlas of the imported material, the mesh's height for the
 ## bend, and the ripe sway on the mature stage only.
@@ -187,5 +210,7 @@ func _sway_material(mesh: Mesh, is_ripe: bool) -> ShaderMaterial:
 	mat.set_shader_parameter(&"plant_base", box.position.y)
 	mat.set_shader_parameter(&"plant_top", box.end.y)
 	mat.set_shader_parameter(&"ripe", is_ripe)
+	mat.set_shader_parameter(&"shake_wrap", SHAKE_WRAP_S)
+	mat.set_shader_parameter(&"shake_len", SHAKE_S)
 	mat.set_shader_parameter(&"sway_enabled", sway)
 	return mat

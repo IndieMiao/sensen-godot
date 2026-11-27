@@ -542,7 +542,41 @@ func _crop_sway() -> void:
 		"sway: off stops every plant and clears the shakes")
 	art.set_sway(true)
 	_check(bool(layers[1].material_override.get_shader_parameter(&"sway_enabled")), "sway: on again")
+	_crop_sway_late(art, soil, {"1,1": ripe, "2,1": young})
 	art.free()
+
+## V-652: Compatibility (GLES3) keeps MultiMesh custom data as truncated half floats (PackedByteArray.encode_half
+## truncates the same way). However long the scene has run, the stored trigger time survives that and the shader's
+## wrapped shake clock puts the first peak where it belongs; a shake over is written still without waiting for a redraw.
+func _crop_sway_late(art: CropArt, soil: Dictionary, crops: Dictionary) -> void:
+	var half := PackedByteArray()
+	half.resize(2)
+	var mat := (art._stages[CropArt.MATURE] as MultiMeshInstance3D).material_override as ShaderMaterial
+	_check(is_equal_approx(mat.get_shader_parameter(&"shake_wrap"), CropArt.SHAKE_WRAP_S) and is_equal_approx(mat.get_shader_parameter(&"shake_len"), CropArt.SHAKE_S),
+		"sway late: the shader wraps and ends shakes on the art's numbers")
+	var exact := true
+	var peaks := true
+	var worst := 0.0
+	# 9 s, 10 min, 25 min, 50 min, 20 h in, and just either side of a wrap.
+	for start: float in [9.0, 600.37, 1500.0, 3000.37, 72000.9, 3 * CropArt.SHAKE_WRAP_S - 0.01, 3 * CropArt.SHAKE_WRAP_S + 0.004]:
+		art.sync(soil, crops, T0 + 61000)
+		art.set_clock(start)
+		art.shake(Vector2i(1, 1), Vector2(1, 0))
+		# What _write_shake hands the MultiMesh (the headless dummy renderer keeps no custom data to read back).
+		var stored := art.shake_data(Vector2i(1, 1)).b
+		half.encode_half(0, stored)
+		exact = exact and art.shake_data(Vector2i(1, 1)).r == 1.0 and half.decode_half(0) == stored and stored >= 0.0 \
+			and stored < CropArt.SHAKE_WRAP_S
+		for elapsed: float in [0.0, 0.11, 0.5, 1.1]:
+			art.set_clock(start + elapsed)
+			var t := fposmod(float(mat.get_shader_parameter(&"shake_clock")) - half.decode_half(0), CropArt.SHAKE_WRAP_S)
+			worst = maxf(worst, absf(t - elapsed))
+			peaks = peaks and t >= elapsed - 0.001 and t <= elapsed + CropArt.SHAKE_STEP_S + 0.001
+	_check(exact, "sway late: every stored trigger time is exact in a half float and inside the wrap")
+	_check(peaks, "sway late: the shake runs on time however long the scene has run (worst %.4f s)" % worst)
+	art.set_clock(art.clock + CropArt.SHAKE_S)
+	_check(art.shake_of(Vector2i(1, 1)).is_empty() and art.shake_data(Vector2i(1, 1)) == Color(0, 0, 0, 0),
+		"sway late: a shake over is written still by the clock alone, so it cannot come round on the next wrap")
 
 ## C-148: P0's numbers (assets/p0/p0_content.json) and the client's settlement.
 func _energy() -> void:
