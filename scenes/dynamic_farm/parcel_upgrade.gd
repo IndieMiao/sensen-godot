@@ -148,24 +148,26 @@ static func level_rows(rules: Dictionary, farm_: Dictionary) -> Array:
 	return out
 
 ## MS-17: the needs go in left to right, `motion/stagger/reward` (60) apart, each ring and icon shrinking to 0.6 and fading
-## (cubic in) within 200; all in ≤ 320. Awaitable; at once when reduced or nothing is drawn.
-func hand_in() -> void:
+## (cubic in) within 200; all in ≤ 320. Returns how long that takes in ms (0 when reduced or nothing is drawn); the
+## caller waits on its own clock, as the sheet may be closed (and its tiles freed) meanwhile.
+func hand_in() -> float:
 	var tiles: Array = []
 	if _tiles != null: tiles = _tiles.get_children()
-	if UiMotion.reduced or tiles.is_empty() or not is_inside_tree(): return
-	var last: Tween = null
+	if UiMotion.reduced or tiles.is_empty() or not is_inside_tree(): return 0.0
+	var total := 0.0
 	var i := 0
 	for t in tiles:
 		var tile := t as Control
 		tile.pivot_offset = tile.size * 0.5
 		var tw := UiMotion.tween(tile, UiTokens.MOTION_EASING_EXIT)
-		tw.tween_interval(UiKit.secs(UiTokens.MOTION_STAGGER_MS_REWARD * mini(i, 2)))
-		var ms := minf(UiTokens.MOTION_DURATION_BASE_MS, UiTokens.MOTION_DURATION_EMPHASIS_MS - UiTokens.MOTION_STAGGER_MS_REWARD * mini(i, 2))
+		var delay := UiTokens.MOTION_STAGGER_MS_REWARD * mini(i, 2)
+		tw.tween_interval(UiKit.secs(delay))
+		var ms := minf(UiTokens.MOTION_DURATION_BASE_MS, UiTokens.MOTION_DURATION_EMPHASIS_MS - delay)
 		tw.tween_property(tile, ^"scale", Vector2.ONE * UiTokens.MOTION_SCALE_FLY_END, UiKit.secs(ms))
 		tw.parallel().tween_property(tile, ^"modulate:a", 0.0, UiKit.secs(ms))
-		last = tw
+		total = maxf(total, delay + ms)
 		i += 1
-	if last != null: await last.finished
+	return total
 
 ## The upgrade went through and its card closed: the next level, faded in over 120.
 func release() -> void:

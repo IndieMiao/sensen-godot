@@ -302,10 +302,14 @@ func _build_handle() -> Button:
 
 func _refresh() -> void:
 	if _row == null: return
+	var shown := {}   # the counts now on the bar: an item that left it rolls no stale number when it comes back
 	for i in slot_count:
 		var cell := _cells[i]
 		cell.visible = not collapsed and not bag_only
-		if i == _dragging: continue
+		if i == _dragging:
+			var held := str(slot(i).get("id", ""))
+			if _shown_qty.has(held): shown[held] = _shown_qty[held]
+			continue
 		var d := slot(i)
 		var id := str(d.get("id", ""))
 		cell.icon = d.get("icon", null)
@@ -318,7 +322,7 @@ func _refresh() -> void:
 			_roll_qty(cell, was, qty)
 		else: cell.quantity = "×%d" % qty if id != "" else ""
 		cell.set_meta(&"_qty_id", id)
-		if id != "": _shown_qty[id] = qty
+		if id != "": shown[id] = qty
 		if id != "" and str(d.get("cooldown", "")) != "": cell.quantity += " · " + str(d.cooldown)
 		cell.pinned = bool(d.get("pinned", false)) and id != ""
 		if i == _target: cell.state = UiItemCell.State.DROP_TARGET   # an empty slot too: a bag item lands there (225)
@@ -326,6 +330,7 @@ func _refresh() -> void:
 		elif id == selected: cell.state = UiItemCell.State.SELECTED
 		elif qty <= 0 and cell.pinned: cell.state = UiItemCell.State.ZERO
 		else: cell.state = UiItemCell.State.DEFAULT
+	_shown_qty = shown
 	_handle.visible = collapsed and not bag_only
 	mouse_filter = Control.MOUSE_FILTER_IGNORE if collapsed or bag_only else Control.MOUSE_FILTER_STOP
 	# Collapsed or bag-only: the end stays at the right (BAR-1-2); the handle sits centred when collapsed.

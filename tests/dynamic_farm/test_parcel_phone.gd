@@ -318,6 +318,9 @@ func _scene() -> void:
 	var button: UiTaskButton = farming.task_button
 	_check(button.get_parent() == scene._header and button.get_index() > farming.energy_chip.get_index() \
 		and button.get_index() == scene._coins_capsule.get_index() - 1, "the task button sits in the top bar before the coins (C-186)")
+	var disc := button.get_theme_stylebox(&"normal") as StyleBoxFlat
+	_check(not button.flat and disc != null and disc.bg_color == UiTokens.COLOR_HUD_CLAY_FACE,
+		"the task button draws the cream clay disc like Back (C-185 §3.1 B; a flat Button would draw none, V-653)")
 	_check(button.visible and farming.phone_button.visible, "task and phone buttons show once the save is read")
 	_check(Tasks.current(farming.farm, farming.server_now()) == "build", "first visit: Build Cottage is current")
 	_check(button.badge and farming.phone_button.badge, "a task not seen yet marks both buttons")

@@ -58,6 +58,7 @@ static func round_button(b: Button, width := float(UiTokens.SIZE_TOUCH_MIN)) -> 
 	var inset := (float(UiTokens.SIZE_TOUCH_MIN) - d) * 0.5
 	var side := (width - d) * 0.5
 	b.custom_minimum_size.x = width
+	b.flat = false   # a flat Button (UiTaskButton) draws no normal/hover box: the disc would not show
 	var up := face(d * 0.5)
 	var down := face_pressed(d * 0.5)
 	for box: StyleBoxFlat in [up, down]:

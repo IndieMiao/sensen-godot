@@ -67,7 +67,7 @@ const LINES := {
 	"upgraded_gift": "Farm Lv%d · +%d %s",
 	# C-197 seed aid: Jasmine's line when she gives the seeds (count, seed name), awaiting PM's C-45 final on SEN-C-197.
 	"seed_aid": "Out of coins and seeds? Here are %d %s, on me.",
-	# C-186 level-up card (C-185 §3.4): its one button, a placeholder awaiting PM's C-45 final on SEN-C-186.
+	# C-186 level-up card (C-185 §3.4): its one button, the copy PM settled on SEN-C-186#44 (C-45).
 	"level_ok": "OK",
 }
 const MET_PATH := "user://dynamic_farm_local/town.json"
@@ -426,7 +426,8 @@ func upgrade() -> Dictionary:
 		rows.append({"icon": ParcelItems.icon_of(item), "label": Upgrade.COPY.gift % [int(gift[item]), ParcelItems.name_of(item)],
 			"value": "", "gift": true})
 	_handing_in = true
-	if sheet != null and is_instance_valid(sheet): await sheet.hand_in()
+	var ms := sheet.hand_in() if sheet != null and is_instance_valid(sheet) else 0.0
+	if ms > 0.0 and is_inside_tree(): await get_tree().create_timer(UiKit.secs(ms), true).timeout
 	_handing_in = false
 	if is_inside_tree(): show_level_card(level, rows, sheet)
 	return result

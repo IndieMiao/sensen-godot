@@ -57,6 +57,7 @@ var _fact_values: Array[Label] = []
 var coins: UiFactRow
 ## A delivery is being shown (C-186 MS-16): refresh() keeps the farm and leaves the page as drawn until it ends.
 var hold := false
+var _celebration := 0   # the delivery whose motion owns `hold` (a newer one, or a turned page, ends an older one)
 var _coins_rolling := false
 var _today_held := -1   # `Requests today` as drawn when the delivery went out (it rolls on from there)
 ## Request id → the card data last drawn (the Done row redraws from it).
@@ -221,6 +222,8 @@ func hold_for_delivery() -> void:
 ## start at once; the row's needs shrink away, it stamps Done, holds, folds, and the list comes back with the new request.
 ## Reduced: the coins count up (at once) and the list is redrawn straight away.
 func celebrate_delivery(id: int, before: int, after: int, at: Vector2) -> void:
+	_celebration += 1
+	var serial := _celebration
 	var today_before := _today_held if _today_held >= 0 else _today_done()
 	_today_held = -1
 	if at != Vector2.INF: float_coins(after - before, at)
@@ -243,7 +246,7 @@ func celebrate_delivery(id: int, before: int, after: int, at: Vector2) -> void:
 		tw.tween_property(tile, ^"scale", Vector2.ZERO, UiKit.secs(UiTokens.MOTION_DURATION_QUICK_MS))
 		tw.parallel().tween_property(tile, ^"modulate:a", 0.0, UiKit.secs(UiTokens.MOTION_DURATION_QUICK_MS))
 	await _wait(UiTokens.MOTION_DURATION_QUICK_MS + UiTokens.MOTION_STAGGER_MS_LIST * maxi(0, tiles.size() - 1))
-	if not _still(c): return
+	if not _still(c, serial, today_before): return
 	var done: Dictionary = (_shown[id] as Dictionary).duplicate()
 	done.done = true
 	done.status = COPY.done
@@ -254,7 +257,7 @@ func celebrate_delivery(id: int, before: int, after: int, at: Vector2) -> void:
 	stamp.scale = Vector2.ONE * UiTokens.MOTION_SCALE_DONE_STAMP
 	UiMotion.tween(stamp, UiTokens.MOTION_EASING_POP).tween_property(stamp, ^"scale", Vector2.ONE, UiKit.secs(UiTokens.MOTION_DURATION_BASE_MS))
 	await _wait(UiTokens.MOTION_DURATION_DONE_HOLD_MS)
-	if not _still(c): return
+	if not _still(c, serial, today_before): return
 	var row := c.get_parent() as Control
 	if row != null:
 		row.pivot_offset = Vector2(row.size.x * 0.5, 0.0)
@@ -262,7 +265,7 @@ func celebrate_delivery(id: int, before: int, after: int, at: Vector2) -> void:
 		fold.tween_property(row, ^"scale:y", 0.0, UiKit.secs(UiTokens.MOTION_DURATION_BASE_MS))
 		fold.parallel().tween_property(row, ^"modulate:a", 0.0, UiKit.secs(UiTokens.MOTION_DURATION_BASE_MS))
 		await fold.finished
-	if not _still(c): return
+	if not _still(c, serial, today_before): return
 	release(today_before)
 
 ## The delivery shown (or refused): the page follows the farm again; new rows fade in from y+16 (260) and `Requests
@@ -296,7 +299,13 @@ func _today_done() -> int:
 	if farm.is_empty(): return 0
 	return int(ParcelFarm.board_today(ParcelFarm.rules(), farm, int(now_ms.call())).done)
 
-func _still(c) -> bool: return is_inside_tree() and is_instance_valid(c) and hold
+## Whether delivery `serial`'s motion goes on with its card `c`. When the page was turned under it (its card freed) the
+## board is let go at once, so it follows the farm again; a later delivery owns the hold and its own release.
+func _still(c, serial: int, today_before: int) -> bool:
+	if serial != _celebration or not hold: return false
+	if is_inside_tree() and is_instance_valid(c) and c.is_inside_tree(): return true
+	if is_inside_tree(): release(today_before)
+	return false
 
 func _wait(ms: float) -> void:
 	await get_tree().create_timer(UiKit.secs(ms), true).timeout

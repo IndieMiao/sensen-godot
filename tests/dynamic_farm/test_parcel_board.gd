@@ -37,6 +37,8 @@ func _run() -> void:
 	_store()
 	_model()
 	await _drawer()
+	await _turned(true)
+	await _turned(false)
 	await _drop()
 	_clean()
 	print("PARCEL_BOARD checks=%d failures=%d" % [checks, failures])
@@ -239,6 +241,43 @@ func _drawer() -> void:
 	host.queue_free()
 	_clean()
 	UiMotion.reduced = false
+
+## MS-16 with motion on: a delivery plays out (Done, hold, fold) and lets the board go; with `turn`, a page turned under
+## its Done row (another request's sheet, then Back) ends the motion and lets the board go at once (C-186#56): the list
+## follows the farm again, so 2 eggs in the bag make the egg row's key Deliver.
+func _turned(turn: bool) -> void:
+	UiMotion.reduced = false
+	var what := "turned" if turn else "played out"
+	var store := LocalStore.new(PARCEL, DIR)
+	var clock := [T0 + H]
+	store.now_ms = func() -> int: return clock[0]
+	store._save(_board_farm({"crop_carrot": 3}), 4)
+	var host := Control.new()
+	host.size = Vector2(360, 800)
+	root.add_child(host)
+	var town: Control = Town.open(host, Town.BOARD, store, PARCEL, DIR.path_join("met.json"))
+	await _settle(town)
+	var board = town.board
+	var sent: Dictionary = await town.board_command({"type": "deliver_request", "request": 1})
+	_check(sent.ok and board.hold, "motion (%s): the board holds its list while the delivery plays" % what)
+	if turn:
+		await create_timer(0.1).timeout
+		board.open_request(2)
+		board.back_to_list()
+	await create_timer(2.0).timeout
+	_check(not board.hold and board.page == "list" and board.cards.has(3) and not board.cards.has(1),
+		"motion (%s): the board is let go, the new request in its row" % what)
+	var saved := store.read()
+	var farm: Dictionary = saved.farm
+	farm.bag["egg"] = 2
+	store._save(farm, int(saved.farm_version))
+	await town._reload_board()
+	_check(town.board.cards.has(2) and town.board.cards[2].command_button().reason == "",
+		"motion (%s): the list follows the farm again: 2 eggs make the egg row Deliver" % what)
+	town.close()
+	await process_frame
+	host.queue_free()
+	_clean()
 
 ## Drop request → BOARD-3 → Dropped; the slot waits 8 h, then the read draws again.
 func _drop() -> void:
