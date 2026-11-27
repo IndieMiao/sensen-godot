@@ -1,7 +1,8 @@
 extends SceneTree
 ## C-193 guard (Q-289 A): the two narrowest claimable r8 starter parcels, unmodified in fixtures/r8/, still hold the
 ## coop (7×5, its real art and kept cells), the barn (C-202: SEN-C-179's 11×6 less its rear-left 2×2, the two cells
-## outside its gate, its real rules and art) and the sheep pen up to 9×7 (one walkable cell outside its front) with the
+## outside its gate, its real rules and art), the sheep pen (C-182: SEN-C-180's 6×6, the cell outside its gate, its real
+## rules and art) and a plain 9×7 (one walkable cell outside its front; C-193's bound for the pen before its art) with the
 ## yard cleared, in at least one of the four turns.
 ## The judgement is the game's placement rule through tools/dev/dynamic_farm/building_fit.gd, the same code as the
 ## statistic (building_fit_stats.gd, docs/plans/C-193.md). If a new dataset or a larger building breaks this, rerun
@@ -57,7 +58,7 @@ func _narrow(block_id: String, sha: String) -> void:
 	var y := Fit.yard(raw)
 	_check(y.ok, "%s: decodes" % block_id)
 	if not y.ok: return
-	var shapes := {"coop 7×5": Fit.coop(), "barn 11×6 less 2×2": Fit.barn(), "pen 9×7": Fit.plain(Vector2i(9, 7))}
+	var shapes := {"coop 7×5": Fit.coop(), "barn 11×6 less 2×2": Fit.barn(), "sheep pen 6×6": Fit.pen(), "pen 9×7": Fit.plain(Vector2i(9, 7))}
 	for name: String in shapes:
 		var s: Dictionary = shapes[name]
 		var b := Fit.best(y, s)
@@ -78,6 +79,6 @@ func _r4_control() -> void:
 	var y := Fit.yard(JSON.parse_string(FileAccess.get_file_as_string(R4_NARROW)))
 	_check(y.ok and y.data.block_id == "p-5402049", "p-5402049 (r4): decodes")
 	if not y.ok: return
-	for s: Dictionary in [Fit.coop(), Fit.barn(), Fit.plain(Vector2i(9, 7))]:
+	for s: Dictionary in [Fit.coop(), Fit.barn(), Fit.pen(), Fit.plain(Vector2i(9, 7))]:
 		_check(Fit.best(y, s).level != Fit.OK, "p-5402049 (r4, core %d×%d): control, %d×%d does not fit"
 			% [y.bounds.size.x, y.bounds.size.y, s.base.x, s.base.y])

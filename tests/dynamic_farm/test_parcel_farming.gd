@@ -130,14 +130,15 @@ func _commands() -> void:
 	_check(ParcelFarm.normalize(JSON.parse_string(JSON.stringify(placed))) == placed, "a JSON round trip keeps the buildings")
 	_check(ParcelFarm.normalize({"v": 2}).is_empty(), "other versions are refused")
 
-## The shipped rules have the cottage, (C-154) the 7×5 coop, (C-181) the 8×6 barn and (C-151) the 1×1 well; a copy
+## The shipped rules have the cottage, (C-154) the 7×5 coop, (C-181) the barn, (C-182) the 6×6 sheep pen and (C-151) the 1×1 well; a copy
 ## lets the well be built 3 times and stands a plain 4×2 coop, at most 1, in for the shipped one.
 func _buildings() -> void:
 	var rules := ParcelFarm.rules()
 	_check(rules.buildings.cottage == {"model": "cottage", "blueprint": "blueprint_cottage", "width": 3, "depth": 3, "max": 1, "materials": {}},
 		"buildings: one 3×3 cottage per parcel")
-	# C-192: the 8×6 barn (C-181's rules) comes after the coop; its own checks are test_barn.gd's.
-	_check(rules.buildings.keys() == ["cottage", "coop", "barn", "well"] and rules.buildings.coop.width == 7 and rules.buildings.coop.depth == 5 \
+	# C-192: the barn (C-181's rules) comes after the coop, C-182's sheep pen after it; their own checks are test_barn.gd's and
+	# test_sheep_pen.gd's.
+	_check(rules.buildings.keys() == ["cottage", "coop", "barn", "sheep_pen", "well"] and rules.buildings.coop.width == 7 and rules.buildings.coop.depth == 5 \
 		and rules.buildings.coop.max == 1 and rules.buildings.coop.blueprint == "blueprint_coop", "buildings: one 7×5 coop per parcel (C-154)")
 	_check(rules.buildings.well == {"model": "well", "blueprint": "blueprint_well", "width": 1, "depth": 1, "max": 1, "materials": {}},
 		"buildings: (C-151) one 1×1 well per parcel")

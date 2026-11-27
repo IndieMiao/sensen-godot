@@ -42,6 +42,10 @@
  * 时扣这么多金币，不够整批拒绝（NOT_ENOUGH_COINS），只能买一次（同 blueprints_claimed）。不加存档字段，版本号不变。
  * C-192（SEN-Q-282）：蓝图 600 金币，还要农场到 min_level 级（2 级），不到报 CONDITION_NOT_MET {level, min_level}；地上最多 2 份奶。
  *
+ * 羊圈（C-182，0.4.6，SEN-Q-282）：照牛棚，又一类养殖建筑（sheep_pen），6×6，盖的时候扣 15 木材 + 15 石头；4 只羊，喂一次扣 3 份
+ * 野草药、1 体力，30 分钟后产 1 份羊毛，地上最多 4 份。蓝图 1,200 金币，要累计交过 min_requests 张委托单（15，requests_done）
+ * 且农场到 3 级：先看委托单数，不到报 CONDITION_NOT_MET {requests_done, min_requests}，再看等级、金币。不加存档字段，版本号不变。
+ *
  * 驿站委托板（C-191，照搬 P0 系统委托板，见 requests.ts）：board 存两格单子和今天交了几单、发了多少完成奖，requests_done
  * 是累计交了几单（羊圈解锁要用）。接单、交单、放弃（accept_request / deliver_request / drop_request）不花体力，“人在驿站”由客户端限定。
  * 每批命令前后各补一次委托板（settleBoard），读档在副本上补。board、requests_done 也是 v1 上追加的字段：旧存档按空板、0 单读。
@@ -591,6 +595,9 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         if (!rule) return fail('UNKNOWN_BLUEPRINT');
         if (Object.hasOwn(s.blueprints_claimed, c.blueprint)) return fail('BLUEPRINT_CLAIMED');
         if (s.sales < rule.min_sales) return fail('CONDITION_NOT_MET', { sales: s.sales, min_sales: rule.min_sales });
+        // C-182（SEN-Q-282）：羊圈蓝图要累计交过 15 张委托单。
+        const minRequests = rule.min_requests ?? 0;
+        if (s.requests_done < minRequests) return fail('CONDITION_NOT_MET', { requests_done: s.requests_done, min_requests: minRequests });
         // C-192（SEN-Q-282）：牛棚蓝图要农场 2 级才能买。
         const minLevel = rule.min_level ?? 1;
         if (s.level < minLevel) return fail('CONDITION_NOT_MET', { level: s.level, min_level: minLevel });

@@ -23,7 +23,8 @@ const REACH := 2
 const OK := 3
 const VERDICT := ["none", "path", "reach", "ok"]
 
-## A plain W×D shape with one walkable cell outside its front middle (the sheep pen's size is not set yet).
+## A plain W×D shape with one walkable cell outside its front middle (C-193 sized the sheep pen before its art; the real
+## pen is `pen()`).
 static func plain(base: Vector2i) -> Dictionary:
 	return {"base": base, "type": "", "keep": [{"cell": Vector2i(base.x / 2, base.y), "walk": true}], "cutouts": []}
 
@@ -37,6 +38,10 @@ static func barn() -> Dictionary:
 	var rule: Dictionary = ParcelFarm.rules().buildings.barn
 	return {"base": Building.base_of(rule), "type": "barn", "keep": [], "cutouts": Building.cutouts_of(rule)}
 
+## C-182: the sheep pen with its real art (SEN-C-180's 6×6, the cell outside its gate, from the rules and the art file).
+static func pen() -> Dictionary:
+	return {"base": Building.base_of(ParcelFarm.rules().buildings.sheep_pen), "type": "sheep_pen", "keep": [], "cutouts": []}
+
 ## C-192's draft barn: 8×6, the cell outside its entry (f000a009), for comparison with earlier statistics.
 static func draft_barn() -> Dictionary:
 	return {"base": Vector2i(8, 6), "type": "", "keep": [{"cell": Vector2i(3, 6), "walk": true}], "cutouts": []}
@@ -48,7 +53,7 @@ static func cottage() -> Dictionary:
 ## The statistic's shapes: name → {base, keep: [{cell, walk}] in the unturned frame (cells outside the footprint),
 ## type: real art type or "", cutouts: the footprint's rects that are not its own (C-202)}.
 static func shapes() -> Dictionary:
-	var out := {"coop": coop(), "barn": barn(), "barn_8x6": draft_barn()}
+	var out := {"coop": coop(), "barn": barn(), "barn_8x6": draft_barn(), "sheep_pen": pen()}
 	for s: Vector2i in [Vector2i(5, 3), Vector2i(6, 4), Vector2i(7, 5), Vector2i(8, 6), Vector2i(9, 7), Vector2i(10, 8)]:
 		out["plain_%dx%d" % [s.x, s.y]] = plain(s)
 	return out

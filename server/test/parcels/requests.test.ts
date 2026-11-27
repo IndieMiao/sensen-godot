@@ -60,6 +60,11 @@ const withBarn = (s: ParcelFarmState): ParcelFarmState =>
   ({ ...structuredClone(s), buildings: [...s.buildings, { id: 3, type: 'barn', model: 'cow_barn', x: 20, y: 10, width: 11, depth: 6, rotation: 0, built_at: T0, animals: ['cow', 'cow'],
     cutouts: [[0, 0, 2, 2]] }] });
 
+/** 盖好的羊圈（建筑 4），出羊毛单要它（C-182）。 */
+const withPen = (s: ParcelFarmState): ParcelFarmState =>
+  ({ ...structuredClone(s), buildings: [...s.buildings, { id: 4, type: 'sheep_pen', model: 'sheep_pen', x: 2, y: 20, width: 6, depth: 6, rotation: 0, built_at: T0,
+    animals: ['sheep', 'sheep', 'sheep', 'sheep'] }] });
+
 describe('dynamic_farm.json requests (C-191)', () => {
   it('ships SEN-Q-281: 2 slots, at once / 8 h / 72 h, 6 a day, bonus 100 a day, Jasmine\'s price × count + bonus, count by item', () => {
     const tiers = ([low, high, bonus]: (typeof Q281)[string]) => [{ level: 1, qty: low, bonus }, { level: 4, qty: high, bonus }];
@@ -69,13 +74,15 @@ describe('dynamic_farm.json requests (C-191)', () => {
       tiers: tiers(Q281.crop_carrot),
       item_tiers: Object.fromEntries(Object.entries(Q281).map(([item, b]) => [item, tiers(b)])),
       templates: { fresh_greens: { item: 'crop_carrot' }, timber_run: { item: 'wood' }, stone_order: { item: 'stone' },
-        egg_basket: { item: 'egg', building: 'coop' }, fresh_milk: { item: 'milk', building: 'barn' } },
+        egg_basket: { item: 'egg', building: 'coop' }, fresh_milk: { item: 'milk', building: 'barn' },
+        wool_bundle: { item: 'wool', building: 'sheep_pen' } },
     });
-    // 不再打折：一件的价就是 Jasmine 的售价（胡萝卜 12、木材 2、石头 2、鸡蛋 20、牛奶 45，C-192）。
-    expect(['crop_carrot', 'wood', 'stone', 'egg', 'milk'].map(i => floorPrice(rules, i))).toEqual([12, 2, 2, 20, 45]);
+    // 不再打折：一件的价就是 Jasmine 的售价（胡萝卜 12、木材 2、石头 2、鸡蛋 20、牛奶 45，C-192；羊毛 30，C-182）。
+    expect(['crop_carrot', 'wood', 'stone', 'egg', 'milk', 'wool'].map(i => floorPrice(rules, i))).toEqual([12, 2, 2, 20, 45, 30]);
     // 每种单子按它要的物品分档，3 级及以下一档、4 级起一档，再高也不变。
     const at = (template: string, level: number) => { const x = tierFor(rules.requests!, level, template); return [...x.qty, x.bonus]; };
-    for (const [template, item] of [['fresh_greens', 'crop_carrot'], ['timber_run', 'wood'], ['stone_order', 'stone'], ['egg_basket', 'egg'], ['fresh_milk', 'milk']])
+    for (const [template, item] of [['fresh_greens', 'crop_carrot'], ['timber_run', 'wood'], ['stone_order', 'stone'], ['egg_basket', 'egg'], ['fresh_milk', 'milk'],
+      ['wool_bundle', 'wool']])
       for (const level of [1, 3, 4, 5, 7, 99]) expect(at(template, level)).toEqual(band(item, level));
   });
 
@@ -94,7 +101,7 @@ describe('dynamic_farm.json requests (C-191)', () => {
     expect(bad({ tiers: [{ level: 1, qty: [2, 3], bonus: 10 }, { level: 1, qty: [2, 3], bonus: 20 }] })).toThrow();
     expect(bad({ templates: {} })).toThrow();
     expect(bad({ templates: { x: { item: 'seed_carrot' } } })).toThrow();   // Jasmine 不收的东西不能出单
-    expect(bad({ templates: { x: { item: 'egg', building: 'pen' } } })).toThrow();   // 没有这类建筑（羊圈还没上）
+    expect(bad({ templates: { x: { item: 'egg', building: 'pen' } } })).toThrow();   // 没有这类建筑（羊圈的类型是 sheep_pen）
     expect(bad({ templates: { x: { item: 'egg', tiers: [{ level: 2, qty: [1, 2], bonus: 20 }] } } })).toThrow();   // 模板自己的分档也从 1 级起
     expect(bad({ item_tiers: [] })).toThrow();
     expect(bad({ item_tiers: { egg: [] } })).toThrow();
@@ -148,7 +155,7 @@ describe('drawing requests (C-191)', () => {
     expect(view(welcomed(), T0 + 3 * H)).toEqual(view(welcomed(), T0 + 5000));
   });
 
-  it('only what the farm can make: no eggs without a coop, no milk without a barn; with them, they come up among the kinds', () => {
+  it('only what the farm can make: no eggs without a coop, no milk without a barn, no wool without a sheep pen; with them, they come up among the kinds', () => {
     const kinds = (s: ParcelFarmState) => {
       const seen = new Set<string>();
       // 每次放弃再到点补位换一张，看 60 张单子都出了什么。
@@ -165,6 +172,9 @@ describe('drawing requests (C-191)', () => {
     expect(kinds(withCoop(welcomed()))).toEqual(['crop_carrot', 'egg', 'stone', 'wood']);
     expect(kinds(withBarn(welcomed()))).toEqual(['crop_carrot', 'milk', 'stone', 'wood']);
     expect(kinds(withBarn(withCoop(welcomed())))).toEqual(['crop_carrot', 'egg', 'milk', 'stone', 'wood']);
+    // C-182：羊毛单（SEN-Q-281 分档 1–2 / 2–3 件，完成奖 20）要先盖羊圈。
+    expect(kinds(withPen(welcomed()))).toEqual(['crop_carrot', 'stone', 'wood', 'wool']);
+    expect(kinds(withPen(withBarn(withCoop(welcomed()))))).toEqual(['crop_carrot', 'egg', 'milk', 'stone', 'wood', 'wool']);
   });
 
   it('count and completion bonus follow the item and the farm level when drawn (SEN-Q-281): Lv3 and below one band, Lv4 on the other', () => {

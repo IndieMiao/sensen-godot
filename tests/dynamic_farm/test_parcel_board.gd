@@ -58,13 +58,15 @@ func _rules() -> void:
 		"egg": band.call([2, 3], [3, 5], 20), "milk": band.call([1, 2], [2, 3], 20), "wool": band.call([1, 2], [2, 3], 20)},
 		"rules: SEN-Q-281's counts and bonuses by item (%s)" % [q.item_tiers])
 	_check(q.tiers == band.call([3, 5], [5, 8], 10), "rules: the shared tiers (for an item with none of its own)")
-	_check(q.templates.keys() == ["fresh_greens", "timber_run", "stone_order", "egg_basket", "fresh_milk"] and q.templates.egg_basket == {"item": "egg", "building": "coop"}
-		and q.templates.fresh_milk == {"item": "milk", "building": "barn"},
-		"rules: carrots, timber, stone, eggs with a coop and milk with a barn (C-192), in the file's order")
+	_check(q.templates.keys() == ["fresh_greens", "timber_run", "stone_order", "egg_basket", "fresh_milk", "wool_bundle"]
+		and q.templates.egg_basket == {"item": "egg", "building": "coop"} and q.templates.fresh_milk == {"item": "milk", "building": "barn"}
+		and q.templates.wool_bundle == {"item": "wool", "building": "sheep_pen"},
+		"rules: carrots, timber, stone, eggs with a coop, milk with a barn (C-192) and wool with a sheep pen (C-182), in the file's order")
 	var rules := ParcelFarm.rules()
-	_check(["crop_carrot", "wood", "stone", "egg", "milk"].map(func(i): return ParcelFarm.floor_price(rules, i)) == [12, 2, 2, 20, 45],
-		"prices 12 / 2 / 2 / 20 / 45, Jasmine's own")
-	for pair in [["fresh_greens", "crop_carrot"], ["timber_run", "wood"], ["stone_order", "stone"], ["egg_basket", "egg"], ["fresh_milk", "milk"]]:
+	_check(["crop_carrot", "wood", "stone", "egg", "milk", "wool"].map(func(i): return ParcelFarm.floor_price(rules, i)) == [12, 2, 2, 20, 45, 30],
+		"prices 12 / 2 / 2 / 20 / 45 / 30, Jasmine's own")
+	for pair in [["fresh_greens", "crop_carrot"], ["timber_run", "wood"], ["stone_order", "stone"], ["egg_basket", "egg"], ["fresh_milk", "milk"],
+			["wool_bundle", "wool"]]:
 		for level in [1, 3, 4, 7]:
 			_check(ParcelFarm.tier_for(rules, level, pair[0]) == q.item_tiers[pair[1]][0 if level < 4 else 1], "rules: %s at Lv%d by its item" % [pair[0], level])
 	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH))

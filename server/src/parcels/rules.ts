@@ -81,8 +81,9 @@ export interface FarmLevelRule {
  * 一次性领取的蓝图：卖成功过至少 min_sales 次后可领，只发一次。
  * coins（C-181，可选，默认 0）：领的时候要花的金币，即在 Scott 处花金币买（牛棚 600，SEN-Q-282；羊圈以后照用）；金币不够整批拒绝。
  * min_level（C-192，可选，默认 1）：农场到这一级才能买（牛棚 2 级，SEN-Q-282）；不到整批拒绝。
+ * min_requests（C-182，可选，默认 0）：累计交过这么多张委托单（存档 requests_done）才能买（羊圈 15 单，SEN-Q-282）；不到整批拒绝。
  */
-export interface BlueprintRule { item: string; amount: number; min_sales: number; min_level?: number; coins?: number }
+export interface BlueprintRule { item: string; amount: number; min_sales: number; min_level?: number; min_requests?: number; coins?: number }
 export interface EconomyRules {
   /** 能卖的物品与单价（金币）；不在表里的不能卖。 */
   sell_prices: Record<string, number>;
@@ -279,7 +280,8 @@ function parseEconomy(e: EconomyRules | undefined, fail: (what: string) => never
   for (const [id, b] of Object.entries(e!.blueprints))
     if (!isId(id) || !isMap(b) || !isId(b.item) || !count(b.amount, 1, 99) || !count(b.min_sales, 0, 1000)
       || (b.coins !== undefined && !count(b.coins, 0, 100_000))
-      || (b.min_level !== undefined && !count(b.min_level, 1, MAX_FARM_LEVEL))) fail(`economy.blueprints.${id} 不对`);
+      || (b.min_level !== undefined && !count(b.min_level, 1, MAX_FARM_LEVEL))
+      || (b.min_requests !== undefined && !count(b.min_requests, 0, 100_000))) fail(`economy.blueprints.${id} 不对`);
 }
 
 /** 从 level 级升到下一级的规则；已经是配置里最高一级时为 null。 */

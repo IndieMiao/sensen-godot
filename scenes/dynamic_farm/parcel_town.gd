@@ -14,7 +14,8 @@ extends Control
 ## - Since C-181 Scott sells the blueprints the rules price in coins (`economy.blueprints.<id>.coins`, the barn's 600):
 ##   one key each, `Buy Barn Blueprint · 600 coins`, until it is bought; below the blueprint's farm level (`min_level`,
 ##   the barn's 2, C-192) it reads `Farm Lv2 needed`, short of coins P0's `Need N more coins` (LOCK-10), and a tap says
-##   so. It sends `claim_blueprint`, which takes the coins on the server.
+##   so. It sends `claim_blueprint`, which takes the coins on the server. C-182: the sheep pen's (1,200) also waits for 15
+##   delivered requests (`min_requests`), read `Need N more requests` before the level.
 ## - Since C-191 the room's Request Board opens here too (who = BOARD): no keeper and no greeting, the board drawer
 ##   (parcel_board.gd) straight away; its keys send `accept_request` / `deliver_request` / `drop_request`, and closing
 ##   it leaves.
@@ -324,11 +325,14 @@ func priced_blueprints() -> Array:
 		if int(all[id].get("coins", 0)) > 0 and not farm.get("blueprints_claimed", {}).has(id): out.append(id)
 	return out
 
-## Why a priced blueprint cannot be bought now, the key's second line and its tap's toast; "" when it can. The farm level
-## comes first (C-192, SEN-Q-282: the barn's from level 2), in P0's `Home Lv2 needed` form: `Farm Lv2 needed`; then the
-## coins, P0's `Need N more coins` (LOCK-10).
+## Why a priced blueprint cannot be bought now, the key's second line and its tap's toast; "" when it can. The delivered
+## requests come first (C-182, SEN-Q-282: the sheep pen's after 15), in LOCK-10's `Need N more <thing>` form: `Need 11
+## more requests`, as the server names them first; then the farm level (C-192, SEN-Q-282: the barn's from level 2, the
+## pen's 3), in P0's `Home Lv2 needed` form: `Farm Lv2 needed`; then the coins, P0's `Need N more coins` (LOCK-10).
 func buy_gap(id: String) -> String:
 	var rule: Dictionary = ParcelFarm.rules().economy.blueprints[id]
+	var requests := int(rule.get("min_requests", 0)) - int(farm.get("requests_done", 0))
+	if requests > 0: return "Need %d more %s" % [requests, "request" if requests == 1 else "requests"]
 	var level := int(rule.get("min_level", 1))
 	if ParcelFarm.farm_level(farm) < level: return "Farm Lv%d needed" % level
 	var short := int(rule.coins) - int(farm.get("coins", 0))

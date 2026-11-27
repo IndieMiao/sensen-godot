@@ -62,7 +62,7 @@ func _rules() -> void:
 	_check(l.animals == ["cow", "cow"] and l.feed == "crop_carrot" and l.feed_amount == 2 and l.product == "milk" and l.amount == 1 \
 		and l.produce_seconds == 900 and l.max_ground == 2 and l.spots.size() >= 2, "barn: two cows, 2 carrots give a milk in 15 min, 2 on the ground (SEN-Q-282)")
 	_check(rules.buildings.coop.livestock.feed_amount == 1, "coop: a hen still eats one carrot (feed_amount defaults to 1)")
-	_check(rules.economy.blueprints.barn == {"item": "blueprint_barn", "amount": 1, "min_sales": 0, "min_level": 2, "coins": 600}
+	_check(rules.economy.blueprints.barn == {"item": "blueprint_barn", "amount": 1, "min_sales": 0, "min_level": 2, "min_requests": 0, "coins": 600}
 		and rules.economy.blueprints.coop.coins == 0 and rules.economy.blueprints.coop.min_level == 1,
 		"Scott: the barn blueprint 600 coins from farm level 2 (SEN-Q-282), the coop's still free at any level")
 	_check(rules.economy.sell_prices.milk == 45 and rules.energy.costs.feed == 1, "milk sells for 45; feeding 1 Energy")

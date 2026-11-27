@@ -30,6 +30,9 @@ extends RefCounted
 ## its `livestock.feed_amount` (default 1; the cows 2 carrots) is taken per feeding, still for one product. Its blueprint
 ## is bought at Scott's: an `economy.blueprints` entry with `coins` (default 0) costs that much at `claim_blueprint`,
 ## refused whole (NOT_ENOUGH_COINS) when short, once only as every one-off blueprint. No save field is added.
+## The sheep pen (C-182, 0.4.6, SEN-Q-282) is another: four sheep, three Wild Herbs a feeding, one Wool 30 minutes later.
+## Its blueprint's `min_requests` (default 0) asks for that many delivered board requests in all (`requests_done`, 15),
+## checked before `min_level` (3) and the coins (1,200): CONDITION_NOT_MET {requests_done, min_requests}.
 ## The request board (C-191, P0's system board at the Washington Square Travel Post) mirrors server/src/parcels/requests.ts:
 ## the rules' `requests`; the save's `board` {slots: [{req, refill_at}], seq, day, done_today, bonus_today} and
 ## `requests_done` (absent before it: an empty board, 0). `settle_board` fills due slots and swaps open requests 72 h old,
@@ -304,10 +307,14 @@ static func _parse_economy(raw: Variant) -> Dictionary:
 			var rule = raw.blueprints[id]
 			if id is String and rule is Dictionary and rule.get("item") is String and whole_in(rule.get("amount"), 1, 99) \
 					and whole_in(rule.get("min_sales"), 0, 1000) and (not rule.has("coins") or whole_in(rule.coins, 0, 100000)) \
-					and (not rule.has("min_level") or whole_in(rule.min_level, 1, MAX_FARM_LEVEL)):
+					and (not rule.has("min_level") or whole_in(rule.min_level, 1, MAX_FARM_LEVEL)) \
+					and (not rule.has("min_requests") or whole_in(rule.min_requests, 0, 100000)):
 				# C-192 (SEN-Q-282): `min_level`, the farm level a blueprint is sold from (the barn's 2), defaults to 1.
+				# C-182 (SEN-Q-282): `min_requests`, how many board requests the farm has delivered in all (`requests_done`)
+				# before it is sold (the sheep pen's 15), defaults to 0.
 				out.blueprints[id] = {"item": rule.item, "amount": int(rule.amount), "min_sales": int(rule.min_sales),
-					"min_level": int(rule.get("min_level", 1)), "coins": int(rule.get("coins", 0))}
+					"min_level": int(rule.get("min_level", 1)), "min_requests": int(rule.get("min_requests", 0)),
+					"coins": int(rule.get("coins", 0))}
 	return out
 
 ## C-148 `energy` with the server's bounds (energy.ts parseEnergyRules), integers made ints; {} when out of them.
@@ -1082,6 +1089,10 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				elif int(next.sales) < int(rule.min_sales):
 					failure = "CONDITION_NOT_MET"
 					detail = {"sales": next.sales, "min_sales": rule.min_sales}
+				elif int(next.get("requests_done", 0)) < int(rule.get("min_requests", 0)):
+					# C-182 (SEN-Q-282): the sheep pen's blueprint is sold after 15 delivered requests.
+					failure = "CONDITION_NOT_MET"
+					detail = {"requests_done": int(next.get("requests_done", 0)), "min_requests": int(rule.min_requests)}
 				elif farm_level(next) < int(rule.get("min_level", 1)):
 					# C-192 (SEN-Q-282): the barn's blueprint is sold from farm level 2.
 					failure = "CONDITION_NOT_MET"
