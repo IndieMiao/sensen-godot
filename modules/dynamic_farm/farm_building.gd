@@ -78,7 +78,7 @@ static func cells(at: Vector2i, base: Vector2i, rotation := 0, cutouts := []) ->
 
 ## C-202 the cutouts of a rules entry or a saved building (the barn's rear-left 2×2), [] without.
 static func cutouts_of(entry: Dictionary) -> Array:
-	return entry.get("cutouts", []) if entry.get("cutouts") is Array else []
+	return ParcelFarm.cutouts_of(entry)
 
 ## The cutouts a new building of `type` is placed with (the rules'), [] for an unknown type or "".
 static func type_cutouts(type: String) -> Array:

@@ -7,7 +7,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { PlayerRow } from '../http/store.js';
 import { energyOf } from './energy.js';
-import { applyFarmCommands, emptyFarm, grant, parseFarmCommands, rebaseFarm, welcome, withEconomy } from './farm.js';
+import { applyFarmCommands, emptyFarm, grant, parseFarmCommands, rebaseFarm, retireDraftBuildings, welcome, withEconomy } from './farm.js';
 import { settleBoard } from './requests.js';
 import { communityOf, isNewerDataset, type ParcelRules } from './rules.js';
 import { activeZone, zoneView, type StarterZones } from './starter_zone.js';
@@ -63,10 +63,12 @@ function parseBbox(raw: unknown): [number, number, number, number] | null {
 
 /**
  * 农场按当前字段补齐后给客户端：缺的经济字段补开局值，缺的体力补满（C-148，energyOf）；委托板补到现在（C-191，settleBoard：
- * 到点的空格抽上单子、过期的换掉，抽到的和下一条命令补位抽到的是同一张）。只补显示，不写回。
+ * 到点的空格抽上单子、过期的换掉，抽到的和下一条命令补位抽到的是同一张）；C-202 之前的旧牛棚拆掉退还（C-209，retireDraftBuildings，
+ * 进入时写回）。只补显示，不写回。
  */
 const farmView = (rules: ParcelRules, farm: OwnedParcel['farm'], at: number) => {
   const f = withEconomy(farm);
+  retireDraftBuildings(rules, f);
   f.energy = energyOf(rules, f, at);
   settleBoard(rules, f, at);
   return f;
@@ -181,6 +183,7 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
    * 换过之后认领已是新版本，重试、并发请求都不会再换一次。不带或条件不满足时与以前一样。
    * C-151：同一次写入里补上还没发过的一次性补发（grant：井的蓝图和水桶），每个农场只发一次。
    * gift 是这次进入发的全部物品（首次进入的赠品加补发），什么都没发为 {}；granted 仍只表示首次进入的赠品。
+   * C-209：同一次写入里拆掉 C-202 之前的旧牛棚并退还（retireDraftBuildings），退的东西不算进 gift。
    */
   app.post('/v1/parcels/mine/enter', { config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (req, reply) => {
     const p = await parcelWriter(req, reply);
@@ -199,12 +202,16 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
         farm = rebaseFarm(deps.rules, farm, at);
         dataset = want;
       }
+      // C-209：C-202 之前的旧牛棚在这次写入里拆掉退还；拆过之后存档里就没有了，重试、并发进入都不会再退。
+      const retired = withEconomy(farm);
+      const tookDown = retireDraftBuildings(deps.rules, retired);
+      if (tookDown) farm = retired;
       const gifted = welcome(deps.rules, farm, at);
       if (gifted) for (const [id, n] of Object.entries(deps.rules.welcome_gift)) gift[id] = (gift[id] ?? 0) + n;
       const topped = grant(deps.rules, gifted ?? farm, at);
       if (topped) for (const [id, n] of Object.entries(topped.gift)) gift[id] = (gift[id] ?? 0) + n;
       const next = topped?.state ?? gifted;
-      return next || rebased ? { farm: next ?? farm, dataset_version: dataset, granted: Boolean(gifted) } : null;
+      return next || rebased || tookDown ? { farm: next ?? farm, dataset_version: dataset, granted: Boolean(gifted) } : null;
     }, at);
     if (out.kind === 'no_parcel') return reply.code(404).send({ code: 'NO_PARCEL', server_time: at });
     if (rebased) req.log.info({ parcel_id: out.parcel.parcel_id, to: out.parcel.dataset_version, ...rebased }, 'parcel rebased to a newer dataset');
