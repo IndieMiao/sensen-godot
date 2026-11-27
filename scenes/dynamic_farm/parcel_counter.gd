@@ -11,6 +11,8 @@ extends UiDrawer
 ## C-186 (C-185 §3.3 D–E, MS-15 / MS-02): a sale floats `+N` over its key and up to three coins fly to the Coins row, which
 ## bumps and rolls as the first lands; a purchase rolls the coins down (they flash, nothing pops); a tap on a grey
 ## `Need N more coins` shakes the key and flashes the Coins number `action/danger` (no toast: the key already says it).
+## C-211 (MS-15's rest): a stack sold out folds its card away (height to 0 in 200, exit) while its grid icon fades (120);
+## a purchase rolls the shelf row's `Bag ×N` up to the new count. Reduced: the card closes and the count changes at once.
 
 signal sell_requested(item_id: String, count: int)
 signal buy_requested(item_id: String, count: int)
@@ -39,6 +41,8 @@ var _qty := {}    # item id -> stepper count
 var sell_point := Vector2.INF
 ## A sale's coins are on their way: refresh() leaves the number for the roll.
 var _rolling := false
+## The sold-out card folding away (its clip, which holds the sheet until it is done), else null.
+var _fold: Control
 
 ## npc: {name, role, title, look}; prices: item id → coins each (sold here); buy_prices_: item id → coins each (bought).
 func _init(farm_: Dictionary, prices_: Dictionary, npc: Dictionary, portrait: Texture2D, buy_prices_ := {}) -> void:
@@ -90,7 +94,7 @@ func _init(farm_: Dictionary, prices_: Dictionary, npc: Dictionary, portrait: Te
 	grid.sell_mode = true
 	grid.can_sell = func(_it: Dictionary) -> bool: return true
 	grid.on_select = func(it: Dictionary): select(str(it.id))
-	grid.selection_cleared.connect(func(): sheet.close())
+	grid.selection_cleared.connect(func(): if _fold == null: sheet.close())
 	body.add_child(grid)
 	refresh(farm_)
 
@@ -109,15 +113,88 @@ func refresh(farm_: Dictionary) -> void:
 	if _rolling or UiMotion.rolling(coins_label()): coins_label().text = drawn
 	var items := sellable().map(func(id): return {id = id, icon = ParcelItems.icon_of(id),
 		qty = int(farm.bag[id]), rarity = 0, kind = "", tab = &""})
+	# The stacks leaving the grid (sold out): their icons fade where they were (MS-15).
+	var leaving := []
+	for id in grid.shown_items().map(func(it): return str(it.id)):
+		if int(farm.get("bag", {}).get(id, 0)) <= 0 and grid.cell_for(id) != null: leaving.append(grid.cell_for(id))
+	if not UiMotion.reduced and is_inside_tree():
+		for cell: UiItemCell in leaving: _fade_icon(cell)
+	# The open card's stack sold out: it folds away (the grid dropping its selection then leaves the card to the fold).
+	if sheet.is_open() and _fold == null and int(farm.get("bag", {}).get(sheet.item_id(), 0)) <= 0: fold_sheet()
 	grid.capacity = maxi(_COLUMNS, ceili(items.size() / float(_COLUMNS)) * _COLUMNS)
 	grid.items = items
 	_empty.visible = items.is_empty()
 	for id in _rows: _show_row(id)
-	if sheet.is_open():
-		if int(farm.get("bag", {}).get(grid.selected_id, 0)) > 0: sheet.refresh()
+	if sheet.is_open() and _fold == null:
+		if int(farm.get("bag", {}).get(sheet.item_id(), 0)) > 0: sheet.refresh()
 		else:
 			sheet.close()
 			grid.clear_selection()
+	elif _fold != null: grid.clear_selection()
+
+## MS-15: the sold-out stack's card folds away — clipped to a box that shrinks from its height to 0 (200, exit) as it
+## fades, the rows under it rising with it; then it closes. Reduced, or off screen: it closes at once.
+func fold_sheet() -> void:
+	if UiMotion.reduced or not sheet.is_visible_in_tree():
+		sheet.close()
+		return
+	var h := sheet.size.y
+	var w := sheet.size.x
+	_fold = Control.new()
+	_fold.name = "SheetFold"
+	_fold.clip_contents = true
+	_fold.mouse_filter = Control.MOUSE_FILTER_STOP   # its keys take no taps while it goes
+	_fold.custom_minimum_size.y = h
+	body.add_child(_fold)
+	body.move_child(_fold, sheet.get_index())
+	sheet.reparent(_fold, false)
+	sheet.position = Vector2.ZERO
+	sheet.size = Vector2(w, h)
+	var shield := Control.new()
+	shield.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	shield.mouse_filter = Control.MOUSE_FILTER_STOP
+	_fold.add_child(shield)
+	var tw := UiMotion.tween(_fold, UiTokens.MOTION_EASING_EXIT)
+	tw.tween_property(_fold, "custom_minimum_size:y", 0.0, UiMotion.secs(UiTokens.MOTION_DURATION_BASE_MS))
+	tw.parallel().tween_property(sheet, "modulate:a", 0.0, UiMotion.secs(UiTokens.MOTION_DURATION_BASE_MS))
+	tw.tween_callback(_end_fold)
+	_fold.set_meta(&"_ui_fold", tw)
+
+## The fold is over (or cut short by another pick): the card is back in its place, closed.
+func _end_fold() -> void:
+	if _fold == null: return
+	var fold := _fold
+	_fold = null
+	UiMotion._kill(fold, &"_ui_fold")
+	var at := fold.get_index()
+	sheet.reparent(body, false)
+	body.move_child(sheet, at)
+	sheet.modulate.a = 1.0
+	sheet.close()
+	fold.queue_free()
+
+## A stack leaving the grid: its icon fades out (120) over where its cell drew it.
+func _fade_icon(cell: UiItemCell) -> void:
+	if cell.icon == null or cell._icon == null or not cell._icon.is_visible_in_tree(): return
+	var ghost := TextureRect.new()
+	ghost.name = "SoldGhost"
+	ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ghost.texture = cell.icon
+	ghost.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ghost.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	var at := cell._icon.get_global_rect()
+	ghost.position = at.position - get_global_rect().position
+	ghost.size = at.size
+	add_child(ghost)
+	var tw := UiMotion.tween(ghost, UiTokens.MOTION_EASING_STANDARD)
+	tw.tween_property(ghost, "modulate:a", 0.0, UiMotion.secs(UiTokens.MOTION_DURATION_FAST_MS))
+	tw.tween_callback(ghost.queue_free)
+
+## C-211 (MS-15): a purchase rolls the shelf row's `Bag ×N` from `before` up to the bag's count now (400; it bumps).
+func roll_bag(id: String, before: int) -> void:
+	var row: UiShopRow = _rows.get(id)
+	if row == null: return
+	UiMotion.roll(row._effect, float(before), float(int(farm.get("bag", {}).get(id, 0))), "Bag ×%d")
 
 ## The Coins row's number (rolls, flashes) and its icon (the coins' landing).
 func coins_label() -> Label: return coins._value
@@ -157,6 +234,7 @@ func roll_coins(before: int) -> void:
 	UiMotion.roll(coins_label(), float(before), float(int(farm.get("coins", 0))))
 
 func select(id: String) -> void:
+	_end_fold()
 	sheet.open(id, &"counter_sell")
 
 ## The selected stack's card, as P0's counter_sell: `12 each`, Sell (one) and Sell All · N coins.

@@ -264,10 +264,20 @@ func _turned(turn: bool) -> void:
 		await create_timer(0.1).timeout
 		board.open_request(2)
 		board.back_to_list()
-	await create_timer(2.0).timeout
+	# C-211 (C-186#82): the egg row under the delivered one, rebuilt with the list, slides to its new place.
+	var egg_ys := []
+	var end := Time.get_ticks_msec() + 2000
+	while Time.get_ticks_msec() < end:
+		await process_frame
+		var egg: Control = board.page_box.get_node_or_null(^"Row_2")
+		if egg != null and not board.hold and (egg_ys.is_empty() or not is_equal_approx(egg.position.y, float(egg_ys.back()))):
+			egg_ys.append(egg.position.y)
 	_check(not board.hold and board.page == "list" and board.cards.has(3) and not board.cards.has(1),
 		"motion (%s): the board is let go, the new request in its row" % what)
 	if not turn:
+		var egg_row: Control = board.page_box.get_node(^"Row_2")
+		_check(egg_ys.size() >= 3 and is_equal_approx(float(egg_ys.back()), egg_row.position.y),
+			"motion: the egg row slides to its new place (C-211), not a jump: %s" % [egg_ys.map(func(y): return roundi(y))])
 		var rows: Array = board.page_box.get_children().filter(func(n): return n is PanelContainer)
 		var sep: int = board.page_box.get_theme_constant(&"separation")
 		_check(rows.size() == 2 and is_equal_approx(rows[1].position.y, rows[0].position.y + rows[0].size.y + sep) and rows[1].modulate.a == 1.0,
@@ -306,6 +316,17 @@ func _drop() -> void:
 	_check(farm.board.slots[1].req == null and int(farm.board.slots[1].refill_at) == T0 + 9 * H, "the slot refills 8 h after the drop")
 	board.back_to_list()
 	_check(board.cards.size() == 1 and board.find_children("*", "Label", true, false).any(func(l): return l.text == "8h"), "the list: one request, `Next request 8h`")
+	# C-211 (C-185 §3.6): the dropped request's row stands in its place (after the first request's) and folds away.
+	var gone: Control = board.page_box.get_node_or_null(^"Gone_2")
+	_check(gone != null and gone.get_index() == board.cards[1].get_parent().get_index() + 1, "back on the list, the dropped row stands in its place")
+	await create_timer(0.1).timeout
+	_check(is_instance_valid(gone) and gone.scale.y < 1.0 and gone.scale.y > 0.0, "…folding away (%.2f)" % (gone.scale.y if is_instance_valid(gone) else -1.0))
+	await create_timer(0.5).timeout
+	_check(board.page_box.get_node_or_null(^"Gone_2") == null and board.cards.size() == 1
+		and board.page_box.get_signal_connection_list(&"sort_children").is_empty(), "…and is gone; the list closed up and let go of its sorts")
+	var first: Control = board.cards[1]
+	await create_timer(1.2).timeout
+	_check(is_instance_valid(first) and board.cards[1] == first, "an unchanged list is not rebuilt on the second's tick (its key keeps its node)")
 	clock[0] = T0 + 9 * H
 	await town._reload_board()
 	_check(town.board.cards.size() == 2, "8 h later the read brings a new request")

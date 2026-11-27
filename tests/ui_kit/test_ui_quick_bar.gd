@@ -496,3 +496,68 @@ func test_a_slot_name_follows_the_cells_auto_translation() -> void:
 	TranslationServer.remove_translation(t)
 	await await_idle_frame()
 	assert_str(name_of.call(bar)).is_equal("Carrot Seeds")
+
+# ---------------------------------------------------------------- MS-10 refill (C-185 §3.1 D / §4, C-211)
+
+func _farm_bar() -> UiQuickBar:
+	var farm := UiQuickBar.new(true)
+	farm.haptics = false
+	farm.position = Vector2(12, 600)
+	bar.get_parent().add_child(farm)
+	farm.slots = [{id = "a", icon = T, title = "A", quantity = 1}, {id = "b", icon = T, title = "B", quantity = 2},
+		{id = "c", icon = T, title = "C", quantity = 3}]
+	return farm
+
+## An item used up: its icon fades where it was (120), the items after it slide left into the gap (300) and the slot
+## left empty shows its frame once they are past; a new item pops in 0.6 → 1 (200).
+func test_farm_bar_refills_used_up_slots_and_pops_new_items() -> void:
+	UiMotion.reduced = false
+	var farm := _farm_bar()
+	await await_idle_frame()
+	var cells := farm.cells()
+	var home: float = cells[0]._surface.position.x
+	var pitch: float = cells[1].position.x - cells[0].position.x
+	farm.slots = [{id = "b", icon = T, title = "B", quantity = 2}, {id = "c", icon = T, title = "C", quantity = 3}]
+	assert_object(farm.get_node_or_null(^"RefillGhost")).is_not_null()
+	assert_float(cells[0]._surface.position.x).is_equal_approx(home + pitch, 0.5)   # B starts where it was
+	assert_float(cells[1]._surface.position.x).is_equal_approx(home + pitch, 0.5)   # C too
+	assert_float(cells[2]._surface.modulate.a).is_equal(0.0)                        # the emptied slot waits
+	await await_millis(700)
+	assert_float(cells[0]._surface.position.x).is_equal_approx(home, 0.5)
+	assert_float(cells[1]._surface.position.x).is_equal_approx(home, 0.5)
+	assert_float(cells[2]._surface.modulate.a).is_equal(1.0)
+	assert_object(farm.get_node_or_null(^"RefillGhost")).is_null()
+	farm.slots = [{id = "b", icon = T, title = "B", quantity = 2}, {id = "c", icon = T, title = "C", quantity = 3},
+		{id = "d", icon = T, title = "D", quantity = 1}]
+	assert_float(cells[2]._surface.scale.x).is_equal_approx(UiTokens.MOTION_SCALE_SLOT_ENTER, 0.01)
+	assert_float(cells[0]._surface.position.x).is_equal_approx(home, 0.5)   # the others stay
+	await await_millis(400)
+	assert_vector(cells[2]._surface.scale).is_equal_approx(Vector2.ONE, Vector2(0.01, 0.01))
+	farm.queue_free()
+
+func test_farm_bar_refill_is_instant_with_reduced_motion() -> void:
+	UiMotion.reduced = true
+	var farm := _farm_bar()
+	await await_idle_frame()
+	var cells := farm.cells()
+	var home: float = cells[0]._surface.position.x
+	farm.slots = [{id = "b", icon = T, title = "B", quantity = 2}]
+	assert_object(farm.get_node_or_null(^"RefillGhost")).is_null()
+	assert_float(cells[0]._surface.position.x).is_equal(home)
+	assert_float(cells[1]._surface.modulate.a).is_equal(1.0)
+	UiMotion.reduced = false
+	farm.queue_free()
+
+## The Bag end's coloured bag (C-211, C-185 §3.1 D / §7): the grey SYS_BAG coloured by its own light, orange.
+func test_bag_end_icon_is_the_grey_bag_coloured_orange() -> void:
+	var tex := UiArt.bag_end()
+	assert_object(tex).is_not_null()
+	assert_object(UiArt.bag_end()).is_same(tex)
+	var img := tex.get_image()
+	var grey := UiArt.SYS_BAG.get_image()
+	if grey.is_compressed(): grey.decompress()
+	assert_vector(Vector2(img.get_size())).is_equal(Vector2(grey.get_size()))
+	var c := img.get_pixel(img.get_width() / 2, img.get_height() / 2)
+	assert_float(c.r).is_greater(c.g)
+	assert_float(c.g).is_greater(c.b)
+	assert_float(img.get_pixel(0, 0).a).is_equal(grey.get_pixel(0, 0).a)   # its shape kept

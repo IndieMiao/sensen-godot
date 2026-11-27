@@ -12,6 +12,9 @@ extends Control
 ## English only (C-82#48): the dynamic farm keeps Journey's 中文 table loaded, so the locale is English while these pages
 ## are open and comes back when they close.
 ## ‹ and Android Back (back()) close the page on top, the profile last; `closed` then.
+## C-211 (C-185 MS-21): opened with `fade` (over the parcel, from the HUD avatar) the pages fade in over the farm
+## (`motion/duration/quick`, 160, standard) and fade out again on close (160, exit; `closed` comes at once, the pages go
+## when faded). The same with 减少动效: MS-21 is a fade already.
 signal closed
 
 const DRESS := "res://scenes/dressing_room/dressing_room.tscn"
@@ -22,12 +25,16 @@ var pages: Array[Control] = []
 var map_view := Vector3.ZERO
 ## The player's home for `My farm`: {name, status?, ready?, pressed: Callable}; {} hides the block (no home yet).
 var home := {}
+## MS-21: fade in when opened, fade out when closed.
+var fade := false
 var _locale := ""
+var _closing := false
 
-static func open(parent: Node, map_view_ := Vector3.ZERO, home_ := {}) -> Control:
+static func open(parent: Node, map_view_ := Vector3.ZERO, home_ := {}, fade_ := false) -> Control:
 	var profile: Control = load("res://scenes/dynamic_farm/parcel_profile.gd").new()
 	profile.map_view = map_view_
 	profile.home = home_
+	profile.fade = fade_
 	parent.add_child(profile)
 	return profile
 
@@ -39,6 +46,10 @@ func _ready() -> void:
 	_locale = TranslationServer.get_locale()
 	TranslationServer.set_locale("en")
 	open_profile()
+	if fade:
+		modulate.a = 0.0
+		UiMotion.tween(self, UiTokens.MOTION_EASING_STANDARD).tween_property(self, "modulate:a", 1.0,
+			UiMotion.secs(UiTokens.MOTION_DURATION_QUICK_MS))
 
 func _exit_tree() -> void:
 	if not _locale.is_empty(): TranslationServer.set_locale(_locale)
@@ -65,9 +76,21 @@ func _drop(page: Control) -> void:
 	page.queue_free()
 
 func close() -> void:
-	if is_queued_for_deletion(): return
-	queue_free()
+	if is_queued_for_deletion() or _closing: return
+	_closing = true
+	if not fade or not is_inside_tree():
+		queue_free()
+		closed.emit()
+		return
+	# MS-21: whatever is under it takes touches again at once; the pages fade away on top.
+	propagate_call(&"set_mouse_filter", [Control.MOUSE_FILTER_IGNORE])
 	closed.emit()
+	var tw := UiMotion.tween(self, UiTokens.MOTION_EASING_EXIT)
+	tw.tween_property(self, "modulate:a", 0.0, UiMotion.secs(UiTokens.MOTION_DURATION_QUICK_MS))
+	tw.tween_callback(queue_free)
+
+## Closed (or closing): `closed` has come, the pages may still be fading out.
+func is_closing() -> bool: return _closing or is_queued_for_deletion()
 
 ## The profile: the signed-in account's name (`You` without one), the home's card, `Look saved` back from the dressing
 ## room's Done. The farm card goes home: the caller's `pressed` once these pages have closed.

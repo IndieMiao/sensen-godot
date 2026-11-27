@@ -133,6 +133,7 @@ static func build(planned: Dictionary, walk: RefCounted, recipe: Variant = null,
 	var batches := {}
 	var triangles := 0
 	var unique := {}
+	var where := []   # per layout item: [its batch key, its instance in that batch]
 	for item: Dictionary in planned.layout:
 		var p: Vector3 = item.transform.origin
 		var variant := Palette.pick(palette, item.asset, p)
@@ -142,6 +143,7 @@ static func build(planned: Dictionary, walk: RefCounted, recipe: Variant = null,
 		if replacement != "": key = "%s:%d:%d" % [replacement,floori(p.x/(64*cell_m)),floori(p.z/(64*cell_m))]
 		if not batches.has(key): batches[key] = {"asset":item.asset,"variant":variant,"shadow":item.shadow and item.role == "tree","transforms":[],"tints":[],"replacement":replacement}
 		batches[key].transforms.append(item.transform)
+		where.append([key, batches[key].transforms.size() - 1])
 		if replacement != "":
 			var tint := Color.WHITE
 			if replacement in ["Linden", "OrchardElm"]:
@@ -162,6 +164,7 @@ static func build(planned: Dictionary, walk: RefCounted, recipe: Variant = null,
 		var node := Art.batch(batch.asset,batch.transforms,batch.shadow,PackedColorArray(batch.tints))
 		node.multimesh.mesh = mesh
 		root.add_child(node)
+		batch["node"] = node
 	# Bind final rendered instances, after budget pruning. All layers go through
 	# this path; a placement role cannot override the model's collision policy.
 	var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(INVENTORY_PATH))
@@ -191,5 +194,7 @@ static func build(planned: Dictionary, walk: RefCounted, recipe: Variant = null,
 			root.add_child(outline)
 	var unique_triangles := 0
 	for count: int in unique.values(): unique_triangles += count
+	# `drawn`: per layout item, [the MultiMeshInstance3D drawing it, its instance index] (C-211: one object can move alone).
+	var drawn := where.map(func(w: Array) -> Array: return [batches[w[0]].node, w[1]])
 	return {"ok":true,"root":root,"instances":planned.layout.size(),"batches":batches.size(),
-		"placed_triangles":triangles,"unique_triangles":unique_triangles,"proxies":proxies}
+		"placed_triangles":triangles,"unique_triangles":unique_triangles,"proxies":proxies,"drawn":drawn}

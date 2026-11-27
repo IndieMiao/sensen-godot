@@ -11,12 +11,15 @@ const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.g
 const HOST := "res://scenes/dynamic_farm/dynamic_farm_host.tscn"
 const ROOM := "res://scenes/dynamic_farm/parcel_outpost.tscn"
 const PARCEL_SETTING := "sensen/dynamic_farm/qa_parcel"
+## C-211: the design's 减少动效 switch for a QA recording (gather_qa_apk.sh GATHER_QA_REDUCED_MOTION=1); no player setting.
+const REDUCED_SETTING := "sensen/dev/reduced_motion"
 const START_BAG := {"hoe_starter": 1, "crop_carrot": 2}
 
 var farm := {}
 var _status: Label
 
 func _ready() -> void:
+	UiMotion.reduced = bool(ProjectSettings.get_setting(REDUCED_SETTING, false))
 	theme = UiKit.theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var bg := ColorRect.new()

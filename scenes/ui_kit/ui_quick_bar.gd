@@ -100,6 +100,8 @@ var _seeds: Button
 var _seeds_icon: TextureRect
 var _seeds_label: Label
 var _shown_qty := {}
+## Farm style: the item ids the slots showed at the last refresh (MS-10 compares the next ones with them).
+var _bar_ids: Array = []
 
 ## UI v3 (C-Q1, C-105): the bar's dark glass, `radius/lg`, drawn this far outside the slots (it takes no room, so
 ## every placement keeps its layout); hidden while collapsed or bag-only.
@@ -302,6 +304,9 @@ func _build_handle() -> Button:
 
 func _refresh() -> void:
 	if _row == null: return
+	# MS-10: what the slots showed before this refresh (their items and icons), for the refill motion after it.
+	var before_ids := _bar_ids
+	var before_icons := _cells.map(func(c: UiItemCell): return c.icon)
 	var shown := {}   # the counts now on the bar: an item that left it rolls no stale number when it comes back
 	for i in slot_count:
 		var cell := _cells[i]
@@ -331,6 +336,13 @@ func _refresh() -> void:
 		elif qty <= 0 and cell.pinned: cell.state = UiItemCell.State.ZERO
 		else: cell.state = UiItemCell.State.DEFAULT
 	_shown_qty = shown
+	if farm_style:
+		var now_ids := []
+		for i in slot_count: now_ids.append("" if i == _dragging else str(slot(i).get("id", "")))
+		if not before_ids.is_empty() and _dragging < 0 and not collapsed and not bag_only and not UiMotion.reduced \
+				and is_visible_in_tree():
+			_refill(before_ids, before_icons, now_ids)
+		_bar_ids = now_ids
 	_handle.visible = collapsed and not bag_only
 	mouse_filter = Control.MOUSE_FILTER_IGNORE if collapsed or bag_only else Control.MOUSE_FILTER_STOP
 	# Collapsed or bag-only: the end stays at the right (BAR-1-2); the handle sits centred when collapsed.
@@ -344,6 +356,87 @@ func _refresh() -> void:
 	_glass.visible = not collapsed and not bag_only
 	_end_label.text = "Close" if bag_open else "Bag"
 	_end_dot.visible = capacity_warning and not bag_open
+
+# ------------------------------------------------------------------ MS-10 refill (C-185 §3.1 D / §4, C-211)
+
+## A slot's item used up: its icon fades out where it was (120), then the items after it slide left into the gap
+## (`motion/duration/quickBarRefill`, 300, standard). A new item in a slot pops in 0.6 → 1 (200, pop). Reduced: the
+## slots simply show their new items (the caller skips this).
+func _refill(before: Array, icons: Array, now: Array) -> void:
+	var gone := false
+	for j in before.size():
+		var id := str(before[j])
+		if id == "" or id in now or j >= _cells.size(): continue
+		gone = true
+		_fade_away(_cells[j], icons[j])
+	var pitch: float = _cells[1].position.x - _cells[0].position.x if _cells.size() > 1 else UiTokens.SIZE_QUICK_SLOT_W
+	for i in now.size():
+		var id := str(now[i])
+		if id == "":
+			# A slot left empty by the slide shows its empty frame once the items have slid past it.
+			if i < before.size() and str(before[i]) != "": _empty_after(_cells[i], (UiTokens.MOTION_DURATION_FAST_MS if gone else 0.0) \
+				+ UiTokens.MOTION_DURATION_QUICK_BAR_REFILL_MS)
+			continue
+		var j := before.find(id)
+		if j < 0: _pop_in(_cells[i])
+		elif j > i: _slide_in(_cells[i], (j - i) * pitch, UiTokens.MOTION_DURATION_FAST_MS if gone else 0.0)
+
+## The used-up item's icon, where its slot drew it, fading out over 120 on top of the bar.
+func _fade_away(cell: UiItemCell, icon: Texture2D) -> void:
+	if icon == null or cell._icon == null: return
+	var ghost := TextureRect.new()
+	ghost.name = "RefillGhost"
+	ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ghost.texture = icon
+	ghost.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ghost.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	var at := cell._icon.get_global_rect()
+	ghost.position = at.position - get_global_rect().position
+	ghost.size = at.size
+	add_child(ghost)
+	var tw := UiMotion.tween(ghost, UiTokens.MOTION_EASING_STANDARD)
+	tw.tween_property(ghost, "modulate:a", 0.0, UiMotion.secs(UiTokens.MOTION_DURATION_FAST_MS))
+	tw.tween_callback(ghost.queue_free)
+
+## A slot now holding the item that sat `offset` to its right: its surface starts there and slides home.
+func _slide_in(cell: UiItemCell, offset: float, delay_ms: float) -> void:
+	var surface := cell._surface
+	UiMotion._kill(surface, &"_ui_refill")
+	_kill_empty(surface)
+	var home: float = surface.get_meta(&"_refill_home", surface.position.x)
+	surface.set_meta(&"_refill_home", home)
+	surface.position.x = home + offset
+	var tw := UiMotion.tween(surface, UiTokens.MOTION_EASING_STANDARD)
+	if delay_ms > 0.0: tw.tween_interval(UiMotion.secs(delay_ms))
+	tw.tween_property(surface, "position:x", home, UiMotion.secs(UiTokens.MOTION_DURATION_QUICK_BAR_REFILL_MS))
+	tw.tween_callback(func(): surface.remove_meta(&"_refill_home"))
+	surface.set_meta(&"_ui_refill", tw)
+
+func _kill_empty(surface: Control) -> void:
+	if not surface.has_meta(&"_ui_empty"): return
+	UiMotion._kill(surface, &"_ui_empty")
+	surface.modulate.a = 1.0
+
+## An emptied slot's frame waits `delay_ms`, then fades in (120).
+func _empty_after(cell: UiItemCell, delay_ms: float) -> void:
+	var surface := cell._surface
+	UiMotion._kill(surface, &"_ui_empty")
+	surface.modulate.a = 0.0
+	var tw := UiMotion.tween(surface, UiTokens.MOTION_EASING_STANDARD)
+	tw.tween_interval(UiMotion.secs(delay_ms))
+	tw.tween_property(surface, "modulate:a", 1.0, UiMotion.secs(UiTokens.MOTION_DURATION_FAST_MS))
+	surface.set_meta(&"_ui_empty", tw)
+
+## A new item in its slot: the surface pops 0.6 → 1 (200, pop) from its centre.
+func _pop_in(cell: UiItemCell) -> void:
+	var surface := cell._surface
+	UiMotion._kill(surface, &"_ui_enter")
+	_kill_empty(surface)
+	surface.pivot_offset = surface.size * 0.5
+	surface.scale = Vector2.ONE * UiTokens.MOTION_SCALE_SLOT_ENTER
+	var tw := UiMotion.tween(surface, UiTokens.MOTION_EASING_POP)
+	tw.tween_property(surface, "scale", Vector2.ONE, UiMotion.secs(UiTokens.MOTION_DURATION_BASE_MS))
+	surface.set_meta(&"_ui_enter", tw)
 
 # ------------------------------------------------------------------ gestures
 

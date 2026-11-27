@@ -479,13 +479,21 @@ func show_level_card(level: int, rows: Array, sheet = null) -> void:
 	await get_tree().process_frame
 	if not is_instance_valid(m) or not m.is_inside_tree() or level_card != m or _level_layer == null: return
 	m.reset_size()
-	m.position = (_level_layer.size - m.size) * 0.5 + Vector2(0, UiRewardMoment.HERO_OVER * 0.5)
+	m.position = level_card_place(_level_layer.size, m.size)
 	if glow != null:
 		var side := maxf(m.size.x, m.size.y) * 2.2
 		glow.size = Vector2(side, side)
 		glow.position = m.position + Vector2(m.size.x * 0.5, 0) - glow.size * 0.5
 		UiMotion.tween(glow, UiTokens.MOTION_EASING_LINEAR).tween_property(glow, ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_FAST_MS))
 	m.play_level_in(scrim)
+
+## Where the level-up card stands on a `screen`-sized layer: centred across, its middle at `size/levelCard/centreY` of
+## the height (C-211, C-186#82: figure 6 has it at about 27–58 %, higher than the middle, leaving room for its hero and
+## light above), kept clear of the top for the hero (HERO_OVER over its edge).
+static func level_card_place(screen: Vector2, card_size: Vector2) -> Vector2:
+	var y := screen.y * UiTokens.SIZE_LEVEL_CARD_CENTRE_Y - card_size.y * 0.5
+	y = clampf(y, UiRewardMoment.HERO_OVER + UiTokens.SPACE_PAGE, maxf(0.0, screen.y - card_size.y))
+	return Vector2((screen.x - card_size.x) * 0.5, y)
 
 ## The level-up card leaves (M-05, its scrim fading); `sheet` then shows the next level.
 func close_level_card(sheet = null) -> void:
@@ -532,9 +540,12 @@ func _swap_line(bar: UiKeeperBar, text: String) -> void:
 func buy(item: String, count: int) -> Dictionary:
 	if busy or count <= 0: return {}
 	var before := int(farm.get("coins", 0))
+	var had := int(farm.get("bag", {}).get(item, 0))
 	var result := await _send({"type": "buy", "item": item, "count": count})
 	if result.get("ok", false):
-		if counter != null and is_instance_valid(counter): counter.roll_coins(before)
+		if counter != null and is_instance_valid(counter):
+			counter.roll_coins(before)
+			counter.roll_bag(item, had)   # C-211 MS-15: the row's `Bag ×N` rolls up
 		toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(item), count], ToastLayer.Severity.SUCCESS, "", 0.0, ParcelItems.icon_of(item))
 	return result
 

@@ -11,6 +11,7 @@
 # GATHER_QA_ABI follows the emulator image; by default it is the host's own architecture
 # (x86_64 on x86_64 hosts such as cardigan-ci, arm64-v8a on Apple silicon such as mac-mini).
 # GATHER_QA_WET_SOIL=1 turns on the development switch that draws tilled soil wet (C-138).
+# GATHER_QA_REDUCED_MOTION=1 (C-211) starts the QA entry with the design's 减少动效 on (UiMotion.reduced; no player setting).
 # GATHER_QA_ENTRY=trade (C-149) makes the main scene tools/dev/dynamic_farm/trade_loop_qa.tscn instead, package
 # com.sensen.dynamicfarm.tradeqa: a stand-in for the map opening the Washington Square room and the parcel on one save.
 # GATHER_QA_ENTRY=level (C-152): tools/dev/dynamic_farm/level_loop_qa.tscn, package com.sensen.dynamicfarm.levelqa: the same
@@ -70,10 +71,11 @@ if [[ -n $cache ]]; then
     cp -a "$cache/.godot" "$p/.godot"
     rm -f "$p/.godot/export_credentials.cfg"
 fi
-python3 -I - "$p/project.godot" "$parcel" "${GATHER_QA_WET_SOIL:-}" "$entry" "$qa_dir" <<'PY'
+python3 -I - "$p/project.godot" "$parcel" "${GATHER_QA_WET_SOIL:-}" "$entry" "$qa_dir" "${GATHER_QA_REDUCED_MOTION:-}" <<'PY'
 import re, sys
 from pathlib import Path
 path, parcel, wet, entry, qa_dir = Path(sys.argv[1]), sys.argv[2], sys.argv[3] == '1', sys.argv[4], sys.argv[5]
+reduced = sys.argv[6] == '1'
 text = path.read_text()
 def one(pattern, repl):
     global text
@@ -83,7 +85,7 @@ one(r'^run/main_scene="[^"]+"$', f'run/main_scene="res://tools/dev/dynamic_farm/
 one(r'^\[application\]$', f'[application]\nconfig/use_custom_user_dir=true\nconfig/custom_user_dir_name="{qa_dir}"')
 one(r'^\[sensen\]$', '[sensen]\nnetwork/online_qa=true\ndynamic_farm/local_farm_save=true\n'
     f'dynamic_farm/qa_parcel="res://tests/dynamic_farm/fixtures/r4/{parcel}.json"'
-    + ('\ndynamic_farm/preview_wet_soil=true' if wet else ''))
+    + ('\ndynamic_farm/preview_wet_soil=true' if wet else '') + ('\ndev/reduced_motion=true' if reduced else ''))
 for key in ('network/base_url', 'network/mobile_base_url'):
     one(rf'^{key}="[^"]+"$', f'{key}="http://127.0.0.1:9"')
 path.write_text(text)

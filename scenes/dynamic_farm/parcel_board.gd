@@ -19,6 +19,10 @@ extends UiDrawer
 ## secondary one. A delivery: its needs shrink away (160, 40 apart), the row stamps `Done` (1.3 → 1), `+N` rises from the
 ## key and coins fly to the Coins row (bump + roll); the Done row holds 600, folds (200) and the list comes back with the
 ## new request fading in from y+16 (260); `Requests today` rolls. A tap on a grey key shakes it and flashes its short need.
+## C-211 (C-185 §3.6 补位, C-186#82): when the list is drawn again (a delivery, a drop, a refill) the rows that stay slide
+## from where they were to their new places (`motion/duration/rowShift`, 260, standard) instead of jumping, a new fact
+## line fades in; a dropped request's row, back on the list, folds away (200) before the others close up. Reduced: the
+## list is simply redrawn.
 
 signal command_requested(command: Dictionary)
 ## A slot's refill time came while the drawer is open: the town reads the save again (the server draws the request).
@@ -65,6 +69,8 @@ var _shown := {}
 var _key := 0
 var _due := -1
 var _tick := 0.0
+## The page box holds the list as last drawn (its rows' places are where a redraw slides them from).
+var _list_drawn := false
 
 func _init(farm_: Dictionary = {}) -> void:
 	super(HEIGHT)
@@ -198,9 +204,40 @@ func dropped() -> void:
 	_draw_page(true)
 
 func back_to_list() -> void:
+	var gone: Dictionary = focus if page == "dropped" else {}
 	page = "list"
 	focus = {}
 	_draw_page(true)
+	if not gone.is_empty(): fold_dropped(gone)
+
+## C-185 §3.6 (C-211): back on the list after a drop, the dropped request's row stands where it was, folds away (200,
+## exit, as the Done row) and the list closes up (the rows under it slide up). `d` is its card data with its `slot`.
+## Async (it waits for the fold); nothing else waits on it.
+func fold_dropped(d: Dictionary) -> void:
+	if UiMotion.reduced or not is_inside_tree() or page != "list" or int(d.get("slot", -1)) < 0: return
+	var slots: Array = farm.get("board", {}).get("slots", [])
+	var before := 0
+	for j in mini(int(d.slot), slots.size()):
+		if slots[j].req != null: before += 1
+	var shown := d.duplicate()
+	shown["status_tone"] = "ready" if d.status == COPY.ready else ("tracked" if d.status == COPY.tracked else "open")
+	var row := _row_for(shown)
+	row.name = "Gone_%d" % int(d.get("id", 0))
+	row.mouse_filter = Control.MOUSE_FILTER_STOP   # nothing on it takes a tap while it goes
+	var at := _fact_values.size() + before
+	page_box.add_child(row)
+	page_box.move_child(row, mini(at, page_box.get_child_count() - 1))
+	var fold := UiMotion.tween(row, UiTokens.MOTION_EASING_EXIT)
+	fold.tween_callback(func(): row.pivot_offset = Vector2(row.size.x * 0.5, 0.0))
+	fold.tween_property(row, ^"scale:y", 0.0, UiKit.secs(UiTokens.MOTION_DURATION_BASE_MS))
+	fold.parallel().tween_property(row, ^"modulate:a", 0.0, UiKit.secs(UiTokens.MOTION_DURATION_BASE_MS))
+	# Nothing is held: a redraw meanwhile (a read, a turned page) simply takes the row away with the rest.
+	await _wait(UiTokens.MOTION_DURATION_BASE_MS)
+	if not is_instance_valid(row) or row.is_queued_for_deletion() or row.get_parent() != page_box: return
+	var places := _row_places()
+	page_box.remove_child(row)
+	row.queue_free()
+	_shift_from(places)
 
 ## The coins of a delivery float up from where its key was (BOARD-DONE: no result card): the v3 float (C-185 R-02).
 func float_coins(coins_: int, at: Vector2) -> void:
@@ -273,41 +310,61 @@ func celebrate_delivery(id: int, before: int, after: int, at: Vector2) -> void:
 func release(today_before := -1) -> void:
 	hold = false
 	_today_held = -1
-	var before_ids := cards.keys()
 	_draw_page(true)
 	if page != "list": return
 	if today_before >= 0 and not _fact_values.is_empty():
 		var q: Dictionary = ParcelFarm.rules().get("requests", {})
 		UiMotion.roll(_fact_values[0], float(today_before), float(_today_done()), "%d/" + str(int(q.get("daily_max", 0))))
-	if UiMotion.reduced: return
-	for id in cards:
-		if id in before_ids: continue
-		var row := (cards[id] as Control).get_parent() as Control
-		if row == null: continue
-		row.modulate.a = 0.0
-		_rise.call_deferred(row)
 
-## A new row rises from y+16 to its place. The list was just rebuilt, so its first layout is not final (the cards size
-## over the next frames): the offset rides on whatever place the list gives the row at each sort, not on the first one.
-func _rise(row: Control) -> void:
+## A row of a list drawn again moves into its place: a new request's row rises from y+16 and fades in (260); one that
+## was on the list before (`from_y`, its place then) slides from there (`motion/duration/rowShift`, standard). The list
+## was just rebuilt, so its first layout is not final (the cards size over the next frames): the move rides on whatever
+## place the list gives the row at each sort, not on the first one.
+func _move_row(row: Control, from_y := NAN) -> void:
 	if not is_instance_valid(row) or not row.is_inside_tree(): return
-	var at := {"home": row.position.y, "off": float(UiTokens.MOTION_OFFSET_BOARD_ENTER)}
+	var rise := is_nan(from_y)
+	var at := {"home": row.position.y, "k": 1.0}
+	var place := func():
+		if not is_instance_valid(row): return
+		var off: float = float(UiTokens.MOTION_OFFSET_BOARD_ENTER) if rise else from_y - float(at.home)
+		row.position.y = float(at.home) + off * float(at.k)
 	var resorted := func():
 		if not is_instance_valid(row): return
 		at.home = row.position.y
-		row.position.y = at.home + at.off
+		place.call()
 	page_box.sort_children.connect(resorted)
 	var done := func():
 		if page_box.sort_children.is_connected(resorted): page_box.sort_children.disconnect(resorted)
 	row.tree_exiting.connect(done, CONNECT_ONE_SHOT)
-	row.position.y = at.home + at.off
+	place.call()
 	var tw := UiMotion.tween(row, UiTokens.MOTION_EASING_STANDARD)
-	var step := func(v: float):
-		at.off = v
-		if is_instance_valid(row): row.position.y = at.home + v
-	tw.tween_method(step, float(UiTokens.MOTION_OFFSET_BOARD_ENTER), 0.0, UiKit.secs(UiTokens.MOTION_DURATION_MODERATE_MS))
-	tw.parallel().tween_property(row, ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_MODERATE_MS))
+	var ms := UiTokens.MOTION_DURATION_MODERATE_MS if rise else UiTokens.MOTION_DURATION_ROW_SHIFT_MS
+	tw.tween_method(func(k: float):
+		at.k = k
+		place.call(), 1.0, 0.0, UiKit.secs(ms))
+	if rise: tw.parallel().tween_property(row, ^"modulate:a", 1.0, UiKit.secs(ms))
 	tw.finished.connect(done)
+
+## Where the list's rows are now (name → y in the page box), for a redraw to slide them from.
+func _row_places() -> Dictionary:
+	var out := {}
+	for c in page_box.get_children():
+		if c is Control and (c as Control).visible and not c.is_queued_for_deletion(): out[c.name] = (c as Control).position.y
+	return out
+
+## After a redraw of the list: the rows it had before slide from their old places, a new fact line fades in.
+func _shift_from(places: Dictionary) -> void:
+	for c in page_box.get_children():
+		var row := c as Control
+		if row == null: continue
+		if places.has(row.name): _move_row.call_deferred(row, float(places[row.name]))
+		elif str(row.name).begins_with("Row_"):
+			row.modulate.a = 0.0
+			_move_row.call_deferred(row)
+		elif str(row.name).begins_with("Fact_"):
+			row.modulate.a = 0.0
+			UiMotion.tween(row, UiTokens.MOTION_EASING_STANDARD).tween_property(row, ^"modulate:a", 1.0,
+				UiKit.secs(UiTokens.MOTION_DURATION_ROW_SHIFT_MS))
 
 func _today_done() -> int:
 	if farm.is_empty(): return 0
@@ -364,15 +421,19 @@ func _draw_page(force: bool) -> void:
 			if not force and key == _key and _fact_values.size() == m.facts.size():
 				for i in m.facts.size(): _fact_values[i].text = str(m.facts[i][1])
 				return
-			_key = key
+			# Only a list that changed moves (a redraw of the same rows, a read that changed nothing, stays still).
+			var places := _row_places() if _list_drawn and key != _key and not UiMotion.reduced and is_inside_tree() else {}
 			_clear()
+			_key = key   # after _clear (which forgets it): the next tick's same list only updates its numbers
 			_list(m)
+			if not places.is_empty(): _shift_from(places)
 		"request": _request_page(rules, now)
 		"drop": _drop_page(rules)
 		"dropped": _dropped_page(rules)
 
 func _clear() -> void:
 	_key = 0
+	_list_drawn = false
 	cards = {}
 	_shown = {}
 	_fact_values = []
@@ -383,30 +444,40 @@ func _clear() -> void:
 func _list(m: Dictionary) -> void:
 	for f in m.facts:
 		var row := UiBoardCard.fact_row(str(f[0]), str(f[1]))
+		row.name = "Fact_%s" % str(f[0])
 		page_box.add_child(row)
 		_fact_values.append(row.get_child(1) as Label)
 	if m.cards.is_empty():
-		page_box.add_child(UiKit.label(COPY.empty, UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY))
+		var empty := UiKit.label(COPY.empty, UiTokens.STYLE_C12_B, UiTokens.COLOR_SECONDARY)
+		empty.name = "Empty"
+		page_box.add_child(empty)
 	for d: Dictionary in m.cards:
-		var c := UiBoardCard.new()
-		c.name = "Request_%d" % int(d.id)
 		var shown := d.duplicate()
 		shown["status_tone"] = "ready" if d.status == COPY.ready else ("tracked" if d.status == COPY.tracked else "open")
-		c.show_request(shown)
-		# C-185 §3.6: Deliver is the v3 primary key, Track the secondary one; a gap stays grey on the key (LOCK-10).
-		c.command_button().kind = UiCommandButton.Kind.SECONDARY if d.command == COPY.track else UiCommandButton.Kind.PRIMARY
+		var row := _row_for(shown)
+		var c := row.get_child(0) as UiBoardCard
 		var cmd: Dictionary = d.cmd
 		var id := int(d.id)
 		c.command_pressed.connect(func(): if not cmd.is_empty(): command_requested.emit(cmd))
 		c.unavailable_pressed.connect(func(_r: String): refuse(c))
 		c.info_pressed.connect(func(): open_request(id))
-		var row := PanelContainer.new()
-		row.name = "Row_%d" % id
-		row.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE_RAISED, UiTokens.RADIUS_LG).with_margins(12, 10, 12, 12))
-		row.add_child(c)
 		page_box.add_child(row)
 		cards[id] = c
 		_shown[id] = shown
+	_list_drawn = true
+
+## One request's row on the list: its card (`shown`: card data with its `status_tone`) on a raised white row.
+func _row_for(shown: Dictionary) -> PanelContainer:
+	var c := UiBoardCard.new()
+	c.name = "Request_%d" % int(shown.id)
+	c.show_request(shown)
+	# C-185 §3.6: Deliver is the v3 primary key, Track the secondary one; a gap stays grey on the key (LOCK-10).
+	c.command_button().kind = UiCommandButton.Kind.SECONDARY if shown.command == COPY.track else UiCommandButton.Kind.PRIMARY
+	var row := PanelContainer.new()
+	row.name = "Row_%d" % int(shown.id)
+	row.add_theme_stylebox_override(&"panel", UiStyleBox.make(UiTokens.COLOR_SURFACE_RAISED, UiTokens.RADIUS_LG).with_margins(12, 10, 12, 12))
+	row.add_child(c)
+	return row
 
 func _request_page(rules: Dictionary, now: int) -> void:
 	var sl := ParcelFarm.request_slot(farm, int(focus.get("id", 0)))
@@ -414,6 +485,8 @@ func _request_page(rules: Dictionary, now: int) -> void:
 		back_to_list()
 		return
 	var d := card(rules, farm, sl.req, now)
+	# Which board slot it sits in: back on the list after a drop, its row folds away from there (C-211).
+	d["slot"] = (farm.board.slots as Array).find(sl)
 	focus = d
 	_clear()
 	page_box.add_child(UiObjectHeader.new({title = d.title, state = d.status, effect = COPY.effect % str(d.noun)}))
