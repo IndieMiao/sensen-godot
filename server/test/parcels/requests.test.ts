@@ -55,6 +55,9 @@ const band = (item: string, level: number): [number, number, number] => {
 /** 盖好的鸡场（建筑 2），出鸡蛋单要它。 */
 const withCoop = (s: ParcelFarmState): ParcelFarmState =>
   ({ ...structuredClone(s), buildings: [...s.buildings, { id: 2, type: 'coop', model: 'chicken_yard', x: 10, y: 10, width: 7, depth: 5, rotation: 0, built_at: T0, animals: ['hen_white'] }] });
+/** 盖好的牛棚（建筑 3），出牛奶单要它（C-192）。 */
+const withBarn = (s: ParcelFarmState): ParcelFarmState =>
+  ({ ...structuredClone(s), buildings: [...s.buildings, { id: 3, type: 'barn', model: 'cow_barn', x: 20, y: 10, width: 8, depth: 6, rotation: 0, built_at: T0, animals: ['cow', 'cow'] }] });
 
 describe('dynamic_farm.json requests (C-191)', () => {
   it('ships SEN-Q-281: 2 slots, at once / 8 h / 72 h, 6 a day, bonus 100 a day, Jasmine\'s price × count + bonus, count by item', () => {
@@ -65,13 +68,13 @@ describe('dynamic_farm.json requests (C-191)', () => {
       tiers: tiers(Q281.crop_carrot),
       item_tiers: Object.fromEntries(Object.entries(Q281).map(([item, b]) => [item, tiers(b)])),
       templates: { fresh_greens: { item: 'crop_carrot' }, timber_run: { item: 'wood' }, stone_order: { item: 'stone' },
-        egg_basket: { item: 'egg', building: 'coop' } },
+        egg_basket: { item: 'egg', building: 'coop' }, fresh_milk: { item: 'milk', building: 'barn' } },
     });
-    // 不再打折：一件的价就是 Jasmine 的售价（胡萝卜 12、木材 2、石头 2、鸡蛋 20）。
-    expect(['crop_carrot', 'wood', 'stone', 'egg'].map(i => floorPrice(rules, i))).toEqual([12, 2, 2, 20]);
+    // 不再打折：一件的价就是 Jasmine 的售价（胡萝卜 12、木材 2、石头 2、鸡蛋 20、牛奶 45，C-192）。
+    expect(['crop_carrot', 'wood', 'stone', 'egg', 'milk'].map(i => floorPrice(rules, i))).toEqual([12, 2, 2, 20, 45]);
     // 每种单子按它要的物品分档，3 级及以下一档、4 级起一档，再高也不变。
     const at = (template: string, level: number) => { const x = tierFor(rules.requests!, level, template); return [...x.qty, x.bonus]; };
-    for (const [template, item] of [['fresh_greens', 'crop_carrot'], ['timber_run', 'wood'], ['stone_order', 'stone'], ['egg_basket', 'egg']])
+    for (const [template, item] of [['fresh_greens', 'crop_carrot'], ['timber_run', 'wood'], ['stone_order', 'stone'], ['egg_basket', 'egg'], ['fresh_milk', 'milk']])
       for (const level of [1, 3, 4, 5, 7, 99]) expect(at(template, level)).toEqual(band(item, level));
   });
 
@@ -90,7 +93,7 @@ describe('dynamic_farm.json requests (C-191)', () => {
     expect(bad({ tiers: [{ level: 1, qty: [2, 3], bonus: 10 }, { level: 1, qty: [2, 3], bonus: 20 }] })).toThrow();
     expect(bad({ templates: {} })).toThrow();
     expect(bad({ templates: { x: { item: 'seed_carrot' } } })).toThrow();   // Jasmine 不收的东西不能出单
-    expect(bad({ templates: { x: { item: 'egg', building: 'barn' } } })).toThrow();   // 没有这类建筑
+    expect(bad({ templates: { x: { item: 'egg', building: 'pen' } } })).toThrow();   // 没有这类建筑（羊圈还没上）
     expect(bad({ templates: { x: { item: 'egg', tiers: [{ level: 2, qty: [1, 2], bonus: 20 }] } } })).toThrow();   // 模板自己的分档也从 1 级起
     expect(bad({ item_tiers: [] })).toThrow();
     expect(bad({ item_tiers: { egg: [] } })).toThrow();
@@ -144,7 +147,7 @@ describe('drawing requests (C-191)', () => {
     expect(view(welcomed(), T0 + 3 * H)).toEqual(view(welcomed(), T0 + 5000));
   });
 
-  it('only what the farm can make: no eggs without a coop; with one, eggs come up among the kinds', () => {
+  it('only what the farm can make: no eggs without a coop, no milk without a barn; with them, they come up among the kinds', () => {
     const kinds = (s: ParcelFarmState) => {
       const seen = new Set<string>();
       // 每次放弃再到点补位换一张，看 60 张单子都出了什么。
@@ -159,6 +162,8 @@ describe('drawing requests (C-191)', () => {
     };
     expect(kinds(welcomed())).toEqual(['crop_carrot', 'stone', 'wood']);
     expect(kinds(withCoop(welcomed()))).toEqual(['crop_carrot', 'egg', 'stone', 'wood']);
+    expect(kinds(withBarn(welcomed()))).toEqual(['crop_carrot', 'milk', 'stone', 'wood']);
+    expect(kinds(withBarn(withCoop(welcomed())))).toEqual(['crop_carrot', 'egg', 'milk', 'stone', 'wood']);
   });
 
   it('count and completion bonus follow the item and the farm level when drawn (SEN-Q-281): Lv3 and below one band, Lv4 on the other', () => {

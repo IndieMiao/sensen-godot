@@ -26,6 +26,10 @@ extends RefCounted
 ## rules' `farm_levels` entry for the next level in coins and materials, for no Energy; each level adds `energy.per_level`
 ## to Max Energy, and a level's `buildings` lets more of a type stand from it on (wells: 2 at Lv3, 3 at Lv5) with its
 ## `gift` (a well blueprint) put in the bag. The save's `level` (absent before it: 1) is kept across dataset moves.
+## The barn (C-181, 0.4.6) is one more livestock type: besides its blueprint it takes `materials` (Timber and Stone), and
+## its `livestock.feed_amount` (default 1; the cows 2 carrots) is taken per feeding, still for one product. Its blueprint
+## is bought at Scott's: an `economy.blueprints` entry with `coins` (default 0) costs that much at `claim_blueprint`,
+## refused whole (NOT_ENOUGH_COINS) when short, once only as every one-off blueprint. No save field is added.
 ## The request board (C-191, P0's system board at the Washington Square Travel Post) mirrors server/src/parcels/requests.ts:
 ## the rules' `requests`; the save's `board` {slots: [{req, refill_at}], seq, day, done_today, bonus_today} and
 ## `requests_done` (absent before it: an empty board, 0). `settle_board` fills due slots and swaps open requests 72 h old,
@@ -216,7 +220,8 @@ static func _parse_livestock(raw: Variant, building: Dictionary) -> Dictionary:
 	for a in raw.animals:
 		if not a is String: return {}
 	if not raw.get("feed") is String or not raw.get("product") is String or not whole_in(raw.get("amount"), 1, 99) \
-			or not whole_in(raw.get("produce_seconds"), 1, 7 * 24 * 3600) or not whole_in(raw.get("max_ground"), 1, MAX_GROUND_DROPS):
+			or not whole_in(raw.get("produce_seconds"), 1, 7 * 24 * 3600) or not whole_in(raw.get("max_ground"), 1, MAX_GROUND_DROPS) \
+			or (raw.has("feed_amount") and not whole_in(raw.feed_amount, 1, 99)):
 		return {}
 	if not raw.get("spots") is Array or raw.spots.size() < int(raw.max_ground) or raw.spots.size() > MAX_GROUND_DROPS * 4: return {}
 	var spots := []
@@ -224,7 +229,8 @@ static func _parse_livestock(raw: Variant, building: Dictionary) -> Dictionary:
 		if not p is Array or p.size() != 2 or not _number(p[0]) or not _number(p[1]): return {}
 		if float(p[0]) < 0 or float(p[0]) > float(building.width) or float(p[1]) < 0 or float(p[1]) > float(building.depth): return {}
 		spots.append(Vector2(float(p[0]), float(p[1])))
-	return {"animals": raw.animals.duplicate(), "feed": raw.feed, "product": raw.product, "amount": int(raw.amount),
+	return {"animals": raw.animals.duplicate(), "feed": raw.feed, "feed_amount": int(raw.get("feed_amount", 1)), "product": raw.product,
+		"amount": int(raw.amount),
 		"produce_seconds": int(raw.produce_seconds), "max_ground": int(raw.max_ground), "spots": spots}
 
 ## C-152 `farm_levels` with the server's bounds (rules.ts parseFarmLevels): from Lv2 on, one entry a level, coins 0–100000,
@@ -257,7 +263,8 @@ static func _parse_levels(raw: Variant, buildings: Dictionary) -> Variant:
 		out.append(level)
 	return out
 
-## C-58 `economy`: sell prices and one-off blueprints; C-149 buy prices (Jasmine's shelf).
+## C-58 `economy`: sell prices and one-off blueprints (C-181: a blueprint's `coins`, 0–100000, default 0, is its price at
+## Scott's); C-149 buy prices (Jasmine's shelf).
 ## {sell_prices:{}, buy_prices:{}, blueprints:{}} when absent.
 static func _parse_economy(raw: Variant) -> Dictionary:
 	var out := {"sell_prices": {}, "buy_prices": {}, "blueprints": {}}
@@ -270,8 +277,11 @@ static func _parse_economy(raw: Variant) -> Dictionary:
 		for id in raw.blueprints:
 			var rule = raw.blueprints[id]
 			if id is String and rule is Dictionary and rule.get("item") is String and whole_in(rule.get("amount"), 1, 99) \
-					and whole_in(rule.get("min_sales"), 0, 1000):
-				out.blueprints[id] = {"item": rule.item, "amount": int(rule.amount), "min_sales": int(rule.min_sales)}
+					and whole_in(rule.get("min_sales"), 0, 1000) and (not rule.has("coins") or whole_in(rule.coins, 0, 100000)) \
+					and (not rule.has("min_level") or whole_in(rule.min_level, 1, MAX_FARM_LEVEL)):
+				# C-192 (SEN-Q-282): `min_level`, the farm level a blueprint is sold from (the barn's 2), defaults to 1.
+				out.blueprints[id] = {"item": rule.item, "amount": int(rule.amount), "min_sales": int(rule.min_sales),
+					"min_level": int(rule.get("min_level", 1)), "coins": int(rule.get("coins", 0))}
 	return out
 
 ## C-148 `energy` with the server's bounds (energy.ts parseEnergyRules), integers made ints; {} when out of them.
@@ -439,11 +449,11 @@ static func drops_in(state: Dictionary, building_id: int) -> Array:
 	return state.get("drops", []).filter(func(d: Dictionary): return int(d.building) == building_id)
 
 ## Why one more feeding at `building` is refused now, or "" when it is not (C-154, the server's checks in its order):
-## NOT_LIVESTOCK, NO_FEED, GROUND_FULL, ANIMALS_FED. Energy is checked apart (the key's price).
+## NOT_LIVESTOCK, NO_FEED (fewer than the rule's `feed_amount`, C-181), GROUND_FULL, ANIMALS_FED. Energy is checked apart (the key's price).
 static func feed_refusal(rule_set: Dictionary, state: Dictionary, building: Dictionary, now: int) -> String:
 	var rule := livestock_of(rule_set, building)
 	if rule.is_empty() or not building.get("animals") is Array or building.animals.is_empty(): return "NOT_LIVESTOCK"
-	if int(state.get("bag", {}).get(rule.feed, 0)) <= 0: return "NO_FEED"
+	if int(state.get("bag", {}).get(rule.feed, 0)) < int(rule.get("feed_amount", 1)): return "NO_FEED"
 	var mine := drops_in(state, int(building.id))
 	if mine.size() >= int(rule.max_ground): return "GROUND_FULL"
 	return "" if _free_animal(building, mine, now) >= 0 else "ANIMALS_FED"
@@ -1010,7 +1020,16 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				elif int(next.sales) < int(rule.min_sales):
 					failure = "CONDITION_NOT_MET"
 					detail = {"sales": next.sales, "min_sales": rule.min_sales}
+				elif farm_level(next) < int(rule.get("min_level", 1)):
+					# C-192 (SEN-Q-282): the barn's blueprint is sold from farm level 2.
+					failure = "CONDITION_NOT_MET"
+					detail = {"level": farm_level(next), "min_level": int(rule.min_level)}
+				elif int(next.coins) < int(rule.get("coins", 0)):
+					# C-181: a priced blueprint (the barn's) is bought.
+					failure = "NOT_ENOUGH_COINS"
+					detail = {"coins": int(next.coins), "need": int(rule.coins)}
 				else:
+					next.coins = int(next.coins) - int(rule.get("coins", 0))
 					next.blueprints_claimed[blueprint] = now
 					next.bag[rule.item] = int(next.bag.get(rule.item, 0)) + int(rule.amount)
 			"gather":
@@ -1061,7 +1080,7 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 							if short: failure = "NO_ENERGY"
 							else:
 								_spend(rule_set, next, now, cost)
-								_take(next.bag, rule.feed)
+								_take(next.bag, rule.feed, int(rule.get("feed_amount", 1)))
 								next.drop_seq = int(next.drop_seq) + 1
 								var id := int(next.drop_seq)
 								next.drops.append({"id": id, "item": rule.product, "amount": int(rule.amount), "building": int(b.id),

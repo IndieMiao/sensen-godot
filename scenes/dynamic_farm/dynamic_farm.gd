@@ -287,6 +287,18 @@ func _refresh_build() -> void:
 	_build_type = build_choice() if _placement == null else ""
 	_build.visible = _build_type != ""
 	if _build.visible: _build.label = "Build %s" % Building.kind(_build_type).name
+	_build.reason = build_gap(_build_type) if _build.visible else ""
+
+## C-181: the first material the type's `materials` (the barn's 20 Timber, 10 Stone) still lacks, as P0's `Need N more
+## Timber`; "" when the bag has them all (the key places, and the server takes them with the blueprint).
+func build_gap(type: String) -> String:
+	if _farming == null or type.is_empty(): return ""
+	var bag: Dictionary = _farming.farm.get("bag", {})
+	var needs: Dictionary = ParcelFarm.rules().buildings[type].get("materials", {})
+	for item: String in needs:
+		var short := int(needs[item]) - int(bag.get(item, 0))
+		if short > 0: return "Need %d more %s" % [short, _farming.item_name(item)]
+	return ""
 
 func begin_placement() -> void:
 	if not _build.visible: return
@@ -785,6 +797,7 @@ func _build_ui() -> void:
 	_build.custom_minimum_size = Vector2(180, 48)
 	_build.visible = false
 	_build.activated.connect(begin_placement)
+	_build.unavailable_pressed.connect(func(reason: String): if _farming != null: _farming.show_notice(reason))
 	_canvas.add_child(_build)
 
 ## The place capsule as wide as its longer line (name or status), at most the screen less its 12 sides; past that

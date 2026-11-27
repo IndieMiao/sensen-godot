@@ -3,9 +3,11 @@ extends RefCounted
 ## the parcel's own blueprints, which the main farm does not have, are named here. Icons are the UI v3 item art (C-86,
 ## Q-155; C-105) where it has the item; the blueprints keep the existing recipe-card icon, anything else P0's icon.
 ## C-151: the well's blueprint is named as the cottage's; the pail (水桶, SEN-C-151) shows P0's Water icon.
+## C-181: the barn's blueprint as the others; milk is drawn here like the egg until item art comes.
 const NAMES := {"blueprint_cottage": "Cottage Blueprint", "blueprint_coop": "Coop Blueprint", "blueprint_well": "Well Blueprint",
-	"pail": "Pail", "egg": "Egg"}
-const ICONS := {"blueprint_cottage": "recipe_card", "blueprint_coop": "recipe_card", "blueprint_well": "recipe_card", "pail": "water"}
+	"blueprint_barn": "Barn Blueprint", "pail": "Pail", "egg": "Egg", "milk": "Milk"}
+const ICONS := {"blueprint_cottage": "recipe_card", "blueprint_coop": "recipe_card", "blueprint_well": "recipe_card",
+	"blueprint_barn": "recipe_card", "pail": "water"}
 ## Parcel item → UiArt item art. The hoe is the v3 row tool; the wild herb (picked from the flowers) is the chamomile.
 const ART := {"crop_carrot": "carrot", "seed_carrot": "seed_carrot", "wood": "wood", "stone": "stone",
 	"wild_herb": "chamomile", "hoe_starter": "row_tool"}
@@ -23,6 +25,7 @@ static func icon_of(id: String) -> Texture2D:
 		var art := UiArt.item(str(ART[id]))
 		if art != null: return art
 	if id == "egg": return egg_icon()
+	if id == "milk": return milk_icon()
 	return P0Logic.icon(str(ICONS.get(id, id)))
 
 static var _egg: ImageTexture
@@ -53,6 +56,41 @@ static func egg_icon() -> Texture2D:
 			img.set_pixel(x, y, c)
 	_egg = ImageTexture.create_from_image(img)
 	return _egg
+
+static var _milk: ImageTexture
+
+## The Milk's icon (C-181): no item art has milk yet, so a bottle is drawn here (a white body with a soft shade, a
+## narrower neck, a blue cap and a thin outline) until item art comes.
+static func milk_icon() -> Texture2D:
+	if _milk != null: return _milk
+	var n := 96
+	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0, 0, 0, 0))
+	var body := Color(0.99, 0.99, 0.96)
+	var shade := Color(0.82, 0.85, 0.88)
+	var cap := Color(0.31, 0.53, 0.78)
+	var edge := Color(0.45, 0.5, 0.58)
+	for y in n:
+		for x in n:
+			var u := (x + 0.5) / n
+			var v := (y + 0.5) / n
+			# Half width at this height: cap 0.10–0.20, neck 0.20–0.34, shoulder to 0.44, body to 0.90 (rounded bottom).
+			var half := 0.0
+			if v >= 0.1 and v < 0.2: half = 0.12
+			elif v >= 0.2 and v < 0.34: half = 0.1
+			elif v >= 0.34 and v < 0.44: half = lerpf(0.1, 0.22, (v - 0.34) / 0.1)
+			elif v >= 0.44 and v < 0.84: half = 0.22
+			elif v >= 0.84 and v < 0.9: half = 0.22 * sqrt(maxf(0.0, 1.0 - pow((v - 0.84) / 0.06, 2.0)))
+			var off := absf(u - 0.5)
+			if off > half: continue
+			var c := cap if v < 0.2 else body.lerp(shade, clampf((u - 0.5) / maxf(half, 0.01) * 0.6 + 0.2, 0.0, 1.0))
+			if v >= 0.2 and u < 0.42 and u > 0.36 and v > 0.46 and v < 0.78: c = c.lerp(Color.WHITE, 0.8)
+			var rim := half - off
+			if rim < 0.02: c = c.lerp(edge, 1.0 - rim / 0.02)
+			c.a = clampf(rim * n * 0.6, 0.0, 1.0)
+			img.set_pixel(x, y, c)
+	_milk = ImageTexture.create_from_image(img)
+	return _milk
 
 static func _content_names() -> Dictionary:
 	var content := P0Logic.content()

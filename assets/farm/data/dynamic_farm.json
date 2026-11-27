@@ -37,6 +37,27 @@
         "spots": [[0.7, 1.2], [1.6, 1.6], [2.8, 2.3], [1.4, 3.6], [3.6, 3.0], [4.6, 3.9], [5.8, 1.0], [6.2, 4.2], [3.4, 4.4], [5.6, 2.6]]
       }
     },
+    "barn": {
+      "model": "cow_barn",
+      "blueprint": "blueprint_barn",
+      "width": 8,
+      "depth": 6,
+      "max": 1,
+      "materials": {
+        "wood": 20,
+        "stone": 10
+      },
+      "livestock": {
+        "animals": ["cow", "cow"],
+        "feed": "crop_carrot",
+        "feed_amount": 2,
+        "product": "milk",
+        "amount": 1,
+        "produce_seconds": 900,
+        "max_ground": 2,
+        "spots": [[2.6, 2.4], [4.2, 2.8], [3.4, 4.2], [5.6, 3.4], [6.9, 4.4], [1.9, 4.9]]
+      }
+    },
     "well": {
       "model": "well",
       "blueprint": "blueprint_well",
@@ -137,7 +158,8 @@
       "wood": 2,
       "wild_herb": 1,
       "stone": 2,
-      "egg": 20
+      "egg": 20,
+      "milk": 45
     },
     "buy_prices": {
       "seed_carrot": 9
@@ -171,6 +193,13 @@
         "item": "blueprint_coop",
         "amount": 1,
         "min_sales": 1
+      },
+      "barn": {
+        "item": "blueprint_barn",
+        "amount": 1,
+        "min_sales": 0,
+        "min_level": 2,
+        "coins": 600
       }
     }
   },
@@ -217,7 +246,8 @@
       "fresh_greens": { "item": "crop_carrot" },
       "timber_run": { "item": "wood" },
       "stone_order": { "item": "stone" },
-      "egg_basket": { "item": "egg", "building": "coop" }
+      "egg_basket": { "item": "egg", "building": "coop" },
+      "fresh_milk": { "item": "milk", "building": "barn" }
     }
   }
 }

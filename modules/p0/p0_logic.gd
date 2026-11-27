@@ -145,7 +145,7 @@ const GATE_SKILL_ICONS := {"farming": "hoe", "fishing": "rod", "cooking": "pot"}
 const PLURALS := {"Lettuce": "Lettuce", "Chamomile": "Chamomile", "Corn": "Corn", "Chili": "Chilies",
 	"Cress": "Cress", "Pea Shoots": "Pea Shoots", "Baby Spinach": "Baby Spinach", "Bok Choy": "Bok Choy", "Grapes": "Grapes",
 	"Timber": "Timber", "Stone": "Stone", "Clay": "Clay", "Flax": "Flax", "Hardwood": "Hardwood", "Coal": "Coal",
-	"Rock Salt": "Rock Salt", "Copper Ore": "Copper Ore", "Iron Ore": "Iron Ore", "Quartz": "Quartz"}
+	"Rock Salt": "Rock Salt", "Copper Ore": "Copper Ore", "Iron Ore": "Iron Ore", "Quartz": "Quartz", "Milk": "Milk"}
 
 ## The four things on the gate card (§4.8.7): what is locked, which level, how far, what crossing it does. One sheet
 ## spec for UiInfoSheet (SKILL-2 482:169): the title with the lock, `Locked` (or the rarity), the lead line
