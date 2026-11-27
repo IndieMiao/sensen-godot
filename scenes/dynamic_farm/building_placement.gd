@@ -64,7 +64,7 @@ func setup(building: String, footprint: Vector2i, data: Dictionary, walk: RefCou
 	_ghost.name = "BuildingPreview"
 	var asset = Building.kind(type).get("asset")
 	if asset is String:
-		var model := Art.instance(asset)
+		var model := Building.model(type, base, walk.cell_m) as MeshInstance3D
 		model.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		_ghost.add_child(model)
 		# See-through, so the cells' green / red under it reads; its own copy of the shared material.
@@ -72,6 +72,8 @@ func setup(building: String, footprint: Vector2i, data: Dictionary, walk: RefCou
 		see_through.albedo_color.a = 0.6
 		see_through.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		model.material_override = see_through
+		for prop: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
+			prop.material_override = see_through
 	elif Building.kind(type).get("livestock", false):
 		# C-154: the coop's yard (its scene or placeholder), see-through by each mesh's own transparency.
 		var yard := Building.model(type, base, walk.cell_m)

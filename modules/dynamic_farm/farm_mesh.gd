@@ -4,8 +4,8 @@ const CHUNK := 32
 const Edges = preload("res://modules/dynamic_farm/farm_edges.gd")
 const Spill = preload("res://modules/dynamic_farm/core_grass_edge.gd")
 const Bank = preload("res://modules/dynamic_farm/farm_bank.gd")
-const GROUND_SHADER = preload("res://modules/farm/shaders/meadow_woods.gdshader")
-const MEADOW = preload("res://assets/farm/art/meadow.png")
+const GROUND_SHADER = preload("res://modules/dynamic_farm/parcel_ground.gdshader")
+const PIGMENTS = preload("res://assets/dynamic_farm/fieldkit/field_pigments.png")
 const EARTH := Color("a8845c") # inner hole walls, warm like the island cliff
 
 static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften := true, widen := false, slope_gain := 0.65) -> Node3D:
@@ -120,6 +120,7 @@ static func build(data: Dictionary, walk: RefCounted, recipe: Dictionary, soften
 	for chunk: Vector2i in grids:
 		var mesh := _add(root,grids[chunk],"CoreGrid_%d_%d" % [chunk.x,chunk.y],false)
 		mesh.material_override = _ground_material(3, data, recipe)
+		mesh.hide()
 		shaded[chunk].append(mesh)
 	_add(root,rim,"EarthEdge",true)
 	var chunks: Array = []
@@ -185,18 +186,8 @@ static func _add(parent: Node3D, st: SurfaceTool, node_name: String, shadows: bo
 static func _ground_material(surface: int, data: Dictionary, recipe: Dictionary) -> ShaderMaterial:
 	var material := ShaderMaterial.new()
 	material.shader = GROUND_SHADER
-	material.set_shader_parameter("meadow_texture",MEADOW)
-	var grass := surface == 1
-	var color := Color(recipe.surface.grass_srgb if grass else recipe.surface.core_warm_surface_srgb)
-	if surface == 3: color = Color(recipe.surface.core_grid_srgb)
-	material.set_shader_parameter("clearing_color",color)
-	material.set_shader_parameter("mottle_warm",Color(recipe.surface.grass_warm_srgb) if grass else color)
-	material.set_shader_parameter("mottle_cool",Color(recipe.surface.grass_far_srgb) if grass else color)
-	material.set_shader_parameter("mottle",float(recipe.surface.grass_mottle) if grass else 1.0)
-	material.set_shader_parameter("wander",float(recipe.surface.grass_wander) if grass else 0.0)
-	material.set_shader_parameter("strokes",0.07 if grass else 0.0)
-	material.set_shader_parameter("woodland_start",100000.0)
-	material.set_shader_parameter("floor_tint",Vector3.ONE)
-	var extent: Vector2 = Vector2(data.grid_size) * data.cell_m * 0.5
-	material.set_shader_parameter("yard",Vector4(-extent.x,-extent.y,extent.x,extent.y))
+	material.set_shader_parameter("pigments", PIGMENTS)
+	material.set_shader_parameter("parcel_metres", Vector2(data.grid_size) * data.cell_m)
+	material.set_shader_parameter("grid_overlay", surface == 3)
+	material.set_shader_parameter("clearing_color", Color(recipe.surface.core_grid_srgb) if surface == 3 else Color.WHITE)
 	return material
