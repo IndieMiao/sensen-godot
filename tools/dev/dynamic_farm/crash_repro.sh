@@ -30,7 +30,9 @@ done
 # Project machine rule: never the default adb server (5037) and never an implicit device.
 [[ $port =~ ^[0-9]+$ && $port != 5037 && -n $serial && -n $out ]] || {
   printf 'Required: --port (not 5037) --serial --out\n' >&2; exit 2; }
-[[ $package =~ ^com\.sensen\.[a-zA-Z0-9_.]+$ && $rounds =~ ^[0-9]+$ ]] || { printf 'Bad --package or --rounds\n' >&2; exit 2; }
+# This project's packages only: com.sensen.*, and the dynamic farm's com.gensen.mapfarm[.internal] (C-142, C-216).
+[[ $package =~ ^(com\.sensen\.[a-zA-Z0-9_.]+|com\.gensen\.mapfarm(\.internal)?)$ && $rounds =~ ^[0-9]+$ ]] || {
+  printf 'Bad --package or --rounds\n' >&2; exit 2; }
 ADB=${ADB:-adb}
 SAMPLE_SECONDS=${SAMPLE_SECONDS:-2}
 BUILDING_AT=${BUILDING_AT:-0.5,0.45}

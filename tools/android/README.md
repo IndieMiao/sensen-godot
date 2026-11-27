@@ -21,7 +21,7 @@ tools/android/run_test.sh --clean-all
 The target is `--serial`, else `JOURNEY_SERIAL`, `DEV`, then the Run's own device
 (see below), else `emulator-5560`. `--device` picks the Run's physical device
 (`CARDIGAN_DEVICE_SERIAL`). `ADB` selects the adb executable. The scenario
-inherits `JOURNEY_SERIAL` and `JOURNEY_PACKAGE`. Build and install the APK before
+inherits `JOURNEY_SERIAL` and `JOURNEY_PACKAGE`, and `ANDROID_SERIAL` set to the same device. Build and install the APK before
 starting the session. Use one session for the entire multi-step test, rather
 than restarting the app for individual taps.
 
@@ -54,8 +54,14 @@ The scripts read them and fall back to the old defaults when they are not set, s
   `CARDIGAN_EMULATOR_SERIAL`, `CARDIGAN_DEVICE_SERIAL`, then the old default (`emulator-5560`, `emulator-5570` in
   P0). `run_test.sh --device` takes `CARDIGAN_DEVICE_SERIAL` and fails when it is not set.
 - Serial, emulator only (`tools/dev/combat_emulator_qa.mjs`, `combat_latency_emulator_qa.mjs`,
-  `movement_emulator_qa.mjs`): `JOURNEY_SERIAL`, then `CARDIGAN_EMULATOR_SERIAL`, then `emulator-5560`.
+  `movement_emulator_qa.mjs`): `JOURNEY_SERIAL`, then `CARDIGAN_EMULATOR_SERIAL`, then `emulator-5560`. They
+  refuse any serial that does not start with `emulator-` (C-216), e.g. a phone picked by `run_test.sh --device`.
   `farm_pond_removal_android_qa.py` accepts any `emulator-*` session, no longer only `emulator-5580`.
+- In a Run (`CARDIGAN_EMULATOR_SERIAL` or `CARDIGAN_DEVICE_SERIAL` is set), a `JOURNEY_SERIAL`, `DEV` or P0 `SERIAL`
+  variable naming none of the Run's devices is ignored with a warning (`… is not a device of this Run; ignoring
+  it.`), so one left in the login environment cannot move the Run to another device (C-216). Serials given on the
+  command line (`--serial`, P0's argument) are used as given. The rule lives in `tools/android/run_serial.sh` and
+  `tools/dev/run_serial.mjs`; test with `node --test tools/dev/run_serial.test.mjs`.
 - Scenarios started by `run_test.sh` use the `JOURNEY_SERIAL` it exports, so they follow the same order.
 
 Scripts with their own private adb server and SDK for a laptop or gs66 (`pond_art_adb.sh`,

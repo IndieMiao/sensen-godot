@@ -1,11 +1,12 @@
 import { execFile } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { isDeepStrictEqual, promisify } from 'node:util';
+import { requireEmulator, runSerial } from './run_serial.mjs';
 
 const execute = promisify(execFile);
 const base = 'http://127.0.0.1:3155/v1/qa/journey/scene';
-// The session's serial (run_test.sh), else this Run's emulator (C-212), else the local default.
-const serial = process.env.JOURNEY_SERIAL || process.env.CARDIGAN_EMULATOR_SERIAL || 'emulator-5560';
+// The session's serial (run_test.sh), else this Run's emulator (C-212), else the local default; emulators only (C-216).
+const serial = requireEmulator(runSerial(['JOURNEY_SERIAL'], { host: ['CARDIGAN_EMULATOR_SERIAL'] }) || 'emulator-5560');
 const output = 'output/combat-emulator-2026-09-15/actions';
 await mkdir(output, { recursive: true });
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));

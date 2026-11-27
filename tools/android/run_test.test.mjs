@@ -35,8 +35,10 @@ test('clean launch and normal completion preserve explicit arguments and device'
 });
 const hostSerials={JOURNEY_SERIAL:undefined,DEV:undefined,ANDROID_SERIAL:undefined,CARDIGAN_EMULATOR_SERIAL:undefined,CARDIGAN_DEVICE_SERIAL:undefined};
 for(const [name,set,expected] of [
-  ['an explicit JOURNEY_SERIAL wins over the host serials',{JOURNEY_SERIAL:'emulator-5558',ANDROID_SERIAL:'emulator-5600',CARDIGAN_EMULATOR_SERIAL:'emulator-5602'},'emulator-5558'],
-  ['DEV wins over the host serials',{DEV:'emulator-5562',ANDROID_SERIAL:'emulator-5600'},'emulator-5562'],
+  ['outside a Run an explicit JOURNEY_SERIAL wins over ANDROID_SERIAL',{JOURNEY_SERIAL:'emulator-5558',ANDROID_SERIAL:'emulator-5600'},'emulator-5558'],
+  ['outside a Run DEV wins over ANDROID_SERIAL',{DEV:'emulator-5562',ANDROID_SERIAL:'emulator-5600'},'emulator-5562'],
+  ['in a Run JOURNEY_SERIAL naming one of its devices wins',{JOURNEY_SERIAL:'R5CT000',ANDROID_SERIAL:'emulator-5600',CARDIGAN_EMULATOR_SERIAL:'emulator-5600',CARDIGAN_DEVICE_SERIAL:'R5CT000'},'R5CT000'],
+  ['in a Run DEV naming one of its devices wins',{DEV:'emulator-5602',CARDIGAN_EMULATOR_SERIAL:'emulator-5602'},'emulator-5602'],
   ['ANDROID_SERIAL comes before the Cardigan serials',{ANDROID_SERIAL:'emulator-5600',CARDIGAN_EMULATOR_SERIAL:'emulator-5602',CARDIGAN_DEVICE_SERIAL:'R5CT000'},'emulator-5600'],
   ['CARDIGAN_EMULATOR_SERIAL comes before the device',{CARDIGAN_EMULATOR_SERIAL:'emulator-5602',CARDIGAN_DEVICE_SERIAL:'R5CT000'},'emulator-5602'],
   ['CARDIGAN_DEVICE_SERIAL alone selects the device',{CARDIGAN_DEVICE_SERIAL:'R5CT000'},'R5CT000'],
@@ -47,8 +49,43 @@ for(const [name,set,expected] of [
     assert.equal((await s.finished).code,0,s.output());
     const rows=await s.rows();assert.ok(rows.length>0&&rows.every(r=>r[0]==='-s'&&r[1]===expected),JSON.stringify(rows));
     assert.ok(s.output().includes(`ON ${expected}`),s.output());
+    assert.ok(!s.output().includes('not a device of this Run'),s.output());
   });
 }
+for(const [name,set,expected,warnings] of [
+  ['a leftover JOURNEY_SERIAL',{JOURNEY_SERIAL:'emulator-5558',ANDROID_SERIAL:'emulator-5600',CARDIGAN_EMULATOR_SERIAL:'emulator-5600'},'emulator-5600',['JOURNEY_SERIAL=emulator-5558']],
+  ['a leftover DEV',{DEV:'10AFAF162200319',CARDIGAN_EMULATOR_SERIAL:'emulator-5602',CARDIGAN_DEVICE_SERIAL:'R5CT000'},'emulator-5602',['DEV=10AFAF162200319']],
+  ['leftover JOURNEY_SERIAL and DEV',{JOURNEY_SERIAL:'emulator-5558',DEV:'emulator-5562',CARDIGAN_DEVICE_SERIAL:'R5CT000'},'R5CT000',['JOURNEY_SERIAL=emulator-5558','DEV=emulator-5562']],
+]){
+  test(`serial: in a Run ${name} outside its devices is ignored with a warning`,async t=>{
+    const s=await scenario(t,command('console.log("ON",process.env.JOURNEY_SERIAL,process.env.ANDROID_SERIAL)'),{...hostSerials,...set});
+    assert.equal((await s.finished).code,0,s.output());
+    const rows=await s.rows();assert.ok(rows.length>0&&rows.every(r=>r[0]==='-s'&&r[1]===expected),JSON.stringify(rows));
+    assert.ok(s.output().includes(`ON ${expected} ${expected}`),s.output());
+    for(const warning of warnings)assert.ok(s.output().includes(`${warning} is not a device of this Run; ignoring it.`),s.output());
+  });
+}
+test('a --serial outside the Run is used as given and handed to the scenario as ANDROID_SERIAL too',async t=>{
+  const s=await scenario(t,['--serial','emulator-5604',...command('console.log("ON",process.env.JOURNEY_SERIAL,process.env.ANDROID_SERIAL)')],
+    {...hostSerials,ANDROID_SERIAL:'emulator-5600',CARDIGAN_EMULATOR_SERIAL:'emulator-5600'});
+  assert.equal((await s.finished).code,0,s.output());
+  assert.ok((await s.rows()).every(r=>r[1]==='emulator-5604'));
+  assert.ok(s.output().includes('ON emulator-5604 emulator-5604'),s.output());
+  assert.ok(!s.output().includes('not a device of this Run'),s.output());
+});
+test('run_serial.sh: android_p0.sh SERIAL follows the same rule',async()=>{
+  const pick=(set)=>new Promise((resolve,reject)=>{
+    const env=Object.fromEntries(Object.entries({...process.env,...hostSerials,SERIAL:undefined,...set}).filter(([,v])=>v!==undefined));
+    const child=spawn('bash',['-c','source "$0"; run_serial SERIAL',path.join(here,'run_serial.sh')],{env,stdio:['ignore','pipe','pipe']});
+    let out='',err='';child.stdout.on('data',s=>out+=s);child.stderr.on('data',s=>err+=s);
+    child.on('error',reject);child.on('exit',code=>resolve({code,out:out.trim(),err}));
+  });
+  assert.deepEqual(await pick({}),{code:0,out:'',err:''});
+  assert.deepEqual(await pick({SERIAL:'emulator-5572',ANDROID_SERIAL:'emulator-5600'}),{code:0,out:'emulator-5572',err:''});
+  assert.deepEqual(await pick({SERIAL:'emulator-5572',CARDIGAN_EMULATOR_SERIAL:'emulator-5602'}),
+    {code:0,out:'emulator-5602',err:'SERIAL=emulator-5572 is not a device of this Run; ignoring it.\n'});
+  assert.deepEqual(await pick({SERIAL:'R5CT000',CARDIGAN_DEVICE_SERIAL:'R5CT000'}),{code:0,out:'R5CT000',err:''});
+});
 test('--device selects CARDIGAN_DEVICE_SERIAL over every other serial and --serial still overrides it',async t=>{
   const set={...hostSerials,JOURNEY_SERIAL:'emulator-5558',ANDROID_SERIAL:'emulator-5600',CARDIGAN_DEVICE_SERIAL:'R5CT000'};
   for(const [args,expected] of [[['--device'],'R5CT000'],[['--device','--serial','emulator-5604'],'emulator-5604']]){
