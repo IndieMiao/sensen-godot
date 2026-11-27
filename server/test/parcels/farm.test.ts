@@ -228,7 +228,7 @@ describe('parcel economy (C-58)', () => {
     const legacy = { v: 1, house: null, cleared: ['2,2'], tilled: ['1,1'], crops: {}, bag: { hoe_starter: 1, crop_carrot: 1 }, welcomed_at: T0 } as unknown as ParcelFarmState;
     const frozen = structuredClone(legacy);
     expect(withEconomy(legacy)).toEqual({ ...frozen, buildings: [], coins: 0, sales: 0, gathered: {}, blueprints_claimed: {},
-      drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1, board: emptyBoard(), requests_done: 0 });
+      drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1, board: emptyBoard(), requests_done: 0, seed_aid_day: null });
     expect(legacy).toEqual(frozen);
     expect(withEconomy({ ...legacy, coins: 30, sales: 2 } as ParcelFarmState)).toMatchObject({ coins: 30, sales: 2 });
     // And it can sell straight away.
@@ -365,7 +365,8 @@ describe('parcel buy (C-149)', () => {
     expect(bad({ ...eco, buy_prices: { 'Seed Carrot': 9 } })).toThrow();
     expect(bad({ ...eco, buy_prices: [9] })).toThrow();
     const { buy_prices: _, ...without } = eco;
-    const none = parseParcelRules(structuredClone({ ...rules, economy: without }));
+    // C-197：种子兜底用 Jasmine 的种子价判断“没钱”，什么都不卖时也不送。
+    const none = parseParcelRules(structuredClone({ ...rules, economy: without, seed_aid: undefined }));
     expect(none.economy.buy_prices).toEqual({});
     const out = applyFarmCommands(none, with24(), [{ type: 'buy', item: 'seed_carrot', count: 1 }], T0 + 60_000);
     expect(out).toMatchObject({ ok: false, code: 'NOT_FOR_SALE' });
@@ -461,7 +462,7 @@ describe('rebase onto a newer dataset (C-136, Q-168)', () => {
     // A C-31 era save without the economy fields comes out with them.
     const legacy = { v: 1, house: null, cleared: ['1,2'], tilled: [], crops: {}, bag: { hoe_starter: 1 }, welcomed_at: T0 } as unknown as ParcelFarmState;
     expect(rebaseFarm(rules, legacy, T0)).toEqual({ ...legacy, buildings: [], cleared: [], coins: 0, sales: 0, gathered: {}, blueprints_claimed: {},
-      drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1, board: emptyBoard(), requests_done: 0 });
+      drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1, board: emptyBoard(), requests_done: 0, seed_aid_day: null });
   });
 });
 
@@ -747,7 +748,7 @@ describe('coop, feeding and drops (C-154)', () => {
       bag: { blueprint_coop: 1 }, welcomed_at: T0, coins: 12, sales: 1, gathered: {}, blueprints_claimed: { coop: T0 } } as unknown as ParcelFarmState;
     const frozen = structuredClone(old);
     const read = withEconomy(old);
-    expect(read).toEqual({ ...frozen, drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1, board: emptyBoard(), requests_done: 0 });
+    expect(read).toEqual({ ...frozen, drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1, board: emptyBoard(), requests_done: 0, seed_aid_day: null });
     expect(old).toEqual(frozen);
     // Its blueprint builds the coop; Scott does not give a second one.
     expect(run(old, [coopAt(20, 20)]).buildings.map(b => b.type)).toEqual(['cottage', 'coop']);

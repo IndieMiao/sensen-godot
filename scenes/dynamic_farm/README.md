@@ -148,11 +148,19 @@ Track (`accept_request`), Deliver (`deliver_request`, tracked or not, once the b
 (LOCK-10) — and the request sheets after P0's BOARD-1 / 3 / DROPPED (`drop_request`). The rules are the `requests` of
 `dynamic_farm.json` (server `server/src/parcels/requests.ts`, client `parcel_farm.gd`): 2 slots, refilled at once after
 a delivery and 8 h after a drop, an open request swapped after 72 h, at most 6 a player day and 100 coins of completion
-bonus; pay is Jasmine's price × 80% (rounded down) × count plus the bonus of the farm level's tier; eggs only with a
-coop. The save's `board` and `requests_done` (the sheep pen's unlock). Draws are a shared hash of the slot's own time,
-so a read and the next command see the same requests. Numbers: SEN-Q-278 (a template may carry its own `tiers`); copy: SEN-C-191#29; notes in
-`docs/plans/C-191.md`. Tests: `tests/dynamic_farm/test_parcel_board.gd` (shared cases `fixtures/request_cases.json`
-with the server); emulator package: `gather_qa_apk.sh` with `GATHER_QA_ENTRY=board`.
+bonus; pay is Jasmine's price × count plus the completion bonus (C-197, owner SEN-Q-281 over SEN-Q-278: `floor_percent`
+100); count and bonus by item and farm level (Lv3 and below / Lv4 on, `item_tiers`; a template may still carry its own
+`tiers`, an item with none takes the shared ones); eggs only with a coop. The save's `board` and `requests_done` (the
+sheep pen's unlock). Draws are a shared hash of the slot's own time, so a read and the next command see the same
+requests. Copy: SEN-C-191#29; notes in `docs/plans/C-191.md` and `docs/plans/C-197.md`. Tests:
+`tests/dynamic_farm/test_parcel_board.gd` (shared cases `fixtures/request_cases.json` with the server); emulator
+package: `gather_qa_apk.sh` with `GATHER_QA_ENTRY=board`.
+
+Seed aid (C-197, SEN-Q-281): with too few coins for one carrot seed, no seeds and no crops (bag or ground), opening
+Jasmine's greeting sends `claim_seed_aid` once; the server gives 3 Carrot Seeds once a player day (`seed_aid` in
+`dynamic_farm.json`, save `seed_aid_day`). Her greeting line says so; Trade stays her one key. Tests:
+`tests/dynamic_farm/test_parcel_town.gd` (shared cases `fixtures/seed_aid_cases.json`); emulator package:
+`GATHER_QA_ENTRY=aid`.
 
 ## First-visit guide (C-35, 0.4.2; C-61, 0.4.3)
 

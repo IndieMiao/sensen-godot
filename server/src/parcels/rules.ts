@@ -4,7 +4,8 @@
  * 所有者 C-137#15 第 3 题“照搬p0”）；体力（C-148，照搬 P0）：上限、恢复、休息和各动作的价；
  * 浇水（C-151）：哪类建筑是井、水桶和一桶浇几格，以及进农场时各发一次的补发（井的蓝图和水桶）；
  * 农场等级（C-152）：在 Scott 处升到下一级花的金币和材料、升到这一级后各类建筑最多几栋、升级时送的物品；
- * 驿站委托板（C-191）：单子格、补位和换单时间、每天上限、地板价和完成奖、出哪些单（见 requests.ts）。
+ * 驿站委托板（C-191）：单子格、补位和换单时间、每天上限、地板价和完成奖、出哪些单（见 requests.ts）；
+ * 种子兜底（C-197）：没钱、没种子、没作物时 Jasmine 每天送的种子（见 seed_aid.ts）。
  * 默认值按所有者拍板 Q-39（C-34#14）与 Q-40（C-33#14），经济按 C-30#29 第 3–5 题（C-30#30 写入的推荐）。
  * 来源是 assets/farm/data/dynamic_farm.json；它不在 content_version 的指纹里，改它不影响旧农场存档。
  */
@@ -12,6 +13,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { parseEnergyRules, type EnergyRules } from './energy.js';
 import { parseRequestRules, type RequestRules } from './requests.js';
+import { parseSeedAidRules, type SeedAidRules } from './seed_aid.js';
 
 /** energy：播一格这种作物花的体力（C-148，照 P0 作物表：胡萝卜 3）。 */
 export interface CropRule { seed: string; grow_seconds: number; yield: number; energy: number }
@@ -107,6 +109,8 @@ export interface ParcelRules {
   economy: EconomyRules;
   /** C-191 驿站委托板；没有这一项等于没有委托板。 */
   requests?: RequestRules;
+  /** C-197 种子兜底；没有这一项等于不送。 */
+  seed_aid?: SeedAidRules;
 }
 
 export const RULES_FILE = 'dynamic_farm.json';
@@ -169,6 +173,7 @@ export function parseParcelRules(raw: unknown): ParcelRules {
   parseFarmLevels(r, fail);
   parseEconomy(r.economy, fail);
   parseRequestRules(r, fail);
+  parseSeedAidRules(r, fail);
   return r;
 }
 
