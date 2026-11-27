@@ -162,10 +162,10 @@ func _safe_bottom() -> float:
 	return UIMetrics.safe_margins(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size(),
 		get_viewport().get_visible_rect().size, 0.0).w
 
-## The footprint filled green or red with its edge; white grid lines on core cells within HALO_R, fading; the
-## protected path's cells in reach in sand (Keep the path clear).
+## The footprint filled green or red with its edge (C-202: its cutouts, free for anything else, left out); white grid
+## lines on core cells within HALO_R, fading; the protected path's cells in reach in sand (Keep the path clear).
 func _paint() -> void:
-	var footprint := Building.cells(at, base, rotation_steps)
+	var footprint := Building.cells(at, base, rotation_steps, Building.type_cutouts(type))
 	var fill := BAD_FILL if reason != "" else OK_FILL
 	var r := HALO_R
 	var lines: Array = []

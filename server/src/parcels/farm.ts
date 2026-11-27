@@ -53,7 +53,7 @@
 import { dayKey, energyCost, maxEnergy, nextRollover, nextTickIn, settleEnergy, spendEnergy, type EnergyState } from './energy.js';
 import { boardOf, emptyBoard, requestCommand, settleBoard, type BoardState } from './requests.js';
 import { claimSeedAid } from './seed_aid.js';
-import { buildingMax, gatherSourceOf, HOME_BUILDING, MAX_BUILDINGS, nextFarmLevel, type ParcelRules } from './rules.js';
+import { buildingMax, gatherSourceOf, HOME_BUILDING, MAX_BUILDINGS, nextFarmLevel, ownCells, type Cutout, type ParcelRules } from './rules.js';
 
 export const FARM_STATE_VERSION = 1;
 /** 格坐标上限与每类格数上限；地块总格数不超过 8192（客户端 parcel_metadata）。 */
@@ -81,6 +81,8 @@ export interface BuildingState extends HouseState {
   id: number; type: string;
   /** C-154：养殖建筑放下时的动物（规则 livestock.animals 的副本，以后改配置不影响已建的）；普通建筑没有。 */
   animals?: string[];
+  /** C-202：放下时规则里的缺口（cutouts 的副本，以后改配置不影响已建的）；这些格不算它的占地。规则没写缺口的建筑没有。 */
+  cutouts?: Cutout[];
 }
 /**
  * 地上的一个掉落物（C-154）：id 在本块地永不复用；item × amount 是捡到什么；building / animal / spot 是哪栋建筑里哪只动物
@@ -391,30 +393,35 @@ export function parseObjectId(v: unknown): OuterObjectId | null {
 }
 export const objectId = (o: OuterObjectId): string => `${o.parcel_id}:${o.recipe_version}:${o.model}:${o.cell}:${o.ordinal}`;
 
-interface Rect { x0: number; y0: number; x1: number; y1: number }
-/** 建筑占的格子范围（含两端）；转 90°/270° 时宽深互换。 */
-function footprint(h: { x: number; y: number; width: number; depth: number; rotation: number }): Rect {
+type Placed = { x: number; y: number; width: number; depth: number; rotation: number; cutouts?: Cutout[] };
+/** 建筑占地的外框右下角（含）；转 90°/270° 时宽深互换。 */
+function farCorner(h: Placed): [number, number] {
   const [w, d] = h.rotation % 2 ? [h.depth, h.width] : [h.width, h.depth];
-  return { x0: h.x, y0: h.y, x1: h.x + w - 1, y1: h.y + d - 1 };
+  return [h.x + w - 1, h.y + d - 1];
 }
 
-const inRect = (f: Rect, x: number, y: number): boolean => x >= f.x0 && x <= f.x1 && y >= f.y0 && y <= f.y1;
+/**
+ * 建筑占的格，"x,y"：外框里去掉缺口（C-202）。自身坐标 [cx, cz]（原点在后左角，z 向入口）转到格子上：
+ * 不转时入口一排是格 y 最小的一排（客户端 farm_building.gd 的 apron 同一转法）。
+ */
+function footprint(h: Placed): string[] {
+  const { width: w, depth: d } = h;
+  return ownCells(w, d, h.cutouts).map(([cx, cz]) => {
+    const [dx, dy] = [[cx, d - 1 - cz], [cz, cx], [w - 1 - cx, cz], [d - 1 - cz, w - 1 - cx]][h.rotation % 4];
+    return `${h.x + dx},${h.y + dy}`;
+  });
+}
+
+/** 所有建筑占的格。 */
+const buildingCells = (s: ParcelFarmState): Set<string> => new Set(s.buildings.flatMap(footprint));
 
 /** 格子在哪栋建筑下面。 */
-const underBuilding = (s: ParcelFarmState, cell: string): boolean => {
-  const [x, y] = parseCell(cell)!;
-  return s.buildings.some(b => inRect(footprint(b), x, y));
-};
+const underBuilding = (s: ParcelFarmState, cell: string): boolean => buildingCells(s).has(cell);
 
-/** 占地 f 里已被其它建筑占的格，"x,y" 按字符串排序。 */
-function overlapped(s: ParcelFarmState, f: Rect): string[] {
-  const out: string[] = [];
-  for (const b of s.buildings) {
-    const o = footprint(b);
-    for (let y = Math.max(f.y0, o.y0); y <= Math.min(f.y1, o.y1); y++)
-      for (let x = Math.max(f.x0, o.x0); x <= Math.min(f.x1, o.x1); x++) out.push(`${x},${y}`);
-  }
-  return [...new Set(out)].sort();
+/** 格子 cells 里已被其它建筑占的，"x,y" 按字符串排序。 */
+function overlapped(s: ParcelFarmState, cells: string[]): string[] {
+  const under = buildingCells(s);
+  return cells.filter(cell => under.has(cell)).sort();
 }
 
 /**
@@ -459,14 +466,14 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         const building: BuildingState = { id, type, model: rule.model, x: c.x, y: c.y, width: rule.width, depth: rule.depth,
           rotation: c.rotation ?? 0, built_at: now };
         if (rule.livestock) building.animals = [...rule.livestock.animals];
+        if (rule.cutouts?.length) building.cutouts = rule.cutouts.map(r => [...r] as Cutout);
+        const [x1, y1] = farCorner(building);
+        if (x1 >= MAX_COORD || y1 >= MAX_COORD) return fail('OUT_OF_BOUNDS');
         const f = footprint(building);
-        if (f.x1 >= MAX_COORD || f.y1 >= MAX_COORD) return fail('OUT_OF_BOUNDS');
         const overlap = overlapped(s, f);
         if (overlap.length) return fail('BUILDING_OVERLAP', { cells: overlap });
-        const covered = [...s.tilled, ...Object.keys(s.crops)].filter(cell => {
-          const [x, y] = parseCell(cell)!;
-          return inRect(f, x, y);
-        });
+        const mine = new Set(f);
+        const covered = [...s.tilled, ...Object.keys(s.crops)].filter(cell => mine.has(cell));
         if (covered.length) return fail('CELL_OCCUPIED', { cells: [...new Set(covered)].sort() });
         take(s.bag, rule.blueprint, 1);
         for (const [item, need] of Object.entries(rule.materials ?? {})) take(s.bag, item, need);

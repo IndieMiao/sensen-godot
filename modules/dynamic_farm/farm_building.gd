@@ -7,7 +7,8 @@ extends RefCounted
 ## may lose its way to spawn. Outside the core (the ring round it and the entry path) nothing can be placed.
 ## C-154: a type's art may keep cells outside its footprint clear (`apron`: the coop's entry, so the player walks in,
 ## and its rear hedge row); they too lie in the core, and no later building covers them. The server stores and
-## checks the footprint only.
+## checks the footprint only. C-202: a type's `cutouts` (the barn's rear-left 2×2) are not its footprint; anything
+## may stand there.
 ## `at` is the footprint's lowest-x, lowest-y cell, as the save stores it; `base` the footprint unturned (width along
 ## x, depth along y); `rotation` quarter turns 0–3 (所有者 SEN-C-134#22 第 3 题: 0, 90, 180, 270°), a quarter or
 ## three-quarter turn swapping width and depth. The server checks only buildings, tilled cells and crops (C-31).
@@ -71,8 +72,18 @@ static func base_of(entry: Dictionary) -> Vector2i:
 static func size(base: Vector2i, rotation := 0) -> Vector2i:
 	return ParcelFarm.turned(base, rotation)
 
-static func cells(at: Vector2i, base: Vector2i, rotation := 0) -> Array[Vector2i]:
-	return ParcelFarm.footprint(at, base, rotation)
+## The footprint's cells; `cutouts` (C-202, the rules' rects in the unturned frame) are not its own.
+static func cells(at: Vector2i, base: Vector2i, rotation := 0, cutouts := []) -> Array[Vector2i]:
+	return ParcelFarm.footprint(at, base, rotation, cutouts)
+
+## C-202 the cutouts of a rules entry or a saved building (the barn's rear-left 2×2), [] without.
+static func cutouts_of(entry: Dictionary) -> Array:
+	return entry.get("cutouts", []) if entry.get("cutouts") is Array else []
+
+## The cutouts a new building of `type` is placed with (the rules'), [] for an unknown type or "".
+static func type_cutouts(type: String) -> Array:
+	var rule = ParcelFarm.rules().get("buildings", {}).get(type)
+	return cutouts_of(rule) if rule is Dictionary else []
 
 ## Cells nothing may cover: uncleared core obstacles (ParcelFarming.obstacle_cells(), every role, weeds too),
 ## the save's buildings and the cells they keep clear (C-154 `apron`), tilled cells and crops.
@@ -98,9 +109,10 @@ static func solid(layout: Array, obstacles: Dictionary) -> Dictionary:
 ## other buildings, reserved extension cells). `type` adds the cells the type keeps clear (C-154 `apron`: the coop's
 ## entry and rear hedge row): each in the core and off other buildings and solid obstacles; walkable, the entry is
 ## then held to reaching spawn like every other walk cell. Tilled cells and crops may lie there (they stay walkable).
+## `type` also leaves its cutouts (C-202) out of the footprint: they are judged as any cell outside it.
 static func reason(data: Dictionary, at: Vector2i, base: Vector2i, rotation: int, taken: Dictionary, path: Dictionary,
 		walk_blocked: Dictionary, type := "") -> String:
-	var footprint := cells(at, base, rotation)
+	var footprint := cells(at, base, rotation, type_cutouts(type))
 	var kept := apron_cells(type, at, base, rotation)
 	for cell in footprint + kept:
 		if not data.by_cell.has(cell) or data.by_cell[cell].zone != "core": return OUTSIDE
@@ -165,7 +177,7 @@ static func start_spot(data: Dictionary, near: Vector2i, base: Vector2i, taken: 
 			if cell.zone != "core": continue
 			var at := Vector2i(cell.x, cell.y) - offset
 			var count := 0
-			for c in cells(at, base, rotation):
+			for c in cells(at, base, rotation, type_cutouts(type)):
 				if obstacles.has(c): count += 1
 			for c in apron_cells(type, at, base, rotation):
 				if walk_blocked.has(c): count += 1 # only solid ones (and buildings) refuse the kept-clear cells
@@ -178,18 +190,13 @@ static func start_spot(data: Dictionary, near: Vector2i, base: Vector2i, taken: 
 
 ## C-154 the cells outside the footprint a type keeps clear (FarmLivestock.keep_clear), turned with the building:
 ## {walk: [Vector2i], art: [Vector2i]}, both empty for a type without them. A cell of the unturned frame turns about
-## the footprint's middle exactly as `transform` turns the model (grid y runs against the scene's +Z, the front).
+## the footprint's middle exactly as `transform` turns the model (grid y runs against the scene's +Z, the front;
+## ParcelFarm.own_to_grid, as the footprint's own cells turn).
 static func apron(type: String, at: Vector2i, base: Vector2i, rotation := 0) -> Dictionary:
 	var out := {"walk": [] as Array[Vector2i], "art": [] as Array[Vector2i]}
 	if type == "" or not kind(type).get("livestock", false): return out
-	var s := size(base, rotation)
 	for k: Dictionary in Livestock.keep_clear(type, base):
-		# Doubled so every centre is a whole number: the cell's centre from the footprint's middle, model frame.
-		var x: int = 2 * k.cell.x + 1 - base.x
-		var z: int = 2 * k.cell.y + 1 - base.y
-		var grid: Vector2i = [Vector2i(x, -z), Vector2i(z, x), Vector2i(-x, z), Vector2i(-z, -x)][posmod(rotation, 4)]
-		var cell := Vector2i(floori((2 * at.x + s.x + grid.x) / 2.0), floori((2 * at.y + s.y + grid.y) / 2.0))
-		out["walk" if k.walk else "art"].append(cell)
+		out["walk" if k.walk else "art"].append(at + ParcelFarm.own_to_grid(k.cell, base, rotation))
 	return out
 
 static func apron_cells(type: String, at: Vector2i, base: Vector2i, rotation := 0) -> Array[Vector2i]:
@@ -235,10 +242,10 @@ static func proxy(walk: RefCounted, type: String, at: Vector2i, base: Vector2i, 
 	return Proxy.new(profile, transform(walk, at, base, rotation), 1.0) if profile is Dictionary else null
 
 ## Every wall of the type at that spot: the KINDS profile, or a livestock building's fence runs and parts (C-154; its
-## entry stays open, so the player walks in).
-static func proxies(walk: RefCounted, type: String, at: Vector2i, base: Vector2i, rotation := 0) -> Array:
+## entry stays open, so the player walks in; C-202: its fence round its `cutouts`).
+static func proxies(walk: RefCounted, type: String, at: Vector2i, base: Vector2i, rotation := 0, cutouts := []) -> Array:
 	if kind(type).get("livestock", false):
-		return Livestock.proxies(type, base, float(walk.cell_m), transform(walk, at, base, rotation))
+		return Livestock.proxies(type, base, float(walk.cell_m), transform(walk, at, base, rotation), cutouts)
 	var one := proxy(walk, type, at, base, rotation)
 	return [one] if one != null else []
 
