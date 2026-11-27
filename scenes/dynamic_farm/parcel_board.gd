@@ -287,13 +287,27 @@ func release(today_before := -1) -> void:
 		row.modulate.a = 0.0
 		_rise.call_deferred(row)
 
+## A new row rises from y+16 to its place. The list was just rebuilt, so its first layout is not final (the cards size
+## over the next frames): the offset rides on whatever place the list gives the row at each sort, not on the first one.
 func _rise(row: Control) -> void:
 	if not is_instance_valid(row) or not row.is_inside_tree(): return
-	var home := row.position.y
-	row.position.y = home + UiTokens.MOTION_OFFSET_BOARD_ENTER
+	var at := {"home": row.position.y, "off": float(UiTokens.MOTION_OFFSET_BOARD_ENTER)}
+	var resorted := func():
+		if not is_instance_valid(row): return
+		at.home = row.position.y
+		row.position.y = at.home + at.off
+	page_box.sort_children.connect(resorted)
+	var done := func():
+		if page_box.sort_children.is_connected(resorted): page_box.sort_children.disconnect(resorted)
+	row.tree_exiting.connect(done, CONNECT_ONE_SHOT)
+	row.position.y = at.home + at.off
 	var tw := UiMotion.tween(row, UiTokens.MOTION_EASING_STANDARD)
-	tw.tween_property(row, ^"position:y", home, UiKit.secs(UiTokens.MOTION_DURATION_MODERATE_MS))
+	var step := func(v: float):
+		at.off = v
+		if is_instance_valid(row): row.position.y = at.home + v
+	tw.tween_method(step, float(UiTokens.MOTION_OFFSET_BOARD_ENTER), 0.0, UiKit.secs(UiTokens.MOTION_DURATION_MODERATE_MS))
 	tw.parallel().tween_property(row, ^"modulate:a", 1.0, UiKit.secs(UiTokens.MOTION_DURATION_MODERATE_MS))
+	tw.finished.connect(done)
 
 func _today_done() -> int:
 	if farm.is_empty(): return 0

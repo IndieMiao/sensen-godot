@@ -267,6 +267,12 @@ func _turned(turn: bool) -> void:
 	await create_timer(2.0).timeout
 	_check(not board.hold and board.page == "list" and board.cards.has(3) and not board.cards.has(1),
 		"motion (%s): the board is let go, the new request in its row" % what)
+	if not turn:
+		var rows: Array = board.page_box.get_children().filter(func(n): return n is PanelContainer)
+		var sep: int = board.page_box.get_theme_constant(&"separation")
+		_check(rows.size() == 2 and is_equal_approx(rows[1].position.y, rows[0].position.y + rows[0].size.y + sep) and rows[1].modulate.a == 1.0,
+			"motion: the new row rose to its own place in the list, below the row above (not where the list's first layout put it)")
+		_check(board.page_box.get_signal_connection_list(&"sort_children").is_empty(), "motion: the rise lets go of the list's sorts")
 	var saved := store.read()
 	var farm: Dictionary = saved.farm
 	farm.bag["egg"] = 2
