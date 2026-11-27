@@ -23,8 +23,8 @@
 # stand-in, its save starting broke (the hoe and 3 eggs) for Jasmine's seed aid, with a carrot and an egg request.
 # GATHER_QA_ENTRY=sway (C-141): tools/dev/dynamic_farm/crop_sway_qa.tscn, package com.sensen.dynamicfarm.swayqa: the core
 # planted full of carrots, the player walked round it with crop sway switched off and on. GATHER_QA_SWAY_MODE picks the
-# run baked into the build: measure (default; frame rates, release export), baseline (no carrots, release) or record
-# (frames for the review video, debug export so run-as can pull them).
+# run baked into the build: measure (default; frame rates, release export), baseline (no carrots, release), record
+# (frames for the review video, debug export so run-as can pull them) or shots (C-208: stills to compare two builds, debug).
 # On macOS the copied editor is re-signed ad hoc (the copy's signature is otherwise invalid and
 # the system kills it) and templates default to ~/Library/Application Support/Godot.
 # Staging is a disposable copy under $TMPDIR (committed sources at HEAD); nothing in the
@@ -51,10 +51,10 @@ sway) entry=crop_sway_qa qa_id=swayqa qa_ver=sway-qa qa_name='Sway QA' qa_dir=Dy
 *) fail 'GATHER_QA_ENTRY must be parcel, trade, level, board, aid or sway' ;;
 esac
 sway_mode=${GATHER_QA_SWAY_MODE:-measure}
-case $sway_mode in measure | baseline | record) ;; *) fail 'GATHER_QA_SWAY_MODE must be measure, baseline or record' ;; esac
+case $sway_mode in measure | baseline | record | shots) ;; *) fail 'GATHER_QA_SWAY_MODE must be measure, baseline, record or shots' ;; esac
 # Only the sway's frame-rate runs use the release template; everything else stays a debug export.
 export_mode=--export-debug
-[[ $entry != crop_sway_qa || $sway_mode == record ]] || export_mode=--export-release
+[[ $entry != crop_sway_qa || $sway_mode == record || $sway_mode == shots ]] || export_mode=--export-release
 case $abi in
 x86_64) x86_64=true arm64=false ;;
 arm64-v8a) x86_64=false arm64=true ;;
