@@ -109,7 +109,7 @@
   "farm_levels": [
     {
       "level": 2,
-      "coins": 40,
+      "coins": 100,
       "items": {
         "wood": 6,
         "stone": 4
@@ -117,7 +117,7 @@
     },
     {
       "level": 3,
-      "coins": 60,
+      "coins": 300,
       "items": {
         "wood": 10,
         "stone": 8
@@ -131,7 +131,7 @@
     },
     {
       "level": 4,
-      "coins": 70,
+      "coins": 600,
       "items": {
         "wood": 14,
         "stone": 12
@@ -139,7 +139,7 @@
     },
     {
       "level": 5,
-      "coins": 80,
+      "coins": 1000,
       "items": {
         "wood": 20,
         "stone": 16
@@ -203,6 +203,7 @@
       }
     }
   },
+  "seed_aid": { "item": "seed_carrot", "amount": 3 },
   "requests": {
     "slots": 2,
     "done_refill_seconds": 0,
@@ -210,12 +211,37 @@
     "expire_seconds": 259200,
     "daily_max": 6,
     "daily_bonus_max": 100,
-    "floor_percent": 80,
+    "floor_percent": 100,
     "tiers": [
-      { "level": 1, "qty": [2, 3], "bonus": 10 },
-      { "level": 4, "qty": [4, 6], "bonus": 20 },
-      { "level": 7, "qty": [6, 10], "bonus": 40 }
+      { "level": 1, "qty": [3, 5], "bonus": 10 },
+      { "level": 4, "qty": [5, 8], "bonus": 10 }
     ],
+    "item_tiers": {
+      "crop_carrot": [
+        { "level": 1, "qty": [3, 5], "bonus": 10 },
+        { "level": 4, "qty": [5, 8], "bonus": 10 }
+      ],
+      "wood": [
+        { "level": 1, "qty": [4, 6], "bonus": 10 },
+        { "level": 4, "qty": [6, 10], "bonus": 10 }
+      ],
+      "stone": [
+        { "level": 1, "qty": [4, 6], "bonus": 10 },
+        { "level": 4, "qty": [6, 10], "bonus": 10 }
+      ],
+      "egg": [
+        { "level": 1, "qty": [2, 3], "bonus": 20 },
+        { "level": 4, "qty": [3, 5], "bonus": 20 }
+      ],
+      "milk": [
+        { "level": 1, "qty": [1, 2], "bonus": 20 },
+        { "level": 4, "qty": [2, 3], "bonus": 20 }
+      ],
+      "wool": [
+        { "level": 1, "qty": [1, 2], "bonus": 20 },
+        { "level": 4, "qty": [2, 3], "bonus": 20 }
+      ]
+    },
     "templates": {
       "fresh_greens": { "item": "crop_carrot" },
       "timber_run": { "item": "wood" },

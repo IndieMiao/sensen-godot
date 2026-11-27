@@ -4,6 +4,8 @@ extends SceneTree
 ## C-152: Scott upgrades the farm (Upgrade Farm → the upgrade sheet → upgrade_farm).
 ## C-181: Scott sells the barn blueprint for 600 coins from farm level 2 (C-192, SEN-Q-282; Buy Barn Blueprint · 600 coins →
 ## claim_blueprint); below level 2 the key reads `Farm Lv2 needed`.
+## C-197: Jasmine's seed aid (owner SEN-Q-281): the client rules against the server's on the shared cases
+## (fixtures/seed_aid_cases.json, also run by server/test/parcels/seed_aid.test.ts) and her greeting giving the seeds.
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 ## Loaded at run time: these use autoloads (Avatar, Localization), which a preload here would compile before.
@@ -37,6 +39,8 @@ func _run() -> void:
 	await _barn_blueprint()
 	await _failures()
 	await _entries()
+	_seed_aid_rules()
+	await _seed_aid()
 	_portraits()
 	_clean()
 	print("PARCEL_TOWN checks=%d failures=%d" % [checks, failures])
@@ -220,7 +224,7 @@ func _upgrade() -> void:
 	var store := LocalStore.new(PARCEL, DIR)
 	store.now_ms = func() -> int: return T0
 	store._save(ParcelFarm.normalize({"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {"wood": 16, "stone": 12},
-		"welcomed_at": T0, "coins": 100}), 3)
+		"welcomed_at": T0, "coins": 400}), 3)
 	var town := await _open(Town.CARPENTER, store)
 	_check(town.keys.has("upgrade") and town.keys.upgrade.label == "Upgrade Farm" and not town.keys.has("take"), "Scott offers Upgrade Farm")
 	_check(town.keys.upgrade.kind == UiCommandButton.Kind.PRIMARY, "alone it is the primary key")
@@ -235,7 +239,7 @@ func _upgrade() -> void:
 	sheet.button.activated.emit()
 	_check(asked[0], "Upgrade reports")
 	for i in 3: await process_frame
-	_check(town.farm.level == 2 and town.farm.coins == 60 and town.farm.bag == {"wood": 10, "stone": 8}, "Lv2: 40 coins, 6 Timber, 4 Stone taken")
+	_check(town.farm.level == 2 and town.farm.coins == 300 and town.farm.bag == {"wood": 10, "stone": 8}, "Lv2: 100 coins, 6 Timber, 4 Stone taken")
 	_check(town.toast.current_text() == "Farm Lv2", "the toast names the level")
 	_check(sheet.title.text == "Farm Lv2 → Lv3" and sheet.button.reason == "", "the sheet moves on to Lv3")
 	await town.upgrade()
@@ -371,6 +375,99 @@ func _entries() -> void:
 		map.queue_free()
 		await process_frame
 	ProjectSettings.set_setting("sensen/dynamic_farm/own_farm", null)
+
+## C-197: the shipped seed aid, malformed ones refused as the server refuses them, and the shared cases.
+func _seed_aid_rules() -> void:
+	var rules := ParcelFarm.rules()
+	_check(rules.seed_aid == {"item": "seed_carrot", "amount": 3}, "seed aid: 3 carrot seeds (SEN-Q-281)")
+	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH))
+	var bad := func(aid: Variant) -> bool:
+		var copy: Dictionary = raw.duplicate(true)
+		copy.seed_aid = aid
+		return ParcelFarm.parse_rules(copy).is_empty()
+	_check(not bad.call({"item": "seed_carrot", "amount": 3}), "seed aid: the shipped one parses")
+	_check(bad.call({"item": "seed_carrot", "amount": 0}) and bad.call({"item": "seed_carrot", "amount": 100}), "seed aid: 1–99 seeds")
+	_check(bad.call({"item": "egg", "amount": 3}), "seed aid: only a crop's seed")
+	_check(bad.call([]), "seed aid: malformed refused")
+	var unsold: Dictionary = raw.duplicate(true)
+	unsold.economy.buy_prices = {}
+	_check(ParcelFarm.parse_rules(unsold).is_empty(), "seed aid: a seed Jasmine does not sell is refused (no price to say \"no coins\")")
+	var none: Dictionary = raw.duplicate(true)
+	none.erase("seed_aid")
+	var without := ParcelFarm.parse_rules(none)
+	_check(not without.is_empty() and without.seed_aid.is_empty(), "seed aid: rules without it parse, no aid")
+	_check(ParcelFarm.apply(without, _broke(), [{"type": "claim_seed_aid"}], T0).code == "NO_SEED_AID", "seed aid: without it, refused")
+	var shared = JSON.parse_string(FileAccess.get_file_as_string("res://tests/dynamic_farm/fixtures/seed_aid_cases.json"))
+	_check(shared is Dictionary and shared.cases.size() >= 12, "seed aid cases: the shared fixture reads")
+	for c: Dictionary in shared.cases:
+		var farm := ParcelFarm.normalize(c.farm)
+		var frozen := JSON.stringify(farm, "", true)
+		var r := ParcelFarm.apply(rules, farm, c.commands, int(c.now))
+		var got := {"ok": true, "bag": r.state.bag, "coins": r.state.coins, "seed_aid_day": r.state.seed_aid_day} if r.ok \
+			else {"ok": false, "index": r.index, "code": r.code, "detail": r.get("detail", {})}
+		var want := JSON.stringify(_ints(c.expect), "", true)
+		_check(JSON.stringify(_ints(got), "", true) == want, "seed aid case '%s': %s, server %s" % [c.name, JSON.stringify(_ints(got)), want])
+		_check(JSON.stringify(farm, "", true) == frozen, "seed aid case '%s': the input save is untouched" % c.name)
+	var given := ParcelFarm.apply(rules, _broke(), [{"type": "claim_seed_aid"}], T0)
+	var reread := ParcelFarm.normalize(JSON.parse_string(JSON.stringify(given.state)))
+	_check(reread.seed_aid_day == ParcelFarm.day_key(rules, T0), "seed aid: the day reads back from the save")
+	_check(ParcelFarm.normalize({"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {}, "welcomed_at": T0}).seed_aid_day == null,
+		"seed aid: a save from before it reads as never given")
+
+## C-197: opening Jasmine with no coins, no seeds and no crops gives 3 carrot seeds once a player day: her greeting line
+## says so, the toast names them, Trade stays the one key; the second visit that day gives nothing.
+func _seed_aid() -> void:
+	_clean()
+	var store := _store_with({"hoe_starter": 1, "wood": 2})
+	var town := await _open(Town.MARKET, store)
+	for i in 4: await process_frame
+	var farm: Dictionary = store.read().farm
+	_check(farm.bag.get("seed_carrot", 0) == 3 and farm.seed_aid_day == ParcelFarm.day_key(ParcelFarm.rules(), T0),
+		"broke at Jasmine's: 3 carrot seeds go into the bag and the day is saved")
+	_check(town.card.line == "Out of coins and seeds? Here are 3 Carrot Seeds, on me.", "her line says so (%s)" % town.card.line)
+	_check(town.toast.current_text() == "Received Carrot Seeds ×3", "the toast names the seeds (%s)" % town.toast.current_text())
+	_check(town.keys.size() == 1 and town.keys.has("trade") and town.keys.trade.text == "Trade", "Trade is still her one key (LOCK-16) (%s)" % [town.keys.keys()])
+	town.close()
+	await process_frame
+	# Seeds sown and broke again the same player day: nothing more, her usual greeting.
+	var saved: Dictionary = store.read()
+	var sown: Dictionary = saved.farm.duplicate(true)
+	sown.bag.erase("seed_carrot")
+	store._save(sown, int(saved.farm_version))
+	town = await _open(Town.MARKET, store)
+	for i in 4: await process_frame
+	_check(not store.read().farm.bag.has("seed_carrot") and town.card.line == Town.LINES.hello, "the same day: no second gift, her usual hello")
+	town.close()
+	await process_frame
+	# The next player day (4 am Pacific) it comes again.
+	store.now_ms = func() -> int: return ParcelFarm.next_rollover(ParcelFarm.rules(), T0)
+	town = await _open(Town.MARKET, store)
+	for i in 4: await process_frame
+	_check(store.read().farm.bag.get("seed_carrot", 0) == 3, "the next player day: 3 more")
+	town.close()
+	await process_frame
+	# Not broke (a carrot to sell): nothing is asked, nothing is given.
+	_clean()
+	store = _store_with({"crop_carrot": 1})
+	town = await _open(Town.MARKET, store)
+	for i in 4: await process_frame
+	_check(not store.read().farm.bag.has("seed_carrot") and store.read().farm.seed_aid_day == null and town.aid_given.is_empty(),
+		"with a carrot in the bag Jasmine gives nothing")
+	town.close()
+	await process_frame
+	_clean()
+
+func _broke() -> Dictionary:
+	return ParcelFarm.normalize({"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {"hoe_starter": 1}, "welcomed_at": T0})
+
+func _ints(v: Variant) -> Variant:
+	if v is float and v == floorf(v): return int(v)
+	if v is Dictionary:
+		var out := {}
+		for k in v: out[k] = _ints(v[k])
+		return out
+	if v is Array: return v.map(_ints)
+	return v
 
 func _portraits() -> void:
 	Town.npc(Town.MARKET)

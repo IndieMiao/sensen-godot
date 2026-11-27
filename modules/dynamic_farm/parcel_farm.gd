@@ -37,13 +37,18 @@ extends RefCounted
 ## before and after a batch and `view` settles a copy (the server's read). `accept_request` / `deliver_request` /
 ## `drop_request` take a request id: delivering takes the items and pays the floor price × count plus the bonus left
 ## today, at most `daily_max` a player day; dropping refills the slot `drop_refill_seconds` later.
+## C-197 (owner SEN-Q-281): the floor price is Jasmine's price (`floor_percent` 100); count and bonus come from the
+## template's own `tiers`, else its item's `item_tiers`, else the shared `tiers`. The seed aid (server seed_aid.ts):
+## with no coins for one of the rules' `seed_aid` seed, no crop seeds and no crops (in the bag or in the ground),
+## `claim_seed_aid` gives `seed_aid.amount` of it once a player day; the save's `seed_aid_day` is that day (absent: never).
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
 const STATE_VERSION := 1
 const MAX_COORD := 1024
 const MAX_CELLS := 8192
 const MAX_BATCH := 50
 const COMMANDS := ["place_house", "place_building", "clear_obstacle", "till", "sow", "harvest", "sell", "buy", "claim_blueprint",
-	"gather", "rest", "feed", "pick_up", "draw_water", "water", "upgrade_farm", "accept_request", "deliver_request", "drop_request"]
+	"gather", "rest", "feed", "pick_up", "draw_water", "water", "upgrade_farm", "accept_request", "deliver_request", "drop_request",
+	"claim_seed_aid"]
 ## C-191 request commands: the request id is their one field.
 const REQUEST_COMMANDS := ["accept_request", "deliver_request", "drop_request"]
 ## Most request board slots (server requests.ts MAX_SLOTS).
@@ -142,7 +147,20 @@ static func parse_rules(raw: Variant) -> Dictionary:
 	if raw.has("requests"):
 		parsed.requests = _parse_requests(raw.requests, parsed)
 		if parsed.requests.is_empty(): return {}
+	# C-197: no `seed_aid`, no aid ({}); out of the server's bounds (seed_aid.ts parseSeedAidRules), the rules are refused.
+	parsed["seed_aid"] = {}
+	if raw.has("seed_aid"):
+		parsed.seed_aid = _parse_seed_aid(raw.seed_aid, parsed)
+		if parsed.seed_aid.is_empty(): return {}
 	return parsed
+
+## C-197 `seed_aid` with the server's bounds: a crop's seed that Jasmine sells (its price is what "no coins" means),
+## 1–99 of it; {} when out of them.
+static func _parse_seed_aid(raw: Variant, parsed: Dictionary) -> Dictionary:
+	if not raw is Dictionary or not raw.get("item") is String or not _is_id(raw.item) or not whole_in(raw.get("amount"), 1, 99): return {}
+	if not parsed.crops.values().any(func(c): return c.seed == raw.item): return {}
+	if not parsed.economy.buy_prices.has(raw.item): return {}
+	return {"item": raw.item, "amount": int(raw.amount)}
 
 ## C-191 `requests` with the server's bounds (requests.ts parseRequestRules), whole numbers made ints; {} when out of them.
 ## Templates keep the file's order (the draw indexes them in it).
@@ -157,6 +175,14 @@ static func _parse_requests(raw: Variant, parsed: Dictionary) -> Dictionary:
 		out[field] = int(raw[field])
 	out.tiers = _parse_tiers(raw.get("tiers"))
 	if out.tiers.is_empty(): return {}
+	# C-197: tiers by item (an item not sold yet may be listed: milk and wool ahead of their buildings).
+	out.item_tiers = {}
+	if raw.has("item_tiers"):
+		if not raw.item_tiers is Dictionary: return {}
+		for item in raw.item_tiers:
+			var by_item := _parse_tiers(raw.item_tiers[item])
+			if not item is String or not _is_id(item) or by_item.is_empty(): return {}
+			out.item_tiers[item] = by_item
 	if not raw.get("templates") is Dictionary or raw.templates.is_empty(): return {}
 	out.templates = {}
 	for id in raw.templates:
@@ -282,7 +308,7 @@ static func _parse_energy(raw: Variant) -> Dictionary:
 static func empty_state() -> Dictionary:
 	return {"v": STATE_VERSION, "buildings": [], "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {}, "welcomed_at": null,
 		"coins": 0, "sales": 0, "gathered": {}, "blueprints_claimed": {}, "drops": [], "drop_seq": 0, "pail_water": 0, "grants": {},
-		"level": 1, "board": empty_board(), "requests_done": 0}
+		"level": 1, "board": empty_board(), "requests_done": 0, "seed_aid_day": null}
 
 ## A board with no slots yet (C-191; server requests.ts emptyBoard).
 static func empty_board() -> Dictionary:
@@ -363,6 +389,8 @@ static func normalize(raw: Variant) -> Dictionary:
 	# C-191: the request board and the count; a save from before them has an empty board and 0, malformed parts dropped.
 	state.board = _board(raw.get("board"))
 	state.requests_done = int(raw.requests_done) if whole_in(raw.get("requests_done"), 0, 1 << 30) else 0
+	# C-197: the player day of the last seed aid; absent or unreadable (as the server reads it) is never.
+	state.seed_aid_day = raw.seed_aid_day if _is_day(raw.get("seed_aid_day")) else null
 	# C-148 Energy: kept when well formed; without it (or malformed, as the server reads it) the farm is at full Energy.
 	var energy = raw.get("energy")
 	if energy is Dictionary and whole_in(energy.get("value"), 0, 1 << 30) and _number(energy.get("at")) \
@@ -612,16 +640,18 @@ static func hash32(key: String) -> int:
 static func _mul32(a: int, b: int) -> int:
 	return (a * (b & 0xFFFF) + (((a * (b >> 16)) & 0xFFFF) << 16)) & 0xFFFFFFFF
 
-## The tier for a farm level (of `template`'s own tiers when it has them, else the shared ones): the last whose level
-## it has reached.
+## The tier for a farm level: the last whose level it has reached, of `template`'s own tiers when it has them, else of
+## its item's `item_tiers` (C-197), else of the shared ones.
 static func tier_for(rule_set: Dictionary, level: int, template := "") -> Dictionary:
-	var tiers: Array = rule_set.requests.templates.get(template, {}).get("tiers", rule_set.requests.tiers)
+	var q: Dictionary = rule_set.requests
+	var own: Dictionary = q.templates.get(template, {})
+	var tiers: Array = own.get("tiers", q.get("item_tiers", {}).get(own.get("item", ""), q.tiers))
 	var tier: Dictionary = tiers[0]
 	for t: Dictionary in tiers:
 		if level >= int(t.level): tier = t
 	return tier
 
-## One item's floor price on the board: Jasmine's price × `floor_percent`%, rounded down.
+## One item's floor price on the board: Jasmine's price × `floor_percent`%, rounded down (C-197: 100%, her price).
 static func floor_price(rule_set: Dictionary, item: String) -> int:
 	return int(rule_set.economy.sell_prices.get(item, 0)) * int(rule_set.requests.floor_percent) / 100
 
@@ -731,6 +761,30 @@ static func _request_command(rule_set: Dictionary, next: Dictionary, command: Di
 			sl.refill_at = now + int(q.done_refill_seconds) * 1000
 	return {"code": "", "detail": {}}
 
+# ------------------------------------------------------------------ Seed aid (C-197, server seed_aid.ts)
+
+## Whether Jasmine's seed aid can be given now: {code: "", detail: {}} when it can, else the server's refusal in its
+## order — no aid in the rules, given this player day already, coins enough for one seed, a crop seed in the bag, a crop
+## in the bag or in the ground.
+static func seed_aid_refusal(rule_set: Dictionary, state: Dictionary, now: int) -> Dictionary:
+	var aid: Dictionary = rule_set.get("seed_aid", {})
+	if aid.is_empty(): return {"code": "NO_SEED_AID", "detail": {}}
+	if state.get("seed_aid_day") == day_key(rule_set, now):
+		return {"code": "SEED_AID_TODAY", "detail": {"resets_at": next_rollover(rule_set, now)}}
+	var price := int(rule_set.economy.buy_prices[aid.item])
+	var coins := int(state.get("coins", 0))
+	if coins >= price: return {"code": "CONDITION_NOT_MET", "detail": {"reason": "coins", "coins": coins, "price": price}}
+	var seeds := {}
+	for id: String in rule_set.crops: seeds[rule_set.crops[id].seed] = true
+	var bag: Dictionary = state.get("bag", {})
+	for id: String in bag:
+		if seeds.has(id) and int(bag[id]) > 0: return {"code": "CONDITION_NOT_MET", "detail": {"reason": "seeds", "item": id}}
+	for id: String in bag:
+		if rule_set.crops.has(id) and int(bag[id]) > 0: return {"code": "CONDITION_NOT_MET", "detail": {"reason": "crops", "item": id}}
+	for cell: String in state.get("crops", {}):
+		return {"code": "CONDITION_NOT_MET", "detail": {"reason": "crops", "cell": cell}}
+	return {"code": "", "detail": {}}
+
 static func key(cell: Vector2i) -> String:
 	return "%d,%d" % [cell.x, cell.y]
 
@@ -796,7 +850,8 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 		return {"ok": false, "index": 0, "code": "SCHEMA"}
 	var next := state.duplicate(true)
 	var blank := empty_state()
-	for field in ["coins", "sales", "gathered", "blueprints_claimed", "drops", "drop_seq", "pail_water", "grants", "board", "requests_done"]:
+	for field in ["coins", "sales", "gathered", "blueprints_claimed", "drops", "drop_seq", "pail_water", "grants", "board", "requests_done",
+			"seed_aid_day"]:
 		if not next.has(field): next[field] = blank[field]
 	next.level = farm_level(next)
 	next.buildings = buildings_of(next).duplicate(true)
@@ -816,7 +871,7 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 		elif command.type == "gather":
 			if not command.get("object") is String or str(command.object).length() > Gather.MAX_OBJECT_LENGTH:
 				return {"ok": false, "index": index, "code": "SCHEMA"}
-		elif command.type == "rest" or command.type == "upgrade_farm":
+		elif command.type == "rest" or command.type == "upgrade_farm" or command.type == "claim_seed_aid":
 			pass
 		elif command.type == "feed" or command.type == "pick_up":
 			if not whole_in(command.get("building" if command.type == "feed" else "drop"), 1, MAX_ID):
@@ -1072,6 +1127,15 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				var outcome := _request_command(rule_set, next, command, now)
 				failure = outcome.code
 				detail = outcome.detail
+			"claim_seed_aid":
+				# At Jasmine's (the town sends it as her greeting opens); the server cannot tell where the player is.
+				var refusal := seed_aid_refusal(rule_set, next, now)
+				failure = refusal.code
+				detail = refusal.detail
+				if failure.is_empty():
+					var aid: Dictionary = rule_set.seed_aid
+					next.bag[aid.item] = int(next.bag.get(aid.item, 0)) + int(aid.amount)
+					next.seed_aid_day = day_key(rule_set, now)
 		if failure == "NO_ENERGY":
 			detail = {"need": cost, "have": int(next.energy.value), "next_in": next_tick_in(rule_set, next, now)}
 		if not failure.is_empty():

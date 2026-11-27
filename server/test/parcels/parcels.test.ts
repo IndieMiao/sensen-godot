@@ -484,25 +484,27 @@ for (const [name, enabled, makeStores] of makers) {
       const short = await command(app, ada, 1, [{ type: 'upgrade_farm' }]);
       expect(short.statusCode).toBe(422);
       expect(short.json()).toMatchObject({ code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 6 }, parcel: { farm_version: 1, farm: { level: 1 } } });
-      // 26 trees and 4 rocks of one's own outer ring (2 Energy each), 20 Timber sold for 40 coins: Lv2's 40 coins, 6 Timber and 4 Stone.
+      // 40 trees and 20 rocks of one's own outer ring (2 Energy each), 34 Timber and 16 Stone sold for 100 coins: Lv2's 100 coins (Q-282), 6 Timber and 4 Stone.
       const tree = (x: number) => ({ type: 'gather', object: `${A.parcel_id}:outer-groves-v2:wild_pz_tree_20:${x},7:0` });
       const rock = (x: number) => ({ type: 'gather', object: `${A.parcel_id}:outer-groves-v2:wild_pz_rock_08:${x},9:0` });
-      const stocked = await command(app, ada, 1, [...Array.from({ length: 26 }, (_, i) => tree(40 + i)), ...Array.from({ length: 4 }, (_, i) => rock(40 + i)),
-        { type: 'sell', item: 'wood', count: 20 }]);
-      expect(stocked.json().parcel.farm).toMatchObject({ coins: 40, bag: { wood: 6, stone: 4 }, energy: { value: 140 } });
-      // A coin short: refused whole, nothing taken.
-      expect((await command(app, ada, 2, [{ type: 'buy', item: 'seed_carrot', count: 1 }, { type: 'upgrade_farm' }])).json())
-        .toMatchObject({ code: 'NOT_ENOUGH_COINS', index: 1, detail: { coins: 31, need: 40 }, parcel: { farm_version: 2, farm: { coins: 40, level: 1 } } });
-      const up = await command(app, ada, 2, [{ type: 'upgrade_farm' }]);
+      expect((await command(app, ada, 1, Array.from({ length: 40 }, (_, i) => tree(40 + i)))).statusCode).toBe(200);
+      const stocked = await command(app, ada, 2, [...Array.from({ length: 20 }, (_, i) => rock(40 + i)),
+        { type: 'sell', item: 'wood', count: 34 }, { type: 'sell', item: 'stone', count: 16 }]);
+      expect(stocked.json().parcel.farm).toMatchObject({ coins: 100, bag: { wood: 6, stone: 4 }, energy: { value: 80 } });
+      // 9 coins short after a seed: refused whole, nothing taken.
+      expect((await command(app, ada, 3, [{ type: 'buy', item: 'seed_carrot', count: 1 }, { type: 'upgrade_farm' }])).json())
+        .toMatchObject({ code: 'NOT_ENOUGH_COINS', index: 1, detail: { coins: 91, need: 100 }, parcel: { farm_version: 3, farm: { coins: 100, level: 1 } } });
+      expect(await mine(app, ada)).toMatchObject({ farm_version: 3, farm: { level: 1, coins: 100, bag: { wood: 6, stone: 4 } } });
+      const up = await command(app, ada, 3, [{ type: 'upgrade_farm' }]);
       expect(up.statusCode).toBe(200);
       const farm = up.json().parcel.farm;
-      expect(farm).toMatchObject({ level: 2, coins: 0, energy: { value: 140 } });
+      expect(farm).toMatchObject({ level: 2, coins: 0, energy: { value: 80 } });
       expect(farm.bag.wood).toBeUndefined();
       expect(farm.bag.stone).toBeUndefined();
       expect((await mine(app, ada)).farm).toMatchObject({ level: 2, coins: 0 });
       // Lv3 asks for 10 Timber: refused, still Lv2.
-      expect((await command(app, ada, 3, [{ type: 'upgrade_farm' }])).json()).toMatchObject({ code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 10 } });
-      expect(await mine(app, ada)).toMatchObject({ farm_version: 3, farm: { level: 2 } });
+      expect((await command(app, ada, 4, [{ type: 'upgrade_farm' }])).json()).toMatchObject({ code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 10 } });
+      expect(await mine(app, ada)).toMatchObject({ farm_version: 4, farm: { level: 2 } });
     });
 
     it('C-58 the same request resent or sent many times at once pays, gathers and grants only once', async () => {
@@ -817,20 +819,22 @@ for (const [name, enabled, makeStores] of makers) {
       const read = await mine(app, ada);
       expect(read.farm.board).toEqual(first);
       expect(first.slots.map((sl: { req: { id: number; drawn_at: number } }) => [sl.req.id, sl.req.drawn_at])).toEqual([[1, T0], [2, T0]]);
-      // At T0 the first entry draws 2 carrots (slot 1) and 3 timber (slot 2), as request_cases.json's first case.
-      expect(first.slots.map((sl: { req: { item: string; qty: number } }) => [sl.req.item, sl.req.qty])).toEqual([['crop_carrot', 2], ['wood', 3]]);
-      // No timber yet: refused, the save and its version unchanged.
-      const short = await command(app, ada, version, [{ type: 'deliver_request', request: 2 }]);
+      // At T0 the first entry draws 5 carrots (slot 1) and 4 timber (slot 2), as request_cases.json's first case (C-197 counts).
+      expect(first.slots.map((sl: { req: { item: string; qty: number } }) => [sl.req.item, sl.req.qty])).toEqual([['crop_carrot', 5], ['wood', 4]]);
+      // Only 2 carrots: refused, the save and its version unchanged.
+      const short = await command(app, ada, version, [{ type: 'deliver_request', request: 1 }]);
       expect(short.statusCode).toBe(422);
-      expect(short.json()).toMatchObject({ code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 3 }, parcel: { farm_version: version } });
-      const res = await command(app, ada, version, [{ type: 'deliver_request', request: 1 }]);
+      expect(short.json()).toMatchObject({ code: 'NOT_ENOUGH', detail: { item: 'crop_carrot', have: 2, need: 5 }, parcel: { farm_version: version } });
+      // Four trees for the timber, then deliver it: Jasmine's 2 × 4 + 10 (SEN-Q-281).
+      const trees = [41, 42, 43, 44].map(x => ({ type: 'gather', object: `${A.parcel_id}:outer-groves-v2:wild_pz_tree_20:${x},7:0` }));
+      const res = await command(app, ada, version, [...trees, { type: 'deliver_request', request: 2 }]);
       expect(res.statusCode).toBe(200);
       const farm = res.json().parcel.farm;
-      expect(farm.coins).toBe(2 * 9 + 10);
-      expect(farm.bag.crop_carrot).toBeUndefined();
+      expect(farm.coins).toBe(4 * 2 + 10);
+      expect(farm.bag.wood).toBeUndefined();
       expect(farm.requests_done).toBe(1);
-      expect(farm.board.slots[0].req).toMatchObject({ id: 3, drawn_at: T0 + 3_600_000, status: 'open' });
-      expect(farm.board.slots[1].req).toEqual(first.slots[1].req);
+      expect(farm.board.slots[1].req).toMatchObject({ id: 3, drawn_at: T0 + 3_600_000, status: 'open' });
+      expect(farm.board.slots[0].req).toEqual(first.slots[0].req);
       expect((await mine(app, ada)).farm).toEqual(farm);
     });
   });
@@ -983,12 +987,12 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
       const drawn = withEconomy(legacy as unknown as ParcelFarmState);
       settleBoard(rules, drawn, clock);
       expect((await mine(app, ada)).farm).toEqual({ ...legacy, buildings, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, drops: [], drop_seq: 0,
-        pail_water: 0, grants: {}, level: 1, energy: full, board: drawn.board, requests_done: 0 });
+        pail_water: 0, grants: {}, level: 1, energy: full, board: drawn.board, requests_done: 0, seed_aid_day: null });
       // Re-entering an old save gives no first-entry gift; it gets the watering grant (C-151) once, which writes the new fields.
       expect((await enter(app, ada)).json()).toMatchObject({ granted: false, gift: WATERING, parcel: { farm_version: 5 } });
       const bag = { hoe_starter: 1, seed_carrot: 2, crop_carrot: 1, ...WATERING };
       const entered = { ...legacy, buildings, bag, coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, drops: [], drop_seq: 0, pail_water: 0,
-        grants: { watering: clock }, level: 1, board: emptyBoard(), requests_done: 0 };
+        grants: { watering: clock }, level: 1, board: emptyBoard(), requests_done: 0, seed_aid_day: null };
       expect((await pool!.query('SELECT farm_state FROM parcel_claims WHERE parcel_id = $1', [A.parcel_id])).rows[0].farm_state).toEqual(entered);
       expect((await enter(app, ada)).json()).toMatchObject({ granted: false, gift: {}, parcel: { farm_version: 5 } });
       const sold = await command(app, ada, 5, [{ type: 'sell', item: 'crop_carrot', count: 1 }]);

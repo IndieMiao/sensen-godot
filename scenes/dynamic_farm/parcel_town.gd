@@ -18,6 +18,10 @@ extends Control
 ## - Since C-191 the room's Request Board opens here too (who = BOARD): no keeper and no greeting, the board drawer
 ##   (parcel_board.gd) straight away; its keys send `accept_request` / `deliver_request` / `drop_request`, and closing
 ##   it leaves.
+## - C-197 seed aid (owner SEN-Q-281): when her greeting opens and the read save has no coins for a seed, no seeds and no
+##   crops, the town sends `claim_seed_aid` once (ParcelFarm.seed_aid_refusal decides whether to ask; the server decides);
+##   given, her greeting line says so and the existing `Received … ×N` toast names the seeds. Nothing else on the card
+##   changes (LOCK-16: Trade stays the one key). A refusal is silent: the greeting stays as it was.
 ## The parcel save (store: read / send, parcel_farm_remote_store.gd or the local stand-in) is authoritative; this
 ## node draws what it answers. Coins are the parcel's own, separate from the main farm's.
 signal closed
@@ -54,6 +58,8 @@ const LINES := {
 	"upgrade_key": "Upgrade Farm",
 	"upgraded": "Farm Lv%d",
 	"upgraded_gift": "Farm Lv%d · +%d %s",
+	# C-197 seed aid: Jasmine's line when she gives the seeds (count, seed name), awaiting PM's C-45 final on SEN-C-197.
+	"seed_aid": "Out of coins and seeds? Here are %d %s, on me.",
 }
 const MET_PATH := "user://dynamic_farm_local/town.json"
 
@@ -74,6 +80,8 @@ var toast: ToastLayer
 ## A greeting's keys, by name (tests and the map read them).
 var keys := {}
 var _switching := false   # the card closes because the counter opens over it
+## C-197: what the seed aid gave this visit ({item, amount}); her greeting line says so while it is set.
+var aid_given := {}
 var _met_path := MET_PATH
 
 ## who: MARKET, CARPENTER or BOARD; store answers read() and send(); parcel_id names the player's parcel (the met record).
@@ -126,6 +134,8 @@ func reload() -> void:
 		keys.retry = retry
 		return
 	_greet()
+	if who == MARKET and aid_given.is_empty() and ParcelFarm.seed_aid_refusal(ParcelFarm.rules(), farm, server_now()).code == "":
+		await claim_seed_aid()
 
 func _adopt(result: Dictionary) -> bool:
 	var next := ParcelFarm.normalize(result.get("farm"))
@@ -197,7 +207,11 @@ func _greet() -> void:
 	else: _greet_carpenter()
 
 func _greet_market() -> void:
-	if not met(MARKET):
+	if not aid_given.is_empty():
+		var seed := ParcelItems.name_of(str(aid_given.item))
+		var amount := int(aid_given.amount)
+		card.line = LINES.seed_aid % [amount, P0Logic.plural(seed) if amount > 1 else seed]
+	elif not met(MARKET):
 		card.line = LINES.intro
 		mark_met(MARKET)
 	elif card.line == "" or card.line == "…" or card.line == LINES.intro: card.line = LINES.hello
@@ -324,6 +338,23 @@ func buy_gap(id: String) -> String:
 static func buy_label(id: String) -> String:
 	var rule: Dictionary = ParcelFarm.rules().economy.blueprints[id]
 	return "Buy %s · %d coins" % [ParcelItems.name_of(str(rule.item)), int(rule.coins)]
+
+## C-197: Jasmine's seed aid, asked once as her greeting opens when the save qualifies. Given: her line says so and a toast
+## names what came in. Refused (another device took it, or the save changed): nothing is said; the greeting stays.
+func claim_seed_aid() -> Dictionary:
+	if busy: return {}
+	var aid: Dictionary = ParcelFarm.rules().get("seed_aid", {})
+	if aid.is_empty(): return {}
+	busy = true
+	var result: Dictionary = await store.send(farm_version, [{"type": "claim_seed_aid"}])
+	busy = false
+	if not is_inside_tree(): return result
+	_adopt(result)
+	if not result.get("ok", false): return result
+	aid_given = {"item": aid.item, "amount": int(aid.amount)}
+	toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(str(aid.item)), int(aid.amount)], ToastLayer.Severity.SUCCESS)
+	if card != null and is_instance_valid(card): _greet()
+	return result
 
 ## Takes Scott's free blueprint (the coop's), or buys a priced one (C-181, the barn's: the server takes the coins).
 func claim_blueprint(id := BLUEPRINT) -> Dictionary:

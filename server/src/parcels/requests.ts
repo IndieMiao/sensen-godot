@@ -1,11 +1,13 @@
 /**
  * 驿站委托板（C-191，0.4.6）：照搬 P0 的系统委托板（server/src/p0/boards.ts，方案 §9.6、§9.13.2），去掉跨城和地区、探索类，
- * 挂在华盛顿广场驿站。数值都在 dynamic_farm.json 的 requests，作者默认值，最终以 SEN-C-189 评审为准：
+ * 挂在华盛顿广场驿站。数值都在 dynamic_farm.json 的 requests；报酬和每单件数按所有者 SEN-Q-281（推翻 Q-278，
+ * 采纳数值评审 SEN-C-189 第 4.1 节）改过（C-197）：
  * - slots 个单子格；交完 done_refill_seconds 后补（默认立即），放弃 drop_refill_seconds 后补（8 小时），
  *   开着没人接 expire_seconds 后换一张（72 小时）；接了（accept_request）不过期，但占着格。
  * - 交单（deliver_request）不要求先接：背包里够数就扣物品、加金币。报酬 = 地板价 × 件数 + 完成奖；
- *   地板价是 Jasmine 的售价 × floor_percent%（向下取整），件数和完成奖按抽单时的农场等级取 tiers 的一档（P0 的 10 / 20 / 40；
- *   模板自己写了 tiers 就用它的）。
+ *   地板价是 Jasmine 的售价 × floor_percent%（向下取整；C-197 起 100，即售价），件数和完成奖按抽单时的农场等级取一档：
+ *   模板自己写了 tiers 用它的，否则用这种物品在 item_tiers 里的（C-197：胡萝卜、木材、石头完成奖 10，蛋、奶、羊毛 20），
+ *   都没有用公共的 tiers。
  * - 每个玩家日（同体力，energy.day）最多交 daily_max 单，完成奖合计不超过 daily_bonus_max；到上限后照常能接、
  *   能放弃，交单被拒（DAILY_LIMIT）。
  * - 单子只按玩家已有的出：模板写了 building 的（鸡蛋要鸡场），这块地上有这类建筑才抽得到；两格尽量不重样。
@@ -25,7 +27,7 @@ import type { ParcelRules } from './rules.js';
 
 /**
  * 一种单子：要的物品（必须是 Jasmine 收的，sell_prices 里有）；building：这块地上有这类建筑才出（鸡蛋要鸡场）；
- * tiers：这种单子自己的件数和完成奖分档（可选，没有就用 requests.tiers），按物品分档时只改配置。
+ * tiers：这种单子自己的件数和完成奖分档（可选，没有就看 requests.item_tiers 里这种物品的，再没有用 requests.tiers）。
  */
 export interface RequestTemplate { item: string; building?: string; tiers?: RequestTier[] }
 /** 农场 level 级起的一档：每单 qty[0]–qty[1] 件，完成奖 bonus。 */
@@ -39,6 +41,11 @@ export interface RequestRules {
   daily_bonus_max: number;
   floor_percent: number;
   tiers: RequestTier[];
+  /**
+   * C-197：按物品分档（物品编号 → 分档），可选。按物品而不是按模板写，以后加的模板（牛奶、羊毛）要的物品在这里有就照它，
+   * 不用再改；物品不必已经在 sell_prices 里（还没上线的产物先写着）。
+   */
+  item_tiers?: Record<string, RequestTier[]>;
   templates: Record<string, RequestTemplate>;
 }
 
@@ -64,7 +71,8 @@ export const emptyBoard = (): BoardState => ({ slots: [], seq: 0, day: null, don
 
 /**
  * requests 的边界：1–8 格，补位 0 秒–30 天，换单 1 小时–30 天，每天 1–100 单、完成奖 0–100000，地板价 1–100%；
- * 档从 1 级起、等级递增，件数 1–999 且下限不大于上限；模板至少一个，物品是 Jasmine 收的，building 是已有的建筑类型。
+ * 档从 1 级起、等级递增，件数 1–999 且下限不大于上限（公共、按物品、按模板的都一样）；模板至少一个，物品是 Jasmine 收的，
+ * building 是已有的建筑类型。
  * 没有 requests 等于没有委托板。
  */
 export function parseRequestRules(r: ParcelRules, fail: (what: string) => never): void {
@@ -74,6 +82,13 @@ export function parseRequestRules(r: ParcelRules, fail: (what: string) => never)
     || !count(q.expire_seconds, 3600, 30 * 86400) || !count(q.daily_max, 1, 100) || !count(q.daily_bonus_max, 0, 100_000)
     || !count(q.floor_percent, 1, 100)) fail('requests 不对');
   parseTiers(q.tiers, fail, 'requests.tiers');
+  if (q.item_tiers !== undefined) {
+    if (!isMap(q.item_tiers)) fail('requests.item_tiers 不对');
+    for (const [item, tiers] of Object.entries(q.item_tiers)) {
+      if (!isId(item)) fail(`requests.item_tiers.${item} 不对`);
+      parseTiers(tiers, fail, `requests.item_tiers.${item}`);
+    }
+  }
   if (!isMap(q.templates) || !Object.keys(q.templates).length) fail('requests.templates 不能为空');
   for (const [id, t] of Object.entries(q.templates)) {
     if (!isId(id) || !isMap(t) || !isId(t.item) || !Object.hasOwn(r.economy.sell_prices, t.item)) fail(`requests.templates.${id} 不对`);
@@ -123,9 +138,13 @@ export function hash32(key: string): number {
   return h >>> 0;
 }
 
-/** 农场 level 级时这种单子（template，不给就看公共分档）的那一档：level 不低于它的最后一档。 */
+/**
+ * 农场 level 级时这种单子（template，不给就看公共分档）的那一档：level 不低于它的最后一档。
+ * 分档先看模板自己的，再看它要的物品在 item_tiers 里的（C-197），都没有用公共的。
+ */
 export function tierFor(q: RequestRules, level: number, template?: string): RequestTier {
-  const tiers = (template !== undefined ? q.templates[template]?.tiers : undefined) ?? q.tiers;
+  const t = template !== undefined && Object.hasOwn(q.templates, template) ? q.templates[template] : undefined;
+  const tiers = t?.tiers ?? (t && q.item_tiers && Object.hasOwn(q.item_tiers, t.item) ? q.item_tiers[t.item] : undefined) ?? q.tiers;
   let tier = tiers[0];
   for (const t of tiers) if (level >= t.level) tier = t;
   return tier;

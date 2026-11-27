@@ -46,9 +46,13 @@
  * 是累计交了几单（羊圈解锁要用）。接单、交单、放弃（accept_request / deliver_request / drop_request）不花体力，“人在驿站”由客户端限定。
  * 每批命令前后各补一次委托板（settleBoard），读档在副本上补。board、requests_done 也是 v1 上追加的字段：旧存档按空板、0 单读。
  * 换数据集不动委托板。
+ *
+ * 种子兜底（C-197，见 seed_aid.ts）：没钱、没种子、没作物时，在 Jasmine 那里 claim_seed_aid，每个玩家日送一次种子；
+ * seed_aid_day 记最近一次送的玩家日，也是 v1 上追加的字段：旧存档没有时按没送过读。换数据集不动它。
  */
 import { dayKey, energyCost, maxEnergy, nextRollover, nextTickIn, settleEnergy, spendEnergy, type EnergyState } from './energy.js';
 import { boardOf, emptyBoard, requestCommand, settleBoard, type BoardState } from './requests.js';
+import { claimSeedAid } from './seed_aid.js';
 import { buildingMax, gatherSourceOf, HOME_BUILDING, MAX_BUILDINGS, nextFarmLevel, type ParcelRules } from './rules.js';
 
 export const FARM_STATE_VERSION = 1;
@@ -133,6 +137,8 @@ export interface ParcelFarmState {
   board: BoardState;
   /** C-191：累计交了几单委托（羊圈解锁要用）。 */
   requests_done: number;
+  /** C-197：最近一次领种子兜底的玩家日（YYYY-MM-DD）；没领过为 null。 */
+  seed_aid_day: string | null;
 }
 
 export type FarmCommand =
@@ -159,7 +165,9 @@ export type FarmCommand =
   /** C-152：在 Scott 处把农场升到下一级。 */
   | { type: 'upgrade_farm' }
   /** C-191：在驿站委托板上接单、交单、放弃，request 是单号。 */
-  | { type: 'accept_request' | 'deliver_request' | 'drop_request'; request: number };
+  | { type: 'accept_request' | 'deliver_request' | 'drop_request'; request: number }
+  /** C-197：在 Jasmine 那里领今天的种子兜底。 */
+  | { type: 'claim_seed_aid' };
 
 /** 命令执行时服务端核实过的上下文：本人地块编号（来自 token 查到的那一行，不来自请求体）。 */
 export interface FarmContext { parcel_id: string }
@@ -172,13 +180,13 @@ export type FarmOutcome =
 export function emptyFarm(): ParcelFarmState {
   return { v: FARM_STATE_VERSION, buildings: [], house: null, cleared: [], tilled: [], crops: {}, bag: {}, welcomed_at: null,
     coins: 0, sales: 0, gathered: {}, blueprints_claimed: {}, drops: [], drop_seq: 0, pail_water: 0, grants: {}, level: 1,
-    board: emptyBoard(), requests_done: 0 };
+    board: emptyBoard(), requests_done: 0, seed_aid_day: null };
 }
 
 /**
  * 旧存档兼容：C-31 时期写下的地块农场没有经济字段，按开局值补上（金币 0、没卖过、没采过、没领过）；
  * C-150 之前的存档没有 buildings，按 house 补上（见 withBuildings）；C-151 之前的没有水桶次数和补发记录，按 0 次、没发过补上；
- * C-152 之前的没有等级，按 1 级补上；C-191 之前的没有委托板，按空板、0 单补上。
+ * C-152 之前的没有等级，按 1 级补上；C-191 之前的没有委托板，按空板、0 单补上；C-197 之前的没有种子兜底记录，按没领过补上。
  * 只补缺的，不动已有字段；返回新对象，不改入参。
  */
 export function withEconomy(state: ParcelFarmState): ParcelFarmState {
@@ -198,6 +206,7 @@ export function withEconomy(state: ParcelFarmState): ParcelFarmState {
   s.level = Number.isInteger(s.level) && s.level >= 1 ? s.level : 1;
   s.board = boardOf(s.board);
   s.requests_done = count(s.requests_done);
+  s.seed_aid_day = typeof s.seed_aid_day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s.seed_aid_day) ? s.seed_aid_day : null;
   return s;
 }
 
@@ -353,8 +362,8 @@ export function parseFarmCommands(raw: unknown): FarmCommand[] | null {
         if (!Number.isInteger(c.drop) || (c.drop as number) < 1 || (c.drop as number) > MAX_ID) return null;
         out.push({ type: 'pick_up', drop: c.drop as number });
         break;
-      case 'upgrade_farm':
-        out.push({ type: 'upgrade_farm' });
+      case 'upgrade_farm': case 'claim_seed_aid':
+        out.push({ type: c.type });
         break;
       case 'accept_request': case 'deliver_request': case 'drop_request':
         if (!Number.isInteger(c.request) || (c.request as number) < 1 || (c.request as number) > MAX_ID) return null;
@@ -649,6 +658,12 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         // 在驿站委托板前（C-191）：服务端不知道人站在哪，“在驿站”由客户端限定。
         const refusal = requestCommand(rules, s, c, now, fail as Parameters<typeof requestCommand>[4], MAX_COINS);
         if (refusal) return refusal;
+        break;
+      }
+      case 'claim_seed_aid': {
+        // 在 Jasmine 跟前（C-197）：服务端不知道人站在哪，“在 Jasmine 那里”由客户端限定。三条都满足、今天没领过才送。
+        const refusal = claimSeedAid(rules, s, now);
+        if (refusal) return fail(refusal.code, refusal.detail);
         break;
       }
     }

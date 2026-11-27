@@ -17,6 +17,8 @@
 # stand-in, its save starting with Lv2's price and Lv3's one Timber short, for Scott's farm upgrade.
 # GATHER_QA_ENTRY=board (C-191): tools/dev/dynamic_farm/board_loop_qa.tscn, package com.sensen.dynamicfarm.boardqa: the same
 # stand-in, its save starting with 3 carrots, 2 eggs and a carrot and an egg request on the Request Board.
+# GATHER_QA_ENTRY=aid (C-197): tools/dev/dynamic_farm/aid_loop_qa.tscn, package com.sensen.dynamicfarm.aidqa: the same
+# stand-in, its save starting broke (the hoe and 3 eggs) for Jasmine's seed aid, with a carrot and an egg request.
 # On macOS the copied editor is re-signed ad hoc (the copy's signature is otherwise invalid and
 # the system kills it) and templates default to ~/Library/Application Support/Godot.
 # Staging is a disposable copy under $TMPDIR (committed sources at HEAD); nothing in the
@@ -38,7 +40,8 @@ parcel) entry=own_parcel_qa qa_id=gatherqa qa_ver=gather-qa qa_name='Gather QA' 
 trade) entry=trade_loop_qa qa_id=tradeqa qa_ver=trade-qa qa_name='Trade QA' qa_dir=DynamicFarmTradeQa ;;
 level) entry=level_loop_qa qa_id=levelqa qa_ver=level-qa qa_name='Level QA' qa_dir=DynamicFarmLevelQa ;;
 board) entry=board_loop_qa qa_id=boardqa qa_ver=board-qa qa_name='Board QA' qa_dir=DynamicFarmBoardQa ;;
-*) fail 'GATHER_QA_ENTRY must be parcel, trade, level or board' ;;
+aid) entry=aid_loop_qa qa_id=aidqa qa_ver=aid-qa qa_name='Aid QA' qa_dir=DynamicFarmAidQa ;;
+*) fail 'GATHER_QA_ENTRY must be parcel, trade, level, board or aid' ;;
 esac
 case $abi in
 x86_64) x86_64=true arm64=false ;;

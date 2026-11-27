@@ -50,15 +50,23 @@ func _clean() -> void:
 func _rules() -> void:
 	var q: Dictionary = ParcelFarm.rules().requests
 	_check(q.slots == 2 and q.done_refill_seconds == 0 and q.drop_refill_seconds == 8 * 3600 and q.expire_seconds == 72 * 3600
-		and q.daily_max == 6 and q.daily_bonus_max == 100 and q.floor_percent == 80, "rules: 2 slots, at once / 8 h / 72 h, 6 a day, 100, 80%")
-	_check(q.tiers == [{"level": 1, "qty": [2, 3], "bonus": 10}, {"level": 4, "qty": [4, 6], "bonus": 20}, {"level": 7, "qty": [6, 10], "bonus": 40}],
-		"rules: P0's three tiers by farm level")
+		and q.daily_max == 6 and q.daily_bonus_max == 100 and q.floor_percent == 100, "rules: 2 slots, at once / 8 h / 72 h, 6 a day, 100, Jasmine's price")
+	# C-197 (SEN-Q-281): count and bonus by item, Lv3 and below / Lv4 on.
+	var band := func(low: Array, high: Array, bonus: int) -> Array:
+		return [{"level": 1, "qty": low, "bonus": bonus}, {"level": 4, "qty": high, "bonus": bonus}]
+	_check(q.item_tiers == {"crop_carrot": band.call([3, 5], [5, 8], 10), "wood": band.call([4, 6], [6, 10], 10), "stone": band.call([4, 6], [6, 10], 10),
+		"egg": band.call([2, 3], [3, 5], 20), "milk": band.call([1, 2], [2, 3], 20), "wool": band.call([1, 2], [2, 3], 20)},
+		"rules: SEN-Q-281's counts and bonuses by item (%s)" % [q.item_tiers])
+	_check(q.tiers == band.call([3, 5], [5, 8], 10), "rules: the shared tiers (for an item with none of its own)")
 	_check(q.templates.keys() == ["fresh_greens", "timber_run", "stone_order", "egg_basket", "fresh_milk"] and q.templates.egg_basket == {"item": "egg", "building": "coop"}
 		and q.templates.fresh_milk == {"item": "milk", "building": "barn"},
 		"rules: carrots, timber, stone, eggs with a coop and milk with a barn (C-192), in the file's order")
 	var rules := ParcelFarm.rules()
-	_check(["crop_carrot", "wood", "stone", "egg", "milk"].map(func(i): return ParcelFarm.floor_price(rules, i)) == [9, 1, 1, 16, 36],
-		"floor prices 9 / 1 / 1 / 16 / 36")
+	_check(["crop_carrot", "wood", "stone", "egg", "milk"].map(func(i): return ParcelFarm.floor_price(rules, i)) == [12, 2, 2, 20, 45],
+		"prices 12 / 2 / 2 / 20 / 45, Jasmine's own")
+	for pair in [["fresh_greens", "crop_carrot"], ["timber_run", "wood"], ["stone_order", "stone"], ["egg_basket", "egg"], ["fresh_milk", "milk"]]:
+		for level in [1, 3, 4, 7]:
+			_check(ParcelFarm.tier_for(rules, level, pair[0]) == q.item_tiers[pair[1]][0 if level < 4 else 1], "rules: %s at Lv%d by its item" % [pair[0], level])
 	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ParcelFarm.RULES_PATH))
 	var bad := func(change: Callable) -> bool:
 		var copy: Dictionary = raw.duplicate(true)
@@ -72,12 +80,22 @@ func _rules() -> void:
 	_check(bad.call(func(r): r.templates = {"x": {"item": "seed_carrot"}}), "rules: an item Jasmine does not buy refused")
 	_check(bad.call(func(r): r.templates = {"x": {"item": "egg", "building": "pen"}}), "rules: an unknown building refused")
 	_check(bad.call(func(r): r.templates.egg_basket.tiers = [{"level": 2, "qty": [1, 2], "bonus": 20}]), "rules: a template's own tiers from Lv1 too")
+	_check(bad.call(func(r): r.item_tiers = []), "rules: item tiers not a map refused")
+	_check(bad.call(func(r): r.item_tiers.egg = [{"level": 1, "qty": [3, 2], "bonus": 20}]), "rules: an item's count range upside down refused")
+	_check(not bad.call(func(r): r.erase("item_tiers")), "rules: no item tiers is fine (the shared ones)")
+	# A milk template (C-192's line) takes milk's tiers with no other change.
+	var milk: Dictionary = raw.duplicate(true)
+	milk.economy.sell_prices["milk"] = 45
+	milk.requests.templates = {"fresh_milk": {"item": "milk"}}
+	var milk_rules := ParcelFarm.parse_rules(milk)
+	_check(ParcelFarm.tier_for(milk_rules, 3, "fresh_milk") == {"level": 1, "qty": [1, 2], "bonus": 20}
+		and ParcelFarm.tier_for(milk_rules, 4, "fresh_milk") == {"level": 4, "qty": [2, 3], "bonus": 20}, "rules: milk 1–2 / 2–3 for +20 by its item")
 	var own: Dictionary = raw.duplicate(true)
 	own.requests.templates.egg_basket.tiers = [{"level": 1, "qty": [1, 1], "bonus": 20}, {"level": 4, "qty": [3, 3], "bonus": 25}]
 	var own_rules := ParcelFarm.parse_rules(own)
 	_check(ParcelFarm.tier_for(own_rules, 1, "egg_basket") == {"level": 1, "qty": [1, 1], "bonus": 20}
 		and ParcelFarm.tier_for(own_rules, 5, "egg_basket") == {"level": 4, "qty": [3, 3], "bonus": 25}
-		and ParcelFarm.tier_for(own_rules, 5, "fresh_greens") == own_rules.requests.tiers[1], "rules: a template's own tiers, the others the shared ones")
+		and ParcelFarm.tier_for(own_rules, 5, "fresh_greens") == own_rules.requests.item_tiers.crop_carrot[1], "rules: a template's own tiers, the others their item's")
 	var none: Dictionary = raw.duplicate(true)
 	none.erase("requests")
 	var parsed := ParcelFarm.parse_rules(none)
@@ -147,11 +165,11 @@ func _model() -> void:
 	_check(m.facts == [["Requests today", "0/6"]], "model: `Requests today 0/6` (%s)" % [m.facts])
 	var carrot: Dictionary = m.cards[0]
 	_check(carrot.title == "Fresh Greens" and carrot.status == "Ready to deliver" and carrot.facts == ["3 Carrots"]
-		and carrot.reward == "37 coins" and carrot.command == "Deliver" and carrot.reason == ""
-		and carrot.cmd == {"type": "deliver_request", "request": 1}, "model: 3 carrots in the bag, ready: Deliver · 37 coins (%s)" % [carrot])
+		and carrot.reward == "46 coins" and carrot.command == "Deliver" and carrot.reason == ""
+		and carrot.cmd == {"type": "deliver_request", "request": 1}, "model: 3 carrots in the bag, ready: Deliver · 46 coins (3 × 12 + 10) (%s)" % [carrot])
 	var eggs: Dictionary = m.cards[1]
 	_check(eggs.title == "Egg Basket" and eggs.status == "Tracked" and eggs.command == "Deliver" and eggs.reason == "Need 2 more Eggs"
-		and eggs.cmd.is_empty() and eggs.reward == "42 coins", "model: tracked eggs, none in the bag: the gap on the key (%s)" % [eggs])
+		and eggs.cmd.is_empty() and eggs.reward == "60 coins", "model: tracked eggs, none in the bag: the gap on the key (%s)" % [eggs])
 	# C-192: milk with a barn, drawn and named as the eggs: `Fresh Milk`, `2 Milk` (milk does not take an s).
 	var milk_farm := _board_farm({"milk": 1})
 	milk_farm.buildings.append({"id": 3, "type": "barn", "model": "cow_barn", "x": 20, "y": 10, "width": 8, "depth": 6, "rotation": 0,
@@ -171,7 +189,7 @@ func _model() -> void:
 	var c: Dictionary = Board.model(rules, capped, T0 + H)
 	_check(c.facts == [["Requests today", "6/6"], ["Bonus today", "95/100"]] and c.cards[0].reason == "Requests today 6/6" and c.cards[0].cmd.is_empty(),
 		"model: at the day's cap the key carries `Requests today 6/6` (%s)" % [c.cards[0]])
-	_check(c.cards[0].reward.begins_with("32 coins · Bonus resets in "), "model: 5 of the bonus left pays 27 + 5 and says when it resets (%s)" % c.cards[0].reward)
+	_check(c.cards[0].reward.begins_with("41 coins · Bonus resets in "), "model: 5 of the bonus left pays 36 + 5 and says when it resets (%s)" % c.cards[0].reward)
 	var waiting := _board_farm({})
 	waiting.board.slots[1] = {"req": null, "refill_at": T0 + 9 * H}
 	var w: Dictionary = Board.model(rules, waiting, T0 + H)
@@ -197,7 +215,7 @@ func _drawer() -> void:
 	_check(board.cards[2].command_button().reason == "Need 2 more Eggs", "the egg row carries its gap")
 	var sent: Dictionary = await town.board_command({"type": "deliver_request", "request": 1})
 	var farm: Dictionary = store.read().farm
-	_check(sent.ok and farm.coins == 37 and not farm.bag.has("crop_carrot") and farm.requests_done == 1, "Deliver: 3 carrots go, 37 coins come, the count is saved")
+	_check(sent.ok and farm.coins == 46 and not farm.bag.has("crop_carrot") and farm.requests_done == 1, "Deliver: 3 carrots go, 46 coins come, the count is saved")
 	_check(farm.board.slots[0].req != null and int(farm.board.slots[0].req.id) == 3, "the delivered slot shows its new request at once")
 	await process_frame
 	_check(town.board.cards.has(3) and not town.board.cards.has(1), "the list follows: the new request in its row")
@@ -259,7 +277,7 @@ func _board_farm(bag: Dictionary) -> Dictionary:
 		"animals": ["hen_white"]}]
 	s.board = {"slots": [
 		{"req": {"id": 1, "template": "fresh_greens", "item": "crop_carrot", "qty": 3, "bonus": 10, "drawn_at": T0, "status": "open"}, "refill_at": T0},
-		{"req": {"id": 2, "template": "egg_basket", "item": "egg", "qty": 2, "bonus": 10, "drawn_at": T0, "status": "accepted"}, "refill_at": T0},
+		{"req": {"id": 2, "template": "egg_basket", "item": "egg", "qty": 2, "bonus": 20, "drawn_at": T0, "status": "accepted"}, "refill_at": T0},
 	], "seq": 2, "day": null, "done_today": 0, "bonus_today": 0}
 	return s
 

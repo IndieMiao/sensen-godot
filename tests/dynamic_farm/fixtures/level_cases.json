@@ -3,7 +3,7 @@
  "parcel_id": "p-3512001",
  "cases": [
   {
-   "name": "Lv1 -> Lv2 with exactly 40 coins, 6 Timber and 4 Stone: all taken, no Energy spent",
+   "name": "Lv1 -> Lv2 with exactly 100 coins, 6 Timber and 4 Stone: all taken, no Energy spent",
    "farm": {
     "v": 1,
     "buildings": [
@@ -40,7 +40,7 @@
      "stone": 4
     },
     "welcomed_at": 1795665600000,
-    "coins": 40,
+    "coins": 100,
     "sales": 0,
     "gathered": {},
     "blueprints_claimed": {},
@@ -120,7 +120,7 @@
      "wild_herb": 2
     },
     "welcomed_at": 1795665600000,
-    "coins": 60,
+    "coins": 300,
     "sales": 0,
     "gathered": {},
     "blueprints_claimed": {},
@@ -201,7 +201,7 @@
      "stone": 12
     },
     "welcomed_at": 1795665600000,
-    "coins": 70,
+    "coins": 600,
     "sales": 0,
     "gathered": {},
     "blueprints_claimed": {},
@@ -243,6 +243,75 @@
    }
   },
   {
+   "name": "Q-282: Lv3 upgraded at the old prices, 70 coins left: refused at the new 600, level and coins kept",
+   "farm": {
+    "v": 1,
+    "buildings": [
+     {
+      "id": 1,
+      "type": "cottage",
+      "model": "cottage",
+      "x": 10,
+      "y": 10,
+      "width": 3,
+      "depth": 3,
+      "rotation": 0,
+      "built_at": 1795665600000
+     }
+    ],
+    "house": {
+     "model": "cottage",
+     "x": 10,
+     "y": 10,
+     "width": 3,
+     "depth": 3,
+     "rotation": 0,
+     "built_at": 1795665600000
+    },
+    "cleared": [],
+    "tilled": [],
+    "crops": {},
+    "bag": {
+     "hoe_starter": 1,
+     "seed_carrot": 3,
+     "blueprint_well": 1,
+     "pail": 1,
+     "wood": 14,
+     "stone": 12
+    },
+    "welcomed_at": 1795665600000,
+    "coins": 70,
+    "sales": 0,
+    "gathered": {},
+    "blueprints_claimed": {},
+    "pail_water": 0,
+    "grants": {
+     "watering": 1795665600000
+    },
+    "level": 3,
+    "energy": {
+     "value": 200,
+     "at": 1795665600000,
+     "rested_on": null
+    }
+   },
+   "commands": [
+    {
+     "type": "upgrade_farm"
+    }
+   ],
+   "now": 1795665600000,
+   "expect": {
+    "ok": false,
+    "index": 0,
+    "code": "NOT_ENOUGH_COINS",
+    "detail": {
+     "coins": 70,
+     "need": 600
+    }
+   }
+  },
+  {
    "name": "Lv4 -> Lv5 gives another well blueprint",
    "farm": {
     "v": 1,
@@ -280,7 +349,7 @@
      "stone": 16
     },
     "welcomed_at": 1795665600000,
-    "coins": 80,
+    "coins": 1000,
     "sales": 0,
     "gathered": {},
     "blueprints_claimed": {},
@@ -425,7 +494,7 @@
      "pail": 1
     },
     "welcomed_at": 1795665600000,
-    "coins": 40,
+    "coins": 100,
     "sales": 0,
     "gathered": {},
     "blueprints_claimed": {},
@@ -495,7 +564,7 @@
      "stone": 3
     },
     "welcomed_at": 1795665600000,
-    "coins": 40,
+    "coins": 100,
     "sales": 0,
     "gathered": {},
     "blueprints_claimed": {},
@@ -635,7 +704,7 @@
      "stone": 4
     },
     "welcomed_at": 1795665600000,
-    "coins": 39,
+    "coins": 99,
     "sales": 0,
     "gathered": {},
     "blueprints_claimed": {},
@@ -661,8 +730,8 @@
     "index": 0,
     "code": "NOT_ENOUGH_COINS",
     "detail": {
-     "coins": 39,
-     "need": 40
+     "coins": 99,
+     "need": 100
     }
    }
   },
@@ -704,7 +773,7 @@
      "stone": 4
     },
     "welcomed_at": 1795665600000,
-    "coins": 40,
+    "coins": 100,
     "sales": 0,
     "gathered": {},
     "blueprints_claimed": {},
@@ -777,7 +846,7 @@
      "stone": 4
     },
     "welcomed_at": 1795665600000,
-    "coins": 40,
+    "coins": 100,
     "sales": 0,
     "gathered": {},
     "blueprints_claimed": {},
@@ -1333,7 +1402,7 @@
      "stone": 8
     },
     "welcomed_at": 1795665600000,
-    "coins": 60,
+    "coins": 300,
     "sales": 0,
     "gathered": {},
     "blueprints_claimed": {},
@@ -1577,7 +1646,7 @@
      "stone": 4
     },
     "welcomed_at": 1795665600000,
-    "coins": 40,
+    "coins": 100,
     "sales": 0,
     "gathered": {},
     "blueprints_claimed": {},

@@ -124,7 +124,7 @@ static func card(rules: Dictionary, farm_: Dictionary, r: Dictionary, now: int) 
 	else: d.cmd = {"type": "accept_request", "request": int(r.id)}
 	return d
 
-## `37 coins`: the floor price × count and the bonus; once today's bonus left is short of it, what delivering pays now
+## `46 coins`: the floor price (since C-197 Jasmine's price) × count and the bonus; once today's bonus left is short of it, what delivering pays now
 ## and when the bonus is back (P0Board.reward_line).
 static func reward_line(rules: Dictionary, farm_: Dictionary, r: Dictionary, now: int) -> String:
 	var q: Dictionary = rules.requests
