@@ -671,6 +671,51 @@ for (const [name, enabled, makeStores] of makers) {
       } finally { await barnApp.close(); }
     });
 
+    it('C-182 sheep pen over HTTP: locked until 15 requests and level 3; bought, built, three Wild Herbs give one wool that stays through re-entry and is picked once', async () => {
+      // The shipped rules: a fresh farm (no request delivered, level 1) cannot buy it; the save and its version stay.
+      const bob = await account(app, 'Bob');
+      await claim(app, bob, B);
+      await enter(app, bob);
+      const locked = await command(app, bob, 1, [{ type: 'claim_blueprint', blueprint: 'sheep_pen' }]);
+      expect(locked.statusCode).toBe(422);
+      expect(locked.json()).toMatchObject({ code: 'CONDITION_NOT_MET', detail: { requests_done: 0, min_requests: 15 }, parcel: { farm_version: 1 } });
+      expect((await mine(app, bob)).farm.blueprints_claimed).toEqual({});
+      // The shipped numbers (15 requests, farm level 3, 1,200 coins, 15 Timber + 15 Stone; SEN-Q-282) are farm.test.ts's; here the unlock,
+      // price and materials are scaled down to what a fresh farm reaches over HTTP: no request, level 1, 2 coins (one Timber sold), 1 Timber
+      // to build. Feed (3 Wild Herbs) and timing are the shipped ones.
+      const cheap = structuredClone(rules);
+      Object.assign(cheap.economy.blueprints.sheep_pen, { coins: 2, min_level: 1, min_requests: 0 });
+      cheap.buildings.sheep_pen.materials = { wood: 1 };
+      const penApp = await appFor(stores, { rules: cheap });
+      try {
+        const ada = await account(penApp, 'Ada');
+        let v = await withCarrots(penApp, ada, A);
+        const outer = (model: string, y: number) => `${A.parcel_id}:outer-groves-v2:${model}:41,${y}:0`;
+        const built = await command(penApp, ada, v, [{ type: 'gather', object: outer('wild_pz_tree_20', 7) }, { type: 'gather', object: outer('wild_pz_tree_20', 8) },
+          ...[11, 12, 13].map(y => ({ type: 'gather', object: outer('wild_pz_flower_20', y) })),
+          { type: 'sell', item: 'wood', count: 1 }, { type: 'claim_blueprint', blueprint: 'sheep_pen' },
+          { type: 'place_building', building: 'sheep_pen', x: 22, y: 22, rotation: 1 }, { type: 'feed', building: 2 }]);
+        expect(built.statusCode).toBe(200);
+        const givenAt = T0 + 60_000 + 1_800_000;
+        expect(built.json().parcel.farm).toMatchObject({ coins: 0, blueprints_claimed: { sheep_pen: T0 + 60_000 }, drop_seq: 1,
+          buildings: [{ type: 'well' }, { id: 2, type: 'sheep_pen', width: 6, depth: 6, rotation: 1, animals: ['sheep', 'sheep', 'sheep', 'sheep'] }],
+          drops: [{ id: 1, item: 'wool', amount: 1, building: 2, animal: 0, ready_at: givenAt }] });
+        expect(built.json().parcel.farm.bag.wild_herb).toBeUndefined();
+        v += 1;
+        expect((await command(penApp, ada, v, [{ type: 'feed', building: 2 }])).json()).toMatchObject({ code: 'NO_FEED', detail: { item: 'wild_herb' }, parcel: { farm_version: v } });
+        expect((await command(penApp, ada, v, [{ type: 'claim_blueprint', blueprint: 'sheep_pen' }])).json()).toMatchObject({ code: 'BLUEPRINT_CLAIMED' });
+        clock = givenAt + 3_600_000;
+        expect((await mine(penApp, ada)).farm.drops).toEqual(built.json().parcel.farm.drops);
+        expect((await enter(penApp, ada)).json().parcel.farm.drops).toHaveLength(1);
+        const results = await Promise.all(Array.from({ length: 8 }, () => command(penApp, ada, v, [{ type: 'pick_up', drop: 1 }])));
+        expect(results.filter(r => r.statusCode === 200)).toHaveLength(1);
+        const after = await mine(penApp, ada);
+        expect(after.farm).toMatchObject({ bag: { wool: 1 }, drops: [] });
+        expect((await command(penApp, ada, after.farm_version, [{ type: 'pick_up', drop: 1 }])).json()).toMatchObject({ code: 'NO_DROP' });
+        expect((await command(penApp, ada, after.farm_version, [{ type: 'sell', item: 'wool', count: 1 }])).json().parcel.farm).toMatchObject({ coins: 30 });
+      } finally { await penApp.close(); }
+    });
+
     it('“abandon and pick again” is refused under the production configuration and leaves the parcel', async () => {
       expect(parcelReselectFromEnv({})).toBe(false);
       expect(parcelReselectFromEnv({ DYNAMIC_FARM_RESELECT: '0' })).toBe(false);

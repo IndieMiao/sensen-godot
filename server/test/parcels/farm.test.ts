@@ -43,7 +43,8 @@ describe('dynamic_farm.json', () => {
     // (more wells come with farm levels, SEN-C-152).
     expect(rules.buildings.cottage).toEqual({ model: 'cottage', blueprint: 'blueprint_cottage', width: 3, depth: 3, max: 1 });
     expect(rules.buildings.well).toEqual({ model: 'well', blueprint: 'blueprint_well', width: 1, depth: 1, max: 1 });
-    expect(Object.keys(rules.buildings)).toEqual(['cottage', 'coop', 'barn', 'well']); // C-181: the barn (its own describe; C-202: 11×6 less a 2×2)
+    // C-181: the barn (its own describe; C-202: 11×6 less a 2×2); C-182: the sheep pen (its own describe).
+    expect(Object.keys(rules.buildings)).toEqual(['cottage', 'coop', 'barn', 'sheep_pen', 'well']);
     // C-151 (owner SEN-C-137#6, #15): a pail holds 3 waterings, filled at a well; every farm gets one well blueprint and one pail, once.
     expect(rules.watering).toEqual({ well: 'well', pail: 'pail', pail_uses: 3 });
     expect(rules.grants).toEqual({ watering: { blueprint_well: 1, pail: 1 } });
@@ -176,13 +177,15 @@ describe('parcel economy (C-58)', () => {
 
   it('ships the C-30#29 numbers: carrot 12, timber 2, wild herb 1, stone 2; 24 h respawn; coop blueprint after the first sale', () => {
     // C-154: the egg (Q-237); C-181: milk, author default awaiting the owner.
-    expect(rules.economy.sell_prices).toEqual({ crop_carrot: 12, wood: 2, wild_herb: 1, stone: 2, egg: 20, milk: 45 });
+    expect(rules.economy.sell_prices).toEqual({ crop_carrot: 12, wood: 2, wild_herb: 1, stone: 2, egg: 20, milk: 45, wool: 30 });
     expect(rules.economy.gather.respawn_seconds).toBe(24 * 3600);
     expect(Object.fromEntries(Object.entries(rules.economy.gather.sources).map(([k, v]) => [k, [v.item, v.amount]])))
       .toEqual({ tree: ['wood', 1], flower: ['wild_herb', 1], rock: ['stone', 1] });
     // C-181: the barn's blueprint is bought at Scott's, no sale needed: 600 coins from farm level 2 (C-192, SEN-Q-282).
     expect(rules.economy.blueprints).toEqual({ coop: { item: 'blueprint_coop', amount: 1, min_sales: 1 },
-      barn: { item: 'blueprint_barn', amount: 1, min_sales: 0, min_level: 2, coins: 600 } });
+      barn: { item: 'blueprint_barn', amount: 1, min_sales: 0, min_level: 2, coins: 600 },
+      // C-182: the sheep pen's after 15 delivered requests at farm level 3, 1,200 coins (SEN-Q-282).
+      sheep_pen: { item: 'blueprint_sheep_pen', amount: 1, min_sales: 0, min_requests: 15, min_level: 3, coins: 1200 } });
     // Coins start at 0, separate from the main farm.
     expect(emptyFarm()).toMatchObject({ coins: 0, sales: 0, gathered: {}, blueprints_claimed: {} });
   });
@@ -356,7 +359,7 @@ describe('parcel buy (C-149)', () => {
     expect(carrot.seed).toBe('seed_carrot');
     expect(rules.economy.buy_prices[carrot.seed]).toBe(carrot.seed_price);
     // Selling prices are unchanged by C-149; the egg is C-154 (Q-237), milk C-181.
-    expect(rules.economy.sell_prices).toEqual({ crop_carrot: 12, egg: 20, milk: 45, wood: 2, wild_herb: 1, stone: 2 });
+    expect(rules.economy.sell_prices).toEqual({ crop_carrot: 12, egg: 20, milk: 45, wool: 30, wood: 2, wild_herb: 1, stone: 2 });
   });
 
   it('refuses out-of-bounds buy prices at load time; an economy without buy_prices sells nothing', () => {
@@ -992,6 +995,183 @@ describe('barn, milk and the bought blueprint (C-181)', () => {
 });
 
 /**
+ * C-182（0.4.6）：羊圈。照牛棚：累计交过 15 张委托单、并且农场 3 级后，在 Scott 处花 1,200 金币买蓝图；盖的时候再扣 15 木材 + 15 石头，
+ * 6×6 整块摆放、四个朝向；4 只羊，喂 3 份野草药（1 体力），30 分钟后产 1 份羊毛，掉在地上走近捡，地上最多 4 份；羊毛卖 30。
+ * 解锁条件、蓝图价、羊的只数和地上上限是所有者在 SEN-Q-282 定的；材料、饲料、产毛时间和售价按 C-176 草案。
+ */
+describe('sheep pen, wool and its unlock (C-182)', () => {
+  const penAt = (x: number, y: number, rotation = 0): FarmCommand => ({ type: 'place_building', building: 'sheep_pen', x, y, rotation });
+  const buy: FarmCommand = { type: 'claim_blueprint', blueprint: 'sheep_pen' };
+  const feed = (building = 1): FarmCommand => ({ type: 'feed', building });
+  const pick = (drop: number): FarmCommand => ({ type: 'pick_up', drop });
+  const LAY = 1_800_000;
+  const tryIt = (state: ParcelFarmState, commands: FarmCommand[], now = T0) => applyFarmCommands(rules, state, commands, now);
+  /** 首次进入后农场 3 级、交过 15 单，有 1,250 金币、20 木材、18 石头、9 份野草药。 */
+  const rich = (): ParcelFarmState => {
+    const s = welcomed();
+    s.coins = 1250;
+    s.level = 3;
+    s.requests_done = 15;
+    s.bag = { ...s.bag, wood: 20, stone: 18, wild_herb: 9 };
+    return s;
+  };
+  const withPen = (rotation = 0) => run(rich(), [buy, penAt(20, 20, rotation)]);
+
+  it('ships the owner\'s numbers (SEN-Q-282): 15 requests and farm level 3, 1,200 coins, 15 Timber + 15 Stone, 4 sheep, 3 Wild Herbs give a wool in 30 min, 4 on the ground, 30 coins', () => {
+    const { livestock, ...pen } = rules.buildings.sheep_pen;
+    // SEN-C-180's 6×6 fold (owner SEN-C-180#99), no cutout.
+    expect(pen).toEqual({ model: 'sheep_pen', blueprint: 'blueprint_sheep_pen', width: 6, depth: 6, max: 1, materials: { wood: 15, stone: 15 } });
+    expect(livestock).toMatchObject({ animals: ['sheep', 'sheep', 'sheep', 'sheep'], feed: 'wild_herb', feed_amount: 3, product: 'wool', amount: 1,
+      produce_seconds: 1800, max_ground: 4 });
+    expect(livestock!.spots.length).toBeGreaterThanOrEqual(livestock!.max_ground);
+    expect(rules.economy.blueprints.sheep_pen).toEqual({ item: 'blueprint_sheep_pen', amount: 1, min_sales: 0, min_requests: 15, min_level: 3, coins: 1200 });
+    expect(rules.economy.sell_prices.wool).toBe(30);
+    expect(rules.energy.costs.feed).toBe(1);
+    // The barn's blueprint asks for no requests.
+    expect(rules.economy.blueprints.barn.min_requests).toBeUndefined();
+  });
+
+  it('refuses a malformed request count at load time', () => {
+    const requests = (min_requests: unknown) => () => parseParcelRules({ ...rules, economy: { ...rules.economy,
+      blueprints: { ...rules.economy.blueprints, sheep_pen: { ...rules.economy.blueprints.sheep_pen, min_requests } } } });
+    expect(requests(0)).not.toThrow();
+    expect(requests(15)).not.toThrow();
+    expect(requests(100_000)).not.toThrow();
+    for (const bad of [-1, 1.5, '15', null, 100_001]) expect(requests(bad)).toThrow();
+  });
+
+  it('buying the blueprint takes 1,200 coins once, after 15 requests at farm level 3; short of requests, level or coins nothing changes', () => {
+    const s = rich();
+    const bought = run(s, [buy]);
+    expect(bought.coins).toBe(50);
+    expect(bought.bag.blueprint_sheep_pen).toBe(1);
+    expect(bought.blueprints_claimed.sheep_pen).toBe(T0);
+    expect(bought.requests_done).toBe(15);
+    expect(tryIt({ ...bought, coins: 9999 }, [buy])).toEqual({ ok: false, index: 0, code: 'BLUEPRINT_CLAIMED' });
+    const refused = (farm: ParcelFarmState, expected: unknown) => {
+      const frozen = structuredClone(farm);
+      expect(tryIt(farm, [buy])).toEqual(expected);
+      expect(farm).toEqual(frozen);
+    };
+    // 委托不够：14 单，等级和金币都够也不行。
+    refused({ ...s, requests_done: 14 }, { ok: false, index: 0, code: 'CONDITION_NOT_MET', detail: { requests_done: 14, min_requests: 15 } });
+    // 等级不够：2 级，委托和金币都够也不行。
+    refused({ ...s, level: 2 }, { ok: false, index: 0, code: 'CONDITION_NOT_MET', detail: { level: 2, min_level: 3 } });
+    // 两样都不够：先报委托单数。
+    refused({ ...s, requests_done: 3, level: 1 }, { ok: false, index: 0, code: 'CONDITION_NOT_MET', detail: { requests_done: 3, min_requests: 15 } });
+    refused({ ...s, coins: 1199 }, { ok: false, index: 0, code: 'NOT_ENOUGH_COINS', detail: { coins: 1199, need: 1200 } });
+    expect(run({ ...s, coins: 1200 }, [buy]).coins).toBe(0);
+    expect(run({ ...s, requests_done: 40, level: 5 }, [buy]).bag.blueprint_sheep_pen).toBe(1);
+  });
+
+  it('a delivered request counts toward the 15: the 15th delivery opens the blueprint in the same batch', () => {
+    const s = { ...rich(), requests_done: 14 };
+    const frozen = structuredClone(s);
+    expect(tryIt(s, [buy])).toMatchObject({ code: 'CONDITION_NOT_MET' });
+    const board = run(s, []);
+    const req = board.board.slots[0].req!;
+    const stocked = { ...board, bag: { ...board.bag, [req.item]: (board.bag[req.item] ?? 0) + req.qty } };
+    const out = run(stocked, [{ type: 'deliver_request', request: req.id }, buy], T0 + 1000);
+    expect(out.requests_done).toBe(15);
+    expect(out.bag.blueprint_sheep_pen).toBe(1);
+    expect(s).toEqual(frozen);
+  });
+
+  it('building needs the blueprint, 15 Timber and 15 Stone; short of any, nothing changes and the blueprint stays', () => {
+    const s = run(rich(), [buy]);
+    expect(tryIt({ ...s, bag: { ...s.bag, blueprint_sheep_pen: 0 } }, [penAt(20, 20)])).toMatchObject({ code: 'NO_BLUEPRINT' });
+    for (const [item, have] of [['wood', 14], ['stone', 14]] as const) {
+      const short = { ...s, bag: { ...s.bag, [item]: have } };
+      const frozen = structuredClone(short);
+      expect(tryIt(short, [penAt(20, 20)])).toEqual({ ok: false, index: 0, code: 'NOT_ENOUGH', detail: { item, have, need: 15 } });
+      expect(short).toEqual(frozen);
+    }
+    const built = run(s, [penAt(20, 20)]);
+    expect(built.bag).toMatchObject({ wood: 5, stone: 3 });
+    expect(built.bag.blueprint_sheep_pen).toBeUndefined();
+  });
+
+  it('places the 6×6 pen in any of four turns with its four sheep, off other buildings, tilled cells and crops; one per parcel', () => {
+    for (const rotation of [0, 1, 2, 3]) {
+      const s = withPen(rotation);
+      expect(s.buildings).toEqual([{ id: 1, type: 'sheep_pen', model: 'sheep_pen', x: 20, y: 20, width: 6, depth: 6, rotation, built_at: T0,
+        animals: ['sheep', 'sheep', 'sheep', 'sheep'] }]);
+      expect(tryIt(s, [{ type: 'till', cell: '25,25' }])).toMatchObject({ ok: false, code: 'CELL_OCCUPIED' });
+      expect(tryIt(s, [{ type: 'till', cell: '26,25' }]).ok).toBe(true);
+    }
+    const s = run(rich(), [buy, { type: 'place_house', x: 10, y: 10 }, { type: 'till', cell: '40,40' }, { type: 'sow', cell: '40,40', crop: 'crop_carrot' }]);
+    const frozen = structuredClone(s);
+    expect(tryIt(s, [penAt(8, 8)])).toMatchObject({ ok: false, code: 'BUILDING_OVERLAP' });
+    expect(tryIt(s, [penAt(36, 36, 1)])).toEqual({ ok: false, index: 0, code: 'CELL_OCCUPIED', detail: { cells: ['40,40'] } });
+    expect(s).toEqual(frozen);
+    const two = withPen();
+    expect(tryIt({ ...two, bag: { ...two.bag, blueprint_sheep_pen: 1, wood: 15, stone: 15 } }, [penAt(1, 1)]))
+      .toEqual({ ok: false, index: 0, code: 'BUILDING_LIMIT', detail: { building: 'sheep_pen', max: 1 } });
+  });
+
+  it('without three Wild Herbs or without Energy feeding is refused and the save does not change', () => {
+    const s = withPen();
+    for (const herbs of [0, 1, 2]) {
+      const hungry = { ...s, bag: { ...s.bag, wild_herb: herbs } };
+      const frozen = structuredClone(hungry);
+      expect(tryIt(hungry, [feed()])).toEqual({ ok: false, index: 0, code: 'NO_FEED', detail: { item: 'wild_herb' } });
+      expect(hungry).toEqual(frozen);
+    }
+    const tired = { ...s, energy: { value: 0, at: T0, rested_on: null } };
+    const frozen = structuredClone(tired);
+    expect(tryIt(tired, [feed()])).toMatchObject({ ok: false, index: 0, code: 'NO_ENERGY', detail: { need: 1, have: 0 } });
+    expect(tired).toEqual(frozen);
+  });
+
+  it('no feeding, no wool; one feeding takes 3 Wild Herbs and 1 Energy and gives one wool at 30 min, picked once only, sold for 30', () => {
+    const s = withPen();
+    expect(run(s, [{ type: 'till', cell: '0,0' }], T0 + 3 * 86_400_000).drops).toEqual([]);
+    const fed = run(s, [feed()], T0 + 1000);
+    expect(fed.bag.wild_herb).toBe(6);
+    expect(fed.energy!.value).toBe(maxEnergy(rules, s) - 1); // 219 at level 3
+    expect(fed.drops).toEqual([{ id: 1, item: 'wool', amount: 1, building: 1, animal: 0, spot: expect.any(Number), ready_at: T0 + 1000 + LAY }]);
+    expect(tryIt(fed, [pick(1)], T0 + LAY)).toEqual({ ok: false, index: 0, code: 'NOT_READY', detail: { ready_at: T0 + 1000 + LAY } });
+    const picked = run(fed, [pick(1)], T0 + 1000 + LAY);
+    expect(picked.bag.wool).toBe(1);
+    expect(picked.drops).toEqual([]);
+    expect(tryIt(picked, [pick(1)], T0 + 1000 + LAY)).toEqual({ ok: false, index: 0, code: 'NO_DROP', detail: { drop: 1 } });
+    expect(tryIt(fed, [pick(1), pick(1)], T0 + 1000 + LAY)).toMatchObject({ ok: false, index: 1, code: 'NO_DROP' });
+    expect(run(picked, [{ type: 'sell', item: 'wool', count: 1 }])).toMatchObject({ coins: 50 + 30 });
+  });
+
+  it('each sheep waits for one wool; at four on the ground no more feeding until one is picked up; the wool survives a JSON round trip', () => {
+    let s = withPen();
+    s.bag.wild_herb = 20;
+    s = run(s, [feed(), feed(), feed(), feed()]);
+    expect(s.drops.map(d => d.animal)).toEqual([0, 1, 2, 3]);
+    expect(new Set(s.drops.map(d => d.spot)).size).toBe(4);
+    expect(s.bag.wild_herb).toBe(8);
+    // SEN-Q-282：地上最多 4 份（含没下的），四只羊都喂过就满了，下好之后也要先捡。
+    expect(tryIt(s, [feed()])).toEqual({ ok: false, index: 0, code: 'GROUND_FULL', detail: { max: 4 } });
+    expect(tryIt(s, [feed()], T0 + 3 * LAY)).toEqual({ ok: false, index: 0, code: 'GROUND_FULL', detail: { max: 4 } });
+    const reread = withEconomy(JSON.parse(JSON.stringify(s)));
+    expect(reread).toEqual(s);
+    const one = run(reread, [pick(2)], T0 + LAY);
+    expect(one.bag.wool).toBe(1);
+    // Every wool is given by now, so no sheep is waiting: the first one eats again.
+    const again = run(one, [feed()], T0 + LAY);
+    expect(again.drops.map(d => [d.id, d.animal])).toEqual([[1, 0], [3, 2], [4, 3], [5, 0]]);
+    expect(tryIt(again, [feed()], T0 + LAY)).toMatchObject({ ok: false, code: 'GROUND_FULL' });
+  });
+
+  it('a rebase gives back the pen blueprint (not its Timber and Stone), wool given and three Wild Herbs per wool not yet given', () => {
+    let s = withPen();
+    s = run(s, [feed()]);
+    s = run(s, [feed()], T0 + LAY);
+    const moved = rebaseFarm(rules, s, T0 + LAY);
+    expect(moved.buildings).toEqual([]);
+    expect(moved.drops).toEqual([]);
+    expect(moved.bag).toMatchObject({ wool: 1, wild_herb: 6, blueprint_sheep_pen: 1, wood: 5, stone: 3 });
+    expect(moved.blueprints_claimed.sheep_pen).toBe(T0);
+  });
+});
+
+/**
  * C-209：SEN-C-192 时期盖下的 8×6 牛棚（存档里没有 cutouts）读档时拆掉，蓝图、材料和它的奶（下没下都算）进背包，按新占地重新摆。
  * 旧存档用当时的规则（8×6、没有缺口）真的盖、真的喂出来。
  */
@@ -1051,6 +1231,25 @@ describe('an old 8×6 barn from before its cutout is taken down and given back (
     expect(retireDraftBuildings(rules, placed)).toBe(false);
     expect(placed).toEqual(again);
   });
+});
+
+/**
+ * C-182：客户端和服务端同一套羊圈规则。tests/dynamic_farm/fixtures/sheep_pen_cases.json 的每个用例在这里按服务端跑，
+ * 在 tests/dynamic_farm/test_sheep_pen.gd 里按客户端 parcel_farm.gd 跑，两边结果都要等于文件里记的结果。
+ */
+describe('C-182 the client runs the same sheep pen cases (shared fixture)', () => {
+  const shared = JSON.parse(readFileSync(path.join(DEFAULT_CONTENT_DIR, '..', '..', '..', 'tests', 'dynamic_farm', 'fixtures', 'sheep_pen_cases.json'), 'utf8'));
+  it('has the cases', () => expect(shared.cases.length).toBeGreaterThanOrEqual(30));
+  for (const c of shared.cases) {
+    it(c.name, () => {
+      const frozen = structuredClone(c.farm);
+      const r = applyFarmCommands(rules, c.farm, c.commands, c.now);
+      expect(r.ok ? { ok: true, buildings: r.state.buildings, drops: r.state.drops, drop_seq: r.state.drop_seq, bag: r.state.bag, energy: r.state.energy,
+        coins: r.state.coins, blueprints_claimed: r.state.blueprints_claimed, requests_done: r.state.requests_done }
+        : { ok: false, index: r.index, code: r.code, detail: r.detail ?? {} }).toEqual(c.expect);
+      expect(c.farm).toEqual(frozen);
+    });
+  }
 });
 
 /**

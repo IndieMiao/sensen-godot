@@ -4,10 +4,12 @@ extends RefCounted
 ## Q-155; C-105) where it has the item; the blueprints keep the existing recipe-card icon, anything else P0's icon.
 ## C-151: the well's blueprint is named as the cottage's; the pail (水桶, SEN-C-151) shows P0's Water icon.
 ## C-181: the barn's blueprint as the others; milk is drawn here like the egg until item art comes.
+## C-182: the sheep pen's blueprint likewise; wool is drawn here too (a fleece) until item art comes.
 const NAMES := {"blueprint_cottage": "Cottage Blueprint", "blueprint_coop": "Coop Blueprint", "blueprint_well": "Well Blueprint",
-	"blueprint_barn": "Barn Blueprint", "pail": "Pail", "egg": "Egg", "milk": "Milk"}
+	"blueprint_barn": "Barn Blueprint", "blueprint_sheep_pen": "Sheep Pen Blueprint", "pail": "Pail", "egg": "Egg", "milk": "Milk",
+	"wool": "Wool"}
 const ICONS := {"blueprint_cottage": "recipe_card", "blueprint_coop": "recipe_card", "blueprint_well": "recipe_card",
-	"blueprint_barn": "recipe_card", "pail": "water"}
+	"blueprint_barn": "recipe_card", "blueprint_sheep_pen": "recipe_card", "pail": "water"}
 ## Parcel item → UiArt item art. The hoe is the v3 row tool; the wild herb (picked from the flowers) is the chamomile.
 const ART := {"crop_carrot": "carrot", "seed_carrot": "seed_carrot", "wood": "wood", "stone": "stone",
 	"wild_herb": "chamomile", "hoe_starter": "row_tool"}
@@ -26,6 +28,7 @@ static func icon_of(id: String) -> Texture2D:
 		if art != null: return art
 	if id == "egg": return egg_icon()
 	if id == "milk": return milk_icon()
+	if id == "wool": return wool_icon()
 	return P0Logic.icon(str(ICONS.get(id, id)))
 
 static var _egg: ImageTexture
@@ -91,6 +94,43 @@ static func milk_icon() -> Texture2D:
 			img.set_pixel(x, y, c)
 	_milk = ImageTexture.create_from_image(img)
 	return _milk
+
+static var _wool: ImageTexture
+
+## The Wool's icon (C-182): no item art has wool yet, so a fleece is drawn here (seven overlapping cream puffs, each
+## lit from the upper left, with a thin warm outline) until item art comes.
+static func wool_icon() -> Texture2D:
+	if _wool != null: return _wool
+	var n := 96
+	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0, 0, 0, 0))
+	var body := Color(0.98, 0.95, 0.88)
+	var shade := Color(0.84, 0.77, 0.66)
+	var edge := Color(0.6, 0.5, 0.38)
+	# Puffs [centre u, centre v, radius] in the unit square: a low wide row of four, three above.
+	var puffs := [[0.27, 0.6, 0.17], [0.45, 0.64, 0.18], [0.63, 0.63, 0.18], [0.78, 0.58, 0.15],
+		[0.36, 0.43, 0.17], [0.56, 0.41, 0.18], [0.72, 0.44, 0.14]]
+	for y in n:
+		for x in n:
+			var u := (x + 0.5) / n
+			var v := (y + 0.5) / n
+			# The nearest puff's edge decides the outline; the topmost covering puff (last drawn) its shade.
+			var inside := -1.0
+			var c := Color(0, 0, 0, 0)
+			for p: Array in puffs:
+				var d := Vector2(u - float(p[0]), v - float(p[1])).length() / float(p[2])
+				if d > 1.0: continue
+				inside = maxf(inside, 1.0 - d)
+				var light := clampf((u - float(p[0]) + v - float(p[1])) / float(p[2]) * 0.45 + 0.35, 0.0, 1.0)
+				c = body.lerp(shade, light)
+				if d > 0.86: c = c.lerp(shade, (d - 0.86) / 0.14 * 0.6)
+			if inside < 0.0: continue
+			var rim := inside * 0.16
+			if rim < 0.02: c = c.lerp(edge, 1.0 - rim / 0.02)
+			c.a = clampf(rim * n * 0.6, 0.0, 1.0)
+			img.set_pixel(x, y, c)
+	_wool = ImageTexture.create_from_image(img)
+	return _wool
 
 static func _content_names() -> Dictionary:
 	var content := P0Logic.content()

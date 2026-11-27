@@ -4,6 +4,8 @@ extends SceneTree
 ## C-152: Scott upgrades the farm (Upgrade Farm → the upgrade sheet → upgrade_farm).
 ## C-181: Scott sells the barn blueprint for 600 coins from farm level 2 (C-192, SEN-Q-282; Buy Barn Blueprint · 600 coins →
 ## claim_blueprint); below level 2 the key reads `Farm Lv2 needed`.
+## C-182: Scott sells the sheep pen blueprint for 1,200 coins after 15 delivered requests at farm level 3 (SEN-Q-282): short of
+## requests the key reads `Need N more requests`, then `Farm Lv3 needed`, then the coins.
 ## C-197: Jasmine's seed aid (owner SEN-Q-281): the client rules against the server's on the shared cases
 ## (fixtures/seed_aid_cases.json, also run by server/test/parcels/seed_aid.test.ts) and her greeting giving the seeds.
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -38,6 +40,7 @@ func _run() -> void:
 	await _upgrade()
 	await _level_card_first_frame()
 	await _barn_blueprint()
+	await _sheep_pen_blueprint()
 	await _failures()
 	await _entries()
 	_seed_aid_rules()
@@ -52,14 +55,17 @@ func _clean() -> void:
 
 func _rules() -> void:
 	var eco: Dictionary = ParcelFarm.rules().economy
-	_check(eco.sell_prices == {"crop_carrot": 12, "wood": 2, "wild_herb": 1, "stone": 2, "egg": 20, "milk": 45},
-		"C-30#36 prices: carrot 12, wood 2, herb 1, stone 2; C-154 egg 20; C-181 milk 45")
+	_check(eco.sell_prices == {"crop_carrot": 12, "wood": 2, "wild_herb": 1, "stone": 2, "egg": 20, "milk": 45, "wool": 30},
+		"C-30#36 prices: carrot 12, wood 2, herb 1, stone 2; C-154 egg 20; C-181 milk 45; C-182 wool 30")
 	# C-181: every blueprint reads a price in coins (0 when the rules give none) and, since C-192, the farm level it is sold
-	# from (1 when the rules give none); the barn's is bought for 600 from level 2 (SEN-Q-282).
-	_check(eco.blueprints.coop == {"item": "blueprint_coop", "amount": 1, "min_sales": 1, "min_level": 1, "coins": 0},
+	# from (1 when the rules give none); the barn's is bought for 600 from level 2 (SEN-Q-282). C-182: and how many requests
+	# the farm has delivered first (0 when the rules give none); the sheep pen's 1,200 after 15 at level 3 (SEN-Q-282).
+	_check(eco.blueprints.coop == {"item": "blueprint_coop", "amount": 1, "min_sales": 1, "min_level": 1, "min_requests": 0, "coins": 0},
 		"one coop blueprint after the first sale")
-	_check(eco.blueprints.barn == {"item": "blueprint_barn", "amount": 1, "min_sales": 0, "min_level": 2, "coins": 600},
+	_check(eco.blueprints.barn == {"item": "blueprint_barn", "amount": 1, "min_sales": 0, "min_level": 2, "min_requests": 0, "coins": 600},
 		"the barn blueprint for 600 coins from farm level 2")
+	_check(eco.blueprints.sheep_pen == {"item": "blueprint_sheep_pen", "amount": 1, "min_sales": 0, "min_level": 3, "min_requests": 15,
+		"coins": 1200}, "the sheep pen blueprint for 1,200 coins after 15 requests at farm level 3")
 	_check(eco.buy_prices == {"seed_carrot": 9}, "C-149: Jasmine sells carrot seeds at 9, the P0 seed price")
 	var p0_carrot := {}
 	var p0 = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/p0_content.json"))
@@ -394,6 +400,69 @@ func _barn_blueprint() -> void:
 	await process_frame
 	town = await _open(Town.CARPENTER, store)
 	_check(not town.keys.has("buy_barn") and store.read().farm.bag.blueprint_barn == 1, "kept after reopening")
+	town.close()
+	await process_frame
+
+## C-182: the sheep pen's blueprint, beside the barn's. Locked (secondary, a tap shakes the key, the store refuses) while the
+## farm has delivered fewer than 15 requests (`Need N more requests`, the server's first check) or is below level 3
+## (`Farm Lv3 needed`), then short of coins; with all three the primary key takes 1,200 and gives the blueprint once.
+func _sheep_pen_blueprint() -> void:
+	_clean()
+	var store := LocalStore.new(PARCEL, DIR)
+	store.now_ms = func() -> int: return T0
+	store._save(ParcelFarm.normalize({"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {"crop_carrot": 1},
+		"welcomed_at": T0, "coins": 5000, "sales": 1, "blueprints_claimed": {"coop": T0, "barn": T0}, "level": 1, "requests_done": 0}), 3)
+	var town := await _open(Town.CARPENTER, store)
+	_check(town.keys.has("buy_sheep_pen") and town.keys.buy_sheep_pen.label == "Buy Sheep Pen Blueprint · 1200 coins",
+		"Scott sells the sheep pen blueprint for 1,200 coins (%s)" % town.keys.buy_sheep_pen.label)
+	_check(town.keys.buy_sheep_pen.reason == "Need 15 more requests" and town.keys.buy_sheep_pen.kind == UiCommandButton.Kind.SECONDARY \
+		and town.keys.upgrade.kind == UiCommandButton.Kind.PRIMARY,
+		"no request delivered, level 1, 5,000 coins: the key reads `Need 15 more requests` first, secondary; Upgrade Farm primary")
+	town.keys.buy_sheep_pen.unavailable_pressed.emit(town.keys.buy_sheep_pen.reason)
+	_check(town.toast.current_text() != "Need 15 more requests" and town.keys.buy_sheep_pen.has_meta(&"_ui_shake"),
+		"a tap on it shakes the key; the key already says why, so no repeat toast (C-185 MS-02)")
+	var locked: Dictionary = await town.claim_blueprint("sheep_pen")
+	_check(not locked.ok and locked.code == "CONDITION_NOT_MET" and locked.get("detail", {}) == {"requests_done": 0, "min_requests": 15} \
+		and store.read().farm.coins == 5000 and not store.read().farm.bag.has("blueprint_sheep_pen"),
+		"the store refuses short of requests: coins and bag unchanged")
+	town.close()
+	await process_frame
+	var reason := func(requests: int, level: int, coins: int) -> String:
+		var saved: Dictionary = store.read().farm
+		saved.requests_done = requests
+		saved.level = level
+		saved.coins = coins
+		store._save(saved, store.read().farm_version)
+		var t: Control = await _open(Town.CARPENTER, store)
+		var why: String = t.keys.buy_sheep_pen.reason
+		t.close()
+		await process_frame
+		return why
+	_check(await reason.call(14, 3, 5000) == "Need 1 more request", "14 requests at level 3: `Need 1 more request`")
+	_check(await reason.call(15, 2, 5000) == "Farm Lv3 needed", "15 requests at level 2: `Farm Lv3 needed`")
+	_check(await reason.call(3, 2, 5000) == "Need 12 more requests", "short of both: the requests first")
+	_check(await reason.call(15, 3, 1100) == "Need 100 more coins", "15 requests at level 3, 1,100 coins: `Need 100 more coins`")
+	var leveled: Dictionary = store.read().farm
+	_check(leveled.requests_done == 15 and leveled.level == 3, "the save read back with 15 requests at level 3")
+	town = await _open(Town.CARPENTER, store)
+	var low: Dictionary = await town.claim_blueprint("sheep_pen")
+	_check(not low.ok and low.code == "NOT_ENOUGH_COINS" and store.read().farm.coins == 1100, "the store refuses short of coins")
+	town.close()
+	await process_frame
+	var saved: Dictionary = store.read().farm
+	saved.coins = 1250
+	store._save(saved, store.read().farm_version)
+	town = await _open(Town.CARPENTER, store)
+	_check(town.keys.buy_sheep_pen.reason == "" and town.keys.buy_sheep_pen.kind == UiCommandButton.Kind.PRIMARY \
+		and town.keys.upgrade.kind == UiCommandButton.Kind.SECONDARY, "with all three it is the primary key, Upgrade Farm secondary")
+	town.keys.buy_sheep_pen.activated.emit()
+	for i in 3: await process_frame
+	_check(town.farm.coins == 50 and town.farm.bag.get("blueprint_sheep_pen") == 1 and town.farm.blueprints_claimed.has("sheep_pen"),
+		"1,200 coins taken, one sheep pen blueprint in the bag")
+	_check(town.toast.current_text() == "Received Sheep Pen Blueprint ×1", "the purchase is announced")
+	_check(not town.keys.has("buy_sheep_pen"), "bought: no second offer")
+	var again: Dictionary = await town.claim_blueprint("sheep_pen")
+	_check(not again.ok and again.code == "BLUEPRINT_CLAIMED" and store.read().farm.coins == 50, "buying again is refused, nothing more taken")
 	town.close()
 	await process_frame
 

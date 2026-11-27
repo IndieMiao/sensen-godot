@@ -21,6 +21,8 @@
 # stand-in, its save starting with 3 carrots, 2 eggs and a carrot and an egg request on the Request Board.
 # GATHER_QA_ENTRY=aid (C-197): tools/dev/dynamic_farm/aid_loop_qa.tscn, package com.sensen.dynamicfarm.aidqa: the same
 # stand-in, its save starting broke (the hoe and 3 eggs) for Jasmine's seed aid, with a carrot and an egg request.
+# GATHER_QA_ENTRY=pen (C-182): tools/dev/dynamic_farm/pen_loop_qa.tscn, package com.sensen.dynamicfarm.penqa: the same
+# stand-in, its save one request and one level short of the sheep pen's blueprint, with the coins and materials after.
 # GATHER_QA_ENTRY=sway (C-141): tools/dev/dynamic_farm/crop_sway_qa.tscn, package com.sensen.dynamicfarm.swayqa: the core
 # planted full of carrots, the player walked round it with crop sway switched off and on. GATHER_QA_SWAY_MODE picks the
 # run baked into the build: measure (default; frame rates, release export), baseline (no carrots, release) or record
@@ -47,8 +49,9 @@ trade) entry=trade_loop_qa qa_id=tradeqa qa_ver=trade-qa qa_name='Trade QA' qa_d
 level) entry=level_loop_qa qa_id=levelqa qa_ver=level-qa qa_name='Level QA' qa_dir=DynamicFarmLevelQa ;;
 board) entry=board_loop_qa qa_id=boardqa qa_ver=board-qa qa_name='Board QA' qa_dir=DynamicFarmBoardQa ;;
 aid) entry=aid_loop_qa qa_id=aidqa qa_ver=aid-qa qa_name='Aid QA' qa_dir=DynamicFarmAidQa ;;
+pen) entry=pen_loop_qa qa_id=penqa qa_ver=pen-qa qa_name='Pen QA' qa_dir=DynamicFarmPenQa ;;
 sway) entry=crop_sway_qa qa_id=swayqa qa_ver=sway-qa qa_name='Sway QA' qa_dir=DynamicFarmSwayQa ;;
-*) fail 'GATHER_QA_ENTRY must be parcel, trade, level, board, aid or sway' ;;
+*) fail 'GATHER_QA_ENTRY must be parcel, trade, level, board, aid, pen or sway' ;;
 esac
 sway_mode=${GATHER_QA_SWAY_MODE:-measure}
 case $sway_mode in measure | baseline | record) ;; *) fail 'GATHER_QA_SWAY_MODE must be measure, baseline or record' ;; esac
