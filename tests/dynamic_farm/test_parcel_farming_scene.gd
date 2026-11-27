@@ -544,11 +544,17 @@ func _energy_short_and_rest() -> void:
 	_check(seen.moved > 0.0 or _beside([door]), "the player stands at the door")
 	_check(await _key(farming, door) == ["Rest", "Rested today", UiSceneAction.State.UNAVAILABLE], "once a player day")
 	_check(await _key(farming, cell) == ["Till", "2 Energy", UiSceneAction.State.DEFAULT], "with Energy again the key works")
+	var bar_rest: float = farming._bar.position.y
 	chip.pressed.emit()
 	await process_frame
 	var panel := farming._ui.find_child("EnergyPanel", true, false) as UiEnergyCard
 	_check(farming.energy_modal == "panel" and panel != null, "a tap on the chip opens P0's Energy panel")
+	await create_timer(0.4).timeout
+	_check(not farming._bar.visible, "C-186 G-02 / M-16: the quick bar slides away under the panel")
 	_check(scene.close_modal() and farming.energy_modal == "", "Back closes it")
+	await create_timer(0.5).timeout
+	_check(farming._bar.visible and is_equal_approx(farming._bar.position.y, bar_rest),
+		"the quick bar comes back to its place (%s, was %s)" % [farming._bar.position.y, bar_rest])
 	scene.queue_free()
 	await process_frame
 

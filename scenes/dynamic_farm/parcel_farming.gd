@@ -772,7 +772,8 @@ func close_energy() -> bool:
 	content.propagate_call(&"set_mouse_filter", [Control.MOUSE_FILTER_IGNORE])
 	if layer.is_inside_tree() and content != veil: UiMotion.panel_out(content, veil, layer.queue_free)
 	else: layer.queue_free()
-	if not farm.is_empty() and not held and _bag == null and phone == null and not _bar.visible:
+	if not farm.is_empty() and not held and _bag == null and phone == null:
+		_place_bar()   # back at its rest (M-16 left it 24 lower), as close_bag does
 		var rest := _bar.position.y
 		_bar.position.y = rest + UiMotion.BAR_HIDE_Y
 		UiMotion.bar_shown(_bar, true, rest)

@@ -362,13 +362,19 @@ class Glow extends Control:
 		rotation += TAU * delta / UiKit.secs(UiTokens.MOTION_DURATION_UPGRADE_GLOW_MS)
 		pivot_offset = size * 0.5
 
+	## Soft rays round the card's middle, fading out by `RADIUS` × the shorter side (C-185 fig-06: a glow behind the
+	## card, not beams across the screen).
+	const RADIUS := 0.62
+
 	func _draw() -> void:
 		var c := size * 0.5
-		var r := size.length() * 0.5
+		var r := minf(size.x, size.y) * RADIUS
+		var clear := Color(color, 0.0)
 		for i in RAYS:
 			var a := TAU * i / RAYS
-			var w := TAU / RAYS * 0.28
-			draw_colored_polygon(PackedVector2Array([c, c + Vector2.from_angle(a - w) * r, c + Vector2.from_angle(a + w) * r]), color)
+			var w := TAU / RAYS * 0.22
+			draw_polygon(PackedVector2Array([c, c + Vector2.from_angle(a - w) * r, c + Vector2.from_angle(a + w) * r]),
+				PackedColorArray([color, clear, clear]))
 
 func set_rewards(v: Array) -> void:
 	rewards = v
