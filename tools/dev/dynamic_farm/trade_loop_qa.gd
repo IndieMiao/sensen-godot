@@ -13,6 +13,9 @@ const ROOM := "res://scenes/dynamic_farm/parcel_outpost.tscn"
 const PARCEL_SETTING := "sensen/dynamic_farm/qa_parcel"
 ## C-211: the design's 减少动效 switch for a QA recording (gather_qa_apk.sh GATHER_QA_REDUCED_MOTION=1); no player setting.
 const REDUCED_SETTING := "sensen/dev/reduced_motion"
+## C-211: slow motion for an emulator recording (GATHER_QA_TIME_SCALE=0.2): the software-rendered emulator draws a few
+## frames a second, too few for a 160 ms fade; everything (tweens, timers, walking) runs at this rate.
+const TIME_SCALE_SETTING := "sensen/dev/time_scale"
 const START_BAG := {"hoe_starter": 1, "crop_carrot": 2}
 
 var farm := {}
@@ -20,6 +23,7 @@ var _status: Label
 
 func _ready() -> void:
 	UiMotion.reduced = bool(ProjectSettings.get_setting(REDUCED_SETTING, false))
+	Engine.time_scale = float(ProjectSettings.get_setting(TIME_SCALE_SETTING, 1.0))
 	theme = UiKit.theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var bg := ColorRect.new()
