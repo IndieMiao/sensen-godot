@@ -15,7 +15,8 @@ extends Control
 ## its own size (`Light` / `Torch`; q(122), 不知火舞 on #264, the frames of row 67). A count `×N` stays with the word
 ## before it (`Harvest ×5` is one line); a verb that cannot break and is too wide steps its font down as any copy.
 ## Both lines keep the full copy: text wider than the 80 px box steps its font size down (to _MIN_FONT) instead of
-## being clipped or ellipsised ("Need 2 Energy", "Ready in 3h 59m").
+## being clipped or ellipsised ("Need 2 Energy", "Ready in 3h 59m"). Copy too wide even at _MIN_FONT is clipped:
+## callers check `cost_fits` and pass their shorter form.
 
 signal pressed_down
 signal released
@@ -73,6 +74,13 @@ func set_state(v: State) -> void:
 func set_hold_progress(v: float) -> void: hold_progress = clampf(v, 0.0, 1.0); queue_redraw()
 
 func is_held() -> bool: return _held
+
+## Whether `text` shows whole as the second line, at the smallest step _fit takes (wider is clipped). A caller with a
+## shorter form puts that on the key where this is false and keeps the whole sentence for the tap's toast (`Need 2
+## more Carrot` → `Need 2 more`, as P0's keys do, p0_locals.gd KEY_W).
+static func cost_fits(text: String) -> bool:
+	var font := UiKit.theme().get_font(&"font", UiTokens.STYLE_CAPTION_B12)
+	return font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, _MIN_FONT).x <= UiTokens.SIZE_SCENE_ACTION - _TEXT_INSET * 2.0
 
 ## What is drawn: a finger on a DEFAULT key shows PRESSED.
 func drawn_state() -> State:

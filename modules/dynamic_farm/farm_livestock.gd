@@ -304,7 +304,8 @@ static func _flat(color: Color) -> StandardMaterial3D:
 	return m
 
 ## An animal's model under a pivot whose −Z is where it faces (the art's `facing` says which way the model looks),
-## scaled from cells to metres; {node, player, clips}.
+## scaled from cells to metres; {node, player, clips}. Without the model: the art's `placeholder` (C-181, the cow) or a
+## small round body.
 static func animal(kind: String, cell_m: float) -> Dictionary:
 	var a := animal_art(kind)
 	var pivot := Node3D.new()
@@ -318,6 +319,8 @@ static func animal(kind: String, cell_m: float) -> Dictionary:
 		pivot.add_child(body)
 		var found := body.find_children("*", "AnimationPlayer", true, false)
 		if not found.is_empty(): player = found[0]
+	elif a.get("placeholder") is Dictionary:
+		pivot.add_child(_animal_placeholder(a.placeholder, cell_m))
 	else:
 		var blob := MeshInstance3D.new()
 		var sphere := SphereMesh.new()
@@ -329,7 +332,39 @@ static func animal(kind: String, cell_m: float) -> Dictionary:
 		pivot.add_child(blob)
 	return {"node": pivot, "player": player, "clips": a.get("clips", {}), "radius": float(a.get("radius", 0.2))}
 
-## A drop's model on the ground (cells to metres, times `drop_scale`), or a small egg-shaped placeholder. The size is
+## C-181: a four-legged stand-in from the art's `placeholder` (`size` [width, height, length] in cells, `color`, `patch`):
+## a body on four legs, the head toward −Z (where the pivot faces), a patch on the back. No clips; it slides.
+static func _animal_placeholder(raw: Dictionary, cell_m: float) -> Node3D:
+	var size := Vector3(0.5, 0.5, 1.0)
+	if raw.get("size") is Array and raw.size.size() == 3 and (raw.size as Array).all(func(v): return (v is int or v is float) and float(v) > 0.0):
+		size = Vector3(float(raw.size[0]), float(raw.size[1]), float(raw.size[2]))
+	size *= cell_m
+	var body_color := Color.from_string(str(raw.get("color", "#f4f1ea")), Color(0.95, 0.94, 0.9))
+	var patch_color := Color.from_string(str(raw.get("patch", "#3b3332")), Color(0.23, 0.2, 0.2))
+	var root := Node3D.new()
+	root.name = "Placeholder"
+	var leg_h := size.y * 0.45
+	var box := func(name_: String, extent: Vector3, at: Vector3, color: Color) -> void:
+		var node := MeshInstance3D.new()
+		node.name = name_
+		var mesh := BoxMesh.new()
+		mesh.size = extent
+		node.mesh = mesh
+		node.position = at
+		node.material_override = _flat(color)
+		root.add_child(node)
+	box.call("Body", Vector3(size.x, size.y - leg_h, size.z * 0.75), Vector3(0, leg_h + (size.y - leg_h) * 0.5, size.z * 0.1), body_color)
+	box.call("Patch", Vector3(size.x * 1.02, (size.y - leg_h) * 0.5, size.z * 0.3), Vector3(0, size.y * 0.8, size.z * 0.2), patch_color)
+	box.call("Head", Vector3(size.x * 0.7, size.y * 0.4, size.z * 0.25), Vector3(0, size.y * 0.85, -size.z * 0.38), body_color)
+	box.call("Muzzle", Vector3(size.x * 0.5, size.y * 0.16, size.z * 0.06), Vector3(0, size.y * 0.76, -size.z * 0.52), Color(0.93, 0.7, 0.7))
+	for i in 4:
+		var x := size.x * (0.3 if i % 2 else -0.3)
+		var z := size.z * (-0.2 if i < 2 else 0.38)
+		box.call("Leg%d" % i, Vector3(size.x * 0.2, leg_h, size.x * 0.2), Vector3(x, leg_h * 0.5, z), patch_color if i == 0 else body_color)
+	return root
+
+## A drop's model on the ground (cells to metres, times `drop_scale`), or a small egg-shaped placeholder (C-181: or the
+## art's placeholder `shape`, a bottle for the milk). The size is
 ## on the model under the holder, so the holder's own scale stays 1 for the lay and pickup animations.
 static func drop_model(item: String, cell_m: float) -> Node3D:
 	var path := str(drop_art(item).get("model", ""))
@@ -343,6 +378,10 @@ static func drop_model(item: String, cell_m: float) -> Node3D:
 		return holder
 	var holder := Node3D.new()
 	holder.name = "Drop_" + item
+	var look = drop_art(item).get("placeholder")
+	if look is Dictionary and str(look.get("shape", "")) == "bottle":
+		holder.add_child(_bottle(look, cell_m * size))
+		return holder
 	var blob := MeshInstance3D.new()
 	var sphere := SphereMesh.new()
 	sphere.radius = 0.055 * cell_m
@@ -353,6 +392,26 @@ static func drop_model(item: String, cell_m: float) -> Node3D:
 	blob.material_override = _flat(Color(0.98, 0.94, 0.84))
 	holder.add_child(blob)
 	return holder
+
+## C-181: a small bottle (the milk's stand-in, the art's `placeholder` shape `bottle`): a body, a neck and a cap, `unit`
+## metres a cell (times the drop's scale).
+static func _bottle(look: Dictionary, unit: float) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Placeholder"
+	var glass := _flat(Color.from_string(str(look.get("color", "#fbfaf4")), Color(0.98, 0.98, 0.95)))
+	var cap := _flat(Color.from_string(str(look.get("cap", "#4f86c6")), Color(0.31, 0.53, 0.78)))
+	for part: Array in [["Body", 0.09, 0.09, 0.2, 0.1, glass], ["Neck", 0.045, 0.08, 0.06, 0.23, glass], ["Cap", 0.05, 0.05, 0.035, 0.278, cap]]:
+		var node := MeshInstance3D.new()
+		node.name = part[0]
+		var mesh := CylinderMesh.new()
+		mesh.top_radius = float(part[1]) * unit
+		mesh.bottom_radius = float(part[2]) * unit
+		mesh.height = float(part[3]) * unit
+		node.mesh = mesh
+		node.position.y = float(part[4]) * unit
+		node.material_override = part[5]
+		root.add_child(node)
+	return root
 
 ## Every mesh under `node` drawn see-through (placement's preview), by the instances' own transparency.
 static func see_through(node: Node, amount := 0.4) -> void:

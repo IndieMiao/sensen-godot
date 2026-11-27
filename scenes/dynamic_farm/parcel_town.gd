@@ -11,6 +11,10 @@ extends Control
 ##   question 5); it only goes into the bag, building comes later (0.4.4).
 ## - Since C-152 Scott also upgrades the farm: his greeting's `Upgrade Farm` opens the upgrade sheet (parcel_upgrade.gd,
 ##   P0's HOME-1 in the kit), whose Upgrade sends `upgrade_farm` (coins, Timber and Stone; more Max Energy and wells).
+## - Since C-181 Scott sells the blueprints the rules price in coins (`economy.blueprints.<id>.coins`, the barn's 600):
+##   one key each, `Buy Barn Blueprint · 600 coins`, until it is bought; below the blueprint's farm level (`min_level`,
+##   the barn's 2, C-192) it reads `Farm Lv2 needed`, short of coins P0's `Need N more coins` (LOCK-10), and a tap says
+##   so. It sends `claim_blueprint`, which takes the coins on the server.
 ## - Since C-191 the room's Request Board opens here too (who = BOARD): no keeper and no greeting, the board drawer
 ##   (parcel_board.gd) straight away; its keys send `accept_request` / `deliver_request` / `drop_request`, and closing
 ##   it leaves.
@@ -232,9 +236,23 @@ func _greet_carpenter() -> void:
 		take.activated.connect(claim_blueprint)
 		card.content.add_child(take)
 		keys.take = take
+	# C-181: the blueprints he sells for coins (the barn's), each until bought: the primary key when it can be bought and
+	# nothing comes before it, else secondary (a short one reads its gap and leaves Upgrade Farm the primary key).
+	for id: String in priced_blueprints():
+		var gap := buy_gap(id)
+		var lead := keys.is_empty() and gap.is_empty()
+		var buy_key := UiCommandButton.new(buy_label(id), UiCommandButton.Kind.PRIMARY if lead else UiCommandButton.Kind.SECONDARY)
+		buy_key.name = "Buy_" + id
+		buy_key.sends = true
+		buy_key.reason = gap
+		buy_key.activated.connect(claim_blueprint.bind(id))
+		buy_key.unavailable_pressed.connect(func(reason: String): toast.show_toast(reason, ToastLayer.Severity.INFO))
+		card.content.add_child(buy_key)
+		keys["buy_" + id] = buy_key
 	# C-152: the farm's upgrade, at Scott's whatever his blueprint line says (none in rules without farm levels).
 	if ParcelFarm.rules().get("farm_levels", []).is_empty(): return
-	var up := UiCommandButton.new(LINES.upgrade_key, UiCommandButton.Kind.SECONDARY if keys.has("take") else UiCommandButton.Kind.PRIMARY)
+	var primary := keys.values().any(func(k: UiCommandButton): return k.kind == UiCommandButton.Kind.PRIMARY)
+	var up := UiCommandButton.new(LINES.upgrade_key, UiCommandButton.Kind.SECONDARY if primary else UiCommandButton.Kind.PRIMARY)
 	up.name = "UpgradeFarm"
 	up.activated.connect(open_upgrade)
 	card.content.add_child(up)
@@ -298,6 +316,29 @@ func buy(item: String, count: int) -> Dictionary:
 		toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(item), count], ToastLayer.Severity.SUCCESS)
 	return result
 
+## C-181: the economy's blueprints with a price in coins this farm has not bought yet, in the rules' order.
+func priced_blueprints() -> Array:
+	var out := []
+	var all: Dictionary = ParcelFarm.rules().get("economy", {}).get("blueprints", {})
+	for id: String in all:
+		if int(all[id].get("coins", 0)) > 0 and not farm.get("blueprints_claimed", {}).has(id): out.append(id)
+	return out
+
+## Why a priced blueprint cannot be bought now, the key's second line and its tap's toast; "" when it can. The farm level
+## comes first (C-192, SEN-Q-282: the barn's from level 2), in P0's `Home Lv2 needed` form: `Farm Lv2 needed`; then the
+## coins, P0's `Need N more coins` (LOCK-10).
+func buy_gap(id: String) -> String:
+	var rule: Dictionary = ParcelFarm.rules().economy.blueprints[id]
+	var level := int(rule.get("min_level", 1))
+	if ParcelFarm.farm_level(farm) < level: return "Farm Lv%d needed" % level
+	var short := int(rule.coins) - int(farm.get("coins", 0))
+	return "Need %d more coins" % short if short > 0 else ""
+
+## A priced blueprint's key: `Buy Barn Blueprint · 600 coins`.
+static func buy_label(id: String) -> String:
+	var rule: Dictionary = ParcelFarm.rules().economy.blueprints[id]
+	return "Buy %s · %d coins" % [ParcelItems.name_of(str(rule.item)), int(rule.coins)]
+
 ## C-197: Jasmine's seed aid, asked once as her greeting opens when the save qualifies. Given: her line says so and a toast
 ## names what came in. Refused (another device took it, or the save changed): nothing is said; the greeting stays.
 func claim_seed_aid() -> Dictionary:
@@ -315,10 +356,11 @@ func claim_seed_aid() -> Dictionary:
 	if card != null and is_instance_valid(card): _greet()
 	return result
 
-func claim_blueprint() -> Dictionary:
+## Takes Scott's free blueprint (the coop's), or buys a priced one (C-181, the barn's: the server takes the coins).
+func claim_blueprint(id := BLUEPRINT) -> Dictionary:
 	if busy: return {}
-	var rule: Dictionary = ParcelFarm.rules().economy.blueprints[BLUEPRINT]
-	var result := await _send({"type": "claim_blueprint", "blueprint": BLUEPRINT})
+	var rule: Dictionary = ParcelFarm.rules().economy.blueprints[id]
+	var result := await _send({"type": "claim_blueprint", "blueprint": id})
 	if result.get("ok", false):
 		toast.show_toast("Received %s ×%d" % [ParcelItems.name_of(str(rule.item)), int(rule.amount)], ToastLayer.Severity.SUCCESS)
 	_greet()

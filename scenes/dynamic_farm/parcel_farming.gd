@@ -22,7 +22,8 @@ extends Node3D
 ## the hen lays an egg on the ground `produce_seconds` later. Walking within reach of a laid egg picks it up by
 ## itself: it flies into the player and on into the Bag (`+1 Egg`), the server checking each egg is taken once.
 ## The coop's own floor is walked, never farmed: its cells show no key of their own; since C-175 a tap on it offers the
-## nearest feeder's Feed, and the press walks there first.
+## nearest feeder's Feed, and the press walks there first. The barn (C-181) works the same way: two carrots a feeding
+## (`Need 2 more Carrot` when short), a cow gives milk on the ground 15 minutes later.
 ## The in-game phone (C-107, design C-85 ⑧): the top bar's task button drops the guide's steps under the bar (C-T1–T3)
 ## and the phone button at the right opens the phone (Tasks / Inbox / Collection, ParcelPhone); both read the save.
 signal state_changed(farm: Dictionary)
@@ -436,7 +437,7 @@ func _refresh_key() -> void:
 		_key.cost = REFUSALS.get(current.refusal, "+%d Energy" % int(current.get("gain", 0)))
 	elif current.verb == "feed":
 		_key.verb = VERBS.feed
-		_key.cost = str(current.refusal_text) if refused else _price()
+		_key.cost = str(current.key_text) if refused else _price()
 	else:
 		_key.verb = VERBS[current.verb]
 		_key.cost = REFUSALS.get(current.refusal, _price())
@@ -462,7 +463,9 @@ func _on_key() -> void:
 		open_energy_card(key_cost, VERBS.get(current.verb, ""))
 		return
 	if not str(current.refusal).is_empty():
-		var refusal := "Not ripe yet" if current.refusal == Space.NOT_RIPE else "Not ready yet" if current.refusal == REGROWING else _key.cost
+		# The whole sentence where the key shows a shorter one (the feeder's `Need 2 more Carrot`, C-192).
+		var refusal := "Not ripe yet" if current.refusal == Space.NOT_RIPE else "Not ready yet" if current.refusal == REGROWING \
+			else str(current.get("refusal_text", _key.cost))
 		_toast.show_toast(refusal, ToastLayer.Severity.REFUSED)
 		return
 	if current.verb == "gather": await gather(current)
@@ -477,21 +480,53 @@ func gather(action: Dictionary) -> Dictionary:
 	return await send(action.command, LABOUR_S)
 
 ## The key at a livestock building's feeder (C-154): Feed, or why not (`Need 1 Carrot`, the art's `Hens are fed` /
-## `Pick up eggs first`); {verb, refusal, refusal_text, command, feeder}.
+## `Pick up eggs first`); {verb, refusal, refusal_text, key_text, command, feeder}. `refusal_text` is the whole
+## sentence (the tap's toast); `key_text` is what the key's second line shows: the same where it fits, else its shorter
+## form (C-192, P0's keys: `Need 2 more Carrot` → `Need 2 more`; the art's `full_short` / `fed_short`).
 func _feed_action(near: Dictionary) -> Dictionary:
 	var b: Dictionary = near.building
 	var refusal := ParcelFarm.feed_refusal(rules, farm, b, server_now())
 	var rule := ParcelFarm.livestock_of(rules, b)
 	var copy: Dictionary = LivestockArt.building_art(str(b.type)).get("copy", {})
 	var text := ""
+	var short := ""
 	match refusal:
-		"NO_FEED": text = "Need 1 %s" % str(_names.get(str(rule.get("feed", "")), ParcelItems.name_of(str(rule.get("feed", "")))))
-		"ANIMALS_FED": text = str(copy.get("fed", "Hens are fed"))
-		"GROUND_FULL": text = str(copy.get("full", "Pick up eggs first"))
+		"NO_FEED":
+			var have := int(farm.get("bag", {}).get(str(rule.get("feed", "")), 0))
+			text = feed_gap(rule, have)
+			short = feed_gap(rule, have, true)
+		"ANIMALS_FED":
+			text = str(copy.get("fed", "Hens are fed"))
+			short = str(copy.get("fed_short", ""))
+		"GROUND_FULL":
+			# C-192: with as many on the ground as animals (the barn's 2, SEN-Q-282) the ground fills before every animal
+			# is waiting, so while none of them is given yet there is nothing to pick up: the key says they are fed.
+			var now := server_now()
+			if ParcelFarm.drops_in(farm, int(b.id)).any(func(d: Dictionary): return int(d.ready_at) <= now):
+				text = str(copy.get("full", "Pick up eggs first"))
+				short = str(copy.get("full_short", ""))
+			else:
+				text = str(copy.get("fed", "Hens are fed"))
+				short = str(copy.get("fed_short", ""))
 		"NOT_LIVESTOCK": text = "That didn't work."
-	return {"verb": "feed", "refusal": refusal, "refusal_text": text, "feed_item": str(rule.get("feed", "")),
+	return {"verb": "feed", "refusal": refusal, "refusal_text": text, "key_text": key_copy(text, short),
+		"feed_item": str(rule.get("feed", "")),
 		"command": {"type": "feed", "building": int(b.id)} if refusal.is_empty() else {}, "feeder": near.point,
 		"approach": bool(near.get("approach", false))}
+
+## The main key's second line for `text`: itself when it shows whole on the key, else `short` (when there is one).
+static func key_copy(text: String, short: String) -> String:
+	return text if short.is_empty() or UiSceneAction.cost_fits(text) else short
+
+## The key's reason when the bag has `have` of the feed and a feeding takes the rule's `feed_amount` (C-181): `Need 1
+## Carrot` with none for one (the coop, as before), else P0's `Need N more <item>` (the barn: `Need 2 more Carrot`).
+## `short`: without the item (`Need 2 more`), what the key shows where the whole one does not fit (C-192).
+func feed_gap(rule: Dictionary, have: int, short := false) -> String:
+	var feed := str(rule.get("feed", ""))
+	var name_ := str(_names.get(feed, ParcelItems.name_of(feed)))
+	var need := int(rule.get("feed_amount", 1))
+	if need == 1 and have <= 0: return "Need 1" if short else "Need 1 %s" % name_
+	return "Need %d more" % (need - have) if short else "Need %d more %s" % [need - have, name_]
 
 ## One feed press (C-154): the feeder is already in reach, so the player faces it and plays the labour clip while
 ## the command goes out; the fed hen then comes to peck (ParcelLivestock). C-175: offered for a tapped coop floor cell,
@@ -891,6 +926,14 @@ func _show_selected() -> void:
 ## An item's icon: the parcel's adapter (ParcelItems, C-59: blueprints show the recipe card), else the main farm's.
 func item_icon(id: String) -> Texture2D:
 	return ParcelItems.icon_of(id)
+
+## An item's name as the bag shows it (C-181: the Build key's `Need N more Timber`).
+func item_name(id: String) -> String:
+	return str(_names.get(id, ParcelItems.name_of(id)))
+
+## A short notice over the scene (C-181: a tap on the Build key while materials are short says why).
+func show_notice(text: String) -> void:
+	if _toast != null: _toast.show_toast(text, ToastLayer.Severity.INFO)
 
 ## A gain (the welcome gift, a harvest; C-33's blueprints and C-59 / C-60 later): one float line per item rising from
 ## `from` (screen point of what gave it) and the item flying into the quick bar's Bag, which bumps as it lands.
