@@ -19,6 +19,10 @@
 # stand-in, its save starting with 3 carrots, 2 eggs and a carrot and an egg request on the Request Board.
 # GATHER_QA_ENTRY=aid (C-197): tools/dev/dynamic_farm/aid_loop_qa.tscn, package com.sensen.dynamicfarm.aidqa: the same
 # stand-in, its save starting broke (the hoe and 3 eggs) for Jasmine's seed aid, with a carrot and an egg request.
+# GATHER_QA_ENTRY=sway (C-141): tools/dev/dynamic_farm/crop_sway_qa.tscn, package com.sensen.dynamicfarm.swayqa: the core
+# planted full of carrots, the player walked round it with crop sway switched off and on. GATHER_QA_SWAY_MODE picks the
+# run baked into the build: measure (default; frame rates, release export), baseline (no carrots, release) or record
+# (frames for the review video, debug export so run-as can pull them).
 # On macOS the copied editor is re-signed ad hoc (the copy's signature is otherwise invalid and
 # the system kills it) and templates default to ~/Library/Application Support/Godot.
 # Staging is a disposable copy under $TMPDIR (committed sources at HEAD); nothing in the
@@ -41,8 +45,14 @@ trade) entry=trade_loop_qa qa_id=tradeqa qa_ver=trade-qa qa_name='Trade QA' qa_d
 level) entry=level_loop_qa qa_id=levelqa qa_ver=level-qa qa_name='Level QA' qa_dir=DynamicFarmLevelQa ;;
 board) entry=board_loop_qa qa_id=boardqa qa_ver=board-qa qa_name='Board QA' qa_dir=DynamicFarmBoardQa ;;
 aid) entry=aid_loop_qa qa_id=aidqa qa_ver=aid-qa qa_name='Aid QA' qa_dir=DynamicFarmAidQa ;;
-*) fail 'GATHER_QA_ENTRY must be parcel, trade, level, board or aid' ;;
+sway) entry=crop_sway_qa qa_id=swayqa qa_ver=sway-qa qa_name='Sway QA' qa_dir=DynamicFarmSwayQa ;;
+*) fail 'GATHER_QA_ENTRY must be parcel, trade, level, board, aid or sway' ;;
 esac
+sway_mode=${GATHER_QA_SWAY_MODE:-measure}
+case $sway_mode in measure | baseline | record) ;; *) fail 'GATHER_QA_SWAY_MODE must be measure, baseline or record' ;; esac
+# Only the sway's frame-rate runs use the release template; everything else stays a debug export.
+export_mode=--export-debug
+[[ $entry != crop_sway_qa || $sway_mode == record ]] || export_mode=--export-release
 case $abi in
 x86_64) x86_64=true arm64=false ;;
 arm64-v8a) x86_64=false arm64=true ;;
@@ -70,10 +80,10 @@ if [[ -n $cache ]]; then
     cp -a "$cache/.godot" "$p/.godot"
     rm -f "$p/.godot/export_credentials.cfg"
 fi
-python3 -I - "$p/project.godot" "$parcel" "${GATHER_QA_WET_SOIL:-}" "$entry" "$qa_dir" <<'PY'
+python3 -I - "$p/project.godot" "$parcel" "${GATHER_QA_WET_SOIL:-}" "$entry" "$qa_dir" "$sway_mode" <<'PY'
 import re, sys
 from pathlib import Path
-path, parcel, wet, entry, qa_dir = Path(sys.argv[1]), sys.argv[2], sys.argv[3] == '1', sys.argv[4], sys.argv[5]
+path, parcel, wet, entry, qa_dir, sway_mode = Path(sys.argv[1]), sys.argv[2], sys.argv[3] == '1', sys.argv[4], sys.argv[5], sys.argv[6]
 text = path.read_text()
 def one(pattern, repl):
     global text
@@ -83,7 +93,8 @@ one(r'^run/main_scene="[^"]+"$', f'run/main_scene="res://tools/dev/dynamic_farm/
 one(r'^\[application\]$', f'[application]\nconfig/use_custom_user_dir=true\nconfig/custom_user_dir_name="{qa_dir}"')
 one(r'^\[sensen\]$', '[sensen]\nnetwork/online_qa=true\ndynamic_farm/local_farm_save=true\n'
     f'dynamic_farm/qa_parcel="res://tests/dynamic_farm/fixtures/r4/{parcel}.json"'
-    + ('\ndynamic_farm/preview_wet_soil=true' if wet else ''))
+    + ('\ndynamic_farm/preview_wet_soil=true' if wet else '')
+    + (f'\ndynamic_farm/crop_sway_qa_mode="{sway_mode}"' if entry == 'crop_sway_qa' else ''))
 for key in ('network/base_url', 'network/mobile_base_url'):
     one(rf'^{key}="[^"]+"$', f'{key}="http://127.0.0.1:9"')
 path.write_text(text)
@@ -146,10 +157,12 @@ run() {
     env -i "PATH=$java/bin:$PATH" "HOME=$home" "TMPDIR=$work" LANG=en_US.UTF-8 "ANDROID_HOME=$sdk" \
         "JAVA_HOME=$java" "ANDROID_ADB_SERVER_PORT=${ANDROID_ADB_SERVER_PORT:-5137}" \
         GODOT_ANDROID_KEYSTORE_DEBUG_PATH="$work/qa.keystore" GODOT_ANDROID_KEYSTORE_DEBUG_USER=gatherqa \
-        GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android "$editor/Godot" --headless --path "$p" "$@" >>"$work/editor.log" 2>&1
+        GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android GODOT_ANDROID_KEYSTORE_RELEASE_PATH="$work/qa.keystore" \
+        GODOT_ANDROID_KEYSTORE_RELEASE_USER=gatherqa GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=android \
+        "$editor/Godot" --headless --path "$p" "$@" >>"$work/editor.log" 2>&1
 }
 run --import || { tail -20 "$work/editor.log" >&2; fail 'import failed'; }
-run --export-debug "Android QA" "$work/gather-qa.apk" || { tail -30 "$work/editor.log" >&2; fail 'export failed'; }
+run "$export_mode" "Android QA" "$work/gather-qa.apk" || { tail -30 "$work/editor.log" >&2; fail 'export failed'; }
 grep -q 'SCRIPT ERROR' "$work/editor.log" && { grep 'SCRIPT ERROR' -A2 "$work/editor.log" >&2; fail 'script errors'; }
 mkdir "$out"
 mv "$work/gather-qa.apk" "$out/"

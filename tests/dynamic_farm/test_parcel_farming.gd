@@ -2,6 +2,7 @@ extends SceneTree
 ## C-34 rules (Q-39) without a scene: the shared numbers, the command rules mirrored from the
 ## C-31 server, the client-only spatial rules and the local save standing in for the server.
 ## C-138: the carrot's seven stages and the dry / wet soil blocks (ParcelCropArt).
+## C-141: crop sway on the stage layers: the sway material, ripe sway on the mature stage only, shakes kept across redraws.
 ## C-148: Energy, P0's numbers, the same cases as the server (fixtures/energy_cases.json), the key's price and Rest.
 ## C-151: watering, the same cases as the server (fixtures/watering_cases.json), the keys at the well and on dry crops.
 ## C-152: farm levels, the same cases as the server (fixtures/level_cases.json), Scott's upgrade sheet and the Build key.
@@ -35,6 +36,7 @@ func _run() -> void:
 	_guide()
 	_crop_stages()
 	_crop_art()
+	_crop_sway()
 	_energy()
 	_energy_cases()
 	_energy_space()
@@ -492,6 +494,54 @@ func _crop_art() -> void:
 	_check(CropArt.SOIL_COLORS.wet.get_luminance() < CropArt.SOIL_COLORS.dry.get_luminance(), "art: wet soil is darker")
 	art.sync({}, {}, T0)
 	_check(art.counts() == {"soil": {"dry": 0, "wet": 0}, "stages": [0, 0, 0, 0, 0, 0, 0]}, "art: nothing tilled, nothing drawn")
+	art.free()
+
+## C-141 (the C-140 design, SEN-Q-321): every plant stage draws with the sway shader on the stage's painted atlas,
+## the bend spans the stage mesh's own height, only the mature stage sways; soil keeps its imported look. A shake
+## sticks to its plant through redraws (also into its next stage) for 1.2 s; off clears it.
+func _crop_sway() -> void:
+	var art := CropArt.new(func(cell: Vector2i) -> Vector3: return Vector3(cell.x, 0, -cell.y), 0.8)
+	var layers: Array = art._stages
+	var shaded := true
+	for stage in range(1, layers.size()):
+		var layer: MultiMeshInstance3D = layers[stage]
+		var mat := layer.material_override as ShaderMaterial
+		var painted := layer.multimesh.mesh.surface_get_material(0) as StandardMaterial3D
+		var box := layer.multimesh.mesh.get_aabb()
+		shaded = shaded and mat != null and mat.shader == CropArt.SWAY_SHADER and layer.multimesh.use_custom_data \
+			and mat.get_shader_parameter(&"albedo_tex") == painted.albedo_texture and painted.albedo_texture != null \
+			and is_equal_approx(mat.get_shader_parameter(&"roughness"), painted.roughness) \
+			and is_equal_approx(mat.get_shader_parameter(&"plant_base"), box.position.y) and is_equal_approx(mat.get_shader_parameter(&"plant_top"), box.end.y) \
+			and art.ripe_layer(stage) == (stage == CropArt.MATURE) and bool(mat.get_shader_parameter(&"sway_enabled"))
+	_check(shaded, "sway: six plant layers on the sway shader with their atlas, mesh height and ripe flag (mature only)")
+	var soil_plain := true
+	for layer: MultiMeshInstance3D in [art._soil[CropArt.DRY], art._soil[CropArt.WET], art._contact]:
+		soil_plain = soil_plain and not layer.material_override is ShaderMaterial and not layer.multimesh.use_custom_data
+	_check(soil_plain, "sway: soil blocks and collars keep their materials")
+	var ripe := {"crop": "crop_carrot", "planted_at": T0 - 60000, "ripe_at": T0}
+	var young := {"crop": "crop_carrot", "planted_at": T0, "ripe_at": T0 + 60000}
+	var soil := {"1,1": CropArt.WET, "2,1": CropArt.WET, "3,1": CropArt.DRY}
+	art.sync(soil, {"1,1": ripe, "2,1": young}, T0 + 13000)
+	art.set_clock(5.0)
+	_check(is_equal_approx(layers[1].material_override.get_shader_parameter(&"crop_clock"), 5.0)
+		and is_equal_approx(layers[CropArt.MATURE].material_override.get_shader_parameter(&"crop_clock"), 5.0), "sway: the clock reaches every stage's material")
+	art.shake(Vector2i(1, 1), Vector2(0.6, 0.8))
+	art.shake(Vector2i(3, 1), Vector2(1, 0))
+	art.shake(Vector2i(9, 9), Vector2(1, 0))
+	_check(art.shake_of(Vector2i(1, 1)) == {"push": Vector2(0.6, 0.8), "at": 5.0}, "sway: a drawn plant takes the shake at the current clock")
+	_check(art.shake_of(Vector2i(3, 1)).is_empty() and art.shake_of(Vector2i(9, 9)).is_empty(), "sway: bare soil and empty ground take none")
+	art.set_clock(6.1)
+	art.sync(soil, {"1,1": ripe, "2,1": young}, T0 + 25000)
+	_check(not art.shake_of(Vector2i(1, 1)).is_empty() and art.counts().stages == [1, 0, 0, 1, 0, 0, 1], "sway: a redraw keeps a live shake, the young carrot one stage on")
+	art.shake(Vector2i(2, 1), Vector2(0, 0.67))
+	art.set_clock(7.2)
+	art.sync(soil, {"1,1": ripe, "2,1": young}, T0 + 37000)
+	_check(art.shake_of(Vector2i(1, 1)).is_empty() and art.shake_of(Vector2i(2, 1)).at == 6.1, "sway: 1.2 s after its trigger a shake is dropped, a later one stays into the next stage")
+	art.set_sway(false)
+	_check(art.shake_of(Vector2i(2, 1)).is_empty() and not bool(layers[CropArt.MATURE].material_override.get_shader_parameter(&"sway_enabled")),
+		"sway: off stops every plant and clears the shakes")
+	art.set_sway(true)
+	_check(bool(layers[1].material_override.get_shader_parameter(&"sway_enabled")), "sway: on again")
 	art.free()
 
 ## C-148: P0's numbers (assets/p0/p0_content.json) and the client's settlement.

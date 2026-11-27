@@ -58,6 +58,18 @@ const PHONE_BUTTON_GAP := UiTokens.SPACE_S4
 const DROP_DOWN_GAP := 10.0
 ## Development only: draw every tilled cell as wet soil (C-138 captures). The game draws a watered crop's cell wet (C-151).
 const WET_SOIL_SETTING := "sensen/dynamic_farm/preview_wet_soil"
+## C-141 crop sway (C-140's owner-confirmed design, attachment-1069 §3, SEN-Q-321): a walking player shakes the
+## carrots they brush past; ripe carrots sway (ParcelCropArt). On unless this setting turns it off.
+const SWAY_SETTING := "sensen/dynamic_farm/crop_sway"
+## Player centre to plant centre on the ground (m): body radius 0.3 + crown radius about 0.25.
+const SWAY_TRIGGER_M := 0.55
+## Slower than this (m/s) brushes nothing: turning on the spot, pushing against a wall.
+const SWAY_MIN_SPEED := 0.5
+## One plant shakes again only after this long (s).
+const SWAY_COOLDOWN_S := 0.6
+## Shake amplitude by carrot stage 0..6 (tilled .. maturity). The design's four growth steps 0.45 / 0.65 / 0.85 / 1.0
+## spread over C-139's six plant stages: seedlings move less, the mature plant the full 13.5°.
+const SWAY_STAGE_AMP := [0.0, 0.45, 0.56, 0.67, 0.78, 0.89, 1.0]
 ## The tools first (C-151: the pail beside the hoe), then seeds and crops.
 const BAG_ORDER := ["hoe_starter", "pail", "seed_carrot", "crop_carrot"]
 ## Parcel items the main farm's content table does not name (C-74#33, copy per C-45). The icon is a placeholder from
@@ -172,6 +184,14 @@ var _outer_root: Node3D
 var _player := Vector3.ZERO
 var _facing := Vector3.ZERO
 var _placed := false
+## Crop sway (C-141): on or off, its clock, the player's last position, the plants within reach last frame and
+## when each plant last shook; `sway_triggers` counts the plants shaken since the last switch (QA).
+var sway := true
+var _sway_clock := 0.0
+var _sway_from = null
+var _sway_inside := {}
+var _sway_last := {}
+var sway_triggers := 0
 ## Layout indices drawn as gathered: index -> true.
 var _spent := {}
 var _spent_material: ShaderMaterial
@@ -247,6 +267,8 @@ func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: Ref
 	_crop_art = CropArt.new(walk.point, data.cell_m)
 	_crop_art.name = "ParcelCrops"
 	add_child(_crop_art)
+	sway = bool(ProjectSettings.get_setting(SWAY_SETTING, true))
+	_crop_art.set_sway(sway)
 	livestock = Livestock.new()
 	livestock.setup(walk)
 	add_child(livestock)
@@ -309,6 +331,7 @@ func update(delta: float, facing_cell: Vector2i, steering: bool, player = null, 
 	if _placed:
 		_player = player
 		_facing = facing
+	if sway: _update_sway(delta)
 	# C-154: animals move; a laid drop in reach is picked up by itself (not while another command is out or a mode holds).
 	if livestock != null and not farm.is_empty():
 		var reached: Array = livestock.update(delta, _player, server_now(), busy or held or not _placed or not _picking.is_empty())
@@ -849,6 +872,49 @@ func _draw_gathered() -> void:
 		_outer_root.add_child(child)
 	art.root.free()
 	picked_art.root.free()
+
+## Crop sway on or off (C-141; QA compares the two). Off draws the carrots still, as before.
+func set_sway(on: bool) -> void:
+	sway = on
+	_sway_from = null
+	_sway_inside.clear()
+	_sway_last.clear()
+	sway_triggers = 0
+	_crop_art.set_sway(on)
+
+## Design §3.1: a plant shakes when the walking player comes within SWAY_TRIGGER_M of it, once per entry and not
+## again within SWAY_COOLDOWN_S, away from the player plus half the walking direction. Only the 3×3 cells round the
+## player are looked at. Tapped routes and the stick both move the player, so both shake by the same rule.
+func _update_sway(delta: float) -> void:
+	_sway_clock += delta
+	_crop_art.set_clock(_sway_clock)
+	if not _placed or farm.is_empty():
+		_sway_from = null
+		return
+	var move := Vector2.ZERO
+	if _sway_from is Vector3: move = Vector2(_player.x - _sway_from.x, _player.z - _sway_from.z)
+	_sway_from = _player
+	var walking := delta > 0.0 and move.length() / delta > SWAY_MIN_SPEED
+	var here: Vector2i = _walk.cell_at(_player)
+	var inside := {}
+	var now := server_now()
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			var cell := here + Vector2i(dx, dy)
+			var crop = farm.crops.get(ParcelFarm.key(cell))
+			if not crop is Dictionary or crop.get("crop") != CropArt.CARROT: continue
+			var at: Vector3 = _walk.point(cell)
+			var away := Vector2(at.x - _player.x, at.z - _player.z)
+			if away.length() >= SWAY_TRIGGER_M: continue
+			inside[cell] = true
+			if _sway_inside.has(cell) or not walking or _sway_clock - float(_sway_last.get(cell, -100.0)) <= SWAY_COOLDOWN_S:
+				continue
+			var push := away.normalized() if away.length() > 0.05 else move.normalized()
+			push = (push + move.normalized() * 0.5).normalized()
+			_crop_art.shake(cell, push * float(SWAY_STAGE_AMP[CropArt.stage_of(crop, now)]))
+			_sway_last[cell] = _sway_clock
+			sway_triggers += 1
+	_sway_inside = inside
 
 func _draw_crops() -> void:
 	if farm.is_empty(): return

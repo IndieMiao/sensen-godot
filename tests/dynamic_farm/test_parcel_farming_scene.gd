@@ -17,6 +17,8 @@ extends SceneTree
 ## shows whole: `Need 2 more Carrot` too wide for it reads `Need 2 more` (the tap's toast keeps the sentence); with the
 ## ground full (2, SEN-Q-282) it reads `Cows are fed` while neither milk is given yet and `Pick up milk first` once they
 ## lie there; milk laid while the app was closed is picked up on the first walk up to it after a cold start.
+## C-141: crop sway is on; walking into the ripe carrot with the stick shakes it once, away from the player; standing in
+## it shakes nothing more; the shake ends 1.2 s on.
 ## Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
@@ -158,6 +160,23 @@ func _press(farming: Node, cell: Vector2i) -> Dictionary:
 	await process_frame
 	seen.moved = start.distance_to(scene._walk.position)
 	return seen
+
+## C-141: steers the stick toward `goal` (or away from it with `away`) until the player is within `near` of it (beyond
+## it when away) or `frames` pass; the stick is released after.
+func _steer(goal: Vector3, near: float, away := false, frames := 120) -> void:
+	for _i in frames:
+		var to: Vector3 = goal - scene.player_position()
+		to.y = 0
+		if (to.length() > near) if away else (to.length() < near): break
+		var right: Vector3 = scene._camera.global_basis.x
+		right.y = 0
+		var forward: Vector3 = -scene._camera.global_basis.z
+		forward.y = 0
+		var d := -to.normalized() if away else to.normalized()
+		scene._movement = Vector2(d.dot(right.normalized()), -d.dot(forward.normalized())).normalized()
+		await process_frame
+	scene._movement = Vector2.ZERO
+	await process_frame
 
 ## The player stands beside `cells` (not on them) and faces them.
 func _beside(cells: Array) -> bool:
@@ -365,6 +384,21 @@ func _first_visit() -> void:
 	await create_timer(farming.get_script().REDRAW_S * 2).timeout
 	_check(_tip(farming) == "Your carrot is ripe. Press Harvest!", "a ripe carrot brings the harvest card: " + _tip(farming))
 	_check(farming._crop_art.counts().stages == [0, 0, 0, 0, 0, 0, 1], "C-138: the ripe carrot is drawn mature")
+	# C-141: walk off, then into the ripe carrot.
+	var plant: Vector3 = walk.point(cell)
+	_check(farming.sway and farming._crop_art.ripe_layer(farming.get_script().CropArt.MATURE), "C-141: crop sway is on by default, the mature stage sways")
+	await _steer(plant, 1.2, true)
+	farming.set_sway(true)
+	_check(farming._crop_art.shake_of(cell).is_empty(), "C-141: away from the carrot, nothing shakes")
+	await _steer(plant, 0.2)
+	var shook: Dictionary = farming._crop_art.shake_of(cell)
+	_check(farming.sway_triggers == 1 and not shook.is_empty() and is_equal_approx((shook.push as Vector2).length(), 1.0),
+		"C-141: walking into the ripe carrot shakes it once at full amplitude: %d %s" % [farming.sway_triggers, shook])
+	for _i in 20: await process_frame
+	_check(farming.sway_triggers == 1, "C-141: standing in it shakes nothing more")
+	await create_timer(1.3).timeout
+	await create_timer(farming.get_script().REDRAW_S * 2).timeout
+	_check(farming._crop_art.shake_of(cell).is_empty(), "C-141: the shake is over 1.2 s on")
 	seen = await _press(farming, cell)
 	_check(_beside([cell]) and seen.clips.has("labour_harvest") and not seen.early, "harvest: beside the cell, the harvest clip")
 	_check(farming.farm.bag.get("crop_carrot") == 1 and farming.last_gains == {"crop_carrot": 1}, "harvest goes to the bag")
