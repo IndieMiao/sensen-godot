@@ -11,8 +11,10 @@ usage() {
 }
 
 adb_bin="${ADB:-adb}"
-# Explicit choice first, then the device the host gave this Run (C-212), then the local default.
-serial="${JOURNEY_SERIAL:-${DEV:-${ANDROID_SERIAL:-${CARDIGAN_EMULATOR_SERIAL:-${CARDIGAN_DEVICE_SERIAL:-emulator-5560}}}}}"
+source "$(dirname "${BASH_SOURCE[0]}")/run_serial.sh"
+# Explicit choice first, then the device the host gave this Run (C-212, C-216), then the local default.
+serial=$(run_serial JOURNEY_SERIAL DEV)
+serial=${serial:-emulator-5560}
 package=''
 duration=''
 clean_all=false
@@ -95,7 +97,8 @@ component=$("$adb_bin" -s "$serial" shell cmd package resolve-activity --brief "
 launch=$("$adb_bin" -s "$serial" shell am start -W -n "$component")
 printf '%s\n' "$launch"
 [[ "$launch" == *'Status: ok'* ]] || { printf 'App launch did not succeed.\n' >&2; exit 1; }
-export JOURNEY_SERIAL="$serial" JOURNEY_PACKAGE="$package"
+# ANDROID_SERIAL too, so the scenario's own serial check accepts a --serial outside the Run's devices.
+export JOURNEY_SERIAL="$serial" ANDROID_SERIAL="$serial" JOURNEY_PACKAGE="$package"
 if ((${#command_args[@]})); then
     set -m
     "${command_args[@]}" &

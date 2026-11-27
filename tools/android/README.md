@@ -21,7 +21,7 @@ tools/android/run_test.sh --clean-all
 The target is `--serial`, else `JOURNEY_SERIAL`, `DEV`, then the Run's own device
 (see below), else `emulator-5560`. `--device` picks the Run's physical device
 (`CARDIGAN_DEVICE_SERIAL`). `ADB` selects the adb executable. The scenario
-inherits `JOURNEY_SERIAL` and `JOURNEY_PACKAGE`. Build and install the APK before
+inherits `JOURNEY_SERIAL` and `JOURNEY_PACKAGE`, and `ANDROID_SERIAL` set to the same device. Build and install the APK before
 starting the session. Use one session for the entire multi-step test, rather
 than restarting the app for individual taps.
 
@@ -54,8 +54,18 @@ The scripts read them and fall back to the old defaults when they are not set, s
   `CARDIGAN_EMULATOR_SERIAL`, `CARDIGAN_DEVICE_SERIAL`, then the old default (`emulator-5560`, `emulator-5570` in
   P0). `run_test.sh --device` takes `CARDIGAN_DEVICE_SERIAL` and fails when it is not set.
 - Serial, emulator only (`tools/dev/combat_emulator_qa.mjs`, `combat_latency_emulator_qa.mjs`,
-  `movement_emulator_qa.mjs`): `JOURNEY_SERIAL`, then `CARDIGAN_EMULATOR_SERIAL`, then `emulator-5560`.
+  `movement_emulator_qa.mjs`): `JOURNEY_SERIAL`, then `CARDIGAN_EMULATOR_SERIAL`, then `emulator-5560`. They
+  refuse any serial that does not start with `emulator-` (C-216), e.g. a phone picked by `run_test.sh --device`.
+  `emulator-5560` is only the default outside a Run: in a Run the host gave only a physical device
+  (`CARDIGAN_DEVICE_SERIAL` without `CARDIGAN_EMULATOR_SERIAL`) they stop with `This Run holds no emulator …`
+  before any adb call, since that emulator is not the Run's (C-217). `tools/dev/mine_routes_emulator_qa.mjs`
+  (started by `run_test.sh` only) refuses a `JOURNEY_SERIAL` that is not `emulator-*` as well.
   `farm_pond_removal_android_qa.py` accepts any `emulator-*` session, no longer only `emulator-5580`.
+- In a Run (`CARDIGAN_EMULATOR_SERIAL` or `CARDIGAN_DEVICE_SERIAL` is set), a `JOURNEY_SERIAL`, `DEV` or P0 `SERIAL`
+  variable naming none of the Run's devices is ignored with a warning (`… is not a device of this Run; ignoring
+  it.`), so one left in the login environment cannot move the Run to another device (C-216). Serials given on the
+  command line (`--serial`, P0's argument) are used as given. The rule lives in `tools/android/run_serial.sh` and
+  `tools/dev/run_serial.mjs`; test with `node --test tools/dev/run_serial.test.mjs`.
 - Scenarios started by `run_test.sh` use the `JOURNEY_SERIAL` it exports, so they follow the same order.
 
 Scripts with their own private adb server and SDK for a laptop or gs66 (`pond_art_adb.sh`,
@@ -107,8 +117,33 @@ or export as well. Repository scripts already do it:
   say `false` through `tools/p0/godot_keep_adb.sh`.
 
 The repository's own `export_presets.cfg` keeps its runnable presets, so an import or export of the
-game project still polls `adb devices`: keep the shared server running, and if it is down, let the
-host's own account restart it rather than a run under a private `HOME`.
+game project still polls `adb devices`, and if the shared server is down at that moment the editor's
+adb starts one under the private `HOME` (C-213). adb takes its keys only from `$HOME/.android`
+(`ANDROID_USER_HOME` is ignored, checked with platform-tools 37), so the same helper also makes
+`$HOME/.android/adbkey` and `adbkey.pub` of a private `HOME` symlinks to the account's own
+`~/.android` keys: a server restarted there offers the account's key and the devices stay
+authorized. The account's `~/.android` is only read, and a `HOME` whose `.android` is the account's
+is left alone (also when `SENSEN_ADB_KEY_DIR` names another directory). `SENSEN_ADB_KEY_DIR=<directory>`
+links another key pair instead and `SENSEN_ADB_KEY_DIR=none` turns the links off.
+
+Hardening (C-217). The key links never stop the caller (`run_tests.sh` and the others go on with exit status 0);
+in these cases the helper only prints a `godot_keep_adb_settings: note: …` line on stderr, and an adb server
+Godot starts there would use keys of its own:
+
+- the private `HOME` (or its `.android`) cannot be written: nothing is changed;
+- the key directory has no `adbkey` and `adbkey.pub` (e.g. the account's keys were deleted): links made there
+  earlier are removed, because adb, finding no key, would write a new one through a dangling link into the
+  account's `~/.android`; a private key file that is not such a link stays. Keys deleted while Godot is already
+  running are not caught;
+- `$HOME/.android`, or `$HOME` when it has none yet, belongs to another user (e.g. `sudo` keeping someone's
+  `HOME`): their keys are left alone.
+
+A private `adbkey` or `adbkey.pub` file (not a link) that a link replaces is kept beside it as
+`<name>.<first 12 hex digits of its SHA-256>.bak` (a hard link; the same key is kept only once), so a device that
+authorized it can be given it back. Temporary names carry a random suffix, so two runs on the same private
+`HOME` at once (keys or editor settings) do not trip over each other.
+Symlinks rather than `ADB_VENDOR_KEYS` because every caller already hands Godot the `HOME` it ran
+the helper with, whereas an environment variable would have to be exported into each Godot process.
 
 Tests: `python3 -m unittest tools/test_godot_keep_adb_settings.py` (its last case runs the real
 Godot against a stub adb: without the helper the import calls `kill-server`, with it it does not).

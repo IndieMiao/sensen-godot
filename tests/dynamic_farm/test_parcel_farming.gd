@@ -2,6 +2,7 @@ extends SceneTree
 ## C-34 rules (Q-39) without a scene: the shared numbers, the command rules mirrored from the
 ## C-31 server, the client-only spatial rules and the local save standing in for the server.
 ## C-138: the carrot's seven stages and the dry / wet soil blocks (ParcelCropArt).
+## C-141: crop sway on the stage layers: the sway material, ripe sway on the mature stage only, shakes kept across redraws.
 ## C-148: Energy, P0's numbers, the same cases as the server (fixtures/energy_cases.json), the key's price and Rest.
 ## C-151: watering, the same cases as the server (fixtures/watering_cases.json), the keys at the well and on dry crops.
 ## C-152: farm levels, the same cases as the server (fixtures/level_cases.json), Scott's upgrade sheet and the Build key.
@@ -35,6 +36,7 @@ func _run() -> void:
 	_guide()
 	_crop_stages()
 	_crop_art()
+	_crop_sway()
 	_energy()
 	_energy_cases()
 	_energy_space()
@@ -44,6 +46,7 @@ func _run() -> void:
 	_levels()
 	_level_cases()
 	_upgrade_sheet()
+	await _crop_art_motion()
 	print("PARCEL_FARMING checks=%d failures=%d" % [checks, failures])
 	quit(1 if failures else 0)
 
@@ -494,6 +497,129 @@ func _crop_art() -> void:
 	art.sync({}, {}, T0)
 	_check(art.counts() == {"soil": {"dry": 0, "wet": 0}, "stages": [0, 0, 0, 0, 0, 0, 0]}, "art: nothing tilled, nothing drawn")
 	art.free()
+
+## C-141 (the C-140 design, SEN-Q-321): every plant stage draws with the sway shader on the stage's painted atlas,
+## the bend spans the stage mesh's own height, only the mature stage sways; soil keeps its imported look. A shake
+## sticks to its plant through redraws (also into its next stage) for 1.2 s; off clears it.
+func _crop_sway() -> void:
+	var art := CropArt.new(func(cell: Vector2i) -> Vector3: return Vector3(cell.x, 0, -cell.y), 0.8)
+	var layers: Array = art._stages
+	var shaded := true
+	for stage in range(1, layers.size()):
+		var layer: MultiMeshInstance3D = layers[stage]
+		var mat := layer.material_override as ShaderMaterial
+		var painted := layer.multimesh.mesh.surface_get_material(0) as StandardMaterial3D
+		var box := layer.multimesh.mesh.get_aabb()
+		shaded = shaded and mat != null and mat.shader == CropArt.SWAY_SHADER and layer.multimesh.use_custom_data \
+			and mat.get_shader_parameter(&"albedo_tex") == painted.albedo_texture and painted.albedo_texture != null \
+			and is_equal_approx(mat.get_shader_parameter(&"roughness"), painted.roughness) \
+			and is_equal_approx(mat.get_shader_parameter(&"plant_base"), box.position.y) and is_equal_approx(mat.get_shader_parameter(&"plant_top"), box.end.y) \
+			and art.ripe_layer(stage) == (stage == CropArt.MATURE) and bool(mat.get_shader_parameter(&"sway_enabled"))
+	_check(shaded, "sway: six plant layers on the sway shader with their atlas, mesh height and ripe flag (mature only)")
+	var soil_plain := true
+	for layer: MultiMeshInstance3D in [art._soil[CropArt.DRY], art._soil[CropArt.WET], art._contact]:
+		soil_plain = soil_plain and not layer.material_override is ShaderMaterial and not layer.multimesh.use_custom_data
+	_check(soil_plain, "sway: soil blocks and collars keep their materials")
+	var ripe := {"crop": "crop_carrot", "planted_at": T0 - 60000, "ripe_at": T0}
+	var young := {"crop": "crop_carrot", "planted_at": T0, "ripe_at": T0 + 60000}
+	var soil := {"1,1": CropArt.WET, "2,1": CropArt.WET, "3,1": CropArt.DRY}
+	art.sync(soil, {"1,1": ripe, "2,1": young}, T0 + 13000)
+	art.set_clock(5.0)
+	_check(is_equal_approx(layers[1].material_override.get_shader_parameter(&"crop_clock"), 5.0)
+		and is_equal_approx(layers[CropArt.MATURE].material_override.get_shader_parameter(&"crop_clock"), 5.0), "sway: the clock reaches every stage's material")
+	art.shake(Vector2i(1, 1), Vector2(0.6, 0.8))
+	art.shake(Vector2i(3, 1), Vector2(1, 0))
+	art.shake(Vector2i(9, 9), Vector2(1, 0))
+	_check(art.shake_of(Vector2i(1, 1)) == {"push": Vector2(0.6, 0.8), "at": 5.0}, "sway: a drawn plant takes the shake at the current clock")
+	_check(art.shake_of(Vector2i(3, 1)).is_empty() and art.shake_of(Vector2i(9, 9)).is_empty(), "sway: bare soil and empty ground take none")
+	art.set_clock(6.1)
+	art.sync(soil, {"1,1": ripe, "2,1": young}, T0 + 25000)
+	_check(not art.shake_of(Vector2i(1, 1)).is_empty() and art.counts().stages == [1, 0, 0, 1, 0, 0, 1], "sway: a redraw keeps a live shake, the young carrot one stage on")
+	art.shake(Vector2i(2, 1), Vector2(0, 0.67))
+	art.set_clock(7.2)
+	art.sync(soil, {"1,1": ripe, "2,1": young}, T0 + 37000)
+	_check(art.shake_of(Vector2i(1, 1)).is_empty() and art.shake_of(Vector2i(2, 1)).at == 6.1, "sway: 1.2 s after its trigger a shake is dropped, a later one stays into the next stage")
+	art.set_sway(false)
+	_check(art.shake_of(Vector2i(2, 1)).is_empty() and not bool(layers[CropArt.MATURE].material_override.get_shader_parameter(&"sway_enabled")),
+		"sway: off stops every plant and clears the shakes")
+	art.set_sway(true)
+	_check(bool(layers[1].material_override.get_shader_parameter(&"sway_enabled")), "sway: on again")
+	_crop_sway_late(art, soil, {"1,1": ripe, "2,1": young})
+	art.free()
+
+## V-652: Compatibility (GLES3) keeps MultiMesh custom data as truncated half floats (PackedByteArray.encode_half
+## truncates the same way). However long the scene has run, the stored trigger time survives that and the shader's
+## wrapped shake clock puts the first peak where it belongs; a shake over is written still without waiting for a redraw.
+func _crop_sway_late(art: CropArt, soil: Dictionary, crops: Dictionary) -> void:
+	var half := PackedByteArray()
+	half.resize(2)
+	var mat := (art._stages[CropArt.MATURE] as MultiMeshInstance3D).material_override as ShaderMaterial
+	_check(is_equal_approx(mat.get_shader_parameter(&"shake_wrap"), CropArt.SHAKE_WRAP_S) and is_equal_approx(mat.get_shader_parameter(&"shake_len"), CropArt.SHAKE_S),
+		"sway late: the shader wraps and ends shakes on the art's numbers")
+	var exact := true
+	var peaks := true
+	var worst := 0.0
+	# 9 s, 10 min, 25 min, 50 min, 20 h in, and just either side of a wrap.
+	for start: float in [9.0, 600.37, 1500.0, 3000.37, 72000.9, 3 * CropArt.SHAKE_WRAP_S - 0.01, 3 * CropArt.SHAKE_WRAP_S + 0.004]:
+		art.sync(soil, crops, T0 + 61000)
+		art.set_clock(start)
+		art.shake(Vector2i(1, 1), Vector2(1, 0))
+		# What _write_shake hands the MultiMesh (the headless dummy renderer keeps no custom data to read back).
+		var stored := art.shake_data(Vector2i(1, 1)).b
+		half.encode_half(0, stored)
+		exact = exact and art.shake_data(Vector2i(1, 1)).r == 1.0 and half.decode_half(0) == stored and stored >= 0.0 \
+			and stored < CropArt.SHAKE_WRAP_S
+		for elapsed: float in [0.0, 0.11, 0.5, 1.1]:
+			art.set_clock(start + elapsed)
+			var t := fposmod(float(mat.get_shader_parameter(&"shake_clock")) - half.decode_half(0), CropArt.SHAKE_WRAP_S)
+			worst = maxf(worst, absf(t - elapsed))
+			peaks = peaks and t >= elapsed - 0.001 and t <= elapsed + CropArt.SHAKE_STEP_S + 0.001
+	_check(exact, "sway late: every stored trigger time is exact in a half float and inside the wrap")
+	_check(peaks, "sway late: the shake runs on time however long the scene has run (worst %.4f s)" % worst)
+	art.set_clock(art.clock + CropArt.SHAKE_S)
+	_check(art.shake_of(Vector2i(1, 1)).is_empty() and art.shake_data(Vector2i(1, 1)) == Color(0, 0, 0, 0),
+		"sway late: a shake over is written still by the clock alone, so it cannot come round on the next wrap")
+
+## C-211 MS-07: a watered cell's soil turns from dry to wet (300) on its own block while the wet batch leaves it out,
+## three drops splash off it; tilled soil puffs four grains of dust. Reduced: the soil is simply wet, nothing flies.
+func _crop_art_motion() -> void:
+	for reduced in [false, true]:
+		UiMotion.reduced = reduced
+		var tag := "reduced" if reduced else "full"
+		var art := CropArt.new(func(cell: Vector2i) -> Vector3: return Vector3(cell.x, 0, -cell.y), 0.8)
+		root.add_child(art)
+		var cell := Vector2i(2, 1)
+		art.sync({"2,1": CropArt.DRY}, {}, T0)
+		art.dust(cell)
+		var dust := art.get_node_or_null(^"TillDust") as CPUParticles3D
+		_check((dust != null and dust.amount == UiTokens.MOTION_LIMIT_TILL_DUST) != reduced, "%s: tilled soil puffs 4 grains (none reduced)" % tag)
+		art.sync({"2,1": CropArt.WET}, {}, T0)
+		art.wet_in(cell)
+		var block := art.get_node_or_null(^"WetFade") as MeshInstance3D
+		var drops := art.get_node_or_null(^"WaterDrops") as CPUParticles3D
+		var wet: MultiMeshInstance3D = art._soil[CropArt.WET]
+		if reduced:
+			_check(block == null and drops == null and art.wetting().is_empty() and wet.multimesh.instance_count == 1,
+				"reduced: the watered soil is simply wet")
+		else:
+			_check(block != null and drops != null and drops.amount == UiTokens.MOTION_LIMIT_WATER_DROPS and art.wetting() == [cell],
+				"full: the watered cell fades on its own block, three drops splash")
+			var m := block.material_override as StandardMaterial3D
+			_check(m.albedo_color.is_equal_approx(art._dry_material.albedo_color), "full: it starts dry")
+			await create_timer(0.15).timeout
+			_check(is_instance_valid(block) and m.albedo_color.get_luminance() < art._dry_material.albedo_color.get_luminance(), "full: …darkening")
+			art.sync({"2,1": CropArt.WET}, {"2,1": {"crop": "crop_carrot", "planted_at": T0, "ripe_at": T0 + 60000, "watered_at": T0}}, T0)
+			_check(art.wetting() == [cell] and is_instance_valid(block), "full: a redraw keeps the fade going")
+			await create_timer(0.3).timeout
+			_check(art.wetting().is_empty() and not is_instance_valid(block) and art.get_node_or_null(^"WetFade") == null,
+				"full: then the wet batch draws it again")
+			art.sync({}, {}, T0)
+			art.sync({"2,1": CropArt.WET}, {}, T0)
+			art.wet_in(cell)
+			art.sync({"2,1": CropArt.DRY}, {}, T0)
+			_check(art.wetting().is_empty(), "full: a cell dry again (another reply) ends its fade")
+		art.free()
+	UiMotion.reduced = false
 
 ## C-148: P0's numbers (assets/p0/p0_content.json) and the client's settlement.
 func _energy() -> void:

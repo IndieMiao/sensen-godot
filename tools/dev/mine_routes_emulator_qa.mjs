@@ -2,11 +2,13 @@ import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {mkdir,writeFile} from 'node:fs/promises';
 import assert from 'node:assert/strict';
+import {requireEmulator} from './run_serial.mjs';
 
 const execute=promisify(execFile),mode=process.argv[2];
 assert.ok(['social','monsters','rocks','boss','boss-finish'].includes(mode));
 const serial=process.env.JOURNEY_SERIAL;
 assert.ok(serial&&process.env.JOURNEY_PACKAGE,'Use tools/android/run_test.sh');
+requireEmulator(serial);
 const dir='output/mine-routes-emulator-2026-09-15';
 await mkdir(dir,{recursive:true});
 const boot=Date.now()/1000-5;

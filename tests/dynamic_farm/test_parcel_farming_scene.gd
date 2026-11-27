@@ -17,6 +17,8 @@ extends SceneTree
 ## shows whole: `Need 2 more Carrot` too wide for it reads `Need 2 more` (the tap's toast keeps the sentence); with the
 ## ground full (2, SEN-Q-282) it reads `Cows are fed` while neither milk is given yet and `Pick up milk first` once they
 ## lie there; milk laid while the app was closed is picked up on the first walk up to it after a cold start.
+## C-141: crop sway is on; walking into the ripe carrot with the stick shakes it once, away from the player; standing in
+## it shakes nothing more; the shake ends 1.2 s on.
 ## Run in the private preview project (README), optionally
 ## with `-- <farm.json>`; without it the synthetic fixture parcel is used.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
@@ -159,6 +161,23 @@ func _press(farming: Node, cell: Vector2i) -> Dictionary:
 	seen.moved = start.distance_to(scene._walk.position)
 	return seen
 
+## C-141: steers the stick toward `goal` (or away from it with `away`) until the player is within `near` of it (beyond
+## it when away) or `frames` pass; the stick is released after.
+func _steer(goal: Vector3, near: float, away := false, frames := 120) -> void:
+	for _i in frames:
+		var to: Vector3 = goal - scene.player_position()
+		to.y = 0
+		if (to.length() > near) if away else (to.length() < near): break
+		var right: Vector3 = scene._camera.global_basis.x
+		right.y = 0
+		var forward: Vector3 = -scene._camera.global_basis.z
+		forward.y = 0
+		var d := -to.normalized() if away else to.normalized()
+		scene._movement = Vector2(d.dot(right.normalized()), -d.dot(forward.normalized())).normalized()
+		await process_frame
+	scene._movement = Vector2.ZERO
+	await process_frame
+
 ## The player stands beside `cells` (not on them) and faces them.
 func _beside(cells: Array) -> bool:
 	var here: Vector2i = scene._walk.cell_at(scene._walk.position)
@@ -241,8 +260,8 @@ func _first_visit() -> void:
 		"the hoe and the seeds show C-86's v3 item art (C-105)")
 	_check(farming._bar.slots[1].icon == load("res://modules/dynamic_farm/parcel_items.gd").icon_of("pail") and farming._bar.slots[1].icon != null,
 		"the pail has its icon (C-151)")
-	_check(farming._bar.bag_icon == UiArt.SYS_BAG and scene._coins_icon.texture == UiArt.COIN,
-		"the Bag end and the coins capsule show the v3 bag and coin (C-105)")
+	_check(farming._bar.bag_icon == UiArt.bag_end() and farming._bar.bag_icon != UiArt.SYS_BAG and scene._coins_icon.texture == UiArt.COIN,
+		"the Bag end shows the v3 bag coloured (C-211), the coins capsule the v3 coin (C-105)")
 	_check(scene._coins_capsule.visible and scene._coins.text == "0", "the top bar shows the parcel's coins, 0 on a new parcel (C-59)")
 	scene._on_farm_changed(farming.farm.merged({"coins": 12}, true))
 	_check(UiMotion.rolling(scene._coins), "the coins roll to the new number (C-186 MS-03)")
@@ -371,6 +390,21 @@ func _first_visit() -> void:
 	await create_timer(farming.get_script().REDRAW_S * 2).timeout
 	_check(_tip(farming) == "Your carrot is ripe. Press Harvest!", "a ripe carrot brings the harvest card: " + _tip(farming))
 	_check(farming._crop_art.counts().stages == [0, 0, 0, 0, 0, 0, 1], "C-138: the ripe carrot is drawn mature")
+	# C-141: walk off, then into the ripe carrot.
+	var plant: Vector3 = walk.point(cell)
+	_check(farming.sway and farming._crop_art.ripe_layer(farming.get_script().CropArt.MATURE), "C-141: crop sway is on by default, the mature stage sways")
+	await _steer(plant, 1.2, true)
+	farming.set_sway(true)
+	_check(farming._crop_art.shake_of(cell).is_empty(), "C-141: away from the carrot, nothing shakes")
+	await _steer(plant, 0.2)
+	var shook: Dictionary = farming._crop_art.shake_of(cell)
+	_check(farming.sway_triggers == 1 and not shook.is_empty() and is_equal_approx((shook.push as Vector2).length(), 1.0),
+		"C-141: walking into the ripe carrot shakes it once at full amplitude: %d %s" % [farming.sway_triggers, shook])
+	for _i in 20: await process_frame
+	_check(farming.sway_triggers == 1, "C-141: standing in it shakes nothing more")
+	await create_timer(1.3).timeout
+	await create_timer(farming.get_script().REDRAW_S * 2).timeout
+	_check(farming._crop_art.shake_of(cell).is_empty(), "C-141: the shake is over 1.2 s on")
 	seen = await _press(farming, cell)
 	_check(_beside([cell]) and seen.clips.has("labour_harvest") and not seen.early, "harvest: beside the cell, the harvest clip")
 	_check(farming.farm.bag.get("crop_carrot") == 1 and farming.last_gains == {"crop_carrot": 1}, "harvest goes to the bag")
@@ -445,15 +479,25 @@ func _profile_from_avatar(farming: Node) -> void:
 	_check(scene._title.custom_minimum_size.x > 0.0 and place.size.x < farming._ui.size.x - 24.0, "as wide as its lines: %s" % place)
 	avatar.pressed.emit()
 	await process_frame
-	_check(scene.profile_open() and not scene._canvas.visible and scene._controls.process_mode == Node.PROCESS_MODE_DISABLED,
-		"the avatar opens the profile; the parcel's HUD hides and its touches stop")
+	# MS-21 (C-211): the profile fades in over the parcel (160); its touches stop at once, the HUD goes once covered.
+	_check(scene.profile_open() and scene._profile.modulate.a < 1.0 and scene._canvas.visible
+		and scene._controls.process_mode == Node.PROCESS_MODE_DISABLED, "the avatar opens the profile fading in over the HUD; touches stop")
+	await create_timer(0.3).timeout
+	_check(scene.profile_open() and is_equal_approx(scene._profile.modulate.a, 1.0) and not scene._canvas.visible,
+		"faded in, the parcel's HUD hides")
 	var page: Control = scene._profile.top()
 	_check(page.get_script() == load("res://scenes/dynamic_farm/parcel_profile_page.gd") and page.farm_card != null, "the profile shows My farm")
 	var expected: String = scene._data.address if not str(scene._data.get("address", "")).is_empty() else str(scene._data.get("name", ""))
 	_check(page.farm_card.find_child("FarmName", true, false).text == expected, "its card is this parcel: %s" % expected)
+	var leaving: Control = scene._profile
 	_check(scene.close_modal() and not scene.profile_open(), "Android Back closes the profile")
 	await process_frame
 	_check(scene._canvas.visible and scene._controls.process_mode == Node.PROCESS_MODE_INHERIT, "the HUD and touches come back")
+	_check(is_instance_valid(leaving) and leaving.modulate.a < 1.0 and leaving.mouse_filter == Control.MOUSE_FILTER_IGNORE,
+		"the profile fades out over the parcel (MS-21), taking no touches")
+	_check(scene.open_profile() == null, "a new profile waits for the one fading out (its pages and locale still there)")
+	await create_timer(0.3).timeout
+	_check(not is_instance_valid(leaving) and scene.get_node_or_null(^"ProfileLayer") == null, "faded out, it and its layer are gone")
 	avatar.pressed.emit()
 	await process_frame
 	scene._profile.top().farm_pressed.emit()
