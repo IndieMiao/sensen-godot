@@ -146,15 +146,17 @@ static func step_past_water(farm: Dictionary, now_ms: int) -> String:
 				"buy": return "barn_blueprint"
 			return ""
 		"sheep_pen":
-			# Cows left unfed while the pen waits on requests, Lv3 and coins: feed them first (their milk sells and fills
-			# requests). A cow with milk still to give or on the ground leaves this to the pen.
+			# The pen's blueprint in the bag: its Timber and Stone and Build Sheep Pen. Before that, cows left unfed while the
+			# pen waits on requests, Lv3 and coins come first (their milk sells and fills requests); a cow with milk still to
+			# give or on the ground leaves this to the pen.
+			var pen := _blueprint_state(farm, rules, SHEEP_PEN)
+			if pen == "bag": return "gather_pen" if _short_of_materials(farm, rules, SHEEP_PEN) else "sheep_pen"
 			var cows := _livestock(rules, BARN)
 			var barn := _building(farm, BARN)
 			if not barn.is_empty() and ParcelFarm.drops_in(farm, int(barn.get("id", 0))).is_empty() \
 					and int(bag.get(str(cows.get("feed", "")), 0)) >= int(cows.get("feed_amount", 1)):
 				return "feed_cows"
-			match _blueprint_state(farm, rules, SHEEP_PEN):
-				"bag": return "gather_pen" if _short_of_materials(farm, rules, SHEEP_PEN) else "sheep_pen"
+			match pen:
 				"requests": return "pen_requests"
 				"level": return _upgrade_step(farm, rules)
 				"coins": return "pen_coins"

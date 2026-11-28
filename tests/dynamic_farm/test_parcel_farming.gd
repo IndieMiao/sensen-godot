@@ -506,6 +506,12 @@ func _guide_046(lv2: Dictionary, now: int) -> void:
 	state.bag.wood = 15
 	state.bag.stone = 15
 	_check(Guide.stage(state, now) == "sheep_pen" and Guide.step(state, now) == "sheep_pen", "guide 0.4.6: blueprint and materials -> Build Sheep Pen")
+	state.drops = []
+	state.bag.crop_carrot = 4
+	_check(Guide.step(state, now) == "sheep_pen", "guide 0.4.6: the pen ready to build comes before idle cows (C-190 run-through)")
+	state.bag.wood = 0
+	_check(Guide.step(state, now) == "gather_pen", "guide 0.4.6: ... and so do its Timber and Stone")
+	state.bag.wood = 15
 	var penned := ParcelFarm.apply(rules, state, [{"type": "place_building", "building": "sheep_pen", "x": 20, "y": 30, "rotation": 0}], now)
 	_check(penned.ok, "guide 0.4.6: the pen goes down (%s)" % penned.get("code", ""))
 	if not penned.ok: return

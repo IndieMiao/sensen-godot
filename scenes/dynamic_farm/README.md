@@ -192,10 +192,10 @@ nearest feeder's Feed and walks there on the press. Copy: `docs/plans/C-175.md`.
 
 0.4.6 (C-190, the run-through of 0.4.6's content) goes on past Lv1: no request delivered yet -> `request` (the Request
 Board in Washington Square); then the barn: short of its 600 coins -> `barn_coins`, else `barn_blueprint` (Scott), the
-blueprint in the bag -> `gather_barn` until its Timber and Stone are there, then `barn` (Build Barn); then the sheep pen,
-with `feed_cows` first whenever the cows give nothing and the bag holds their 2 carrots: short of 15 requests ->
-`pen_requests`, below Lv3 -> the upgrade's steps, short of 1,200 coins -> `pen_coins`, else `pen_blueprint`, then
-`gather_pen` / `sheep_pen`; a pen with no wool from it yet -> `gather_herbs` / `feed_sheep`; nothing once there is wool.
+blueprint in the bag -> `gather_barn` until its Timber and Stone are there, then `barn` (Build Barn); then the sheep pen:
+its blueprint in the bag -> `gather_pen` / `sheep_pen`; else `feed_cows` first whenever the cows give nothing and the bag
+holds their 2 carrots, then short of 15 requests -> `pen_requests`, below Lv3 -> the upgrade's steps, short of 1,200
+coins -> `pen_coins`, else `pen_blueprint`; a pen with no wool from it yet -> `gather_herbs` / `feed_sheep`; nothing once there is wool.
 Sold wool leaves no trace, so the parcel drops that step once the device saw every row done. The phone adds REQUESTS &
 ANIMALS (`Deliver a request`, `Build the Barn`, `Build the Sheep Pen`, `Feed the sheep`). Copy: `docs/plans/C-190.md`.
 
