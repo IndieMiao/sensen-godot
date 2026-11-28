@@ -13,6 +13,9 @@ var float_scale := 1.0
 var float_ring := false
 var line_px := 0.0   # 0: the line is 12 mm wide in the world
 var line_color := Color("f5e9c9")
+## The water's height where the splash and rings sit (C-232: the Aquatic Park bay lies 1.45 m under the pier's deck);
+## Journey's and P0's ponds keep 0.085.
+var water_y := 0.085
 const RING_PX := 1.5
 const RING_GAP_PX := 1.5
 const RING_INK := Color("#2F3A33CC")   # ink, 80 %
@@ -300,7 +303,7 @@ func step(dt: float) -> void:
 	# to the hand, so they stay where it came out and fade there (the user 11-08, SGODOT-447: they followed the float).
 	var on_water := _landing if lifting else bobber_position
 	_splash.visible = _splash_age < 0.75 and active_float
-	_splash.global_position = Vector3(on_water.x, 0.085, on_water.z)
+	_splash.global_position = Vector3(on_water.x, water_y, on_water.z)
 	_splash.scale = Vector3.ONE * (0.5 + _splash_age * 4.0)
 	_splash_material.albedo_color.a = maxf(0, 0.8 - _splash_age)
 	var stir := 0.7 if fighting else 0.3 if active_float and _cast_age >= 0.85 else 0.0

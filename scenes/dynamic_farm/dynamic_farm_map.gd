@@ -7,6 +7,8 @@ extends Control
 ## Washington Square Travel Post (town_entry.gd), opens its place card; Go opens the 3D room (parcel_outpost.tscn) where
 ## Jasmine (Market) and Scott (Carpenter) trade through the home's parcel save. Like "Enter my farm" it is only in
 ## packages with `own_farm` (C-59#29): internal test packages and the release package (C-98).
+## C-232 (0.4.7): a second fixed place pin, the Aquatic Park pier (TownEntry.pier()), carded and travelled to the same
+## way; Go opens the pier (parcel_pier.tscn), where the player fishes into the home's parcel save. One place card at a time.
 ## C-110: the map frames the player's home on entry and has a "My home" key; the account chip (Sign in, or the name
 ## with Sign out behind it) stays at the top right whether or not a parcel is selected.
 ## The guide (C-35, C-61) gives the next step: in the hint under the top row with nothing selected, on the home's card.
@@ -45,6 +47,9 @@ const TownEntry := preload("res://scenes/dynamic_farm/town_entry.gd")
 const MapTravel := preload("res://scenes/dynamic_farm/map_travel.gd")
 ## The Washington Square pin's place in the avatar's trips (C-188).
 const TOWN := "town"
+## C-232: the Aquatic Park pier's pin (town_entry.gd pier()), its 3D space and its place in the trips.
+const PIER_ROOM := "res://scenes/dynamic_farm/parcel_pier.tscn"
+const PIER := "pier"
 const PROFILE := "res://scenes/dynamic_farm/parcel_profile.gd"
 const LocalFarmStore := preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const RemoteFarmStore := preload("res://modules/dynamic_farm/parcel_farm_remote_store.gd")
@@ -143,6 +148,7 @@ var _home: Button
 var _locate: Button
 var _bottom: VBoxContainer
 var _entry: Control # The Washington Square pin and its place card (TownEntry).
+var _pier: Control # C-232: the Aquatic Park pier's pin and card (TownEntry.pier()).
 ## The avatar and its trips (C-188, map_travel.gd); the parcel card hidden while a trip has taken it away; the farm read
 ## for Enter my farm, opened once the iris has closed on home; a farm read whose trip was cancelled (Back), not opened;
 ## the place whose scene is open (the iris opens from it on the way back); the scene a trip preloads (T-02).
@@ -383,9 +389,12 @@ func _build_ui() -> void:
 	_profile_button.pressed.connect(_open_profile); _hud.add_child(_profile_button)
 	_entry = TownEntry.new(); _entry.visible = false; _hud.add_child(_entry); _hud.move_child(_entry, 0)
 	_entry.go_requested.connect(_open_town)
-	_entry.card_changed.connect(_on_entry_card)
+	_entry.card_changed.connect(func(open: bool): _on_entry_card(open, _entry))
+	_pier = TownEntry.pier(); _pier.visible = false; _hud.add_child(_pier); _hud.move_child(_pier, 0)
+	_pier.go_requested.connect(_open_pier)
+	_pier.card_changed.connect(func(open: bool): _on_entry_card(open, _pier))
 	# Over the pins, under the panels and keys; its iris over everything (added last below).
-	_travel = MapTravel.new(); _hud.add_child(_travel); _hud.move_child(_travel, 1)
+	_travel = MapTravel.new(); _hud.add_child(_travel); _hud.move_child(_travel, 2)   # over both pins (C-232)
 	_travel.fade_in.assign([_top])
 	_travel.closed.connect(_travel_closed)
 	_travel.cancelled.connect(_travel_cancelled)
@@ -548,7 +557,7 @@ func _render() -> void:
 	_enter.visible = state == "mine"; _enter.disabled = not idle
 	_open.visible = state != "mine"
 	_reselect.visible = state == "mine" and _claims.can_give_up(); _reselect.disabled = not idle
-	_home.visible = _claims.has_home() and not (_entry != null and _entry.is_open())
+	_home.visible = _claims.has_home() and not _place_card_open()
 	_home.disabled = _selector.manifest.is_empty() or _opening or _traveling()
 	_locate.disabled = _home.disabled
 	_render_entry()
@@ -765,6 +774,7 @@ func _gate_map(notice := "") -> void:
 	if _selector != null: _selector.pause() # clears the parcel layers and hides the native map
 	if _claims != null: _claims.pause(); _claims.forget()
 	if _entry != null: _entry.close_card()
+	if _pier != null: _pier.close_card()
 	if not await _sign_in_gate(notice): return
 	_account_changed()
 	if _suspended or _leaving: return # resume() loads the map again
@@ -878,13 +888,20 @@ func _open_sign_in() -> void:
 
 ## The Washington Square pin (C-115): in packages that enter one's own farm, once the map shows; the card's Distance and Go
 ## need the home. Its card stands over the map's panels while it is open.
+## C-232: the Aquatic Park pin likewise.
 func _render_entry() -> void:
 	if _entry == null: return
-	_entry.camera = _camera
-	_entry.visible = _own_farm_entry() and not _selector.manifest.is_empty() and not _suspended and not _leaving
 	var center = _claims.mine.get("center") if _claims != null and _claims.has_home() else null
-	_entry.home_center = center if Geo.valid_point(center) else []
-	if not _entry.visible: _entry.close_card()
+	for e: Control in [_entry, _pier]:
+		if e == null: continue
+		e.camera = _camera
+		e.visible = _own_farm_entry() and not _selector.manifest.is_empty() and not _suspended and not _leaving
+		e.home_center = center if Geo.valid_point(center) else []
+		if not e.visible: e.close_card()
+
+## A place card (Washington Square's or the pier's, C-232) is open.
+func _place_card_open() -> bool:
+	return (_entry != null and _entry.is_open()) or (_pier != null and _pier.is_open())
 
 ## A tap on the map: the Washington Square pin first (farm-dev's city map takes a pin's tap before the ground), else the
 ## building under it.
@@ -892,21 +909,27 @@ func _on_map_tap(point: Vector2) -> void:
 	if _traveling(): # a tap while walking skips to the end (C-188, D-437 ④); nothing is picked meanwhile
 		if _travel.walking(): _travel.skip()
 		return
-	if _entry != null and _entry.visible and not _opening and _entry.hit(point * _camera.size):
-		_entry.open_card(); return
+	for e: Control in [_entry, _pier]:
+		if e != null and e.visible and not _opening and e.hit(point * _camera.size):
+			e.open_card(); return
 	_selector.tap(point, _camera.zoom)
 
 ## While the card is open it stands over the map's panels and side keys; a pin low on the screen, where the card would
 ## cover it, flies to the middle first.
-func _on_entry_card(open: bool) -> void:
-	_hud.move_child(_entry, -1 if open else 0)
+func _on_entry_card(open: bool, entry: Control = null) -> void:
+	if entry == null: entry = _entry
+	if open:   # one place card at a time (C-232: the pier's and Washington Square's)
+		for other: Control in [_entry, _pier]:
+			if other != null and other != entry and other.is_open(): other.close_card()
+	_hud.move_child(entry, -1 if open else 0)
+	open = _place_card_open()
 	_bottom.visible = not open; _locate.visible = not open; _profile_button.visible = not open
 	_home.visible = not open and _claims != null and _claims.has_home()
-	if not open: return
+	if not open or not entry.is_open(): return
 	_camera.stop()
-	var at: Vector2 = _entry.screen_point()
+	var at: Vector2 = entry.screen_point()
 	if at == Vector2.INF or at.y > _camera.size.y * PIN_CLEAR_OF_CARD:
-		_camera.fly_to(TownEntry.LON, TownEntry.LAT, _camera.zoom)
+		_camera.fly_to(entry.lon, entry.lat, _camera.zoom)
 
 ## Go on the Washington Square card: the 3D room above the map (AppRouter, as "Enter my farm"), trading through the home's
 ## parcel save. Back or the room's door returns here; the map then reads the save again for the guide's line.
@@ -920,9 +943,23 @@ func _open_town() -> void:
 	await _enter_town()
 
 func _enter_town() -> void:
+	await _enter_place(ROOM)
+
+## C-232: Go on the Aquatic Park card: the pier above the map (parcel_pier.tscn), fishing into the home's parcel save; the
+## avatar walks there first as to Washington Square.
+func _open_pier() -> void:
+	if not _own_farm_entry() or _claims == null or not _claims.has_home() or _opening or _profile != null or _traveling(): return
+	var card: Control = _pier.card if _pier.is_open() else null
+	if _travel != null and _travel.depart(PIER, card, card.get_node_or_null("Sheet") if card != null else null):
+		_preload_scene(PIER_ROOM); _render(); return
+	_pier.close_card()
+	await _enter_place(PIER_ROOM)
+
+## One of the map's 3D spaces (the Washington Square room, the pier) over the map, trading through the home's save.
+func _enter_place(path: String) -> void:
 	if _claims == null or not _claims.has_home(): _travel_back(); return
 	var home: Dictionary = _claims.mine
-	await _open_scene(ROOM, {"store": _farm_store(str(home.parcel_id), str(home.get("dataset_version", ""))),
+	await _open_scene(path, {"store": _farm_store(str(home.parcel_id), str(home.get("dataset_version", ""))),
 		"parcel_id": str(home.parcel_id), "return_context": {"center": Array(_camera.center), "zoom": _camera.zoom}})
 
 func _traveling() -> bool:
@@ -937,6 +974,7 @@ func _render_travel() -> void:
 	var center = _claims.mine.get("center") if _claims != null and _claims.has_home() else null
 	if Geo.valid_point(center): places[MapTravel.HOME] = {"geo": center, "pin": null}
 	if _entry != null and _entry.visible: places[TOWN] = {"geo": [TownEntry.LON, TownEntry.LAT], "pin": _entry}
+	if _pier != null and _pier.visible: places[PIER] = {"geo": [_pier.lon, _pier.lat], "pin": _pier}
 	_travel.places = places
 	var parcel := str(_claims.mine.get("parcel_id", "")) if places.has(MapTravel.HOME) else ""
 	if parcel != MapTravel.home_parcel:
@@ -946,11 +984,13 @@ func _render_travel() -> void:
 ## The card faded out as the trip set off: the place card closes, the parcel card steps aside until the trip is over.
 func _travel_card_gone() -> void:
 	if _travel.destination() == TOWN: _entry.close_card()
+	elif _travel.destination() == PIER: _pier.close_card()
 	else: _travel_card = true; _render()
 
 ## The iris has closed on the place: its scene opens (the farm once read).
 func _travel_closed(place: String) -> void:
 	if place == TOWN: await _enter_town()
+	elif place == PIER: await _enter_place(PIER_ROOM)
 	elif not _farm_waiting.is_empty():
 		var farm := _farm_waiting; _farm_waiting = {}
 		await _open_farm_scene(farm)
@@ -1198,6 +1238,8 @@ func is_back_navigation_locked() -> bool:
 		_travel.cancel(); return true
 	if _entry != null and _entry.is_open():
 		_entry.close_card(); return true
+	if _pier != null and _pier.is_open():
+		_pier.close_card(); return true
 	_leave(); return true
 
 func _notification(what: int) -> void:

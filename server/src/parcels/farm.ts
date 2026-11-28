@@ -54,6 +54,9 @@
  * 种子兜底（C-197，见 seed_aid.ts）：没钱、没种子、没作物时，在 Jasmine 那里 claim_seed_aid，每个玩家日送一次种子；
  * seed_aid_day 记最近一次送的玩家日，也是 v1 上追加的字段：旧存档没有时按没送过读。换数据集不动它。
  *
+ * 钓鱼（C-232，0.4.7，见 fishing.ts）：Aquatic Park 码头投竿、收线小游戏由服务端重放判定、鱼进背包；第一次到码头送新手竿，
+ * 鱼竿和鱼饵在 Jasmine 柜台买（buy，限量见 fishing.goods）。存在 fishing，也是 v1 上追加的可选字段：旧存档按没钓过读。换数据集不动它。
+ *
  * 旧牛棚（C-209）：C-202 之前盖的 8×6 牛棚（存档里没有 cutouts）读档时拆掉，蓝图、材料和它的奶退进背包，玩家按新占地重新摆
  * （见 retireDraftBuildings）。不加字段，版本号不变。
  *
@@ -67,6 +70,7 @@
 import { dayKey, energyCost, maxEnergy, nextRollover, nextTickIn, settleEnergy, spendEnergy, type EnergyState } from './energy.js';
 import { boardOf, emptyBoard, requestCommand, settleBoard, type BoardState } from './requests.js';
 import { claimSeedAid } from './seed_aid.js';
+import { fishingCommand, fishingOf, goodsRefusal, parseFishingCommand, type FishingCommand, type FishingState } from './fishing.js';
 import { buildingMax, gatherSourceOf, HOME_BUILDING, MAX_BUILDINGS, nextFarmLevel, ownCells, type Cutout, type ParcelRules } from './rules.js';
 
 export const FARM_STATE_VERSION = 1;
@@ -155,6 +159,8 @@ export interface ParcelFarmState {
   requests_done: number;
   /** C-197：最近一次领种子兜底的玩家日（YYYY-MM-DD）；没领过为 null。 */
   seed_aid_day: string | null;
+  /** C-232：码头钓鱼（fishing.ts）；没钓过、没到过码头的存档没有这一项。 */
+  fishing?: FishingState;
 }
 
 export type FarmCommand =
@@ -187,7 +193,9 @@ export type FarmCommand =
   /** C-229：把编号为 building 的建筑挪到 x,y（新占地 x、y 最小的格）、转 rotation 个 90°。 */
   | { type: 'move_building'; building: number; x: number; y: number; rotation: number }
   /** C-229：把编号为 building 的建筑收回成蓝图。 */
-  | { type: 'store_building'; building: number };
+  | { type: 'store_building'; building: number }
+  /** C-232：码头钓鱼（fishing.ts）。 */
+  | FishingCommand;
 
 /** 命令执行时服务端核实过的上下文：本人地块编号（来自 token 查到的那一行，不来自请求体）。 */
 export interface FarmContext { parcel_id: string }
@@ -227,6 +235,8 @@ export function withEconomy(state: ParcelFarmState): ParcelFarmState {
   s.board = boardOf(s.board);
   s.requests_done = count(s.requests_done);
   s.seed_aid_day = typeof s.seed_aid_day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s.seed_aid_day) ? s.seed_aid_day : null;
+  // C-232：没有就不补（旧存档原样），有就按 fishingOf 读，不成形的部分丢掉。
+  if (s.fishing !== undefined) s.fishing = fishingOf(s.fishing);
   return s;
 }
 
@@ -421,8 +431,12 @@ export function parseFarmCommands(raw: unknown): FarmCommand[] | null {
         if (!Number.isInteger(c.request) || (c.request as number) < 1 || (c.request as number) > MAX_ID) return null;
         out.push({ type: c.type, request: c.request as number });
         break;
-      default:
-        return null;
+      default: {
+        // C-232：钓鱼命令（形状检查在 fishing.ts）。
+        const f = parseFishingCommand(c);
+        if (!f) return null;
+        out.push(f);
+      }
     }
   }
   return out;
@@ -650,6 +664,9 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
         const price = Object.hasOwn(eco.buy_prices, c.item) ? eco.buy_prices[c.item] : undefined;
         if (price === undefined) return fail('NOT_FOR_SALE', { item: c.item });
         const total = price * c.count;
+        // C-232：鱼竿每种一根、鱼饵每天限量、碳素竿和亮片要 4 级（fishing.goods）；先核条件，再核金币。
+        const limited = goodsRefusal(rules, s, c.item, c.count, now, fail);
+        if (limited) return limited;
         if (s.coins < total) return fail('NOT_ENOUGH_COINS', { coins: s.coins, need: total });
         s.coins -= total;
         s.bag[c.item] = (s.bag[c.item] ?? 0) + c.count;
@@ -760,6 +777,12 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
       case 'accept_request': case 'deliver_request': case 'drop_request': {
         // 在驿站委托板前（C-191）：服务端不知道人站在哪，“在驿站”由客户端限定。
         const refusal = requestCommand(rules, s, c, now, fail as Parameters<typeof requestCommand>[4], MAX_COINS);
+        if (refusal) return refusal;
+        break;
+      }
+      case 'visit_pier': case 'cast_line': case 'reel_line': case 'cancel_line': {
+        // 在码头沿边（C-232）：服务端没有码头几何，“人在码头”由客户端限定；结果由服务端定（fishing.ts）。
+        const refusal = fishingCommand(rules, s, c, now, ctx?.parcel_id ?? '', fail);
         if (refusal) return refusal;
         break;
       }

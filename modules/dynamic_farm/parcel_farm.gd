@@ -55,6 +55,9 @@ extends RefCounted
 ## while a drop is on its way (D2, PRODUCING {ready_at} of the last). Both are free; no save field is added.
 ## C-209: a building placed before its type had cutouts (C-192's 8×6 barn) is taken down when the save is read, its
 ## blueprint, materials and drops given back (`retire_draft_buildings`); no save field is added.
+## C-232 (0.4.7): fishing at the Aquatic Park pier is ParcelFishing's (parcel_fishing.gd, server fishing.ts): `visit_pier`,
+## `cast_line`, `reel_line`, `cancel_line`, the save's optional `fishing` (absent before it: never fished) and the tackle
+## limits on `buy` (one rod of each kind, a day's baits, Lv4 for the Carbon Rod and the Spinner).
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
 const STATE_VERSION := 1
 const MAX_COORD := 1024
@@ -62,7 +65,7 @@ const MAX_CELLS := 8192
 const MAX_BATCH := 50
 const COMMANDS := ["place_house", "place_building", "clear_obstacle", "till", "sow", "harvest", "sell", "buy", "claim_blueprint",
 	"gather", "rest", "feed", "pick_up", "draw_water", "water", "upgrade_farm", "accept_request", "deliver_request", "drop_request",
-	"claim_seed_aid", "move_building", "store_building"]
+	"claim_seed_aid", "move_building", "store_building", "visit_pier", "cast_line", "reel_line", "cancel_line"]
 ## C-191 request commands: the request id is their one field.
 const REQUEST_COMMANDS := ["accept_request", "deliver_request", "drop_request"]
 ## Most request board slots (server requests.ts MAX_SLOTS).
@@ -91,6 +94,7 @@ const MAX_COINS := 1000000000
 const MAX_SELL_COUNT := 999
 const MAX_BUY_COUNT := 999
 const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
+const Fishing = preload("res://modules/dynamic_farm/parcel_fishing.gd")
 
 static var _rules := {}
 
@@ -170,6 +174,12 @@ static func parse_rules(raw: Variant) -> Dictionary:
 	if raw.has("seed_aid"):
 		parsed.seed_aid = _parse_seed_aid(raw.seed_aid, parsed)
 		if parsed.seed_aid.is_empty(): return {}
+	# C-232: no `fishing`, no fishing ({}); out of the server's bounds (fishing.ts parseFishingRules), the rules are refused.
+	parsed["fishing"] = {}
+	if raw.has("fishing"):
+		var fishing = Fishing.parse_rules(raw.fishing, parsed)
+		if fishing == null: return {}
+		parsed.fishing = fishing
 	return parsed
 
 ## C-197 `seed_aid` with the server's bounds: a crop's seed that Jasmine sells (its price is what "no coins" means),
@@ -441,6 +451,8 @@ static func normalize(raw: Variant) -> Dictionary:
 	if energy is Dictionary and whole_in(energy.get("value"), 0, 1 << 30) and _number(energy.get("at")) \
 			and (energy.get("rested_on") == null or _is_day(energy.get("rested_on"))):
 		state.energy = {"value": int(energy.value), "at": int(energy.at), "rested_on": energy.get("rested_on")}
+	# C-232: the pier's fishing, kept only when the save has it (as the server reads it, fishingOf).
+	if raw.has("fishing") and raw.fishing != null: state.fishing = Fishing.fishing_of(raw.fishing)
 	return state
 
 ## The save's request board read as the server reads it (requests.ts boardOf): malformed slots and requests left out,
@@ -993,6 +1005,8 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 			if not whole_in(command.get("building"), 1, MAX_ID): return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type in REQUEST_COMMANDS:
 			if not whole_in(command.get("request"), 1, MAX_ID): return {"ok": false, "index": index, "code": "SCHEMA"}
+		elif command.type in Fishing.COMMANDS:
+			if not Fishing.schema(command): return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type == "place_house" or command.type == "place_building":
 			if not whole_in(command.get("x"), 0, MAX_COORD - 1) or not whole_in(command.get("y"), 0, MAX_COORD - 1) \
 					or (command.has("rotation") and not whole_in(command.rotation, 0, 3)) \
@@ -1124,9 +1138,14 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				var item: String = command.item
 				var prices: Dictionary = rule_set.get("economy", {}).get("buy_prices", {})
 				var total := int(prices.get(item, 0)) * int(command.count)
+				# C-232: the tackle limits (fishing.goods) before the coins; today's count is kept only if the batch goes through.
+				var limit := Fishing.goods_refusal(rule_set, next, item, int(command.count), now) if prices.has(item) else {"code": ""}
 				if not prices.has(item):
 					failure = "NOT_FOR_SALE"
 					detail = {"item": item}
+				elif not str(limit.code).is_empty():
+					failure = limit.code
+					detail = limit.detail
 				elif int(next.coins) < total:
 					failure = "NOT_ENOUGH_COINS"
 					detail = {"coins": next.coins, "need": total}
@@ -1252,6 +1271,11 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				var outcome := _request_command(rule_set, next, command, now)
 				failure = outcome.code
 				detail = outcome.detail
+			"visit_pier", "cast_line", "reel_line", "cancel_line":
+				# At the pier's edge (the pier scene sends them); the server decides the fish (fishing.ts).
+				var outcome := Fishing.command(rule_set, next, command, now, parcel_id)
+				failure = outcome.code
+				detail = outcome.detail
 			"claim_seed_aid":
 				# At Jasmine's (the town sends it as her greeting opens); the server cannot tell where the player is.
 				var refusal := seed_aid_refusal(rule_set, next, now)
@@ -1261,7 +1285,7 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 					var aid: Dictionary = rule_set.seed_aid
 					next.bag[aid.item] = int(next.bag.get(aid.item, 0)) + int(aid.amount)
 					next.seed_aid_day = day_key(rule_set, now)
-		if failure == "NO_ENERGY":
+		if failure == "NO_ENERGY" and cost > 0:   # a cast prices itself (fishing.cast_energy) and says so
 			detail = {"need": cost, "have": int(next.energy.value), "next_in": next_tick_in(rule_set, next, now)}
 		if not failure.is_empty():
 			var result := {"ok": false, "index": index, "code": failure}

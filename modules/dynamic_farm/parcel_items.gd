@@ -5,6 +5,7 @@ extends RefCounted
 ## C-151: the well's blueprint is named as the cottage's; the pail (水桶, SEN-C-151) shows P0's Water icon.
 ## C-181: the barn's blueprint as the others; milk is drawn here like the egg until item art comes.
 ## C-182: the sheep pen's blueprint likewise; wool is drawn here too (a fleece) until item art comes.
+## C-232: the pier's fish, rods and baits are P0's, names and icons (assets/p0/icons/fish_*.svg, rod_*.svg, bait_*.svg).
 const NAMES := {"blueprint_cottage": "Cottage Blueprint", "blueprint_coop": "Coop Blueprint", "blueprint_well": "Well Blueprint",
 	"blueprint_barn": "Barn Blueprint", "blueprint_sheep_pen": "Sheep Pen Blueprint", "pail": "Pail", "egg": "Egg", "milk": "Milk",
 	"wool": "Wool"}
@@ -135,6 +136,12 @@ static func wool_icon() -> Texture2D:
 static func _content_names() -> Dictionary:
 	var content := P0Logic.content()
 	var names := {}
+	# C-232: the pier's fish, rods and baits keep their P0 names (P0's fish table and fish_p1's Sea Bass, its rods
+	# and fishing_p1's Carbon Rod, its goods: `Worm Bait`, `Spinner Lure`).
+	for fish: Dictionary in content.get("fish", []): names[str(fish.get("id", ""))] = str(fish.get("name", ""))
+	for rod: Dictionary in content.get("fishing", {}).get("rods", []): names[str(rod.get("id", ""))] = str(rod.get("name", ""))
+	for id: String in content.get("goods", {}):
+		if id.begins_with("bait_"): names[id] = str(content.goods[id].get("name", ""))
 	for crop: Dictionary in content.get("crops", []):
 		names[str(crop.get("id", ""))] = str(crop.get("name", ""))
 		names[str(crop.get("seed", ""))] = str(crop.get("seed_name", ""))

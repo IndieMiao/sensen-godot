@@ -182,10 +182,21 @@
       "stone": 2,
       "egg": 20,
       "milk": 45,
-      "wool": 30
+      "wool": 30,
+      "fish_crucian": 3,
+      "fish_carp": 4,
+      "fish_mullet": 4,
+      "fish_perch": 7,
+      "fish_bass": 7,
+      "fish_mackerel": 8,
+      "fish_seabass": 14
     },
     "buy_prices": {
-      "seed_carrot": 9
+      "seed_carrot": 9,
+      "rod_reed": 80,
+      "rod_carbon": 600,
+      "bait_worm": 2,
+      "bait_lure": 6
     },
     "gather": {
       "recipe_version": "outer-groves-v2",
@@ -280,6 +291,54 @@
       "egg_basket": { "item": "egg", "building": "coop" },
       "fresh_milk": { "item": "milk", "building": "barn" },
       "wool_bundle": { "item": "wool", "building": "sheep_pen" }
+    }
+  },
+  "fishing": {
+    "cast_energy": 5,
+    "refund_fail": 3,
+    "bite_min_ms": 1800,
+    "bite_spread_ms": 2400,
+    "hook_window_ms": 2200,
+    "settle_grace_ms": 15000,
+    "starter_rod": "rod_starter",
+    "weights": [60, 30, 10],
+    "fish": {
+      "fish_crucian": 1,
+      "fish_carp": 1,
+      "fish_mullet": 1,
+      "fish_perch": 2,
+      "fish_bass": 2,
+      "fish_mackerel": 2,
+      "fish_seabass": 3
+    },
+    "rods": [
+      { "id": "rod_starter", "hook_bonus_ms": 0, "band_bonus": 0, "loss_mult": 1 },
+      { "id": "rod_reed", "hook_bonus_ms": 400, "band_bonus": 0.03, "loss_mult": 1 },
+      { "id": "rod_carbon", "hook_bonus_ms": 800, "band_bonus": 0.05, "loss_mult": 0.9 }
+    ],
+    "baits": {
+      "bait_worm": { "shift": [-10, 10, 0], "wait": 0.5 },
+      "bait_lure": { "shift": [-15, -5, 20], "wait": 1 }
+    },
+    "goods": {
+      "rod_reed": { "max_owned": 1 },
+      "rod_carbon": { "max_owned": 1, "min_level": 4 },
+      "bait_worm": { "daily": 30 },
+      "bait_lure": { "daily": 10, "min_level": 4 }
+    },
+    "reel": {
+      "step_ms": 50,
+      "max_steps": 600,
+      "bar_acceleration": 2.8,
+      "bar_max_speed": 0.75,
+      "initial_progress": 0.3,
+      "max_band": 0.45,
+      "min_loss": 0.04,
+      "tiers": {
+        "1": { "bar_size": 0.34, "fish_speed": 0.2, "turn_steps": 40, "gain": 0.16, "loss": 0.08 },
+        "2": { "bar_size": 0.29, "fish_speed": 0.32, "turn_steps": 30, "gain": 0.14, "loss": 0.1 },
+        "3": { "bar_size": 0.24, "fish_speed": 0.44, "turn_steps": 22, "gain": 0.13, "loss": 0.12 }
+      }
     }
   }
 }
