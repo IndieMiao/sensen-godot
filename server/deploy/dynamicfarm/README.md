@@ -189,7 +189,7 @@ C-203。服务端把玩家的关键行为批量上报到 Mixpanel，游戏客户
 
 - 健康检查通过，运行的是 `.env` 里写的提交号；
 - 邮箱注册已开放：用一个太短的密码试注册，应回 400 `WEAK_PASSWORD`（不建号、不发信）；
-- Google 登录已开启：用一个不成形的令牌试登录，应回 401 `GOOGLE_TOKEN_*`（不去 Google 取公钥）；
+- Google 登录按 app 容器里的 `GOOGLE_CLIENT_IDS` 判断（C-259）：开着时显示“Google 登录已开启”，用一个不成形的令牌试登录，应回 401 `GOOGLE_TOKEN_*`（不去 Google 取公钥）；置空（正式服按所有者 Q-243 只开邮箱注册）时显示“Google 登录已关闭（按配置）”，应回 503 `GOOGLE_UNAVAILABLE`。冒烟开头会打一行“Google 登录按配置判断：开着／关着”。ops.sh 的命令行不变，回滚到旧镜像时旧工具照旧按开着检查；
 - 游客入口已关：用一个随机安装密钥试游客登录，应回 403 `GUEST_CLOSED`（不建号）；
 - 不登录不能认领、不能存档（401 `UNAUTHENTICATED`）。
 

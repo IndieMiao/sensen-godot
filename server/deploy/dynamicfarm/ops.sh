@@ -318,6 +318,8 @@ do_guests() {
 do_smoke() {
   check_env; check_release_env
   # 默认在 app 容器里打它自己的 3000 端口；给了入口地址（如 https://…/dynamicfarm/v1）就走入口。
+  # Google 登录由冒烟工具按 app 容器里的 GOOGLE_CLIENT_IDS 判断（C-259）：空着就核对它关着（503 GOOGLE_UNAVAILABLE），开着照旧核对。
+  # 不另加参数，回滚到旧镜像时旧工具照样能跑。
   local invite=""; [ "${1:-}" != --invite ] || { invite=1; shift; }
   local base="${1:-http://127.0.0.1:3000/v1}" args
   args=(--base "$base" --git-sha "$(envget GIT_SHA)")
