@@ -13,13 +13,24 @@ extends UiDrawer
 ## `Need N more coins` shakes the key and flashes the Coins number `action/danger` (no toast: the key already says it).
 ## C-211 (MS-15's rest): a stack sold out folds its card away (height to 0 in 200, exit) while its grid icon fades (120);
 ## a purchase rolls the shelf row's `Bag ×N` up to the new count. Reduced: the card closes and the count changes at once.
+## C-232 (0.4.7): once the player has been to the Aquatic Park pier (the save's `fishing.gifted_at`), the shelf also has the
+## tackle (`economy.buy_prices` rods and baits, limits in `fishing.goods`): a rod is a one-off row (no stepper) until owned,
+## then its row goes; baits step up to what the coins and the day's limit cover. Below the item's farm level the key is the
+## grey `Farm Lv4 needed`, a used-up day `Sold out today`; the effect line is P0's (`Bite window 2.6 s`, `Faster bites`,
+## `More Rare fish`). More than SHELF_ROWS rows scroll in a shelf 2½ rows high; the drawer grows by what the shelf shows.
 
 signal sell_requested(item_id: String, count: int)
 signal buy_requested(item_id: String, count: int)
 
 const ParcelItems = preload("res://modules/dynamic_farm/parcel_items.gd")
+const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
+const Fishing = preload("res://modules/dynamic_farm/parcel_fishing.gd")
 ## 560 for the bag half as before (C-59), plus one shelf row (58) and its gap.
 const HEIGHT := 626.0
+const ROW_H := 58.0
+## C-232: up to this many shelf rows stand open; more scroll in a shelf ROWS_SHOWN rows high (the half row says it scrolls).
+const SHELF_ROWS := 2
+const ROWS_SHOWN := 2.5
 const _MAX_STEP := 99
 const _GAP := 8.0
 const _SMALL := 4.0
@@ -30,6 +41,10 @@ var prices := {}
 ## Item id → coins each on Jasmine's shelf (C-149 `economy.buy_prices`).
 var buy_prices := {}
 var shelf: VBoxContainer
+## C-232: the shelf's scroll (rows past SHELF_ROWS); its height follows the rows shown.
+var shelf_scroll: TouchScrollContainer
+## C-232: the server's clock (the day's bait limit); the town sets its server_now.
+var now_ms: Callable = func() -> int: return int(Time.get_unix_time_from_system() * 1000.0)
 var keeper_bar: UiKeeperBar
 var sheet: UiInfoSheet
 var grid: UiInventoryGrid
@@ -59,9 +74,15 @@ func _init(farm_: Dictionary, prices_: Dictionary, npc: Dictionary, portrait: Te
 	coins = UiFactRow.new("Coins", "0")
 	coins.icon = UiArt.COIN
 	body.add_child(coins)
+	shelf_scroll = TouchScrollContainer.new()
+	shelf_scroll.name = "Shelf"
+	shelf_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	shelf_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	body.add_child(shelf_scroll)
 	shelf = VBoxContainer.new()
+	shelf.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	shelf.add_theme_constant_override(&"separation", 0)
-	body.add_child(shelf)
+	shelf_scroll.add_child(shelf)
 	for id in buy_prices:
 		var row := UiShopRow.new()
 		row.name = "Buy_%s" % id
@@ -125,6 +146,7 @@ func refresh(farm_: Dictionary) -> void:
 	grid.items = items
 	_empty.visible = items.is_empty()
 	for id in _rows: _show_row(id)
+	_fit_shelf()
 	if sheet.is_open() and _fold == null:
 		if int(farm.get("bag", {}).get(sheet.item_id(), 0)) > 0: sheet.refresh()
 		else:
@@ -253,32 +275,77 @@ func spec(id: String) -> Dictionary:
 func row_of(id: String) -> UiShopRow:
 	return _rows.get(id, null)
 
-## How many of `id` the coins cover (the stepper's top), at least 1 so the row still draws its stepper.
+## How many of `id` the coins cover (the stepper's top), at least 1 so the row still draws its stepper; C-232: no more than
+## the day's bait limit leaves.
 func affordable(id: String) -> int:
 	var each := int(buy_prices.get(id, 0))
-	return clampi(int(farm.get("coins", 0)) / each, 1, _MAX_STEP) if each > 0 else 1
+	var top := clampi(int(farm.get("coins", 0)) / each, 1, _MAX_STEP) if each > 0 else 1
+	var left := Fishing.can_buy(ParcelFarm.rules(), farm, id, int(now_ms.call()))
+	return clampi(left, 1, top) if left >= 0 else top
+
+## C-232: whether the shelf shows `id` now: always, unless it is tackle (fishing.goods) and the player has not been to the
+## pier yet, or a rod already owned.
+func on_shelf(id: String) -> bool:
+	var g: Dictionary = ParcelFarm.rules().get("fishing", {}).get("goods", {}).get(id, {})
+	if g.is_empty(): return true
+	if farm.get("fishing", {}).get("gifted_at") == null: return false
+	return not g.has("max_owned") or int(farm.get("bag", {}).get(id, 0)) < int(g.max_owned)
+
+## The shelf's rows on show, in the rules' order.
+func shelf_ids() -> Array:
+	return _rows.keys().filter(func(id): return (_rows[id] as Control).visible)
+
+## The shelf as tall as its rows, ROWS_SHOWN at most (scrolling past them); the drawer grows by what it shows over one row.
+func _fit_shelf() -> void:
+	var n := shelf_ids().size()
+	var shown := minf(float(n), ROWS_SHOWN) if n > SHELF_ROWS else float(n)
+	shelf_scroll.custom_minimum_size.y = shown * ROW_H
+	set_height(HEIGHT + maxf(0.0, shown - 1.0) * ROW_H)
 
 ## A shelf row, as P0's counter_buy (F-07) in the copy PM finalised on C-149#10 (C-45 / Q-61): the name, `Bag ×N` under
 ## it, the price for the chosen count (`9 coins`, `18 coins`), then stepper + Buy, or the grey `Need N more coins`.
 ## No grow-time line and no `2 × 9 coins` working.
+## C-232 tackle: the effect on the third line; below its farm level `Farm Lv4 needed`, the day's baits bought `Sold out
+## today`, both before the coins (the server checks them first).
 func buy_spec(id: String, qty := 1) -> Dictionary:
 	var each := int(buy_prices.get(id, 0))
 	qty = maxi(1, qty)
 	var short := each * qty - int(farm.get("coins", 0))
 	var button := {id = &"buy", label = "Buy", kind = &"secondary", payload = {}} if short <= 0 \
 		else {id = &"buy", label = "Need %d more coins" % short, kind = &"unavailable", payload = {}}
-	return {id = id, title = ParcelItems.name_of(id), icon = ParcelItems.icon_of(id), info = false,
-		facts = ["Bag ×%d" % int(farm.get("bag", {}).get(id, 0))],
+	var rules := ParcelFarm.rules()
+	var g: Dictionary = rules.get("fishing", {}).get("goods", {}).get(id, {})
+	if g.has("min_level") and ParcelFarm.farm_level(farm) < int(g.min_level):
+		button = {id = &"buy", label = "Farm Lv%d needed" % int(g.min_level), kind = &"unavailable", payload = {}}
+	elif g.has("daily") and Fishing.can_buy(rules, farm, id, int(now_ms.call())) == 0:
+		button = {id = &"buy", label = "Sold out today", kind = &"unavailable", payload = {}}
+	var facts := ["Bag ×%d" % int(farm.get("bag", {}).get(id, 0))]
+	var effect := tackle_effect(id)
+	if effect != "": facts.append(effect)
+	return {id = id, title = ParcelItems.name_of(id), icon = ParcelItems.icon_of(id), info = false, facts = facts,
 		price = {each = each, total = each * qty, text = "%d coins" % (each * qty), line = ""},
 		buttons = [button]}
 
+## C-232: a rod's or bait's effect in P0's words (P0ItemInfo: `Bite window 2.6 s`, `Faster bites`, `More Rare fish`); "".
+static func tackle_effect(id: String) -> String:
+	var f: Dictionary = ParcelFarm.rules().get("fishing", {})
+	if f.is_empty(): return ""
+	for rod: Dictionary in f.rods:
+		if rod.id == id: return "Bite window %.1f s" % (float(int(f.hook_window_ms) + int(rod.hook_bonus_ms)) / 1000.0)
+	if f.baits.has(id): return "More Rare fish" if int(f.baits[id].shift[f.baits[id].shift.size() - 1]) > 0 else "Faster bites"
+	return ""
+
 func _show_row(id: String) -> void:
+	var row := _rows[id] as UiShopRow
+	row.visible = on_shelf(id)
+	if not row.visible: return
 	var top := affordable(id)
 	var qty := clampi(int(_qty.get(id, 1)), 1, top)
 	_qty[id] = qty
 	# The row's new stepper takes its old count, capped at `top` (the wallet shrank under it): the same as qty here.
-	var row := _rows[id] as UiShopRow
-	row.show_spec(buy_spec(id, qty), false, top)
+	# C-232: a rod is one-off (no stepper), as P0's counter_buy.
+	var g: Dictionary = ParcelFarm.rules().get("fishing", {}).get("goods", {}).get(id, {})
+	row.show_spec(buy_spec(id, qty), int(g.get("max_owned", 0)) == 1, top)
 	if row.buy != null and row.buy.is_unavailable():
 		row.buy.unavailable_pressed.connect(func(_r: String): refuse(row.buy))
 

@@ -36,6 +36,7 @@ func _run() -> void:
 	_commands()
 	await _market()
 	await _buy()
+	await _tackle()
 	await _carpenter()
 	await _upgrade()
 	await _level_card_first_frame()
@@ -55,8 +56,9 @@ func _clean() -> void:
 
 func _rules() -> void:
 	var eco: Dictionary = ParcelFarm.rules().economy
-	_check(eco.sell_prices == {"crop_carrot": 12, "wood": 2, "wild_herb": 1, "stone": 2, "egg": 20, "milk": 45, "wool": 30},
-		"C-30#36 prices: carrot 12, wood 2, herb 1, stone 2; C-154 egg 20; C-181 milk 45; C-182 wool 30")
+	_check(eco.sell_prices == {"crop_carrot": 12, "wood": 2, "wild_herb": 1, "stone": 2, "egg": 20, "milk": 45, "wool": 30,
+		"fish_crucian": 3, "fish_carp": 4, "fish_mullet": 4, "fish_perch": 7, "fish_bass": 7, "fish_mackerel": 8, "fish_seabass": 14},
+		"C-30#36 prices: carrot 12, wood 2, herb 1, stone 2; C-154 egg 20; C-181 milk 45; C-182 wool 30; C-232 the seven fish at P0's")
 	# C-181: every blueprint reads a price in coins (0 when the rules give none) and, since C-192, the farm level it is sold
 	# from (1 when the rules give none); the barn's is bought for 600 from level 2 (SEN-Q-282). C-182: and how many requests
 	# the farm has delivered first (0 when the rules give none); the sheep pen's 1,200 after 15 at level 3 (SEN-Q-282).
@@ -66,7 +68,8 @@ func _rules() -> void:
 		"the barn blueprint for 600 coins from farm level 2")
 	_check(eco.blueprints.sheep_pen == {"item": "blueprint_sheep_pen", "amount": 1, "min_sales": 0, "min_level": 3, "min_requests": 15,
 		"coins": 1200}, "the sheep pen blueprint for 1,200 coins after 15 requests at farm level 3")
-	_check(eco.buy_prices == {"seed_carrot": 9}, "C-149: Jasmine sells carrot seeds at 9, the P0 seed price")
+	_check(eco.buy_prices == {"seed_carrot": 9, "rod_reed": 80, "rod_carbon": 600, "bait_worm": 2, "bait_lure": 6},
+		"C-149: Jasmine sells carrot seeds at 9, the P0 seed price; C-232 the rods and baits (SEN-C-223 §6.2)")
 	var p0_carrot := {}
 	var p0 = JSON.parse_string(FileAccess.get_file_as_string("res://assets/p0/p0_content.json"))
 	for crop: Dictionary in p0.get("crops", []):
@@ -185,7 +188,8 @@ func _buy() -> void:
 	await process_frame
 	var counter = town.counter
 	var row: UiShopRow = counter.row_of("seed_carrot")
-	_check(row != null and counter.shelf.get_child_count() == 1, "one shelf row: carrot seeds")
+	_check(row != null and counter.shelf_ids() == ["seed_carrot"], "one shelf row: carrot seeds (no tackle before the pier)")
+	_check(counter.height == counter.HEIGHT, "the drawer as tall as before")
 	var spec: Dictionary = row.spec()
 	_check(spec.title == "Carrot Seeds" and spec.facts == ["Bag ×0"] and spec.price.text == "9 coins" and spec.price.line == "", "the row (C-149#10): name, bag count, 9 coins, no extra lines")
 	_check(row.buy != null and row.buy.is_unavailable() and row.buy.reason == "Need 9 more coins" and row.stepper == null, "no coins: Buy is grey with the shortfall")
@@ -216,6 +220,43 @@ func _buy() -> void:
 	await process_frame
 	town = await _open(Town.MARKET, store)
 	_check(town.farm.coins == 6 and town.farm.bag.seed_carrot == 2, "coming back: the same coins and seeds")
+	town.close()
+	await process_frame
+
+## C-232: after the first pier visit the shelf has the tackle: one-off rods until owned, baits to the day's limit, the
+## Carbon Rod and the Spinner grey below farm level 4, the shelf scrolling past two rows.
+func _tackle() -> void:
+	_clean()
+	var store := LocalStore.new(PARCEL, DIR)
+	store.now_ms = func() -> int: return T0
+	store._save(ParcelFarm.normalize({"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {"rod_starter": 1, "fish_seabass": 1},
+		"welcomed_at": T0, "coins": 300, "fishing": {"gifted_at": T0}}), 3)
+	var town := await _open(Town.MARKET, store)
+	town.keys.trade.activated.emit()
+	await process_frame
+	var counter = town.counter
+	_check(counter.shelf_ids() == ["seed_carrot", "rod_reed", "rod_carbon", "bait_worm", "bait_lure"], "seeds, two rods and two baits")
+	_check(counter.shelf_scroll.custom_minimum_size.y == counter.ROWS_SHOWN * counter.ROW_H
+		and counter.height == counter.HEIGHT + (counter.ROWS_SHOWN - 1.0) * counter.ROW_H, "two and a half rows show, the rest scroll")
+	var reed: UiShopRow = counter.row_of("rod_reed")
+	_check(reed.spec().title == "Reed Rod" and reed.spec().price.text == "80 coins" and reed.stepper == null and not reed.buy.is_unavailable()
+		and reed._gate.text == "Bite window 2.6 s", "Reed Rod: one-off, 80 coins, its bite window")
+	var carbon: UiShopRow = counter.row_of("rod_carbon")
+	_check(carbon.buy.is_unavailable() and carbon.buy.reason == "Farm Lv4 needed", "Carbon Rod: Farm Lv4 needed")
+	_check(counter.row_of("bait_lure").buy.reason == "Farm Lv4 needed" and counter.row_of("bait_lure")._gate.text == "More Rare fish", "Spinner Lure: Lv4, more Rare fish")
+	var worm: UiShopRow = counter.row_of("bait_worm")
+	_check(worm.spec().title == "Worm Bait" and worm.stepper != null and worm.stepper.max_value == 30 and worm._gate.text == "Faster bites",
+		"Worm Bait: the stepper stops at the day's 30")
+	await town.buy("rod_reed", 1)
+	_check(town.farm.bag.get("rod_reed") == 1 and counter.shelf_ids() == ["seed_carrot", "rod_carbon", "bait_worm", "bait_lure"], "bought: the Reed Rod row goes")
+	await town.buy("bait_worm", 20)
+	_check(counter.row_of("bait_worm").stepper.max_value == 10, "20 bought: 10 left today")
+	await town.buy("bait_worm", 10)
+	_check(counter.row_of("bait_worm").buy.is_unavailable() and counter.row_of("bait_worm").buy.reason == "Sold out today", "30 bought: Sold out today")
+	var refused: Dictionary = await town.buy("bait_worm", 1)
+	_check(not refused.ok and refused.code == "DAILY_LIMIT", "the store refuses the 31st")
+	await town.sell("fish_seabass", 1)
+	_check(int(town.farm.coins) == 300 - 80 - 60 + 14 and not town.farm.bag.has("fish_seabass"), "a Sea Bass sells for 14")
 	town.close()
 	await process_frame
 

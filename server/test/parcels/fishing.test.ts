@@ -1,4 +1,6 @@
 /** Aquatic Park 码头钓鱼（C-232）：投竿扣体力、服务端按种子重放收线记录判定、同一竿只能领一次、渔具限量。 */
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONTENT_DIR } from '../../src/domain/content.js';
 import { applyFarmCommands, emptyFarm, parseFarmCommands, welcome, withEconomy, type FarmCommand, type ParcelFarmState } from '../../src/parcels/farm.js';
@@ -303,5 +305,41 @@ describe('tackle at Jasmine’s counter (C-232)', () => {
     expect(apply(rich(3), [{ type: 'buy', item: 'bait_lure', count: 1 }])).toMatchObject({ code: 'CONDITION_NOT_MET', detail: { min_level: 4 } });
     // A refused batch keeps no count: 31 at once is refused and 30 still go through.
     expect(apply(rich(), [{ type: 'buy', item: 'bait_worm', count: 31 }])).toMatchObject({ ok: false, code: 'DAILY_LIMIT', detail: { bought: 0 } });
+  });
+});
+
+/**
+ * 客户端和服务端同一套钓鱼规则：tests/dynamic_farm/fixtures/fishing_cases.json 的每个用例在这里按服务端跑，
+ * 在 tests/dynamic_farm/test_parcel_fishing.gd 里按客户端 parcel_fishing.gd 跑，两边结果都要等于文件里记的结果。
+ */
+describe('C-232 the client runs the same fishing cases (shared fixture)', () => {
+  const shared = JSON.parse(readFileSync(path.join(DEFAULT_CONTENT_DIR, '..', '..', '..', 'tests', 'dynamic_farm', 'fixtures', 'fishing_cases.json'), 'utf8'));
+  it('has the cases', () => {
+    expect(shared.cases.length).toBeGreaterThanOrEqual(40);
+    expect(shared.reels.length).toBeGreaterThanOrEqual(150);
+  });
+  for (const c of shared.cases) {
+    it(c.name, () => {
+      const frozen = structuredClone(c.farm);
+      const r = applyFarmCommands(rules, c.farm, c.commands, c.now, { parcel_id: shared.parcel_id });
+      expect(r.ok ? { ok: true, bag: r.state.bag, energy: r.state.energy, coins: r.state.coins, fishing: r.state.fishing ?? null }
+        : { ok: false, index: r.index, code: r.code, detail: r.detail ?? {} }).toEqual(c.expect);
+      expect(c.farm).toEqual(frozen);
+    });
+  }
+  it('replays every reel to the recorded outcome, step for step', () => {
+    for (const r of shared.reels) {
+      const tier = reelTier(f, r.rarity, f.rods.find(x => x.id === r.rod)!);
+      expect(replayReel(f, r.seed, tier, r.inputs)!.outcome).toBe(r.outcome);
+      const s = initialReel(f, r.seed);
+      const marks: number[][] = [];
+      for (const bit of r.inputs) {
+        stepReel(f, s, bit === '1', tier);
+        if (s.step % 40 === 0 || s.outcome !== 'playing') marks.push([s.step, s.bar, s.fish, s.progress]);
+      }
+      expect(marks).toEqual(r.marks);
+    }
+    for (const x of shared.rolls) for (const bait of ['bait_worm', 'bait_lure'])
+      expect([rollRarity(f, x.seed, null), rollRarity(f, x.seed, bait)]).toEqual([x.none, x[bait]]);
   });
 });

@@ -373,6 +373,8 @@ func open_counter() -> void:
 	var data := npc(MARKET)
 	var economy: Dictionary = ParcelFarm.rules().get("economy", {})
 	counter = Counter.new(farm, economy.get("sell_prices", {}), data, portrait(MARKET, false), economy.get("buy_prices", {}))
+	counter.now_ms = server_now   # C-232: the day's bait limit runs on the server's day
+	counter.refresh(farm)
 	counter.keeper_bar.line = LINES.hello
 	counter.close_requested.connect(func(): stack.close_drawer())
 	counter.sell_requested.connect(sell)
