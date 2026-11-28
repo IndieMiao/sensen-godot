@@ -987,8 +987,8 @@ func _setup_world() -> void:
 	_normal_size = CameraRules.close_view_size(get_viewport().get_visible_rect().size) * CameraRules.P0_VIEW_K
 
 func _on_avatar_ready(_config) -> void:
-	var merged := _rig.find_children("merged_mesh","MeshInstance3D",true,false)
-	if merged.is_empty() or (merged[0] as MeshInstance3D).mesh == null or (merged[0] as MeshInstance3D).mesh.get_surface_count() == 0:
+	# The merged body, or its parts shown separately while an unusable read back is retried (C-248).
+	if not MergedAssembler.shows_body(_rig.skeleton):
 		_fail("The player appearance is incomplete.")
 		return
 	_avatar_loaded = true
