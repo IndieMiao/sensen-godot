@@ -208,12 +208,26 @@ static func settings(version: String, safe_top := 0.0, safe_bottom := 0.0, home 
 		out.sends = false
 		out.activated.connect(func(): page.open_pressed.emit("sign_out"))
 		end.add_child(out)
-		var del := UiSettingRow.new(UiSettingRow.Kind.LINK, "Delete account", "Deletes your farm, items and progress")
-		del.name = "DeleteAccount"
-		del.set_danger()
-		del.pressed.connect(func(): page.open_pressed.emit("delete_account"))
-		end.add_child(UiSettingRow.group([del]))
+		page.add_delete_account(end)
 	return page
+
+## The Danger row `Delete account ›` / `Deletes your farm, items and progress` in its own card ("delete_account"):
+## in `end` (P0: 12 under Sign out), or with no `end` at the page's foot, 24 under Legal — the dynamic farm's Settings,
+## whose Sign out stays on the map's account chip (C-243).
+func add_delete_account(end: Container = null) -> UiSettingRow:
+	if end == null:
+		var gap := Control.new()
+		gap.custom_minimum_size.y = _END_GAP
+		gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		body.add_child(gap)
+	var del := UiSettingRow.new(UiSettingRow.Kind.LINK, "Delete account", "Deletes your farm, items and progress")
+	del.name = "DeleteAccount"
+	del.set_danger()
+	del.pressed.connect(func(): open_pressed.emit("delete_account"))
+	var card := UiSettingRow.group([del])
+	if end != null: end.add_child(card)
+	else: body.add_child(card)
+	return del
 
 ## Visible test settings (341 d559585e), retaining the approved B page layout and copy (aa0e971b).
 static func test_options(on: bool, is_test: bool, safe_top := 0.0, safe_bottom := 0.0) -> P0SettingsPage:

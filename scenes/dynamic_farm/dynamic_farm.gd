@@ -990,6 +990,8 @@ func open_profile() -> Control:
 	# MS-21 (C-185 §4, C-211): the profile fades in over the parcel (160); the parcel's HUD goes once it is covered.
 	_profile = load(PROFILE).open(_profile_layer, Vector3.ZERO, profile_home(), true)
 	_profile.closed.connect(_profile_closed)
+	# C-243: Settings › Delete account on the parcel: back to the map, which shows the sign-in panel.
+	_profile.account_deleted.connect(_request_back)
 	_profile.tree_exited.connect(_profile_layer.queue_free)   # its layer goes when its pages have faded out
 	_controls.process_mode = Node.PROCESS_MODE_DISABLED
 	var profile := _profile

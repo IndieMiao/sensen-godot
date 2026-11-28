@@ -40,6 +40,13 @@ var busy := false
 var from_account := false
 ## 登录墙（2026-09-29 取消游客模式）：没有关闭按钮，登录成功前关不掉。
 var gate := false
+## 删号后是否以游客身份重新登录（Net.delete_account）。动态农场没有游客身份，为 false（C-243）。
+var guest_login := true
+## 登录页的提示（例如删号后的结果），代替默认副标题；换到其它步骤后不再显示（C-243）。
+var notice := ""
+## 打开时的状态。直接以删号确认打开（动态农场的 Settings › Delete account，C-243）时，"Keep my account" 关闭面板，
+## 不进"我的账号"页。
+var _opened_as := ""
 var _reset_code_sent := false
 ## 测试替身：func(nonce_hash) -> 原生回包；空则走 iOS 原生桥。
 var apple_transport: Callable = Callable()
@@ -74,11 +81,13 @@ var _toast_line: Label
 var _error_field: Control
 var _card: Control
 
-static func open(host: Node, p_mode := "sign_in", p_reason := "", look_v3 := false, english_only := false) -> AccountPanel:
+static func open(host: Node, p_mode := "sign_in", p_reason := "", look_v3 := false, english_only := false,
+		p_notice := "") -> AccountPanel:
 	var panel := AccountPanel.new()
 	panel.v3 = look_v3
 	panel.english = english_only
 	panel.reason = p_reason
+	panel.notice = p_notice
 	panel.mode = p_mode if p_mode in MODES else "sign_in"
 	host.add_child(panel)
 	return panel
@@ -146,6 +155,7 @@ func _ready() -> void:
 	if v3: _dress_v3()
 	if Net and Net.account.signed_in() and mode in ["sign_in", "sign_up"]: mode = "account"
 	if Net and Net.account.signed_in(): _email.text = Net.account.email
+	_opened_as = mode
 	set_mode(mode)
 
 ## UI v3 shell (C-106, C-85 ④ as approved in Q-124): the scene blurred under a light scrim, then a 312 wide paper card
@@ -514,6 +524,7 @@ func _option(node_name: String, labels: Array, parent: Control = null) -> Option
 ## 状态切换：显示哪些输入框、标题文案、按钮列表。
 func set_mode(next: String) -> void:
 	mode = next
+	if next != "sign_in": notice = ""
 	# A new step starts at its title, not wherever the previous step was scrolled to. Refreshing the same
 	# step ("Send a new code" re-enters it) keeps the scroll, so the buttons stay under the finger.
 	var step := mode + ("+code" if mode == "forgot" and _reset_code_sent else "")
@@ -532,7 +543,8 @@ func set_mode(next: String) -> void:
 	match mode:
 		"sign_in":
 			_show([_email, _password, _show_passwords])
-			_texts("Sign in", reason if not reason.is_empty() else "Sign in with your email to keep your farm on every device.")
+			_texts("Sign in", notice if not notice.is_empty() else reason if not reason.is_empty()
+				else "Sign in with your email to keep your farm on every device.")
 			_set_actions(_with_apple([["sign_in", "Sign in", "accent"], ["to_sign_up", "Create an account"], ["to_forgot", "Forgot password?"]]))
 		"sign_up":
 			_show([_email, _password, _confirm_password, _show_passwords])
@@ -629,7 +641,7 @@ func _texts(title: String, subtitle: String) -> void:
 	_subtitle.text = _t(subtitle)
 	# v3 (C-85 ④ A / D): signing in, creating an account and the profile show no line under the title unless it says
 	# why the panel opened (a reason).
-	if v3: _subtitle.visible = not (mode in ["sign_in", "sign_up", "profile"] and reason.is_empty())
+	if v3: _subtitle.visible = not (mode in ["sign_in", "sign_up", "profile"] and reason.is_empty() and notice.is_empty())
 
 ## iOS 上登录 / 注册页都给 Apple 登录，紧跟主按钮（App Store 4.8：与其它登录方式同等显眼）。
 func _with_apple(list: Array) -> Array:
@@ -783,6 +795,9 @@ func _on_action(id: String) -> void:
 		"later": _after_sign_in()
 		"save_profile": await _submit_profile()
 		"to_account":
+			if _opened_as == "delete":
+				dismiss()
+				return
 			from_account = false
 			set_mode("account")
 		"change_password": await _submit_password_change()
@@ -998,7 +1013,7 @@ func _submit_delete() -> void:
 		_say("Enter your password.")
 		return
 	_set_busy(true)
-	var result := await Net.delete_account(_password.text)
+	var result := await Net.delete_account(_password.text, guest_login)
 	_set_busy(false)
 	if not result.ok:
 		_say(AccountSession.describe(str(result.code)))
