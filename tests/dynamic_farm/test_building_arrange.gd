@@ -10,7 +10,8 @@ extends SceneTree
 ## elsewhere it stands there with its hens and both eggs. Back folds the card, then ends the mode; Done ends it too.
 ## Reopened, everything is where it was left. C-247 (V-779): an egg laid with the card up shows on it at once; the
 ## Energy countdown goes on under the Move preview; the cottage moved over the player leaves them where the camera
-## sees them, not behind its roof.
+## sees them, not behind its roof. C-254 (V-798): a building panned up to the top bar keeps its marker just under the
+## bar (LOCK-06 as it was), still tappable, and loses it once up behind the bar.
 ## Run in the private preview project (README), optionally with `-- <farm.json>`.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -161,6 +162,71 @@ func _state_of(id: int) -> Dictionary:
 		if int(b.id) == id: return b
 	return {}
 
+## Where building `id`'s marker would be without the top bar (over its model's top, as marker_point).
+func _marker_raw(id: int) -> Vector2:
+	var lift: float = load("res://scenes/dynamic_farm/building_arrange.gd").MARKER_LIFT
+	var built: Dictionary = scene._buildings[id]
+	var b: Dictionary = built.state
+	var middle: Vector3 = Building.center(scene._walk, Building.at_of(b), Building.base_of(b), int(b.rotation))
+	var top := middle.y
+	for mesh: VisualInstance3D in (built.node as Node3D).find_children("*", "VisualInstance3D", true, false):
+		top = maxf(top, (mesh.global_transform * mesh.get_aabb()).end.y)
+	return scene._camera.unproject_position(Vector3(middle.x, top + lift, middle.z))
+
+## C-254 (C-247 V-798): the camera pans until building `id` goes up behind the top bar (LOCK-06). Its marker never
+## goes over the bar: where it would (the V-798 frame) it stays just under it, the bar as it was, and a tap on it
+## picks the building; once the building is up behind the bar the marker goes. Panned back, it is where it was.
+func _marker_under_bar(arrange: Control, id: int) -> void:
+	var focus_was: Vector3 = scene._focus
+	var overview_was: bool = scene._overview
+	var bar: float = scene.top_bar_bottom()
+	var hit: float = load("res://scenes/dynamic_farm/building_arrange.gd").MARKER_HIT
+	var header: Control = scene._header
+	var header_was := header.get_global_rect()
+	var marker: Control = arrange.markers[id]
+	var start_pos: Vector2 = marker.position + marker.size * 0.5
+	var middle: Vector2 = scene.get_viewport().get_visible_rect().size * 0.5
+	# First well under the bar: the marker is over its building, as before.
+	for _i in 200:
+		if _marker_raw(id).y > bar + hit * 2.0: break
+		scene.pan(middle, middle + Vector2(0, 4))
+	arrange._place_markers()
+	var low_raw := _marker_raw(id)
+	_check(low_raw.y > bar + hit * 2.0 and marker.visible and (marker.position + marker.size * 0.5).distance_to(low_raw) < 0.5,
+		"C-254: well under the bar, the marker is over its building: %s, unbarred %s" % [marker.position + marker.size * 0.5, low_raw])
+	var over := 0
+	var tucked := false
+	var picked := false
+	var hid_early := false
+	var gone := false
+	for _i in 600:
+		scene.pan(middle, middle - Vector2(0, 4))
+		arrange._place_markers()
+		var raw := _marker_raw(id)
+		if not marker.visible:
+			gone = true
+			hid_early = raw.y - hit * 0.5 > bar
+			break
+		if marker.position.y < bar - 0.01: over += 1
+		if raw.y < bar and not tucked:
+			# The V-798 frame: unbarred, the marker's middle would be on the bar.
+			tucked = absf(marker.position.y - bar) < 0.01
+			arrange.tap(marker.position + marker.size * 0.5)
+			picked = arrange.selected == id
+			arrange.close_card()
+	_check(tucked, "C-254: pushed up, building %d's marker would be on the top bar; it stays just under it" % id)
+	_check(over == 0, "C-254: the marker never goes over the top bar (%d frames did)" % over)
+	_check(picked, "C-254: a tap on the marker under the bar picks building %d" % id)
+	_check(gone and not hid_early, "C-254: up behind the bar the marker goes, not before")
+	_check(header.get_global_rect() == header_was and header.visible, "C-254: the top bar stays as it was")
+	scene._focus = focus_was
+	scene._overview = overview_was
+	scene._place_camera()
+	arrange._place_markers()
+	_check(marker.visible and (marker.position + marker.size * 0.5).distance_to(start_pos) < 0.5,
+		"C-254: panned back, the marker is where it was: %s, was %s" % [marker.position + marker.size * 0.5, start_pos])
+	await process_frame
+
 func _arrange() -> void:
 	var store := LocalStore.new(raw.block_id, dir)
 	await _seed(store, {"hoe_starter": 1, "pail": 1, "blueprint_cottage": 1, "blueprint_coop": 1, "blueprint_well": 1, "crop_carrot": 2})
@@ -203,6 +269,7 @@ func _arrange() -> void:
 		# Approximate: a marker sits at its building's projected point, a fractional position, and a Control's size is
 		# kept as offset_bottom - offset_top in float32, so it can read 44.00001 at some points (C-249).
 		_check(m.visible and m.size.is_equal_approx(Vector2(44, 44)), "building %d's marker shows, its hit area 44: %s" % [id, m.size])
+	await _marker_under_bar(arrange, _id_of("coop"))
 	# The coop: its facts, Store waiting for the egg (D2).
 	arrange.select(coop_id)
 	await process_frame
