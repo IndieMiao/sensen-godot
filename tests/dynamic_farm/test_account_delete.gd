@@ -74,7 +74,8 @@ func _run() -> void:
 	verify(settings.body.get_child(settings.body.get_child_count() - 1).is_ancestor_of(row), "at the foot of Settings, under Legal")
 	verify(settings.find_child("SignOut", true, false) == null and settings.find_child("SignedInWith", true, false) == null,
 		"no Sign out or Signed in with here: they stay on the map's account chip")
-	verify(row.find_child("Title", true, false).text == "Delete account", "the row reads Delete account")
+	verify(row.find_child("Title", true, false).text == "Delete account" and row.find_child("Line", true, false) == null,
+		"the row reads Delete account, no line under it (C-243#9)")
 
 	# Keep my account: nothing is deleted, Settings stays.
 	row.pressed.emit(); await process_frame

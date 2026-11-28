@@ -9,7 +9,7 @@ extends Control
 ##   what a tap does); no skills, collections or voice (no such data in the dynamic farm; ①-D ⑦);
 ## - Settings with Legal — Licenses (and Map data's `Share anonymous map usage`, the map SDK's own switch) and the
 ##   installed package's version; no Test options, Language or Notifications. Signed in, the Danger row `Delete account ›`
-##   at the foot (C-243; Google Play asks for deletion in the app): it opens the account panel's delete step (the v3 look,
+##   (no line under it) at the foot (C-243; Google Play asks for deletion in the app): it opens the account panel's delete step (the v3 look,
 ##   in English; the password for an account that has one), whose `Keep my account` / ✕ go back to Settings and delete
 ##   nothing. Deleted, the pages close and `account_deleted` comes: the host shows the sign-in panel, as after Sign out.
 ##   Sign in and Sign out stay on the map's account chip.
@@ -145,7 +145,7 @@ func profile_view() -> Dictionary:
 func open_settings() -> P0SettingsPage:
 	var page := P0SettingsPage.settings(version_line(), _safe_top(), _safe_bottom(), {}, "", P0SettingsPage.BLOCKED_NONE,
 		false, "", "", "", "", "", false)
-	if signed_in(): page.add_delete_account()
+	if signed_in(): page.add_delete_account(null, "") # `Delete account ›` alone, no line under it (C-243#9)
 	page.back_pressed.connect(back)
 	page.open_pressed.connect(func(what: String):
 		if what == "licenses": open_licenses()
