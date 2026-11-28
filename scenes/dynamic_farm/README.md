@@ -231,6 +231,9 @@ its yard behind the placement preview (`Cancel · Rotate · Move`, its old outli
 moved, it lands with the Build pop. Back folds the card, then ends the mode, as Done does.
 Tests: `tests/dynamic_farm/test_building_arrange.gd`; captures `tools/dev/dynamic_farm/arrange_shots.gd`; emulator package
 `GATHER_QA_ENTRY=arrange`. Notes: `docs/plans/C-229.md`.
+C-247 (V-779): the card's facts follow the clock (a drop laid with the card up shows within the second); the farm's clock
+goes on under a placement or Move preview (Energy `+1 in m:ss`, animals); a building put down over the player steps them
+out to the nearest clear point the camera sees them at, not behind its roof (`seen`). Notes: `docs/plans/C-247.md`.
 
 ## Washington Square room (C-115)
 
