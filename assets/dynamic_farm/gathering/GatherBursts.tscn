@@ -1,0 +1,236 @@
+[gd_scene format=3]
+
+[ext_resource type="Shader" path="res://assets/dynamic_farm/gathering/motes/burst.gdshader" id="motion"]
+[ext_resource type="Texture2D" path="res://assets/dynamic_farm/gathering/motes/chips.png" id="tex_chips"]
+[ext_resource type="Texture2D" path="res://assets/dynamic_farm/gathering/motes/leaves.png" id="tex_leaves"]
+[ext_resource type="Texture2D" path="res://assets/dynamic_farm/gathering/motes/dust.png" id="tex_dust"]
+[ext_resource type="Texture2D" path="res://assets/dynamic_farm/gathering/motes/shards.png" id="tex_shards"]
+[ext_resource type="Texture2D" path="res://assets/dynamic_farm/gathering/motes/sparks.png" id="tex_sparks"]
+[ext_resource type="Texture2D" path="res://assets/dynamic_farm/gathering/motes/petals.png" id="tex_petals"]
+[ext_resource type="Texture2D" path="res://assets/dynamic_farm/gathering/motes/clippings.png" id="tex_clippings"]
+
+[sub_resource type="ShaderMaterial" id="path_chips"]
+shader = ExtResource("motion")
+shader_parameter/speed = Vector2(1.2,2.2)
+shader_parameter/diameter = Vector2(0.03,0.06)
+shader_parameter/gravity = 9
+shader_parameter/cone = 50
+shader_parameter/sway_hz = 0
+
+[sub_resource type="StandardMaterial3D" id="ink_chips"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("tex_chips")
+billboard_mode = 3
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="card_chips"]
+material = SubResource("ink_chips")
+size = Vector2(1,1)
+
+[sub_resource type="ShaderMaterial" id="path_leaves"]
+shader = ExtResource("motion")
+shader_parameter/speed = Vector2(0.3,0.8)
+shader_parameter/diameter = Vector2(0.05,0.08)
+shader_parameter/gravity = 1.2
+shader_parameter/cone = 100
+shader_parameter/sway_hz = 1.5
+
+[sub_resource type="StandardMaterial3D" id="ink_leaves"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("tex_leaves")
+billboard_mode = 3
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="card_leaves"]
+material = SubResource("ink_leaves")
+size = Vector2(1,1)
+
+[sub_resource type="ShaderMaterial" id="path_dust"]
+shader = ExtResource("motion")
+shader_parameter/speed = Vector2(0.4,0.9)
+shader_parameter/diameter = Vector2(0.12,0.25)
+shader_parameter/gravity = -0.2
+shader_parameter/cone = 68
+shader_parameter/sway_hz = 0
+
+[sub_resource type="StandardMaterial3D" id="ink_dust"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("tex_dust")
+billboard_mode = 3
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="card_dust"]
+material = SubResource("ink_dust")
+size = Vector2(1,1)
+
+[sub_resource type="ShaderMaterial" id="path_shards"]
+shader = ExtResource("motion")
+shader_parameter/speed = Vector2(1.4,2.4)
+shader_parameter/diameter = Vector2(0.03,0.05)
+shader_parameter/gravity = 9
+shader_parameter/cone = 70
+shader_parameter/sway_hz = 0
+
+[sub_resource type="StandardMaterial3D" id="ink_shards"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("tex_shards")
+billboard_mode = 3
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="card_shards"]
+material = SubResource("ink_shards")
+size = Vector2(1,1)
+
+[sub_resource type="ShaderMaterial" id="path_sparks"]
+shader = ExtResource("motion")
+shader_parameter/speed = Vector2(2,3)
+shader_parameter/diameter = Vector2(0.02,0.03)
+shader_parameter/gravity = 0
+shader_parameter/cone = 60
+shader_parameter/sway_hz = 0
+
+[sub_resource type="StandardMaterial3D" id="ink_sparks"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("tex_sparks")
+billboard_mode = 3
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="card_sparks"]
+material = SubResource("ink_sparks")
+size = Vector2(1,1)
+
+[sub_resource type="ShaderMaterial" id="path_petals"]
+shader = ExtResource("motion")
+shader_parameter/speed = Vector2(0.3,0.7)
+shader_parameter/diameter = Vector2(0.03,0.05)
+shader_parameter/gravity = 0.8
+shader_parameter/cone = 85
+shader_parameter/sway_hz = 2
+
+[sub_resource type="StandardMaterial3D" id="ink_petals"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("tex_petals")
+billboard_mode = 3
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="card_petals"]
+material = SubResource("ink_petals")
+size = Vector2(1,1)
+
+[sub_resource type="ShaderMaterial" id="path_clippings"]
+shader = ExtResource("motion")
+shader_parameter/speed = Vector2(0.4,0.9)
+shader_parameter/diameter = Vector2(0.02,0.04)
+shader_parameter/gravity = 3
+shader_parameter/cone = 70
+shader_parameter/sway_hz = 1
+
+[sub_resource type="StandardMaterial3D" id="ink_clippings"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+vertex_color_use_as_albedo = true
+albedo_texture = ExtResource("tex_clippings")
+billboard_mode = 3
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="card_clippings"]
+material = SubResource("ink_clippings")
+size = Vector2(1,1)
+
+[node name="GatherBursts" type="Node3D"]
+
+[node name="Chips" type="GPUParticles3D" parent="."]
+emitting = false
+cast_shadow = 0
+amount = 4
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+visibility_aabb = AABB(-2,-2,-2,4,4,4)
+process_material = SubResource("path_chips")
+draw_pass_1 = SubResource("card_chips")
+
+[node name="Leaves" type="GPUParticles3D" parent="."]
+emitting = false
+cast_shadow = 0
+amount = 12
+lifetime = 1.1
+one_shot = true
+explosiveness = 1.0
+visibility_aabb = AABB(-2,-2,-2,4,4,4)
+process_material = SubResource("path_leaves")
+draw_pass_1 = SubResource("card_leaves")
+
+[node name="Dust" type="GPUParticles3D" parent="."]
+emitting = false
+cast_shadow = 0
+amount = 10
+lifetime = 0.6
+one_shot = true
+explosiveness = 1.0
+visibility_aabb = AABB(-2,-2,-2,4,4,4)
+process_material = SubResource("path_dust")
+draw_pass_1 = SubResource("card_dust")
+
+[node name="Shards" type="GPUParticles3D" parent="."]
+emitting = false
+cast_shadow = 0
+amount = 5
+lifetime = 0.45
+one_shot = true
+explosiveness = 1.0
+visibility_aabb = AABB(-2,-2,-2,4,4,4)
+process_material = SubResource("path_shards")
+draw_pass_1 = SubResource("card_shards")
+
+[node name="Sparks" type="GPUParticles3D" parent="."]
+emitting = false
+cast_shadow = 0
+amount = 2
+lifetime = 0.18
+one_shot = true
+explosiveness = 1.0
+visibility_aabb = AABB(-2,-2,-2,4,4,4)
+process_material = SubResource("path_sparks")
+draw_pass_1 = SubResource("card_sparks")
+
+[node name="Petals" type="GPUParticles3D" parent="."]
+emitting = false
+cast_shadow = 0
+amount = 7
+lifetime = 0.9
+one_shot = true
+explosiveness = 1.0
+visibility_aabb = AABB(-2,-2,-2,4,4,4)
+process_material = SubResource("path_petals")
+draw_pass_1 = SubResource("card_petals")
+
+[node name="Clippings" type="GPUParticles3D" parent="."]
+emitting = false
+cast_shadow = 0
+amount = 6
+lifetime = 0.7
+one_shot = true
+explosiveness = 1.0
+visibility_aabb = AABB(-2,-2,-2,4,4,4)
+process_material = SubResource("path_clippings")
+draw_pass_1 = SubResource("card_clippings")
