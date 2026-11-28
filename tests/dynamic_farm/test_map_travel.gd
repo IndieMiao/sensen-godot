@@ -410,6 +410,26 @@ func _map() -> void:
 	await process_frame
 	_check(router.opened.size() == opened and MapTravel.at == page.TOWN and t.phase == MapTravel.Phase.IDLE and not page._drop_farm,
 		"back from the background: at the pin, the late farm read opens nothing")
+	# C-232: the Aquatic Park pin is a place too; Go walks there and the pier opens (as Washington Square's room).
+	_check(t.places.has(page.PIER) and page._pier.visible and t.get_index() > page._pier.get_index(), "the pier's pin is a place, under the avatar")
+	page._pier.open_card()
+	_check(page._pier.is_open() and not page._entry.is_open(), "the pier's card opens")
+	page._entry.open_card()
+	_check(page._entry.is_open() and not page._pier.is_open(), "one place card at a time")
+	page._entry.close_card()
+	page._pier.open_card(); page._open_pier()
+	_check(t.heading(page.PIER), "Go walks to the pier")
+	_step(t, 2500)
+	_step(t, 1000)
+	await process_frame
+	await process_frame
+	_check(router.opened.back()[0] == page.PIER_ROOM and router.opened.back()[1].get("parcel_id") == "p-home", "the iris closed: the pier opens on the home's save")
+	await process_frame
+	await process_frame
+	_check(page._inside == page.PIER and MapTravel.at == page.PIER, "the avatar is at the pier")
+	router.back()
+	_step(t, 600)
+	_check(t.phase == MapTravel.Phase.IDLE and MapTravel.at == page.PIER, "back from the pier, the avatar stays there")
 	page.queue_free(); plugin.queue_free()
 	await process_frame
 	RouterFixture.restore(root, router, real_router)

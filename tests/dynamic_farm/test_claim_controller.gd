@@ -364,6 +364,20 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 	check(page.is_back_navigation_locked() and not entry.is_open() and page._bottom.visible and page._profile_button.visible
 		and page._locate.visible and page._home.visible,
 		"Back closes the card first; the keys come back")
+	# C-232: the Aquatic Park pier's pin, carded the same way: its name, Fishing, Distance, Go.
+	var pier_pin: Control = page._pier
+	page._camera.frame_center(pier_pin.lon, pier_pin.lat, 17.5)
+	page._render(); await process_frame
+	var pier_at: Vector2 = pier_pin.screen_point()
+	check(pier_pin.visible and pier_pin.pin.visible and pier_pin.pin.text == "Aquatic Park" and pier_at.distance_to(page._camera.size * 0.5) < 1.0,
+		"the Aquatic Park pin shows on its spot")
+	page._on_map_tap((pier_at - Vector2(0, 16)) / page._camera.size)
+	await process_frame
+	var pier_labels: Array = pier_pin.card.find_children("*", "Label", true, false).map(func(l): return l.text) if pier_pin.is_open() else []
+	check(pier_pin.is_open() and not entry.is_open() and pier_labels.has("Aquatic Park Pier") and pier_labels.has("Fishing")
+		and pier_labels.has("Distance") and pier_pin.card.find_child("Primary", true, false) != null and not page._bottom.visible,
+		"a tap on it opens its card: Aquatic Park Pier, Fishing, Distance, Go (%s)" % [pier_labels])
+	check(page.is_back_navigation_locked() and not pier_pin.is_open() and page._bottom.visible, "Back closes the pier's card")
 	page._camera.frame_center(entry.LON, entry.LAT + 0.0004, 17.5) # the pin low on the screen, where the card goes
 	await process_frame
 	var low: Vector2 = entry.screen_point()

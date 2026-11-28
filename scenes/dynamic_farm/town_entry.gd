@@ -7,6 +7,9 @@ extends Control
 ## Go, × above the corner, a tap outside closes). Selected, the pin grows as CityMapView's does. Go asks the map to
 ## open the room (parcel_outpost.tscn). Without a home the card says so and has no Go: Jasmine and Scott trade through
 ## the home's parcel save. The map owns the tap: it asks hit() before its own building pick.
+## C-232 (0.4.7): the same pin and card for the Aquatic Park pier (`pier()`, P0's coast pond glyph; Go opens
+## parcel_pier.tscn). The owner's "no place icons on the map" (C-103#17) stays: each pin is a fixed 3D space's entry, not a
+## POI. Each entry keeps its own place in `lat` / `lon`, its glyph and copy; the constants below stay Washington Square's.
 signal go_requested
 signal card_changed(open: bool)
 
@@ -20,6 +23,10 @@ const TITLE := "Washington Square Travel Post"
 const SUBTITLE := "Market · Carpenter"
 const NO_HOME := "Claim a home first."
 const GO := "Go"
+## C-232: the Aquatic Park Municipal Pier's foot (Van Ness Ave and Beach St), north-west of the North Beach starter area.
+## Copy after the Travel Post's form, awaiting PM's C-45 final.
+const PIER := {"lat": 37.8066, "lon": -122.4242, "icon": "res://assets/p0/icons/pond_coast.svg", "short": "Aquatic Park",
+	"title": "Aquatic Park Pier", "subtitle": "Fishing", "node": "AquaticPark"}
 ## The pin's name is shown whole (C-145; C-115#62): "Washington Square" is wider than a map pin's usual 96 px short name.
 ## Only the width changes, not the copy or its style.
 const NAME_MAX_W := 160.0
@@ -28,6 +35,14 @@ const FOCUS_SCALE := 1.6
 const FOCUS_IN_S := 0.28
 const FOCUS_OUT_S := 0.14
 
+## This entry's place and copy (Washington Square's unless made by pier()).
+var lat := LAT
+var lon := LON
+var icon_path := ICON
+var short_name := SHORT
+var title := TITLE
+var subtitle := SUBTITLE
+var node_name := "WashingtonSquare"
 var camera: Control
 ## The player's home centre [lon, lat] for the Distance fact ([] without a home; no home, no Go).
 var home_center: Array = []
@@ -39,13 +54,25 @@ var _safe_bottom := 0.0
 var travel_lift := 0.0
 var _travel_pop := 1.0
 
+## C-232: the pier's entry (same pin, card and Go; its own place and copy).
+static func pier() -> Control:
+	var e: Control = load("res://scenes/dynamic_farm/town_entry.gd").new()
+	e.lat = float(PIER.lat)
+	e.lon = float(PIER.lon)
+	e.icon_path = str(PIER.icon)
+	e.short_name = str(PIER.short)
+	e.title = str(PIER.title)
+	e.subtitle = str(PIER.subtitle)
+	e.node_name = str(PIER.node)
+	return e
+
 func _ready() -> void:
-	name = "TownEntry"
+	name = "TownEntry" if node_name == "WashingtonSquare" else "PierEntry"
 	theme = UiKit.theme()
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pin = UiMapDestination.new(load(ICON) if ResourceLoader.exists(ICON) else null, SHORT)
-	pin.name = "WashingtonSquare"
+	pin = UiMapDestination.new(load(icon_path) if ResourceLoader.exists(icon_path) else null, short_name)
+	pin.name = node_name
 	pin.short_max_w = NAME_MAX_W
 	add_child(pin)
 	pin.visible = false
@@ -62,7 +89,7 @@ func place() -> void:
 
 func screen_point() -> Vector2:
 	if camera == null or not camera.has_method("geo_screen"): return Vector2.INF
-	return camera.geo_screen(LON, LAT)
+	return camera.geo_screen(lon, lat)
 
 ## Whether a screen point (this control's coordinates) is on the pin: its disc and name, grown to the 44 px touch size.
 func hit(point: Vector2) -> bool:
@@ -103,9 +130,9 @@ func open_card(safe_bottom := 0.0) -> void:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 8)
 	panel.add_child(col)
-	col.add_child(UiObjectHeader.new({"title": TITLE, "state": SUBTITLE}))
+	col.add_child(UiObjectHeader.new({"title": title, "state": subtitle}))
 	if home_center.size() == 2:
-		col.add_child(UiFactRow.new("Distance", distance_text(km_between(Vector2(float(home_center[1]), float(home_center[0])), Vector2(LAT, LON)))))
+		col.add_child(UiFactRow.new("Distance", distance_text(km_between(Vector2(float(home_center[1]), float(home_center[0])), Vector2(lat, lon)))))
 		var go := UiCommandButton.new(GO)
 		go.name = "Primary"
 		go.size_flags_horizontal = Control.SIZE_EXPAND_FILL
