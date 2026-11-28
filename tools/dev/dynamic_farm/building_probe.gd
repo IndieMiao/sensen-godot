@@ -34,7 +34,7 @@ func _run() -> void:
 		quit(1))
 	await _open(save_dir)
 	var id: String = raw.block_id
-	report.entered = {"build":scene._build_type, "build_label":scene._build.label, "build_visible":scene._build.visible}
+	report.entered = {"build":scene.book_entries().map(func(e): return e.type), "build_label":scene._build.label, "build_visible":scene._build.visible}
 	await _shot(id + "-1-entered")
 	scene.begin_placement()
 	var p = scene._placement
