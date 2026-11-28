@@ -39,6 +39,9 @@ const PATH := "Keep the path clear"
 ## C-175: the spot is refused only for the core obstacles standing on it; it is valid once they are cleared.
 const CLEAR := "Clear the plants and rocks here first"
 const AROUND := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
+## C-253: a placement preview starts within this many metres of the player (footprint middle to the player's cell)
+## when the yard has any spot there, ready or once cleared, so it opens by home in view instead of across the yard.
+const START_REACH_M := 8.0
 
 ## The client art of a type: {asset, name, profile} (KINDS), {name, livestock: true} for a type the art file
 ## describes (C-154), or {} for a type this client has no art for.
@@ -164,12 +167,33 @@ static func nearest(data: Dictionary, near: Vector2i, base: Vector2i, taken: Dic
 ## the other turns. A fresh yard often has no room for the coop until some of its trees, bushes, rocks and weeds are
 ## cleared, so with no valid spot it starts on the one that needs the fewest of them (`obstacles`) cleared, nearest
 ## first, judged with them gone (`clear_taken` / `clear_walk_blocked`); null when even a cleared yard has none.
+## C-253: both are first sought within `reach_m` metres of `near` (the preview's camera frames the spot, so a far one
+## leaves home out of view: 711 Pacific Ave's yard had its only ready coop spot 60 cells off), a ready spot there
+## before one to clear there; only with neither in reach does it take the nearest ready spot, then one to clear, anywhere.
 static func start_spot(data: Dictionary, near: Vector2i, base: Vector2i, taken: Dictionary, path: Dictionary,
 		walk_blocked: Dictionary, type: String, obstacles: Dictionary, clear_taken: Dictionary,
-		clear_walk_blocked: Dictionary) -> Variant:
+		clear_walk_blocked: Dictionary, reach_m := START_REACH_M) -> Variant:
+	var reach := reach_m / float(data.get("cell_m", 1.0))
+	var ready: Array = []
 	for rotation in 4:
 		var found = nearest(data, near, base, taken, path, walk_blocked, rotation, type)
-		if found != null: return {"at": found, "rotation": rotation}
+		if found == null: continue
+		var spot := {"at": found, "rotation": rotation}
+		if (Vector2(found as Vector2i + middle(base, rotation) - near)).length() <= reach: return spot
+		ready.append(spot)
+	var options := _clear_options(data, near, base, walk_blocked, type, obstacles)
+	for o: Array in options:
+		if o[1] > reach * reach: continue
+		if reason(data, o[3], base, o[2], clear_taken, path, clear_walk_blocked, type) == "": return {"at": o[3], "rotation": o[2]}
+	if not ready.is_empty(): return ready[0]
+	for o: Array in options:
+		if reason(data, o[3], base, o[2], clear_taken, path, clear_walk_blocked, type) == "": return {"at": o[3], "rotation": o[2]}
+	return null
+
+## Every core spot in all four turns as [obstacles to clear, squared distance of its middle from `near`, rotation, at],
+## fewest to clear first, then nearest, then the lower turn (C-175).
+static func _clear_options(data: Dictionary, near: Vector2i, base: Vector2i, walk_blocked: Dictionary, type: String,
+		obstacles: Dictionary) -> Array:
 	var options: Array = []
 	for rotation in 4:
 		var offset := middle(base, rotation)
@@ -184,9 +208,7 @@ static func start_spot(data: Dictionary, near: Vector2i, base: Vector2i, taken: 
 			options.append([count, (at - near + offset).length_squared(), rotation, at])
 	options.sort_custom(func(a: Array, b: Array):
 		return a[0] < b[0] or (a[0] == b[0] and (a[1] < b[1] or (a[1] == b[1] and a[2] < b[2]))))
-	for o: Array in options:
-		if reason(data, o[3], base, o[2], clear_taken, path, clear_walk_blocked, type) == "": return {"at": o[3], "rotation": o[2]}
-	return null
+	return options
 
 ## C-154 the cells outside the footprint a type keeps clear (FarmLivestock.keep_clear), turned with the building:
 ## {walk: [Vector2i], art: [Vector2i]}, both empty for a type without them. A cell of the unturned frame turns about

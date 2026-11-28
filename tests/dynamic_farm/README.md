@@ -94,6 +94,9 @@ Locally: `tools/run_tests.sh --ci-import` once, then `tools/ci/dynamic_farm_test
 parcels pinned in `fixtures/r8/` and asserts the cleared yard still holds the coop, the barn
 (8×6) and a pen up to 9×7; p-5402049 (r4) is its negative control. The statistic behind it and
 how to rerun it on a new dataset: `docs/plans/C-193.md`.
+`test_start_spot.gd` (C-253) also reads its own parcel, 711 PACIFIC AVE (`p-0178001`, the big yard of
+the C-190 recording) pinned in `fixtures/yard/`: the placement preview starts within
+`Building.START_REACH_M` of the player there (it started about 60 cells off), in the real scene too.
 
 
 Run prepare_isolated.py with a fresh external target. It copies exact scripts and
