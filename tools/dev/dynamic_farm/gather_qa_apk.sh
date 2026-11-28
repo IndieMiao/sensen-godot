@@ -6,7 +6,7 @@
 #
 #   [GATHER_QA_ABI=x86_64|arm64-v8a] tools/dev/dynamic_farm/gather_qa_apk.sh NEW_OUTPUT_DIR [PARCEL] [IMPORTED_CHECKOUT]
 #
-# PARCEL is an r4 fixture name (default p-3139010). IMPORTED_CHECKOUT, a checkout of the same
+# PARCEL is an r4 fixture name (default p-3139010; with GATHER_QA_ENTRY=yard a fixtures/yard/ one). IMPORTED_CHECKOUT, a checkout of the same
 # commit already imported headless, lends its .godot cache so the import only checks changes.
 # GATHER_QA_ABI follows the emulator image; by default it is the host's own architecture
 # (x86_64 on x86_64 hosts such as cardigan-ci, arm64-v8a on Apple silicon such as mac-mini).
@@ -27,6 +27,9 @@
 # straight away, its save starting cleared with the cottage, coop, well and barn blueprints (the barn short of Stone).
 # GATHER_QA_ENTRY=arrange (C-229): tools/dev/dynamic_farm/arrange_loop_qa.tscn, package com.sensen.dynamicfarm.arrangeqa: the
 # book's entry with the cottage, coop, sheep pen and well blueprints, the pen's materials, carrots and Wild Herbs (level 3).
+# GATHER_QA_ENTRY=yard (C-253): tools/dev/dynamic_farm/yard_loop_qa.tscn, package com.sensen.dynamicfarm.yardqa: PARCEL from
+# tests/dynamic_farm/fixtures/yard/ (default p-0178001, 711 PACIFIC AVE), its yard uncleared with the cottage, level 3,
+# and the coop and sheep pen blueprints with the pen's materials: where the placement preview starts on a crowded yard.
 # GATHER_QA_ENTRY=sway (C-141): tools/dev/dynamic_farm/crop_sway_qa.tscn, package com.sensen.dynamicfarm.swayqa: the core
 # planted full of carrots, the player walked round it with crop sway switched off and on. GATHER_QA_SWAY_MODE picks the
 # run baked into the build: measure (default; frame rates, release export), baseline (no carrots, release), record
@@ -38,12 +41,14 @@
 set -euo pipefail
 fail() { echo "gather QA APK: $*" >&2; exit 1; }
 (($# >= 1)) || fail 'usage: gather_qa_apk.sh NEW_OUTPUT_DIR [PARCEL] [IMPORTED_CHECKOUT]'
-out=$1 parcel=${2:-p-3139010} cache=${3:-}
+fixtures=tests/dynamic_farm/fixtures/r4 default_parcel=p-3139010
+[[ ${GATHER_QA_ENTRY:-parcel} != yard ]] || fixtures=tests/dynamic_farm/fixtures/yard default_parcel=p-0178001
+out=$1 parcel=${2:-$default_parcel} cache=${3:-}
 [[ $out == /* && ! -e $out ]] || fail 'output directory must be a new absolute path'
-[[ $parcel =~ ^p-[A-Za-z0-9*-]+$ ]] || fail 'parcel must be an r4 fixture name'
+[[ $parcel =~ ^p-[A-Za-z0-9*-]+$ ]] || fail "parcel must be a fixture name in $fixtures"
 root=$(cd "$(dirname "$0")/../../.." && pwd)
 cd "$root"
-[[ -f tests/dynamic_farm/fixtures/r4/$parcel.json ]] || fail "no fixture $parcel"
+[[ -f $fixtures/$parcel.json ]] || fail "no fixture $parcel in $fixtures"
 os=$(uname -s)
 case $(uname -m) in arm64 | aarch64) host_abi=arm64-v8a ;; *) host_abi=x86_64 ;; esac
 abi=${GATHER_QA_ABI:-$host_abi}
@@ -56,8 +61,9 @@ aid) entry=aid_loop_qa qa_id=aidqa qa_ver=aid-qa qa_name='Aid QA' qa_dir=Dynamic
 pen) entry=pen_loop_qa qa_id=penqa qa_ver=pen-qa qa_name='Pen QA' qa_dir=DynamicFarmPenQa ;;
 book) entry=book_loop_qa qa_id=bookqa qa_ver=book-qa qa_name='Book QA' qa_dir=DynamicFarmBookQa ;;
 arrange) entry=arrange_loop_qa qa_id=arrangeqa qa_ver=arrange-qa qa_name='Arrange QA' qa_dir=DynamicFarmArrangeQa ;;
+yard) entry=yard_loop_qa qa_id=yardqa qa_ver=yard-qa qa_name='Yard QA' qa_dir=DynamicFarmYardQa ;;
 sway) entry=crop_sway_qa qa_id=swayqa qa_ver=sway-qa qa_name='Sway QA' qa_dir=DynamicFarmSwayQa ;;
-*) fail 'GATHER_QA_ENTRY must be parcel, trade, level, board, aid, pen, book, arrange or sway' ;;
+*) fail 'GATHER_QA_ENTRY must be parcel, trade, level, board, aid, pen, book, arrange, yard or sway' ;;
 esac
 sway_mode=${GATHER_QA_SWAY_MODE:-measure}
 case $sway_mode in measure | baseline | record | shots) ;; *) fail 'GATHER_QA_SWAY_MODE must be measure, baseline, record or shots' ;; esac
@@ -85,13 +91,13 @@ trap 'rm -rf "$work"' EXIT
 p=$work/project editor=$work/editor home=$work/home
 mkdir -p "$p" "$editor/editor_data/export_templates" "$home"
 git archive "$rev" -- project.godot icon.svg icon.svg.import assets modules scenes addons \
-    tools/dev/dynamic_farm tests/dynamic_farm/fixtures/r4 | tar -xf - -C "$p"
+    tools/dev/dynamic_farm tests/dynamic_farm/fixtures/r4 tests/dynamic_farm/fixtures/yard | tar -xf - -C "$p"
 if [[ -n $cache ]]; then
     [[ -d $cache/.godot/imported ]] || fail 'IMPORTED_CHECKOUT has no .godot/imported'
     cp -a "$cache/.godot" "$p/.godot"
     rm -f "$p/.godot/export_credentials.cfg"
 fi
-python3 -I - "$p/project.godot" "$parcel" "${GATHER_QA_WET_SOIL:-}" "$entry" "$qa_dir" "$sway_mode" "${GATHER_QA_REDUCED_MOTION:-}" "${GATHER_QA_TIME_SCALE:-}" <<'PY'
+python3 -I - "$p/project.godot" "$fixtures/$parcel" "${GATHER_QA_WET_SOIL:-}" "$entry" "$qa_dir" "$sway_mode" "${GATHER_QA_REDUCED_MOTION:-}" "${GATHER_QA_TIME_SCALE:-}" <<'PY'
 import re, sys
 from pathlib import Path
 path, parcel, wet, entry, qa_dir, sway_mode = Path(sys.argv[1]), sys.argv[2], sys.argv[3] == '1', sys.argv[4], sys.argv[5], sys.argv[6]
@@ -106,7 +112,7 @@ def one(pattern, repl):
 one(r'^run/main_scene="[^"]+"$', f'run/main_scene="res://tools/dev/dynamic_farm/{entry}.tscn"')
 one(r'^\[application\]$', f'[application]\nconfig/use_custom_user_dir=true\nconfig/custom_user_dir_name="{qa_dir}"')
 one(r'^\[sensen\]$', '[sensen]\nnetwork/online_qa=true\ndynamic_farm/local_farm_save=true\n'
-    f'dynamic_farm/qa_parcel="res://tests/dynamic_farm/fixtures/r4/{parcel}.json"'
+    f'dynamic_farm/qa_parcel="res://{parcel}.json"'
     + ('\ndynamic_farm/preview_wet_soil=true' if wet else '') + ('\ndev/reduced_motion=true' if reduced else '') + (f'\ndev/time_scale={scale}' if scale else '')
     + (f'\ndynamic_farm/crop_sway_qa_mode="{sway_mode}"' if entry == 'crop_sway_qa' else ''))
 for key in ('network/base_url', 'network/mobile_base_url'):
@@ -125,7 +131,7 @@ advanced_options=false
 dedicated_server=false
 custom_features=""
 export_filter="all_resources"
-include_filter="assets/farm/data/*.json,assets/p0/*.json,assets/dynamic_farm/*.json,assets/avatar/*.json,modules/dynamic_farm/map/config.json,tests/dynamic_farm/fixtures/r4/*.json,assets/localization/*.json,assets/ui/fonts/*.txt"
+include_filter="assets/farm/data/*.json,assets/p0/*.json,assets/dynamic_farm/*.json,assets/avatar/*.json,modules/dynamic_farm/map/config.json,tests/dynamic_farm/fixtures/r4/*.json,tests/dynamic_farm/fixtures/yard/*.json,assets/localization/*.json,assets/ui/fonts/*.txt"
 exclude_filter="addons/gdUnit4/*,assets/avatar/source/*.fbx"
 export_path=""
 patches=PackedStringArray()
