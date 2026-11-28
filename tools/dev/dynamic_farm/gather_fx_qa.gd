@@ -6,7 +6,7 @@ extends Node
 ## with the synthesised sounds:
 ##   FRAME_DIR=/abs/frames godot --path . --rendering-method mobile --fixed-fps 30 \
 ##     --write-movie /abs/gather.avi res://tools/dev/dynamic_farm/gather_fx_qa.tscn
-## GATHER_FX_REDUCED=1 runs it with reduced motion (UiMotion.reduced).
+## GATHER_FX_REDUCED=1 runs it with reduced motion (UiMotion.reduced); GATHER_FX_EVERY=0.0333 saves every frame at 30 fps.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const FARM := "res://tests/dynamic_farm/fixtures/r4/p-3139010.json"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -26,6 +26,7 @@ func _ready() -> void:
 	if _out.is_empty(): _out = ProjectSettings.globalize_path("user://gather_fx_frames")
 	DirAccess.make_dir_recursive_absolute(_out)
 	UiMotion.reduced = OS.get_environment("GATHER_FX_REDUCED") == "1"
+	if not OS.get_environment("GATHER_FX_EVERY").is_empty(): every_s = float(OS.get_environment("GATHER_FX_EVERY"))
 	_run.call_deferred()
 
 func _process(delta: float) -> void:

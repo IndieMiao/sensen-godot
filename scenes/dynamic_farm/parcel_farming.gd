@@ -468,6 +468,11 @@ func _refresh_key() -> void:
 		_keys.visible = false
 		_bar.visible = false
 		return
+	# C-236 (V-774): while an object is being gathered the key keeps showing it, until its fall, breaking or pull has
+	# played out (a yard tree's cell offers Till only once the tree is gone; a felled outer tree reads Regrowing after).
+	if swinging and not current.is_empty() and not farm.is_empty():
+		_marker.visible = true
+		return
 	current = {} if farm.is_empty() else Space.action(rules, _data, _path, _obstacles, farm, target, server_now())
 	# C-154: a coop's floor is never farmed (no key there); at its feeder the key feeds.
 	# C-171: a tapped cell with a step to do (Fill at a well, Till) wins over the feeder, as a tapped object does.
@@ -674,15 +679,13 @@ func _settle(t: Dictionary, command: Dictionary) -> Dictionary:
 	if kind in PULLED:
 		# A herb: the icon pops from over the player's head and flies on into the bar with the floats.
 		var head := _player_screen()
-		announce_gains(gains, head)
-		announce_energy(-spent, head)
+		_gather_floats(gains, spent, head, true)
 		gather_stage.picked_up()
 		_body.hold_plant(t.model, false)
 	else:
 		var drop: Node3D = gather_stage.reward(str(t.get("item", ""))) if not gains.is_empty() else null
 		var from: Vector2 = _body.screen_point(drop.global_position, 0.3) if drop != null else _gain_screen(command)
-		announce_gains(gains, from, false, false)
-		announce_energy(-spent, from)
+		_gather_floats(gains, spent, from, false)
 		if drop != null:
 			var drop_rule: Dictionary = GatherFx.kind(kind).get("drop", {})
 			await get_tree().create_timer(UiMotion.secs(float(drop_rule.get("pop_ms", 360)) + float(drop_rule.get("hold_ms", 200)))).timeout
@@ -704,6 +707,13 @@ func _settle(t: Dictionary, command: Dictionary) -> Dictionary:
 		await get_tree().create_timer(_clip_left()).timeout
 		if is_inside_tree(): gather_stage.vanish()
 	return result
+
+## The gathering's two lines (V-774, design figure 2): `+2 Timber` on top, `−3 Energy` under it, a line apart from the
+## first frame. The stack grows upward, so the Energy goes first (line 0) and the items above it (line 1 on).
+func _gather_floats(gains: Dictionary, spent: int, from: Vector2, fly: bool) -> void:
+	_float_batch = {}
+	announce_energy(-spent, from)
+	announce_gains(gains, from, false, fly, 1 if spent != 0 else 0)
 
 ## How long the object's last clip still plays (s).
 func _clip_left() -> float:
@@ -1362,9 +1372,9 @@ func show_notice(text: String) -> void:
 ## when the bar comes back (land_pending). `pickup`: the egg / milk path, the icon flies at once (MS-05).
 ## Items without a name or icon in the content table are skipped. `fly` false (C-236): the floats only; `fly_gains` sends
 ## the icons later, from where the gathered drop reached the player.
-func announce_gains(gains: Dictionary, from: Vector2, pickup := false, fly := true) -> void:
+func announce_gains(gains: Dictionary, from: Vector2, pickup := false, fly := true, first_line := 0) -> void:
 	last_gains = {}
-	var lines := 0
+	var lines := first_line
 	var flights := 0
 	var newest: UiGainFloat = null
 	var on_screen := _bag == null and phone == null and _bar.is_visible_in_tree()

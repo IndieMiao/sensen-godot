@@ -144,7 +144,7 @@ func _press(farming: Node, cell: Vector2i) -> Dictionary:
 	farming.pick(cell)
 	await process_frame
 	await process_frame
-	var seen := {"clips": {}, "moved": 0.0, "early": false, "pail": false, "floats": []}
+	var seen := {"clips": {}, "moved": 0.0, "early": false, "pail": false, "floats": [], "verbs": {}}
 	var start: Vector3 = scene._walk.position
 	var version: int = farming.farm_version
 	var player := scene._rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
@@ -157,6 +157,7 @@ func _press(farming: Node, cell: Vector2i) -> Dictionary:
 		if pail != null and pail.visible and scene._labour_left > 0.0: seen.pail = true
 		if scene._labour_left > 0.0 and farming.farm_version != version: seen.early = true
 		for text in _floats(farming): if not text in seen.floats: seen.floats.append(text)
+		if farming.swinging: seen.verbs[farming._key.verb] = true
 		await process_frame
 	_check(not farming.busy and not farming.swinging, "a press finishes")
 	farming._key.released.emit()
@@ -310,6 +311,7 @@ func _first_visit() -> void:
 	_check(seen.moved > data.cell_m and _beside(block), "the player walks beside the tree and faces it")
 	# The last chop sends at its contact, before its follow-through ends (SEN-C-234 §3), so the farm changes mid-clip.
 	_check(seen.clips.has("gather/labour_chop"), "the chop clip plays, the tree goes with the last chop (%s)" % [seen])
+	_check(seen.verbs.keys() == ["Chop"], "V-774: the key reads Chop until the tree is gone, never Till under the falling tree (%s)" % [seen.verbs])
 	_check(farming.gather_stage.played.count("hit tree 1/3 stage 0") == 1 and farming.gather_stage.played.has("hit tree 2/3 stage 1")
 		and farming.gather_stage.played.has("finish tree"), "three chops, the third fells it (%s)" % [farming.gather_stage.played])
 	_check(farming.farm.cleared == [ParcelFarm.key(obstacle)] and _obstacle_instances(farming) == before - 1, "the held press clears it, named by its anchor")

@@ -22,6 +22,8 @@ const VOICES := 4
 var played := []
 ## Camera shake and haptics go through these (the scene's; tests leave them empty).
 var shake_camera: Callable
+## Where the last drop popped (QA).
+var drop_at := Vector3.ZERO
 var vibrate: Callable = func(ms: int) -> void: Input.vibrate_handheld(ms)
 
 var _target: Node3D
@@ -201,6 +203,23 @@ func trunk_point(along: float) -> Vector3:
 	var reach := _crown_start() * along
 	return _rest.origin + _away * reach + Vector3(0, 0.08, 0)
 
+## V-774: where the log pops on the fallen trunk, seen from the default view. The trunk falls about the stump's top, so
+## it lies at the stump's height, not on the ground; the log sits on top of it, part way to the crown, and leans to the
+## camera's side of it (otherwise, the player standing on the camera's side, the stump and trunk hide it).
+func log_point() -> Vector3:
+	var art := _art()
+	var pivot := art.get_node_or_null("CrownPivot") as Node3D if art != null else null
+	var scale := _rest.basis.get_scale().y
+	var height := (pivot.position.y if pivot != null else 0.7) * scale + 0.16 * scale
+	var at := _rest.origin + _away * _crown_start() * 0.6 + Vector3(0, height, 0)
+	var camera := get_viewport().get_camera_3d() if is_inside_tree() else null
+	if camera != null:
+		var to_camera := camera.global_position - at
+		to_camera.y = 0.0
+		var side := to_camera - _away * to_camera.dot(_away)
+		if side.length() > 0.001: at += side.normalized() * 0.22 * scale
+	return at
+
 ## What the object gave, once the server said so: a log along the fallen trunk or the stone from the pieces pops up;
 ## the caller pulls it to the player (`pull_drop`). Null for a herb (already in the hand) or an item without a drop.
 func reward(item: String) -> Node3D:
@@ -209,8 +228,9 @@ func reward(item: String) -> Node3D:
 	_drop = DROPS[item].instantiate() as Node3D
 	_drop.name = "GatherDrop"
 	add_child(_drop)
-	var at := trunk_point(0.7) if _kind == "tree" else _rest.origin + _away * 0.35 + Vector3(0, 0.02, 0)
+	var at := log_point() if _kind == "tree" else _rest.origin + _away * 0.35 + Vector3(0, 0.02, 0)
 	_drop.position = at
+	drop_at = at
 	_drop.rotation.y = atan2(_away.x, _away.z) + PI * 0.5
 	var player := _drop.get_node_or_null("AnimationPlayer") as AnimationPlayer
 	if player != null and player.has_animation("pop"): player.play("pop")

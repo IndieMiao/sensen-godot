@@ -233,6 +233,9 @@ func _first_visit() -> Dictionary:
 		_check(farming.last_gains == {ITEMS[kind][0]: numbers[3]} and ("+%d %s" % [numbers[3], ITEMS[kind][1]]) in floats
 			and ("−%d Energy" % numbers[2]) in floats, "the gain and the Energy float up (%s: %s)" % [kind, floats])
 		if kind == "tree":
+			var stage: Node3D = farming.gather_stage
+			var origin: Vector3 = farming.gatherables[index].origin
+			_check(stage.drop_at.y - origin.y > 0.4, "V-774: the log pops on the fallen trunk at the stump's height, not on the ground (%s)" % stage.drop_at)
 			_check(played.find("landed tree") >= 0 and played.find("drop wood") > played.find("landed tree"),
 				"the log pops out only once the tree is down (%s)" % [played])
 		if kind == "rock":
