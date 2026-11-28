@@ -48,7 +48,7 @@ handle_path /dynamicfarm/* {
 |---|---|
 | `.env` 必填 | `POSTGRES_PASSWORD`、`TOKEN_PEPPER`、`TRUSTED_PROXIES`、`INVITE_EMAIL_DOMAIN`、`PG_IMAGE`、`AGE_RECIPIENT`、`SMTP_URL`、`MAIL_FROM`（后两项 C-101 起必填，含发信密码，只放 `.env`） |
 | `ops.sh deploy` / `rollback` 写入，不要手改 | `APP_IMAGE`、`APP_IMAGE_ID`、`GIT_SHA` |
-| `.env` 选填 | `DF_HOST_PORT`、`DF_SUBNET`、`DF_BACKUP_DIR`、`DF_BACKUP_KEEP`、`PARCEL_IDLE_RECLAIM_DAYS`（游客地块闲置多少天收回，不写为 30，0 为不收回；C-100）、`ANONYMOUS_SIGNUPS_PER_NETWORK_HOUR` / `ANONYMOUS_SIGNUPS_PER_BLOCK_HOUR` / `ANONYMOUS_SIGNUPS_PER_HOUR`（每小时新建匿名玩家的上限：每个网络、每个 IPv6 /48、合计，不写为 10 / 50 / 1000；C-120）、`PARCEL_STARTER_ZONE`（起步区，不写按配置文件、0 关、1 开；C-130）、`LOGIN_ATTEMPTS_PER_NETWORK_15MIN` / `LOGIN_ATTEMPTS_PER_ACCOUNT_15MIN` / `LOGIN_TRUSTED_NETWORK_DAYS`（密码尝试：每个邮箱每个网络、每个邮箱来自没登录过的网络合计，不写为 10 / 10；登录过的网络记 90 天；C-132）、`MAIL_PER_RECIPIENT_HOUR` / `MAIL_PER_RECIPIENT_DAY` / `MAIL_PER_HOUR` / `MAIL_PER_DAY`（验证信：每个收件邮箱、整个服务，不写为 5 / 10 / 200 / 1000；C-132）、`MIXPANEL_PROJECT_TOKEN` / `MIXPANEL_API_HOST`（产品分析上报，两项都填才开，不填不上报；见下文“产品分析（Mixpanel）”；C-203） |
+| `.env` 选填 | `DF_HOST_PORT`、`DF_SUBNET`、`DF_BACKUP_DIR`、`DF_BACKUP_KEEP`、`PARCEL_IDLE_RECLAIM_DAYS`（游客地块闲置多少天收回，不写为 30，0 为不收回；C-100）、`ANONYMOUS_SIGNUPS_PER_NETWORK_HOUR` / `ANONYMOUS_SIGNUPS_PER_BLOCK_HOUR` / `ANONYMOUS_SIGNUPS_PER_HOUR`（每小时新建匿名玩家的上限：每个网络、每个 IPv6 /48、合计，不写为 10 / 50 / 1000；C-120）、`PARCEL_STARTER_ZONE`（起步区，不写按配置文件、0 关、1 开；C-130）、`LOGIN_ATTEMPTS_PER_NETWORK_15MIN` / `LOGIN_ATTEMPTS_PER_ACCOUNT_15MIN` / `LOGIN_TRUSTED_NETWORK_DAYS`（密码尝试：每个邮箱每个网络、每个邮箱来自没登录过的网络合计，不写为 10 / 10；登录过的网络记 90 天；C-132）、`MAIL_PER_RECIPIENT_HOUR` / `MAIL_PER_RECIPIENT_DAY` / `MAIL_PER_HOUR` / `MAIL_PER_DAY`（验证信：每个收件邮箱、整个服务，不写为 5 / 10 / 200 / 1000；C-132）、`MIXPANEL_PROJECT_TOKEN` / `MIXPANEL_API_HOST`（产品分析上报，两项都填才开，不填不上报；见下文“产品分析（Mixpanel）”；C-203）、`MIXPANEL_GDPR_TOKEN`（删号时同步删除 Mixpanel 数据用的 GDPR OAuth 令牌，只能和前两项一起填；C-205） |
 | `compose.yml` 写死 | `ACCOUNT_SIGNUP`、`GUEST_ACCOUNTS`、`GUEST_WRITES`、`PARCEL_GUEST_WRITES`、`DYNAMIC_FARM_RESELECT`、`GOOGLE_CLIENT_IDS`、`APPLE_BUNDLE_IDS`、`QA_EMAIL_DOMAIN`、`QA_EMAIL_CODE`、`QA_PLAYER_IDS`、`EMAIL_LOG_CODES`、`NODE_OPTIONS`、`DATABASE_URL` |
 | 只在操作员一侧，恢复加密备份时用 | `AGE_IDENTITY`（age 私钥文件的路径；私钥不放在服务器上） |
 
@@ -173,11 +173,15 @@ C-203。服务端把玩家的关键行为批量上报到 Mixpanel，游戏客户
 
 开启前必须先完成：所有者建好 Mixpanel 项目（数据存放地区建项目后不能改）、隐私政策加上分析服务商、Google Play 数据安全表单补“应用活动”。之后：
 
-1. 在 `.env` 填 `MIXPANEL_PROJECT_TOKEN`（项目设置里的 Project Token）和 `MIXPANEL_API_HOST`（美国 `https://api.mixpanel.com`、欧盟 `https://api-eu.mixpanel.com`、印度 `https://api-in.mixpanel.com`，按项目地区），然后 `ops.sh deploy` 或重启 app。
-2. 看启动日志的 `analytics=` 是接口主机名；在 Mixpanel 的 Events 页面能看到新的 `login` 等事件。日志里出现 `[analytics]` 开头的行表示某批没发出去（重试一次后已丢弃，玩家不受影响）。
+1. 在 `.env` 填 `MIXPANEL_PROJECT_TOKEN`（项目设置里的 Project Token）、`MIXPANEL_API_HOST`（美国 `https://api.mixpanel.com`、欧盟 `https://api-eu.mixpanel.com`、印度 `https://api-in.mixpanel.com`，按项目地区）和 `MIXPANEL_GDPR_TOKEN`（删号同步删除用，见下文），然后 `ops.sh deploy` 或重启 app。
+2. 看启动日志的 `analytics=` 是接口主机名、`analytics_delete=on`；在 Mixpanel 的 Events 页面能看到新的 `login` 等事件。日志里出现 `[analytics]` 开头的行表示某批没发出去（重试一次后已丢弃，玩家不受影响）。
 3. 可选：把已有注册补进去，方便从开服第一天算留存。在部署目录里先只数：`docker compose -f compose.yml --env-file .env exec -T app ./node_modules/.bin/tsx tools/mixpanel_backfill_signups.ts`，确认数量后加 `--send` 再跑一次（可加 `--since YYYY-MM-DD`）。重跑或与实时上报重叠都不会重复计数。
 
-关闭：把两项清空后重启 app。已经发到 Mixpanel 的数据要在 Mixpanel 后台删。
+删号同步删除（C-205）：玩家删号后，服务端丢掉队列里这个人还没发出的事件，并向 Mixpanel 的 GDPR 删除接口（与上报同地区：`mixpanel.com`、`eu.mixpanel.com`、`in.mixpanel.com` 的 `/api/app/data-deletions/v3.0/`）提交删除任务，Mixpanel 最长 30 天内删完。这个接口要另一个凭据 `MIXPANEL_GDPR_TOKEN`：项目所有者或管理员在 Mixpanel 右上角头像 → Profile & Preferences → Data & Privacy 生成的 GDPR OAuth 令牌，有效期一年，到期前生成新的、换进 `.env` 并重启 app。启动日志 `analytics_delete=on/off` 显示是否已配。没配或提交失败时删号照常成功，日志记一行（`MIXPANEL_GDPR_TOKEN not set ...` 或 `Mixpanel deletion for user <编号> not requested ...`，含用户编号），由人在 Mixpanel 后台按该编号补删；成功时记 `Mixpanel deletion requested for user <编号>, task <任务号>`。
+
+关停时限（C-205）：app 关停时最后一次发送（含删除请求）最多等 5 秒，超时丢弃剩下的并记 `[analytics] shutdown limit ...`，保证在 `docker stop` 的 10 秒宽限期内退出。
+
+关闭：把两项（和 `MIXPANEL_GDPR_TOKEN`）清空后重启 app。已经发到 Mixpanel 的数据要在 Mixpanel 后台删。
 
 ## 冒烟
 

@@ -8,7 +8,10 @@ import { PgStore } from '../../src/db/pg_store.js';
 import { createInvites } from '../../src/accounts/invites.js';
 import { DEFAULT_CONTENT_DIR, contentVersion, loadContent } from '../../src/domain/content.js';
 import { plotFor } from '../../src/http/app.js';
-import { MIXPANEL_HOSTS, MixpanelAnalytics, NO_ANALYTICS, createAnalytics, mixpanelConfigFromEnv } from '../../src/analytics/mixpanel.js';
+import { spawn } from 'node:child_process';
+import { createServer, type Server } from 'node:http';
+import { fileURLToPath } from 'node:url';
+import { MIXPANEL_HOSTS, MixpanelAnalytics, NO_ANALYTICS, SHUTDOWN_MS, createAnalytics, mixpanelConfigFromEnv } from '../../src/analytics/mixpanel.js';
 import { SIGNUPS_SQL, backfillSignups, type SignupRow } from '../../src/analytics/backfill.js';
 
 const DSN = process.env.TEST_DATABASE_URL;
@@ -56,6 +59,13 @@ describe('mixpanelConfigFromEnv', () => {
     expect(mixpanelConfigFromEnv({ MIXPANEL_PROJECT_TOKEN: 'x', MIXPANEL_API_HOST: 'http://api.mixpanel.com' })).toHaveProperty('invalid');
     for (const host of MIXPANEL_HOSTS)
       expect(mixpanelConfigFromEnv({ MIXPANEL_PROJECT_TOKEN: ' x ', MIXPANEL_API_HOST: host + '/' })).toEqual({ token: 'x', host });
+  });
+
+  it('takes the optional GDPR token for deletions only together with the two settings (C-205)', () => {
+    const on = { MIXPANEL_PROJECT_TOKEN: 'x', MIXPANEL_API_HOST: 'https://api.mixpanel.com' };
+    expect(mixpanelConfigFromEnv({ ...on, MIXPANEL_GDPR_TOKEN: ' g ' })).toEqual({ token: 'x', host: 'https://api.mixpanel.com', gdprToken: 'g' });
+    expect(mixpanelConfigFromEnv({ ...on, MIXPANEL_GDPR_TOKEN: ' ' })).toEqual({ token: 'x', host: 'https://api.mixpanel.com' });
+    expect(mixpanelConfigFromEnv({ MIXPANEL_GDPR_TOKEN: 'g' })).toHaveProperty('invalid');
   });
 });
 
@@ -136,6 +146,174 @@ describe('MixpanelAnalytics', () => {
     expect(() => a.track('login', 'u-1')).not.toThrow();
     await expect(a.flush()).resolves.toBeUndefined();
     expect(logs.at(-1)).toBe('[analytics] dropped 1 events');
+  });
+});
+
+/** 删除接口的 fetch 桩：按顺序回答；记下 URL、认证和请求体。'hang' 一直不回，直到被取消。 */
+function stubDeletionFetch(...answers: (number | 'throw' | 'hang')[]) {
+  const calls: { url: string; auth: string; body: unknown }[] = [];
+  const fetch = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+    calls.push({ url: String(url), auth: (init!.headers as Record<string, string>).authorization, body: JSON.parse(String(init!.body)) });
+    const a = answers.length ? answers.shift()! : 200;
+    if (a === 'throw') throw new Error('connect ECONNREFUSED');
+    if (a === 'hang') return new Promise<Response>((_, reject) => init!.signal!.addEventListener('abort', () => reject(init!.signal!.reason)));
+    const body = String(url).includes('/data-deletions/')
+      ? '{"status":"ok","results":[{"status":"PENDING","tracking_id":"1583792934719392965","distinct_id_count":1}]}' : '{}';
+    return new Response(a === 200 ? body : '{"error":"nope"}', { status: a });
+  });
+  return { fetch: fetch as unknown as typeof globalThis.fetch, calls };
+}
+
+describe('deleting a user (C-205)', () => {
+  it.each([
+    ['https://api.mixpanel.com', 'https://mixpanel.com'], ['https://api-eu.mixpanel.com', 'https://eu.mixpanel.com'], ['https://api-in.mixpanel.com', 'https://in.mixpanel.com'],
+  ])('asks the GDPR API of the same region (%s) to delete the user, after dropping their unsent events', async (host, gdprHost) => {
+    const { fetch, calls } = stubDeletionFetch();
+    const { a, logs } = client({ fetch, host, gdprToken: 'oauth-1', batchSize: 10 });
+    a.track('login', 'u-1');
+    a.track('login', 'u-2');
+    a.track('parcel_enter', 'u-1');
+    a.deleteUser('u-1');
+    await a.close();
+    const deletion = calls.find(c => c.url.includes('/data-deletions/'))!;
+    expect(deletion).toEqual({ url: `${gdprHost}/api/app/data-deletions/v3.0/?token=s3cret`, auth: 'Bearer oauth-1',
+      body: { distinct_ids: ['u-1'], compliance_type: 'GDPR' } });
+    // u-1's queued events never leave; u-2's still do.
+    const imported = calls.filter(c => c.url.endsWith('/import?strict=1')).flatMap(c => c.body as { properties: { distinct_id: string } }[]);
+    expect(imported.map(e => e.properties.distinct_id)).toEqual(['u-2']);
+    expect(logs).toEqual(['[analytics] Mixpanel deletion requested for user u-1, task 1583792934719392965']);
+  });
+
+  it('waits for a batch already on its way before asking for the deletion', async () => {
+    const order: string[] = [];
+    let answer!: () => void;
+    const fetch = vi.fn(async (url: string | URL | Request) => {
+      order.push(String(url).includes('/data-deletions/') ? 'delete' : 'import');
+      if (order.length === 1) await new Promise<void>(resolve => { answer = resolve; });
+      return new Response('{}', { status: 200 });
+    }) as unknown as typeof globalThis.fetch;
+    const { a } = client({ fetch, gdprToken: 'oauth-1', batchSize: 1, timeoutMs: 60_000 });
+    a.track('login', 'u-1');
+    a.deleteUser('u-1');
+    await new Promise(resolve => setImmediate(resolve));
+    expect(order).toEqual(['import']);
+    answer();
+    await a.close();
+    expect(order).toEqual(['import', 'delete']);
+  });
+
+  it('skips the deletion with a log line when no GDPR token is configured, and sends nothing for that user', async () => {
+    const { fetch, calls } = stubDeletionFetch();
+    const { a, logs } = client({ fetch });
+    a.track('login', 'u-1');
+    a.deleteUser('u-1');
+    await a.close();
+    expect(calls).toHaveLength(0);
+    expect(logs).toEqual(['[analytics] MIXPANEL_GDPR_TOKEN not set, Mixpanel data of deleted user u-1 was not deleted; delete it in Mixpanel by hand']);
+  });
+
+  it.each([
+    ['a server error', [503, 503], 2], ['rate limiting', [429, 429], 2], ['a network error', ['throw', 'throw'], 2], ['a rejected token', [401], 1],
+  ] as const)('only logs after %s, never throwing into account deletion', async (_, answers, tries) => {
+    const { fetch, calls } = stubDeletionFetch(...answers);
+    const { a, logs } = client({ fetch, gdprToken: 'oauth-1' });
+    expect(() => a.deleteUser('u-1')).not.toThrow();
+    await a.close();
+    expect(calls).toHaveLength(tries);
+    expect(logs.at(-1)).toBe('[analytics] Mixpanel deletion for user u-1 not requested; delete it in Mixpanel by hand');
+  });
+
+  it('keeps deletions one at a time (the GDPR API allows one request a second)', async () => {
+    let inFlight = 0, most = 0;
+    const fetch = vi.fn(async () => {
+      most = Math.max(most, ++inFlight);
+      await new Promise(resolve => setTimeout(resolve, 5));
+      inFlight--;
+      return new Response('{}', { status: 200 });
+    }) as unknown as typeof globalThis.fetch;
+    const { a } = client({ fetch, gdprToken: 'oauth-1' });
+    for (const id of ['u-1', 'u-2', 'u-3']) a.deleteUser(id);
+    await a.close();
+    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(most).toBe(1);
+  });
+
+  it('does nothing when Mixpanel is off', () => {
+    expect(() => NO_ANALYTICS.deleteUser('u-1')).not.toThrow();
+  });
+});
+
+describe('shutting down (C-205)', () => {
+  it('waits at most 5 seconds by default, inside docker stop\'s 10 second grace period', () => {
+    expect(SHUTDOWN_MS).toBe(5_000);
+  });
+
+  it('sends everything when Mixpanel answers in time', async () => {
+    const { fetch, calls } = stubFetch();
+    const { a, logs } = client({ fetch, batchSize: 2, shutdownMs: 1_000 });
+    for (const id of ['u-1', 'u-2', 'u-3']) a.track('login', id);
+    await a.close();
+    expect(calls.flatMap(c => c.events.map(e => e.properties.distinct_id))).toEqual(['u-1', 'u-2', 'u-3']);
+    expect(logs).toEqual([]);
+  });
+
+  it('gives up at the limit when Mixpanel never answers, cancels the request and drops the rest', async () => {
+    const { fetch, calls, spy } = stubFetch('hang', 'hang');
+    const { a, logs } = client({ fetch, batchSize: 2, timeoutMs: 60_000, retryDelayMs: 60_000, shutdownMs: 100, gdprToken: 'oauth-1' });
+    for (const id of ['u-1', 'u-2', 'u-3']) a.track('login', id);
+    a.deleteUser('u-4');
+    const started = Date.now();
+    await a.close();
+    expect(Date.now() - started).toBeLessThan(1_000);
+    expect(logs).toContain('[analytics] shutdown limit 100ms reached, dropped 1 queued events and 1 pending deletions');
+    // The outstanding request is cancelled, and nothing is retried or sent afterwards.
+    const signal = spy.mock.calls[0][1]!.signal!;
+    expect(signal.aborted).toBe(true);
+    await new Promise(resolve => setTimeout(resolve, 20));
+    expect(calls).toHaveLength(1);
+    a.track('login', 'u-5');
+    await a.flush();
+    expect(calls).toHaveLength(1);
+  });
+
+  it('gives up at the limit even when the request ignores cancellation', async () => {
+    const fetch = vi.fn(() => new Promise<Response>(() => {})) as unknown as typeof globalThis.fetch;
+    const { a, logs } = client({ fetch, timeoutMs: 60_000, shutdownMs: 50 });
+    a.track('login', 'u-1');
+    const started = Date.now();
+    await a.close();
+    expect(Date.now() - started).toBeLessThan(1_000);
+    expect(logs.some(l => l.startsWith('[analytics] shutdown limit 50ms reached'))).toBe(true);
+  });
+
+  describe('a real process against a Mixpanel that accepts the connection and never answers', () => {
+    let server: Server;
+    afterEach(() => new Promise<void>(resolve => { server?.closeAllConnections(); server?.close(() => resolve()); }));
+
+    it('exits within the shutdown limit', async () => {
+      let requests = 0;
+      server = createServer(() => { requests++; /* never answers */ });
+      await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+      const { port } = server.address() as { port: number };
+      const module = fileURLToPath(new URL('../../src/analytics/mixpanel.ts', import.meta.url));
+      // host is checked only by mixpanelConfigFromEnv; the class takes any address, here the silent local server.
+      const script = `const { MixpanelAnalytics } = await import(${JSON.stringify(module)});
+        const a = new MixpanelAnalytics({ token: 't', host: 'http://127.0.0.1:${port}', shutdownMs: 300, timeoutMs: 60000, retryDelayMs: 60000 });
+        a.track('login', 'u-1'); a.track('login', 'u-2');
+        await a.close(); console.log('closed');`;
+      const started = Date.now();
+      const child = spawn(process.execPath, ['--import', 'tsx', '--input-type=module', '-e', script],
+        { cwd: fileURLToPath(new URL('../..', import.meta.url)), stdio: ['ignore', 'pipe', 'pipe'] });
+      let out = '', err = '';
+      child.stdout.on('data', d => { out += d; });
+      child.stderr.on('data', d => { err += d; });
+      const code = await new Promise<number | null>(resolve => child.on('exit', resolve));
+      const took = Date.now() - started;
+      expect({ code, out: out.trim(), requests }).toEqual({ code: 0, out: 'closed', requests: 1 });
+      expect(err).toContain('[analytics] shutdown limit 300ms reached');
+      // Startup of tsx included; far below the 10 s grace period and the 60 s request timeout.
+      expect(took).toBeLessThan(5_000);
+    }, 15_000);
   });
 });
 

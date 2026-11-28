@@ -46,7 +46,7 @@ const guestAccountsClosed = guestAccountsClosedFromEnv(process.env);
 if (guestAccountsClosed === null) { console.error('GUEST_ACCOUNTS 只能是 open 或 closed'); process.exit(1); }
 const accountLimits = accountLimitsFromEnv(process.env);
 if ('invalid' in accountLimits) { console.error(`${accountLimits.invalid} 只能是 1–1000000 的整数`); process.exit(1); }
-// Product analytics (C-203): off unless MIXPANEL_PROJECT_TOKEN and MIXPANEL_API_HOST are both set.
+// Product analytics (C-203): off unless MIXPANEL_PROJECT_TOKEN and MIXPANEL_API_HOST are both set; MIXPANEL_GDPR_TOKEN adds deletion (C-205).
 const mixpanel = mixpanelConfigFromEnv(process.env);
 if (mixpanel && 'invalid' in mixpanel) { console.error(mixpanel.invalid); process.exit(1); }
 
@@ -157,7 +157,7 @@ const app = await buildApp({
 // Guests' parcels idle over PARCEL_IDLE_RECLAIM_DAYS (default 30, 0 = never) return to the map (C-100).
 const stopReclaim = scheduleIdleReclaim(parcelStore, parcelIdleDays, () => Date.now(), line => console.log(line));
 app.addHook('onClose', async () => { stopReclaim(); });
-// Events still queued are sent on shutdown; a failure there is only logged.
+// Events still queued are sent on shutdown within SHUTDOWN_MS (5 s, C-205); what is left after that is dropped and logged.
 app.addHook('onClose', async () => { await analytics.close(); });
 
 // Only one room writer may serve this database. HTTP-only replicas set REALTIME_ENABLED=0.
@@ -178,4 +178,4 @@ if (process.env.REALTIME_ENABLED !== '0') {
 
 const port = Number(process.env.PORT ?? 3000);
 await app.listen({ port, host: '0.0.0.0' });
-console.log(`farm-server listening on ${port} content=${cv} cities=${cities.size} ip_city=${ipLocator ? 'on' : 'off'} guest_writes=${process.env.GUEST_WRITES === '1'} parcel_reselect=${parcelReselectFromEnv(process.env)} parcel_guest_writes=${parcelGuestWrites} parcel_idle_days=${parcelIdleDays} anonymous_signups=${anonymousSignupLimits.perNetwork}/${anonymousSignupLimits.perBlock}/${anonymousSignupLimits.total} starter_zone=${starterZones.enabled ? starterZones.zones.map(z => z.id).join(',') || 'none' : 'off'} signup=${signupClosed ? 'closed' : 'open'} guest_accounts=${guestAccountsClosed ? 'closed' : 'open'} analytics=${mixpanel ? new URL(mixpanel.host).host : 'off'}`);
+console.log(`farm-server listening on ${port} content=${cv} cities=${cities.size} ip_city=${ipLocator ? 'on' : 'off'} guest_writes=${process.env.GUEST_WRITES === '1'} parcel_reselect=${parcelReselectFromEnv(process.env)} parcel_guest_writes=${parcelGuestWrites} parcel_idle_days=${parcelIdleDays} anonymous_signups=${anonymousSignupLimits.perNetwork}/${anonymousSignupLimits.perBlock}/${anonymousSignupLimits.total} starter_zone=${starterZones.enabled ? starterZones.zones.map(z => z.id).join(',') || 'none' : 'off'} signup=${signupClosed ? 'closed' : 'open'} guest_accounts=${guestAccountsClosed ? 'closed' : 'open'} analytics=${mixpanel ? new URL(mixpanel.host).host : 'off'} analytics_delete=${mixpanel?.gdprToken ? 'on' : 'off'}`);
