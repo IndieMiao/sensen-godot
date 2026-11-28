@@ -177,7 +177,9 @@ describe('parcel economy (C-58)', () => {
 
   it('ships the C-30#29 numbers: carrot 12, timber 2, wild herb 1, stone 2; 24 h respawn; coop blueprint after the first sale', () => {
     // C-154: the egg (Q-237); C-181: milk, author default awaiting the owner.
-    expect(rules.economy.sell_prices).toEqual({ crop_carrot: 12, wood: 2, wild_herb: 1, stone: 2, egg: 20, milk: 45, wool: 30 });
+    // C-232: the seven Aquatic Park fish at their P0 prices (SEN-C-223 §6.1, SEN-Q-342).
+    expect(rules.economy.sell_prices).toEqual({ crop_carrot: 12, wood: 2, wild_herb: 1, stone: 2, egg: 20, milk: 45, wool: 30,
+      fish_crucian: 3, fish_carp: 4, fish_mullet: 4, fish_perch: 7, fish_bass: 7, fish_mackerel: 8, fish_seabass: 14 });
     expect(rules.economy.gather.respawn_seconds).toBe(24 * 3600);
     expect(Object.fromEntries(Object.entries(rules.economy.gather.sources).map(([k, v]) => [k, [v.item, v.amount]])))
       .toEqual({ tree: ['wood', 1], flower: ['wild_herb', 1], rock: ['stone', 1] });
@@ -352,14 +354,14 @@ describe('parcel buy (C-149)', () => {
     return s;
   };
 
-  it('ships carrot seeds at 9 coins, the P0 seed price, and nothing else for sale', () => {
-    expect(rules.economy.buy_prices).toEqual({ seed_carrot: 9 });
+  it('ships carrot seeds at 9 coins, the P0 seed price, and (C-232) the rods and baits of SEN-C-223 §6.2', () => {
+    expect(rules.economy.buy_prices).toEqual({ seed_carrot: 9, rod_reed: 80, rod_carbon: 600, bait_worm: 2, bait_lure: 6 });
     const p0 = JSON.parse(readFileSync(path.resolve(DEFAULT_CONTENT_DIR, '..', '..', 'p0', 'p0_content.json'), 'utf8'));
     const carrot = p0.crops.find((c: { id: string }) => c.id === 'crop_carrot');
     expect(carrot.seed).toBe('seed_carrot');
     expect(rules.economy.buy_prices[carrot.seed]).toBe(carrot.seed_price);
-    // Selling prices are unchanged by C-149; the egg is C-154 (Q-237), milk C-181.
-    expect(rules.economy.sell_prices).toEqual({ crop_carrot: 12, egg: 20, milk: 45, wool: 30, wood: 2, wild_herb: 1, stone: 2 });
+    // Selling prices are unchanged by C-149; the egg is C-154 (Q-237), milk C-181, the fish C-232.
+    expect(rules.economy.sell_prices).toMatchObject({ crop_carrot: 12, egg: 20, milk: 45, wool: 30, wood: 2, wild_herb: 1, stone: 2 });
   });
 
   it('refuses out-of-bounds buy prices at load time; an economy without buy_prices sells nothing', () => {

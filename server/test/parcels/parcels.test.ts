@@ -21,6 +21,7 @@ import { parcelReselectFromEnv } from '../../src/parcels/routes.js';
 import { emptyFarm, NEVER, withEconomy, type ParcelFarmState } from '../../src/parcels/farm.js';
 import { emptyBoard, settleBoard } from '../../src/parcels/requests.js';
 import type { StarterZones } from '../../src/parcels/starter_zone.js';
+import { castSeed, initialReel, pickFish, reelTier, stepReel } from '../../src/parcels/fishing.js';
 
 const DSN = process.env.TEST_DATABASE_URL;
 if (process.env.CI === '1' && !DSN) throw new Error('CI 下必须设置 TEST_DATABASE_URL');
@@ -714,6 +715,71 @@ for (const [name, enabled, makeStores] of makers) {
         expect((await command(penApp, ada, after.farm_version, [{ type: 'pick_up', drop: 1 }])).json()).toMatchObject({ code: 'NO_DROP' });
         expect((await command(penApp, ada, after.farm_version, [{ type: 'sell', item: 'wool', count: 1 }])).json().parcel.farm).toMatchObject({ coins: 30 });
       } finally { await penApp.close(); }
+    });
+
+    it('C-232 fishing over HTTP: too little Energy cannot cast; the server replays the reel trace; one cast lands one fish however often it is sent', async () => {
+      const ada = await account(app, 'Ada');
+      await claim(app, ada, A);
+      await enter(app, ada);
+      // First visit to the pier: one Starter Rod, once.
+      const visit = await command(app, ada, 1, [{ type: 'visit_pier' }]);
+      expect(visit.json().parcel.farm).toMatchObject({ bag: { rod_starter: 1 }, fishing: { gifted_at: T0, cast: null } });
+      expect((await command(app, ada, 2, [{ type: 'visit_pier' }])).json()).toMatchObject({ code: 'PIER_GIFTED', parcel: { farm_version: 2 } });
+      const f = rules.fishing!;
+      // Cast: −5 Energy; the tier, seed and bite time are the server's.
+      let res = await command(app, ada, 2, [{ type: 'cast_line' }]);
+      expect(res.statusCode).toBe(200);
+      const c = res.json().parcel.farm.fishing.cast;
+      expect(res.json().parcel.farm.energy.value).toBe(195);
+      expect(c).toMatchObject({ at: T0, rod: 'rod_starter', bait: null, seed: castSeed(A.parcel_id, T0, 0) });
+      // A trace played to a catch, sent once the bite and the reel have had their time.
+      const tier = reelTier(f, c.rarity, f.rods[0]);
+      const sim = initialReel(f, c.seed);
+      let inputs = '';
+      while (sim.outcome === 'playing') { const held = sim.fish > sim.bar; inputs += held ? '1' : '0'; stepReel(f, sim, held, tier); }
+      expect(sim.outcome).toBe('caught');
+      // Sent at once (a forged trace): refused, nothing changes.
+      clock = c.bite_at + 300;
+      res = await command(app, ada, 3, [{ type: 'reel_line', hook_ms: 300, inputs }]);
+      expect(res.json()).toMatchObject({ code: 'REEL_INPUT', parcel: { farm_version: 3 } });
+      // A trace the replay calls unfinished is refused too; the client never names the outcome or the fish.
+      clock = c.bite_at + 300 + inputs.length * f.reel.step_ms;
+      res = await command(app, ada, 3, [{ type: 'reel_line', hook_ms: 300, inputs: inputs.slice(0, -2), outcome: 'landed', fish: 'fish_seabass' }]);
+      expect(res.json()).toMatchObject({ code: 'REEL_INPUT', detail: { reason: 'unfinished' } });
+      // Eight copies of the real reel at once: one is applied, one fish in the bag.
+      const results = await Promise.all(Array.from({ length: 8 }, () => command(app, ada, 3, [{ type: 'reel_line', hook_ms: 300, inputs }])));
+      expect(results.filter(r => r.statusCode === 200)).toHaveLength(1);
+      const fish = pickFish(f, c.seed, c.rarity);
+      const after = await mine(app, ada);
+      expect(after.farm.bag[fish]).toBe(1);
+      expect(after.farm.fishing).toMatchObject({ cast: null, caught: { [fish]: 1 }, last: { result: 'landed', fish } });
+      expect((await command(app, ada, after.farm_version, [{ type: 'reel_line', hook_ms: 300, inputs }])).json()).toMatchObject({ code: 'NO_CAST' });
+      // It sells at Jasmine's price.
+      const sold = await command(app, ada, after.farm_version, [{ type: 'sell', item: fish, count: 1 }]);
+      expect(sold.json().parcel.farm.coins).toBe(rules.economy.sell_prices[fish]);
+      // Energy: with 4 left a cast is refused and the save stays as it was.
+      const tired = structuredClone(rules);
+      tired.fishing!.cast_energy = 196;
+      tired.fishing!.refund_fail = 0;
+      const tiredApp = await appFor(stores, { rules: tired });
+      try {
+        const bob = await account(tiredApp, 'Bob');
+        await claim(tiredApp, bob, B);
+        await enter(tiredApp, bob);
+        expect((await command(tiredApp, bob, 1, [{ type: 'visit_pier' }, { type: 'cast_line' }, { type: 'cancel_line' }])).statusCode).toBe(200);
+        const v = (await mine(tiredApp, bob)).farm_version;
+        // Cancelled before the bite: all 196 back. Cast again and let it get away: 4 left.
+        await command(tiredApp, bob, v, [{ type: 'cast_line' }]);
+        const line = (await mine(tiredApp, bob)).farm.fishing.cast;
+        clock = line.bite_at;
+        await command(tiredApp, bob, v + 1, [{ type: 'cancel_line' }]);
+        const low = await mine(tiredApp, bob);
+        expect(low.farm.energy.value).toBe(4);
+        const refused = await command(tiredApp, bob, low.farm_version, [{ type: 'cast_line' }]);
+        expect(refused.statusCode).toBe(422);
+        expect(refused.json()).toMatchObject({ code: 'NO_ENERGY', detail: { need: 196, have: 4 }, parcel: { farm_version: low.farm_version } });
+        expect((await mine(tiredApp, bob)).farm.fishing.cast).toBeNull();
+      } finally { await tiredApp.close(); }
     });
 
     it('“abandon and pick again” is refused under the production configuration and leaves the parcel', async () => {
