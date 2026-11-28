@@ -190,7 +190,9 @@ func _arrange() -> void:
 	_check(arrange.markers.size() == 3, "one marker per building: %d" % arrange.markers.size())
 	for id: int in arrange.markers:
 		var m: Control = arrange.markers[id]
-		_check(m.visible and m.size == Vector2(44, 44), "building %d's marker shows, its hit area 44" % id)
+		# Approximate: a marker sits at its building's projected point, a fractional position, and a Control's size is
+		# kept as offset_bottom - offset_top in float32, so it can read 44.00001 at some points (C-249).
+		_check(m.visible and m.size.is_equal_approx(Vector2(44, 44)), "building %d's marker shows, its hit area 44: %s" % [id, m.size])
 	# The coop: its facts, Store waiting for the egg (D2).
 	arrange.select(coop_id)
 	await process_frame
