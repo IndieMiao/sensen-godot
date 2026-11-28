@@ -104,6 +104,11 @@ func sync(farm: Dictionary, rules: Dictionary, now: int) -> void:
 		if not present.has(id): _expected.erase(id)
 	_draw_laid(now, false)
 
+## C-229: hides (or shows again) building `id`'s yard, its animals and drops, while its move preview stands in for it.
+func show_yard(id: int, shown: bool) -> void:
+	var yard = _yards.get(id)
+	if yard != null: (yard.root as Node3D).visible = shown
+
 static func _same_spot(a: Dictionary, b: Dictionary) -> bool:
 	return str(a.type) == str(b.type) and int(a.x) == int(b.x) and int(a.y) == int(b.y) and int(a.rotation) == int(b.rotation) \
 		and int(a.width) == int(b.width) and int(a.depth) == int(b.depth)

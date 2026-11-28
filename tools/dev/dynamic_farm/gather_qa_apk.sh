@@ -25,6 +25,8 @@
 # stand-in, its save one request and one level short of the sheep pen's blueprint, with the coins and materials after.
 # GATHER_QA_ENTRY=book (C-228): tools/dev/dynamic_farm/book_loop_qa.tscn, package com.sensen.dynamicfarm.bookqa: the parcel
 # straight away, its save starting cleared with the cottage, coop, well and barn blueprints (the barn short of Stone).
+# GATHER_QA_ENTRY=arrange (C-229): tools/dev/dynamic_farm/arrange_loop_qa.tscn, package com.sensen.dynamicfarm.arrangeqa: the
+# book's entry with the cottage, coop, sheep pen and well blueprints, the pen's materials, carrots and Wild Herbs (level 3).
 # GATHER_QA_ENTRY=sway (C-141): tools/dev/dynamic_farm/crop_sway_qa.tscn, package com.sensen.dynamicfarm.swayqa: the core
 # planted full of carrots, the player walked round it with crop sway switched off and on. GATHER_QA_SWAY_MODE picks the
 # run baked into the build: measure (default; frame rates, release export), baseline (no carrots, release), record
@@ -53,8 +55,9 @@ board) entry=board_loop_qa qa_id=boardqa qa_ver=board-qa qa_name='Board QA' qa_d
 aid) entry=aid_loop_qa qa_id=aidqa qa_ver=aid-qa qa_name='Aid QA' qa_dir=DynamicFarmAidQa ;;
 pen) entry=pen_loop_qa qa_id=penqa qa_ver=pen-qa qa_name='Pen QA' qa_dir=DynamicFarmPenQa ;;
 book) entry=book_loop_qa qa_id=bookqa qa_ver=book-qa qa_name='Book QA' qa_dir=DynamicFarmBookQa ;;
+arrange) entry=arrange_loop_qa qa_id=arrangeqa qa_ver=arrange-qa qa_name='Arrange QA' qa_dir=DynamicFarmArrangeQa ;;
 sway) entry=crop_sway_qa qa_id=swayqa qa_ver=sway-qa qa_name='Sway QA' qa_dir=DynamicFarmSwayQa ;;
-*) fail 'GATHER_QA_ENTRY must be parcel, trade, level, board, aid, pen, book or sway' ;;
+*) fail 'GATHER_QA_ENTRY must be parcel, trade, level, board, aid, pen, book, arrange or sway' ;;
 esac
 sway_mode=${GATHER_QA_SWAY_MODE:-measure}
 case $sway_mode in measure | baseline | record | shots) ;; *) fail 'GATHER_QA_SWAY_MODE must be measure, baseline, record or shots' ;; esac

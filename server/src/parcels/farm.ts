@@ -56,6 +56,13 @@
  *
  * 旧牛棚（C-209）：C-202 之前盖的 8×6 牛棚（存档里没有 cutouts）读档时拆掉，蓝图、材料和它的奶退进背包，玩家按新占地重新摆
  * （见 retireDraftBuildings）。不加字段，版本号不变。
+ *
+ * 移动和收回（C-229，0.4.7，设计稿 SEN-C-227 D-555 README §5，所有者 SEN-Q-344 D1–D3）：move_building 把一栋建筑挪到新位置、
+ * 新朝向，占地校验和 place_building 相同，只是不算它自己原来的格；它的动物、地上的掉落物（按建筑里的落点记，随建筑走）、
+ * 正在产的计时都不变，不花蓝图、材料和体力。store_building 把一栋建筑收回成蓝图：蓝图一张和规则 materials 全数退进背包（D1），
+ * 地上已经下了的产物进背包，动物跟着拆掉（再摆放时照规则带上，和 C-209 一样）；小屋不能收回（D3，CANNOT_STORE），
+ * 喂过还没下的不能收回（D2，PRODUCING，带最晚那份的 ready_at），不退饲料、不丢产出。两条命令都不花体力，只能由地块主人发
+ * （路由按 token 查本人地块）。不加存档字段，版本号不变。
  */
 import { dayKey, energyCost, maxEnergy, nextRollover, nextTickIn, settleEnergy, spendEnergy, type EnergyState } from './energy.js';
 import { boardOf, emptyBoard, requestCommand, settleBoard, type BoardState } from './requests.js';
@@ -176,7 +183,11 @@ export type FarmCommand =
   /** C-191：在驿站委托板上接单、交单、放弃，request 是单号。 */
   | { type: 'accept_request' | 'deliver_request' | 'drop_request'; request: number }
   /** C-197：在 Jasmine 那里领今天的种子兜底。 */
-  | { type: 'claim_seed_aid' };
+  | { type: 'claim_seed_aid' }
+  /** C-229：把编号为 building 的建筑挪到 x,y（新占地 x、y 最小的格）、转 rotation 个 90°。 */
+  | { type: 'move_building'; building: number; x: number; y: number; rotation: number }
+  /** C-229：把编号为 building 的建筑收回成蓝图。 */
+  | { type: 'store_building'; building: number };
 
 /** 命令执行时服务端核实过的上下文：本人地块编号（来自 token 查到的那一行，不来自请求体）。 */
 export interface FarmContext { parcel_id: string }
@@ -397,6 +408,15 @@ export function parseFarmCommands(raw: unknown): FarmCommand[] | null {
       case 'upgrade_farm': case 'claim_seed_aid':
         out.push({ type: c.type });
         break;
+      case 'move_building':
+        if (!Number.isInteger(c.building) || (c.building as number) < 1 || (c.building as number) > MAX_ID || !coord(c.x) || !coord(c.y)
+          || ![0, 1, 2, 3].includes(c.rotation as number)) return null;
+        out.push({ type: 'move_building', building: c.building as number, x: c.x, y: c.y, rotation: c.rotation as number });
+        break;
+      case 'store_building':
+        if (!Number.isInteger(c.building) || (c.building as number) < 1 || (c.building as number) > MAX_ID) return null;
+        out.push({ type: 'store_building', building: c.building as number });
+        break;
       case 'accept_request': case 'deliver_request': case 'drop_request':
         if (!Number.isInteger(c.request) || (c.request as number) < 1 || (c.request as number) > MAX_ID) return null;
         out.push({ type: c.type, request: c.request as number });
@@ -442,16 +462,33 @@ function footprint(h: Placed): string[] {
   });
 }
 
-/** 所有建筑占的格。 */
-const buildingCells = (s: ParcelFarmState): Set<string> => new Set(s.buildings.flatMap(footprint));
+/** 所有建筑占的格；except 是不算在内的那栋（C-229 移动时它自己）。 */
+const buildingCells = (s: ParcelFarmState, except?: number): Set<string> =>
+  new Set(s.buildings.filter(b => b.id !== except).flatMap(footprint));
 
 /** 格子在哪栋建筑下面。 */
 const underBuilding = (s: ParcelFarmState, cell: string): boolean => buildingCells(s).has(cell);
 
-/** 格子 cells 里已被其它建筑占的，"x,y" 按字符串排序。 */
-function overlapped(s: ParcelFarmState, cells: string[]): string[] {
-  const under = buildingCells(s);
+/** 格子 cells 里已被其它建筑占的，"x,y" 按字符串排序；except 是不算在内的那栋。 */
+function overlapped(s: ParcelFarmState, cells: string[], except?: number): string[] {
+  const under = buildingCells(s, except);
   return cells.filter(cell => under.has(cell)).sort();
+}
+
+/**
+ * 一栋建筑能不能放在它记的位置、朝向上（place_building 和 C-229 move_building 共用）：外框不出格子上限（OUT_OF_BOUNDS），
+ * 不压别的建筑（BUILDING_OVERLAP，移动时不算它自己 except），不压开垦格和作物（CELL_OCCUPIED）。能放返回 null。
+ */
+function spotRefusal(s: ParcelFarmState, building: Placed, except?: number): { code: string; detail?: Record<string, unknown> } | null {
+  const [x1, y1] = farCorner(building);
+  if (x1 >= MAX_COORD || y1 >= MAX_COORD) return { code: 'OUT_OF_BOUNDS' };
+  const f = footprint(building);
+  const overlap = overlapped(s, f, except);
+  if (overlap.length) return { code: 'BUILDING_OVERLAP', detail: { cells: overlap } };
+  const mine = new Set(f);
+  const covered = [...s.tilled, ...Object.keys(s.crops)].filter(cell => mine.has(cell));
+  if (covered.length) return { code: 'CELL_OCCUPIED', detail: { cells: [...new Set(covered)].sort() } };
+  return null;
 }
 
 /**
@@ -498,17 +535,41 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
           rotation: c.rotation ?? 0, built_at: now };
         if (rule.livestock) building.animals = [...rule.livestock.animals];
         if (rule.cutouts?.length) building.cutouts = rule.cutouts.map(r => [...r] as Cutout);
-        const [x1, y1] = farCorner(building);
-        if (x1 >= MAX_COORD || y1 >= MAX_COORD) return fail('OUT_OF_BOUNDS');
-        const f = footprint(building);
-        const overlap = overlapped(s, f);
-        if (overlap.length) return fail('BUILDING_OVERLAP', { cells: overlap });
-        const mine = new Set(f);
-        const covered = [...s.tilled, ...Object.keys(s.crops)].filter(cell => mine.has(cell));
-        if (covered.length) return fail('CELL_OCCUPIED', { cells: [...new Set(covered)].sort() });
+        const spot = spotRefusal(s, building);
+        if (spot) return fail(spot.code, spot.detail);
         take(s.bag, rule.blueprint, 1);
         for (const [item, need] of Object.entries(rule.materials ?? {})) take(s.bag, item, need);
         s.buildings.push(building);
+        s.house = homeOf(s.buildings);
+        break;
+      }
+      case 'move_building': {
+        // C-229：挪到新位置、新朝向；不算它自己原来的格。动物、掉落物（按落点随建筑走）、计时、建成时间不变。
+        const b = s.buildings.find(x => x.id === c.building);
+        if (!b) return fail('NO_BUILDING', { building: c.building });
+        const moved = { ...b, x: c.x, y: c.y, rotation: c.rotation };
+        const spot = spotRefusal(s, moved, b.id);
+        if (spot) return fail(spot.code, spot.detail);
+        b.x = c.x;
+        b.y = c.y;
+        b.rotation = c.rotation;
+        s.house = homeOf(s.buildings);
+        break;
+      }
+      case 'store_building': {
+        // C-229（SEN-Q-344 D1–D3）：小屋不收；喂过还没下的不收；否则蓝图和规则材料全退，已下的产物进背包，动物随建筑拆掉。
+        const b = s.buildings.find(x => x.id === c.building);
+        if (!b) return fail('NO_BUILDING', { building: c.building });
+        if (b.type === HOME_BUILDING) return fail('CANNOT_STORE', { building: c.building });
+        const rule = Object.hasOwn(rules.buildings, b.type) ? rules.buildings[b.type] : undefined;
+        if (!rule) return fail('UNKNOWN_BUILDING', { building: b.type });
+        const mine = s.drops.filter(d => d.building === b.id);
+        const waiting = mine.filter(d => d.ready_at > now);
+        if (waiting.length) return fail('PRODUCING', { ready_at: Math.max(...waiting.map(d => d.ready_at)) });
+        for (const [item, n] of Object.entries({ [rule.blueprint]: 1, ...rule.materials })) s.bag[item] = (s.bag[item] ?? 0) + n;
+        for (const d of mine) s.bag[d.item] = (s.bag[d.item] ?? 0) + d.amount;
+        s.drops = s.drops.filter(d => d.building !== b.id);
+        s.buildings = s.buildings.filter(x => x.id !== b.id);
         s.house = homeOf(s.buildings);
         break;
       }

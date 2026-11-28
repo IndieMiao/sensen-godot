@@ -212,8 +212,27 @@ preview go back to the book where it was scrolled; Back in the book closes it. T
 are while placing (R1). Blueprints are no longer on the quick bar (D4; still in the bag). The guide's build, well and
 coop lines point at Blueprints (draft copy, PM finalises it, C-45). The server already took any blueprint in any order;
 `server/test/parcels/farm.test.ts` and `parcels.test.ts` pin it and that a missing blueprint, a taken spot and short
-materials refuse the whole batch with the save unchanged. The Arrange key, moving and storing are SEN-C-229.
+materials refuse the whole batch with the save unchanged. The Arrange key, moving and storing: SEN-C-229, below.
 Tests: `tests/dynamic_farm/test_blueprint_book.gd`; emulator package `GATHER_QA_ENTRY=book`. Notes: `docs/plans/C-228.md`.
+
+## Moving and storing buildings (C-229, 0.4.7)
+
+Design SEN-C-227 D-555 README §5 (figure 3), accepted with D1–D3 (SEN-Q-344). The server's `move_building {building,
+x, y, rotation}` checks the new spot as `place_building` does, the building's own old cells not counting, and keeps its
+animals, drops (saved by spot, so they go with it) and timers; `store_building {building}` gives back the blueprint and
+the rules' `materials` (D1) and puts its laid drops in the bag; never the cottage (D3, `CANNOT_STORE`), never while a drop
+is on its way (D2, `PRODUCING {ready_at}`). Both are free and owner only; `parcel_farm.gd` has the same rules
+(`store_refusal`, `store_returns`), with the shared cases in `tests/dynamic_farm/fixtures/arrange_cases.json`
+(`tools/dev/dynamic_farm/arrange_cases.ts`). While a building stands the book has a full-width `Arrange` key at the
+bottom; it starts the arrange mode (`building_arrange.gd`): the farming UI away (M-16, the phone too), a marker over each
+building (LOCK-07 icon button sizes, a four-way arrow, gold while selected), one `Done`; a drag pans. A tap on a marker or
+a building's cells slides its card up: its picture, name, `3 Hens` / `1 Egg on the ground`, `Store` and `Move` (the
+cottage: `Move`), Store greyed `Ready in …` while a drop is on its way. Store asks `Store <name>?` with what goes back
+into the bag; stored, the building shrinks away with dust and a toast says `<name> stored`. Move hides the building and
+its yard behind the placement preview (`Cancel · Rotate · Move`, its old outline in white dashes, its own cells free);
+moved, it lands with the Build pop. Back folds the card, then ends the mode, as Done does.
+Tests: `tests/dynamic_farm/test_building_arrange.gd`; captures `tools/dev/dynamic_farm/arrange_shots.gd`; emulator package
+`GATHER_QA_ENTRY=arrange`. Notes: `docs/plans/C-229.md`.
 
 ## Washington Square room (C-115)
 
