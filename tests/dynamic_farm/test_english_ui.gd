@@ -22,7 +22,11 @@ var labels := {
 	"Sign in with Google": "通过 Google 登录", "Create an account": "注册新账号", "Close": "关闭",
 	"Create account": "注册", "Password (8+ characters)": "密码（至少 8 位）", "Confirm password": "确认密码",
 	"Already have an account? Sign in": "已有账号？登录", "Signing in…": "正在登录…",
-	"Email or password is incorrect.": "邮箱或密码错误。", "Enter a valid email address.": "请输入有效的邮箱地址。"
+	"Email or password is incorrect.": "邮箱或密码错误。", "Enter a valid email address.": "请输入有效的邮箱地址。",
+	# C-243: Settings › Delete account's step and the sign-in panel's line after it.
+	"Delete account?": "删除账号？", "Delete permanently": "永久删除", "Keep my account": "保留账号",
+	"This permanently deletes your account and your farm. Enter your password to confirm.": "删号说明",
+	"Enter your password.": "请输入密码。", "Your account has been deleted.": "账号已删除。"
 }
 ## Loaded at run time, like the map does: the panel uses the Net autoload.
 const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
@@ -99,7 +103,7 @@ func _loading_layer() -> void:
 ## C-85 ④; the main farm's classic panel still translates.
 func _sign_in_panel(map_page: Node) -> void:
 	GoogleSignIn.force_available = true # the Android row (Google Play services), as on the phone
-	for mode in ["sign_in", "sign_up", "forgot", "verify", "profile"]:
+	for mode in ["sign_in", "sign_up", "forgot", "verify", "profile", "delete"]:
 		var panel = load(ACCOUNT_PANEL).open(map_page, mode, "", true, true)
 		await process_frame
 		var chinese := shown(panel).filter(func(p): return has_cjk(p[1]))
@@ -111,7 +115,15 @@ func _sign_in_panel(map_page: Node) -> void:
 			panel._say("Email or password is incorrect.", false)
 			await process_frame
 			verify(shown(panel).all(func(p): return not has_cjk(p[1])), "v3 sign-in error stays English")
+		if mode == "delete":
+			panel._say("Enter your password.", false)
+			await process_frame
+			verify(shown(panel).all(func(p): return not has_cjk(p[1])), "v3 delete error stays English")
 		panel.free()
+	var deleted = load(ACCOUNT_PANEL).open(map_page, "sign_in", "", true, true, "Your account has been deleted.")
+	await process_frame
+	verify(shown(deleted).any(func(p): return p[1] == "Your account has been deleted."), "v3 sign-in line after deletion stays English")
+	deleted.free()
 	GoogleSignIn.force_available = false
 	var classic = load(ACCOUNT_PANEL).open(map_page, "sign_in")
 	await process_frame

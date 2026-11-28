@@ -616,3 +616,38 @@ func test_v3_gate_hides_close_and_classic_has_no_toast() -> void:
 	assert_object(classic.find_child("ShowPasswords", true, false)).is_not_null()
 	assert_bool((classic.find_child("ShowPasswords", true, false) as Control).visible).is_true()
 	classic.queue_free()
+
+## C-243: the dynamic farm opens the delete step on its own (Settings › Delete account). Keep my account closes it
+## and sends nothing; deleted with guest_login false, no guest sign-in follows (the dynamic farm has no guest).
+func test_delete_step_opened_alone_keeps_or_deletes_without_a_guest() -> void:
+	var t := _apple_net([{"status": 200, "json": {"ok": true, "deleted": true}}])
+	_sign_in_locally("Ada")
+	Net.account.has_password = true
+	var kept := _v3_panel("delete")
+	assert_array(_actions(kept)).contains(["delete_now", "to_account"])
+	await kept._on_action("to_account")
+	assert_bool(kept.is_queued_for_deletion()).is_true()
+	assert_array(t.requests).is_empty()
+	assert_bool(Net.account.signed_in()).is_true()
+	var p := _v3_panel("delete")
+	p.guest_login = false
+	p._password.text = "correct horse"
+	await p._on_action("delete_now")
+	assert_int(t.requests.size()).is_equal(1)
+	assert_str(t.requests[0].method).is_equal("DELETE")
+	assert_bool(Net.account.signed_in()).is_false()
+	assert_bool(Net.deleted_here).is_true()
+	assert_bool(p.is_queued_for_deletion()).is_true()
+	_restore_net()
+
+## C-243: the sign-in step's line after a deletion replaces the default one and goes with the next step.
+func test_v3_notice_shows_on_sign_in_until_another_step() -> void:
+	var p := AccountPanel.open(self, "sign_in", "", true, true, "Your account has been deleted.")
+	assert_bool(p._subtitle.visible).is_true()
+	assert_str(p._subtitle.text).is_equal("Your account has been deleted.")
+	p.set_mode("sign_up")
+	p.set_mode("sign_in")
+	assert_bool(p._subtitle.visible).is_false()
+	assert_str(p.notice).is_empty()
+	await get_tree().process_frame # replaced keys are freed at the end of the frame
+	p.queue_free()

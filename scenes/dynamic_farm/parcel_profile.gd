@@ -7,9 +7,13 @@ extends Control
 ## Only what applies here shows:
 ## - the profile: the name, and `My farm` with the home's card when there is a home (`home`: its name, status line and
 ##   what a tap does); no skills, collections or voice (no such data in the dynamic farm; ①-D ⑦);
-## - Settings with Legal alone — Privacy Policy (C-242, once its page is up), Licenses (and Map data's `Share anonymous
-##   map usage`, the map SDK's own switch) and the installed package's version; no Test options, Language, Notifications
-##   or account rows (sign-in stays on the map).
+## - Settings with Legal — Privacy Policy (C-242, once its page is up), Licenses (and Map data's `Share anonymous map
+##   usage`, the map SDK's own switch) and the installed package's version; no Test options, Language or Notifications.
+##   Signed in, the Danger row `Delete account ›` (no line under it) at the foot (C-243; Google Play asks for deletion in
+##   the app): it opens the account panel's delete step (the v3 look, in English; the password for an account that has
+##   one), whose `Keep my account` / ✕ go back to Settings and delete nothing. Deleted, the pages close and
+##   `account_deleted` comes: the host shows the sign-in panel, as after Sign out. Sign in and Sign out stay on the map's
+##   account chip.
 ## English only (C-82#48): the dynamic farm keeps Journey's 中文 table loaded, so the locale is English while these pages
 ## are open and comes back when they close.
 ## ‹ and Android Back (back()) close the page on top, the profile last; `closed` then.
@@ -17,8 +21,12 @@ extends Control
 ## (`motion/duration/quick`, 160, standard) and fade out again on close (160, exit; `closed` comes at once, the pages go
 ## when faded). The same with 减少动效: MS-21 is a fade already.
 signal closed
+## The account was deleted from Settings › Delete account (C-243); the pages have closed (`closed` came first).
+signal account_deleted
 
 const DRESS := "res://scenes/dressing_room/dressing_room.tscn"
+## Loaded at run time: the panel uses the Net autoload.
+const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
 ## C-242: the dynamic farm's own Privacy Policy (docs/legal/dynamic-farm-privacy.md), not the Gensen app's (P0Legal). Legal's
 ## `Privacy Policy ›` opens it in the system browser. The row shows only once the page is up: putting it up is a release
 ## the owner approves separately, so PRIVACY_LIVE stays false until then — turn it on with that release.
@@ -38,6 +46,8 @@ var fade := false
 var privacy := privacy_url()
 var _locale := ""
 var _closing := false
+## The account panel's delete step over Settings, while it is open.
+var _delete_panel: CanvasLayer
 
 static func open(parent: Node, map_view_ := Vector3.ZERO, home_ := {}, fade_ := false) -> Control:
 	var profile: Control = load("res://scenes/dynamic_farm/parcel_profile.gd").new()
@@ -72,8 +82,12 @@ func _push(page: Control) -> void:
 	pages.append(page)
 	add_child(page)
 
-## The page on top goes and the one under it shows again; the profile going closes everything.
+## The page on top goes and the one under it shows again; the profile going closes everything. The delete step over
+## Settings goes first (as its ✕: nothing is deleted), unless a delete is in flight.
 func back() -> void:
+	if is_instance_valid(_delete_panel):
+		_delete_panel.dismiss()
+		return
 	if pages.is_empty(): return
 	_drop(pages.pop_back())
 	if pages.is_empty(): close()
@@ -140,12 +154,32 @@ func profile_view() -> Dictionary:
 func open_settings() -> P0SettingsPage:
 	var page := P0SettingsPage.settings(version_line(), _safe_top(), _safe_bottom(), {}, "", P0SettingsPage.BLOCKED_NONE,
 		false, "", privacy, "", "", "", false)
+	if signed_in(): page.add_delete_account(null, "") # `Delete account ›` alone, no line under it (C-243#9)
 	page.back_pressed.connect(back)
 	page.open_pressed.connect(func(what: String):
 		if what == "licenses": open_licenses()
-		elif what == "privacy" and privacy != "": ExternalLink.open(privacy))
+		elif what == "privacy" and privacy != "": ExternalLink.open(privacy)
+		elif what == "delete_account": open_delete_account())
 	_push(page)
 	return page
+
+func signed_in() -> bool:
+	var net := get_node_or_null("/root/Net")
+	return net != null and net.account.signed_in()
+
+## Settings › Delete account (C-243): the account panel's delete step over the pages. Deleted (signed out when it
+## closes), the pages close and `account_deleted` comes; kept, Settings stays as it was.
+func open_delete_account() -> CanvasLayer:
+	if is_instance_valid(_delete_panel) or not signed_in(): return null
+	_delete_panel = load(ACCOUNT_PANEL).open(self, "delete", "", true, true) # the v3 look (C-85 ④), in English (C-144)
+	_delete_panel.guest_login = false # the dynamic farm has no guest (C-146)
+	var panel := _delete_panel
+	panel.closed.connect(func(still_signed_in: bool):
+		if _delete_panel == panel: _delete_panel = null
+		if still_signed_in or is_closing(): return
+		close()
+		account_deleted.emit(), CONNECT_ONE_SHOT)
+	return panel
 
 func open_licenses() -> P0SettingsPage:
 	var page := P0SettingsPage.licenses(P0Legal.groups(), _safe_top(), _safe_bottom())
