@@ -9,7 +9,7 @@ SEN-C-242。适用动态农场 App（`com.gensen.mapfarm`，连 `https://farm.se
 - 地址：`https://gensen.app/privacy-dynamic-farm`。和 Gensen App 的两份政策（`/privacy`、`/privacy-android`）放在同一个站点，同一个开发者名下；Play Console 的“隐私权政策网址”也填这个地址。
 - 不放正式服域名（`farm.sensenjoy.cn`）：正式服合并后自动部署，放在服务端路由里等于合并即上线，越过“上线另行批准”。
 - 本文件是网页的源文本。发布时由有 gensen.app 权限的人把下面的英文（和中文，如要放）做成页面；“Last updated”写成实际上线日期。
-- App 入口：设置 › Legal 第一行 `Privacy Policy ›`，在系统浏览器里打开上面的地址（`scenes/dynamic_farm/parcel_profile.gd` 的 `PRIVACY_URL`）。页面上线前 `PRIVACY_LIVE` 为 `false`，这一行不显示，免得玩家点开 404；随页面上线一起改成 `true`（和 Gensen App 的 `P0Legal.PRIVACY_LIVE` 同一做法）。
+- App 入口：设置 › Legal 第一行 `Privacy Policy ›`，在系统浏览器里打开上面的地址（`scenes/dynamic_farm/parcel_profile.gd` 的 `PRIVACY_URL`）。页面上线前 `PRIVACY_LIVE` 为 `false`，这一行不显示，免得玩家点开 404；页面 2026-11-28 上线（SEN-C-203#91），SEN-C-255 改成 `true`（和 Gensen App 的 `P0Legal.PRIVACY_LIVE` 同一做法）。
 
 ## 英文
 

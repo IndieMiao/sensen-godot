@@ -72,6 +72,11 @@ func _run() -> void:
 	var row: Node = settings.find_child("DeleteAccount", true, false)
 	verify(row != null and row.is_visible_in_tree(), "signed in: Settings has Delete account")
 	verify(settings.body.get_child(settings.body.get_child_count() - 1).is_ancestor_of(row), "at the foot of Settings, under Legal")
+	var policy: Node = settings.find_child("PrivacyPolicy", true, false)
+	var licenses: Node = settings.find_child("Licenses", true, false)
+	verify(policy != null and licenses != null and policy.get_parent() == licenses.get_parent()
+		and policy.get_index() < licenses.get_index() and not policy.get_parent().is_ancestor_of(row),
+		"Legal keeps Privacy Policy, then Licenses, above Delete account (C-255)")
 	verify(settings.find_child("SignOut", true, false) == null and settings.find_child("SignedInWith", true, false) == null,
 		"no Sign out or Signed in with here: they stay on the map's account chip")
 	verify(row.find_child("Title", true, false).text == "Delete account" and row.find_child("Line", true, false) == null,

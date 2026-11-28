@@ -7,7 +7,7 @@ extends Control
 ## Only what applies here shows:
 ## - the profile: the name, and `My farm` with the home's card when there is a home (`home`: its name, status line and
 ##   what a tap does); no skills, collections or voice (no such data in the dynamic farm; ①-D ⑦);
-## - Settings with Legal — Privacy Policy (C-242, once its page is up), Licenses (and Map data's `Share anonymous map
+## - Settings with Legal — Privacy Policy (C-242; its page up, C-255), Licenses (and Map data's `Share anonymous map
 ##   usage`, the map SDK's own switch) and the installed package's version; no Test options, Language or Notifications.
 ##   Signed in, the Danger row `Delete account ›` (no line under it) at the foot (C-243; Google Play asks for deletion in
 ##   the app): it opens the account panel's delete step (the v3 look, in English; the password for an account that has
@@ -28,10 +28,10 @@ const DRESS := "res://scenes/dressing_room/dressing_room.tscn"
 ## Loaded at run time: the panel uses the Net autoload.
 const ACCOUNT_PANEL := "res://scenes/account/account_panel.gd"
 ## C-242: the dynamic farm's own Privacy Policy (docs/legal/dynamic-farm-privacy.md), not the Gensen app's (P0Legal). Legal's
-## `Privacy Policy ›` opens it in the system browser. The row shows only once the page is up: putting it up is a release
-## the owner approves separately, so PRIVACY_LIVE stays false until then — turn it on with that release.
+## `Privacy Policy ›` opens it in the system browser. The row shows only once the page is up: PRIVACY_LIVE was false until
+## it was; up 11-28 09:12Z (C-203#91, the owner's release in H-142), so true (C-255).
 const PRIVACY_URL := "https://gensen.app/privacy-dynamic-farm"
-const PRIVACY_LIVE := false
+const PRIVACY_LIVE := true
 static func privacy_url(live := PRIVACY_LIVE) -> String: return PRIVACY_URL if live else ""
 
 ## The pages open, the profile first; only the top one shows.

@@ -107,24 +107,27 @@ func _run() -> void:
 	verify(row(settings, "Licenses") != null, "Settings lists Licenses")
 	for gone in ["TestOptions", "Language", "Notifications", "SignedInWith", "SignOut", "DeleteAccount", "HomeCity", "Version"]:
 		verify(row(settings, gone) == null, "no %s row in the dynamic farm's Settings" % gone)
-	# C-242: the dynamic farm's own Privacy Policy, first in Legal once its page is up; until then no row.
+	# C-242: the dynamic farm's own Privacy Policy, first in Legal once its page is up; C-255: it is up, so the row shows.
 	var Host: GDScript = host.get_script()
 	verify(Host.PRIVACY_URL == "https://gensen.app/privacy-dynamic-farm" and Host.PRIVACY_URL != load("res://modules/p0/p0_legal.gd").PRIVACY_ANDROID,
 		"the policy is the dynamic farm's own address, not the Gensen app's")
+	verify(Host.PRIVACY_LIVE and host.privacy == Host.PRIVACY_URL, "the page is up: Settings has the policy's address")
 	verify(Host.privacy_url(true) == Host.PRIVACY_URL and Host.privacy_url(false) == "", "the address only once the page is up")
-	verify((row(settings, "PrivacyPolicy") != null) == Host.PRIVACY_LIVE, "Privacy Policy shows exactly when the page is up")
-	host.privacy = Host.privacy_url(true)
-	var live_settings: Control = host.open_settings()
-	await process_frame
-	var policy: Node = row(live_settings, "PrivacyPolicy")
-	var licenses_row: Node = row(live_settings, "Licenses")
+	var policy: Node = row(settings, "PrivacyPolicy")
+	var licenses_row: Node = row(settings, "Licenses")
 	verify(policy != null and policy.get_parent() == licenses_row.get_parent()
-		and policy.get_index() < licenses_row.get_index(), "with the page up: Privacy Policy, then Licenses, in Legal")
+		and policy.get_index() < licenses_row.get_index(), "Privacy Policy, then Licenses, in Legal")
+	verify(policy.find_child("Title", true, false).text == "Privacy Policy", "the row reads Privacy Policy, as C-243 left it")
 	var asked := ExternalLink.asked.size()
 	policy.pressed.emit()
-	verify(ExternalLink.asked.size() == asked + 1 and ExternalLink.asked[asked] == Host.PRIVACY_URL,
+	verify(ExternalLink.asked.size() == asked + 1 and ExternalLink.asked[asked] == "https://gensen.app/privacy-dynamic-farm",
 		"Privacy Policy opens the policy's address in the browser")
-	verify(host.top() == live_settings, "and stays on Settings")
+	verify(host.top() == settings, "and stays on Settings")
+	host.privacy = Host.privacy_url(false)
+	var hidden_settings: Control = host.open_settings()
+	await process_frame
+	verify(row(hidden_settings, "PrivacyPolicy") == null and row(hidden_settings, "Licenses") != null,
+		"without an address no Privacy Policy row; Licenses stays")
 	host.back(); await process_frame
 	host.privacy = Host.privacy_url()
 	verify(host.top() == settings and settings.visible, "back to Settings as opened")
