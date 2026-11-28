@@ -13,6 +13,7 @@ import { MemoryParcelStore } from '../../src/parcels/store.js';
 import { MixpanelAnalytics, type Analytics } from '../../src/analytics/mixpanel.js';
 import { makeKeys, signToken } from '../fixtures/firebase_tokens.js';
 import { sha256Hex } from '../../src/accounts/apple_token.js';
+import type { Mailer } from '../../src/accounts/mailer.js';
 
 const content = loadContent(DEFAULT_CONTENT_DIR);
 const CV = contentVersion(DEFAULT_CONTENT_DIR);
@@ -29,12 +30,12 @@ const EMAIL = 'ada@example.com';
 const IP = '203.0.113.7';
 
 const opened: { app: FastifyInstance; analytics?: Analytics }[] = [];
-async function appWith(analytics?: Analytics) {
+async function appWith(analytics?: Analytics, mailer?: Mailer) {
   const store = new MemoryStore({ content, timezone: 'America/Los_Angeles', plot: plotFor(content), now: () => T0, contentVersion: CV });
   const app = await buildApp({
     store, content, contentVersion: CV, blueprintDir: path.join(ROOT, 'assets', 'blueprints'), regionsFile: path.join(DEFAULT_CONTENT_DIR, 'regions.json'),
     pepper: 'test-pepper', now: () => T0, realtimeEnabled: false, google: { audiences: [GOOGLE_AUD], keys: GOOGLE_KEYS.keys },
-    parcels: { store: new MemoryParcelStore(id => store.displayNameOf(id)), rules, reselect: false }, analytics,
+    parcels: { store: new MemoryParcelStore(id => store.displayNameOf(id)), rules, reselect: false }, analytics, mailer,
   });
   opened.push({ app, analytics });
   return app;
@@ -170,5 +171,89 @@ describe('analytics in the routes (C-203)', () => {
     while (pending.length) { pending.shift()!(); await new Promise(resolve => setImmediate(resolve)); }
     await done;
     expect(fetch.mock.calls.length).toBeGreaterThan(1);
+  });
+
+  // —— C-205 ——
+  /** 收信桩：记下每个验证码。 */
+  const inbox = () => {
+    const mail: { email: string; code: string; purpose: string }[] = [];
+    const mailer: Mailer = { async sendCode(email, code, purpose) { mail.push({ email, code, purpose }); } };
+    return { mail, mailer };
+  };
+  const register = (app: FastifyInstance, email = EMAIL) => app.inject({ method: 'POST', url: '/v1/auth/email/register', remoteAddress: IP,
+    payload: { email, password: 'correct horse', display_name: 'Ada' } });
+  const gdprClient = (answer: number) => {
+    const calls: { url: string; body: string }[] = [];
+    const fetch = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+      calls.push({ url: String(url), body: String(init!.body) });
+      return new Response(String(url).includes('/data-deletions/') && answer === 200 ? '{"status":"ok","results":[{"tracking_id":"42"}]}' : '{}', { status: answer });
+    });
+    const logs: string[] = [];
+    const analytics = new MixpanelAnalytics({ token: 'test-token', host: 'https://api.mixpanel.com', gdprToken: 'oauth', fetch: fetch as unknown as typeof globalThis.fetch,
+      batchSize: 50, flushMs: 60_000, timeoutMs: 100, retryDelayMs: 0, log: line => logs.push(line) });
+    return { analytics, calls, logs, deletions: () => calls.filter(c => c.url.includes('/data-deletions/')).map(c => JSON.parse(c.body)) };
+  };
+
+  it('reports a login with method password_reset after a successful email password reset', async () => {
+    const mp = mixpanel();
+    const { mail, mailer } = inbox();
+    const app = await appWith(mp.analytics, mailer);
+    const userId = (await register(app)).json().user_id;
+    await app.inject({ method: 'POST', url: '/v1/auth/email/code', remoteAddress: IP, payload: { email: EMAIL, purpose: 'reset' } });
+    const code = mail.filter(m => m.purpose === 'reset').at(-1)!.code;
+    // A wrong code changes nothing and reports nothing.
+    const wrong = await app.inject({ method: 'POST', url: '/v1/auth/email/reset', remoteAddress: IP,
+      payload: { email: EMAIL, code: code === '000000' ? '111111' : '000000', password: 'brand new pass' } });
+    expect(wrong.statusCode).toBe(422);
+    const reset = await app.inject({ method: 'POST', url: '/v1/auth/email/reset', remoteAddress: IP, payload: { email: EMAIL, code, password: 'brand new pass' } });
+    expect(reset.statusCode).toBe(200);
+    await mp.analytics.flush();
+    expect(mp.batches.flat().map(e => ({ event: e.event, id: e.properties.distinct_id, method: e.properties.method, time: e.properties.time }))).toEqual([
+      { event: 'account_created', id: userId, method: 'email', time: T0 },
+      { event: 'login', id: userId, method: 'password_reset', time: T0 },
+    ]);
+  });
+
+  it.each(['app', 'web'] as const)('asks Mixpanel to delete the account\'s data when it is deleted (%s), dropping its unsent events', async source => {
+    const mp = gdprClient(200);
+    const app = await appWith(mp.analytics);
+    const reg = (await register(app)).json();
+    const other = (await register(app, 'bea@example.com')).json();
+    const res = source === 'app'
+      ? await app.inject({ method: 'DELETE', url: '/v1/users/me', headers: bearer(reg.token), remoteAddress: IP, payload: { password: 'correct horse' } })
+      : await app.inject({ method: 'POST', url: '/v1/account/delete', remoteAddress: IP, payload: { email: EMAIL, password: 'correct horse' } });
+    expect(res.statusCode).toBe(200);
+    await mp.analytics.close();
+    expect(mp.deletions()).toEqual([{ distinct_ids: [reg.user_id], compliance_type: 'GDPR' }]);
+    const imported = mp.calls.filter(c => c.url.includes('/import')).flatMap(c => JSON.parse(c.body) as { properties: { distinct_id: string } }[]);
+    expect(imported.map(e => e.properties.distinct_id)).toEqual([other.user_id]);
+    expect(mp.logs).toEqual([`[analytics] Mixpanel deletion requested for user ${reg.user_id}, task 42`]);
+  });
+
+  it('still deletes the account when Mixpanel refuses the deletion, and only logs', async () => {
+    const mp = gdprClient(500);
+    const app = await appWith(mp.analytics);
+    const reg = (await register(app)).json();
+    const res = await app.inject({ method: 'DELETE', url: '/v1/users/me', headers: bearer(reg.token), remoteAddress: IP, payload: { password: 'correct horse' } });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().ok).toBe(true);
+    expect((await app.inject({ method: 'GET', url: '/v1/users/me', headers: bearer(reg.token) })).statusCode).toBe(401);
+    await mp.analytics.close();
+    expect(mp.deletions()).toHaveLength(2);
+    expect(mp.logs.at(-1)).toBe(`[analytics] Mixpanel deletion for user ${reg.user_id} not requested; delete it in Mixpanel by hand`);
+  });
+
+  it('sends nothing on reset or deletion when Mixpanel is not configured', async () => {
+    const spy = vi.spyOn(globalThis, 'fetch');
+    const { mail, mailer } = inbox();
+    const app = await appWith(undefined, mailer);
+    expect((await register(app)).statusCode).toBe(201);
+    await app.inject({ method: 'POST', url: '/v1/auth/email/code', remoteAddress: IP, payload: { email: EMAIL, purpose: 'reset' } });
+    const reset = await app.inject({ method: 'POST', url: '/v1/auth/email/reset', remoteAddress: IP,
+      payload: { email: EMAIL, code: mail.filter(m => m.purpose === 'reset').at(-1)!.code, password: 'brand new pass' } });
+    expect(reset.statusCode).toBe(200);
+    const del = await app.inject({ method: 'DELETE', url: '/v1/users/me', headers: bearer(reset.json().token), remoteAddress: IP, payload: { password: 'brand new pass' } });
+    expect(del.statusCode).toBe(200);
+    expect(spy).not.toHaveBeenCalled();
   });
 });
