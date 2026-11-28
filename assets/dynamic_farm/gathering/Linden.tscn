@@ -1,0 +1,154 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/gathering/Linden.glb" id="geo"]
+[ext_resource type="Shader" path="res://assets/dynamic_farm/gathering/gather_surface.gdshader" id="paint"]
+
+[sub_resource type="ShaderMaterial" id="active"]
+resource_local_to_scene = true
+shader = ExtResource("paint")
+
+[sub_resource type="Animation" id="stage_0"]
+resource_name = "stage_0"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Linden/CrownPivot/Sound:visible")
+tracks/0/interp = 0
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [true]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Art/Linden/CrownPivot/Nick:visible")
+tracks/1/interp = 0
+tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Art/Linden/CrownPivot/Hewn:visible")
+tracks/2/interp = 0
+tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+
+[sub_resource type="Animation" id="stage_1"]
+resource_name = "stage_1"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Linden/CrownPivot/Sound:visible")
+tracks/0/interp = 0
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Art/Linden/CrownPivot/Nick:visible")
+tracks/1/interp = 0
+tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [true]}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Art/Linden/CrownPivot/Hewn:visible")
+tracks/2/interp = 0
+tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+
+[sub_resource type="Animation" id="stage_2"]
+resource_name = "stage_2"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Linden/CrownPivot/Sound:visible")
+tracks/0/interp = 0
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Art/Linden/CrownPivot/Nick:visible")
+tracks/1/interp = 0
+tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Art/Linden/CrownPivot/Hewn:visible")
+tracks/2/interp = 0
+tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [true]}
+
+[sub_resource type="Animation" id="hit"]
+resource_name = "hit"
+length = 0.26
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Linden/CrownPivot:rotation_degrees:x")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0, 0.03, 0.089, 0.145, 0.2, 0.26), "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1), "update": 0, "values": [0, 4, -2.8, 1.8, -0.8, 0]}
+
+[sub_resource type="Animation" id="fall"]
+resource_name = "fall"
+length = 1.66
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Linden/CrownPivot:rotation_degrees:x")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0, 0.12, 0.88, 0.98, 1.1), "transitions": PackedFloat32Array(1, 2, 1, 1, 1), "update": 0, "values": [0, 0, 88, 80, 88]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Art/Linden/CrownPivot/Crown:material_override:shader_parameter/coverage")
+tracks/1/interp = 1
+tracks/1/keys = {"times": PackedFloat32Array(0, 1.36, 1.66), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [1.0, 1.0, 0.0]}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Art/Linden/CrownPivot:position:y")
+tracks/2/interp = 1
+tracks/2/keys = {"times": PackedFloat32Array(0, 1.36, 1.66), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [0.72, 0.72, 0.62]}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Art/Linden/CrownPivot:visible")
+tracks/3/interp = 0
+tracks/3/keys = {"times": PackedFloat32Array(0, 1.66), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [true, false]}
+
+[sub_resource type="Animation" id="reduced_fall"]
+resource_name = "reduced_fall"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Linden/CrownPivot/Crown:material_override:shader_parameter/coverage")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0, 0.3), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [1.0, 0.0]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Art/Linden/CrownPivot:visible")
+tracks/1/interp = 0
+tracks/1/keys = {"times": PackedFloat32Array(0, 0.3), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [true, false]}
+
+[sub_resource type="Animation" id="reset"]
+resource_name = "reset"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Linden/CrownPivot:visible")
+tracks/0/interp = 0
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [true]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Art/Linden/CrownPivot/Crown:material_override:shader_parameter/coverage")
+tracks/1/interp = 1
+tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [1.0]}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Art/Linden/CrownPivot:position:y")
+tracks/2/interp = 1
+tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.72]}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Art/Linden/CrownPivot:rotation_degrees:x")
+tracks/3/interp = 1
+tracks/3/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0]}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Art/Linden/CrownPivot/Sound:visible")
+tracks/4/interp = 0
+tracks/4/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [true]}
+tracks/5/type = "value"
+tracks/5/path = NodePath("Art/Linden/CrownPivot/Nick:visible")
+tracks/5/interp = 0
+tracks/5/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/6/type = "value"
+tracks/6/path = NodePath("Art/Linden/CrownPivot/Hewn:visible")
+tracks/6/interp = 0
+tracks/6/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+
+[sub_resource type="AnimationLibrary" id="clips"]
+_data = {&"stage_0": SubResource("stage_0"), &"stage_1": SubResource("stage_1"), &"stage_2": SubResource("stage_2"), &"hit": SubResource("hit"), &"fall": SubResource("fall"), &"reduced_fall": SubResource("reduced_fall"), &"reset": SubResource("reset")}
+
+[node name="LindenTarget" type="Node3D"]
+
+[node name="Art" parent="." instance=ExtResource("geo")]
+
+[node name="Crown" parent="Art/Linden/CrownPivot"]
+material_override = SubResource("active")
+
+[node name="Sound" parent="Art/Linden/CrownPivot"]
+material_override = SubResource("active")
+
+[node name="Nick" parent="Art/Linden/CrownPivot"]
+material_override = SubResource("active")
+visible = false
+
+[node name="Hewn" parent="Art/Linden/CrownPivot"]
+material_override = SubResource("active")
+visible = false
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries/ = SubResource("clips")
+
+[editable path="Art"]

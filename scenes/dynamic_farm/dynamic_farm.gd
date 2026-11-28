@@ -24,6 +24,16 @@ const Building = preload("res://modules/dynamic_farm/farm_building.gd")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Art = preload("res://modules/farm/farm_art.gd")
 const Placement = preload("res://scenes/dynamic_farm/building_placement.gd")
+const Book = preload("res://scenes/dynamic_farm/blueprint_book.gd")
+const Thumbs = preload("res://scenes/dynamic_farm/blueprint_thumbs.gd")
+const BLUEPRINT_ICON := preload("res://assets/ui/v3/hero/hero_blueprints.png")
+## A card's grey key when the type is at its limit (as Scott's key words it).
+const BOOK_LEVEL := "Farm Lv%d needed"
+## Place: the book fades out this fast into the preview.
+const BOOK_FADE_MS := 120.0
+## The Blueprints key's number pops 1 → COUNT_BUMP → 1 in COUNT_BUMP_MS when it changes.
+const COUNT_BUMP := 1.15
+const COUNT_BUMP_MS := 200.0
 ## The main farm's pop and dust (a Homestead look swapped in), reused for a building just built (C-114).
 const Fence = preload("res://scenes/p0/p0_fence.gd")
 const HOUSE_DUST_SCALE := 4.0
@@ -124,9 +134,19 @@ var _facing := Vector3.BACK
 # The buildings (C-33 the first house, C-150 any type) on the owner's parcel, through ParcelFarming's save, by
 # building id: {node, proxy, wire}; none in the art preview.
 var _buildings := {}
+## The Blueprints key (C-228; the Build key before it, in the same place and size): opens the blueprint book.
 var _build: UiCommandButton
-## The type the Build key places (build_choice()), "" when it is hidden.
-var _build_type := ""
+## Its cream disc with the blueprints in the bag, and the number in it.
+var _build_count: PanelContainer
+var _build_count_label: Label
+## The blueprint book while open (blueprint_book.gd), else null; where its list was scrolled when it closed for a
+## placement (opened again there on Cancel).
+var _book: Control
+var _book_scroll := 0
+var _thumbs: Node
+## The dark glass chip under the avatar naming the blueprint being placed (SEN-C-227 README §4 item 2).
+var _placing_chip: PanelContainer
+var _placing_name: Label
 var _placement: Placement
 var _sending := false
 var _paths: RefCounted
@@ -294,25 +314,141 @@ func _on_farm_changed(farm: Dictionary) -> void:
 func buildings_state() -> Array:
 	return ParcelFarm.buildings_of(_farming.farm) if _farming != null else []
 
-## The first type of the rules' `buildings` whose blueprint is in the bag, still under its limit at the farm's level
-## (C-152: wells 2 from Lv3, 3 from Lv5) and with art here; "" when there is none.
-func build_choice() -> String:
-	if _farming == null: return ""
+## The blueprint book's cards (C-228, SEN-C-227 README §3): every type of the rules' `buildings`, in that order, whose
+## blueprint the bag holds and that has art here, as {type, name, count (blueprints in the bag), materials: [{item,
+## name, icon, have, need}], reason}. `reason` is "" when it can be placed, the level that allows one more
+## (`Farm Lv3 needed`, C-152: wells 2 from Lv3) when the type is at its limit, else the first short material
+## (build_gap). A type at a limit no level raises (a spare cottage blueprint) is left out: nothing could place it.
+func book_entries() -> Array:
+	if _farming == null or _farming.farm.is_empty(): return []
 	var bag: Dictionary = _farming.farm.get("bag", {})
 	var rules := ParcelFarm.rules()
 	var types: Dictionary = rules.get("buildings", {})
 	var built := buildings_state()
 	var level := ParcelFarm.farm_level(_farming.farm)
+	var out := []
 	for type: String in types:
-		if int(bag.get(types[type].blueprint, 0)) <= 0 or Building.kind(type).is_empty(): continue
-		if built.filter(func(b): return b.type == type).size() < ParcelFarm.building_max(rules, type, level): return type
-	return ""
+		var count := int(bag.get(types[type].blueprint, 0))
+		if count <= 0 or Building.kind(type).is_empty(): continue
+		var standing := built.filter(func(b): return b.type == type).size()
+		var reason := ""
+		if standing >= ParcelFarm.building_max(rules, type, level):
+			var from := _level_allowing(rules, type, standing + 1)
+			if from <= 0: continue
+			reason = BOOK_LEVEL % from
+		var materials := []
+		var needs: Dictionary = types[type].get("materials", {})
+		for item: String in needs:
+			materials.append({"item": item, "name": _farming.item_name(item), "icon": _farming.item_icon(item),
+				"have": int(bag.get(item, 0)), "need": int(needs[item])})
+		if reason == "": reason = build_gap(type)
+		out.append({"type": type, "name": Building.kind(type).name, "count": count, "materials": materials, "reason": reason})
+	return out
 
+## The lowest farm level whose limit for `type` is at least `want`, or 0 when none is.
+static func _level_allowing(rules: Dictionary, type: String, want: int) -> int:
+	var level := 1
+	while true:
+		if ParcelFarm.building_max(rules, type, level) >= want: return level
+		if ParcelFarm.next_level(rules, level).is_empty(): return 0
+		level += 1
+	return 0
+
+## Blueprints in the bag for the rules' building types: the number on the Blueprints key.
+func blueprint_count() -> int:
+	if _farming == null: return 0
+	var bag: Dictionary = _farming.farm.get("bag", {})
+	var n := 0
+	for rule: Dictionary in ParcelFarm.rules().get("buildings", {}).values(): n += int(bag.get(rule.blueprint, 0))
+	return n
+
+## The Blueprints key (C-228, SEN-C-227 README §2; owner SEN-Q-344 R2): on one's own loaded parcel while a blueprint
+## is in the bag or a building stands, unless the book or a placement holds the screen. Its disc shows the
+## blueprints in the bag (none drawn at 0); a change pops it (1 → 1.15 → 1 in 200).
 func _refresh_build() -> void:
-	_build_type = build_choice() if _placement == null else ""
-	_build.visible = _build_type != ""
-	if _build.visible: _build.label = "Build %s" % Building.kind(_build_type).name
-	_build.reason = build_gap(_build_type) if _build.visible else ""
+	var shown: bool = _farming != null and not _farming.farm.is_empty() and _placement == null and _book == null \
+		and (blueprint_count() > 0 or not buildings_state().is_empty())
+	_build.visible = shown
+	var count := blueprint_count()
+	_build_count_label.text = str(count)
+	_build_count.visible = count > 0
+	if not shown: return
+	# The number last seen on the key: a Build made while the key was hidden pops it as it comes back.
+	var was := int(_build_count.get_meta(&"count", -1))
+	_build_count.set_meta(&"count", count)
+	if was >= 0 and was != count and count > 0: _bump_count()
+
+func _bump_count() -> void:
+	if UiMotion.reduced or not _build_count.is_inside_tree(): return
+	_build_count.pivot_offset = _build_count.size * 0.5
+	var tw := UiMotion.tween(_build_count, UiTokens.MOTION_EASING_STANDARD)
+	tw.tween_property(_build_count, "scale", Vector2.ONE * COUNT_BUMP, UiMotion.secs(COUNT_BUMP_MS * 0.5))
+	tw.tween_property(_build_count, "scale", Vector2.ONE, UiMotion.secs(COUNT_BUMP_MS * 0.5))
+
+## Opens the blueprint book (M-04 over the scrim); the farming UI is held under it (no key, no quick bar, no guide).
+func open_book() -> Control:
+	if _book != null or _farming == null or _farming.farm.is_empty() or _placement != null or _back_sent: return null
+	if not _route.is_empty(): _end_route("cancelled")
+	_movement = Vector2.ZERO
+	_controls.reset()
+	_controls.process_mode = Node.PROCESS_MODE_DISABLED
+	_farming.held = true
+	_book = Book.new(book_entries(), _thumb)
+	_book.close_requested.connect(close_book)
+	_book.place_requested.connect(place_from_book)
+	_canvas.add_child(_book)
+	_book.open()
+	_book.stagger(_book.cards)
+	if _book.scroll != null and _book_scroll > 0:
+		var book := _book
+		var at := _book_scroll
+		# The list has its height once laid out; the scroll position waits for that frame.
+		(func(): if is_instance_valid(book) and book.scroll != null: book.scroll.scroll_vertical = at).call_deferred()
+	_refresh_build()
+	return _book
+
+## Closes the book (M-05, or the 120 fade into a placement); false when it was not open.
+func close_book(into_placement := false) -> bool:
+	if _book == null: return false
+	_book_scroll = _book.scroll.scroll_vertical if _book.scroll != null else 0
+	var book := _book
+	_book = null
+	if into_placement and not UiMotion.reduced and book.is_inside_tree():
+		book.closing = true
+		book.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		book.scrim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		book.frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var tw := UiMotion.tween(book, UiTokens.MOTION_EASING_STANDARD)
+		tw.tween_property(book, "modulate:a", 0.0, UiMotion.secs(BOOK_FADE_MS))
+		tw.tween_callback(book.queue_free)
+	else:
+		book.close()
+	if not into_placement:
+		_book_scroll = 0
+		_farming.held = false
+		_controls.process_mode = Node.PROCESS_MODE_INHERIT
+		_controls.reset()
+	_refresh_build()
+	return true
+
+func book_open() -> bool: return _book != null
+
+## A card's Place: the book fades and that type's placement starts.
+func place_from_book(type: String) -> void:
+	if _book == null: return
+	close_book(true)
+	if not begin_placement(type):
+		_farming.held = false
+		_controls.process_mode = Node.PROCESS_MODE_INHERIT
+		_refresh_build()
+
+## The book's picture of a type (BlueprintThumbs), made on first use.
+func _thumb(type: String) -> Texture2D:
+	if _thumbs == null:
+		_thumbs = Thumbs.new()
+		_thumbs.name = "BlueprintThumbs"
+		add_child(_thumbs)
+	return _thumbs.texture(type, Building.base_of(ParcelFarm.rules().buildings[type]), _walk.cell_m)
 
 ## C-181: the first material the type's `materials` (the barn's 20 Timber, 10 Stone) still lacks, as P0's `Need N more
 ## Timber`; "" when the bag has them all (the key places, and the server takes them with the blueprint).
@@ -328,9 +464,17 @@ func build_gap(type: String) -> String:
 func _show_placement_grid(shown: bool) -> void:
 	for part: MeshInstance3D in _placement_grid: part.visible = shown
 
-func begin_placement() -> void:
-	if not _build.visible: return
-	var type := _build_type
+## The preview of `type`'s blueprint (C-228: any card of the book; "" takes the book's first placeable one): false when
+## nothing can be placed.
+func begin_placement(type := "") -> bool:
+	if _farming == null or _placement != null: return false
+	if type == "":
+		for entry: Dictionary in book_entries():
+			if entry.reason == "":
+				type = entry.type
+				break
+	var entry_ok := book_entries().any(func(e): return e.type == type and e.reason == "")
+	if not entry_ok: return false
 	var base := Building.base_of(ParcelFarm.rules().buildings[type])
 	# A press still walking to its cell is given up; one already working finishes under the preview.
 	if not _route.is_empty(): _end_route("cancelled")
@@ -352,12 +496,22 @@ func begin_placement() -> void:
 		start.at if start != null else _walk.cell_at(_actor.position) - Building.middle(base), cleared,
 		start.rotation if start != null else 0)
 	_placement.confirmed.connect(_on_place_confirmed)
-	_placement.cancelled.connect(end_placement)
+	_placement.cancelled.connect(cancel_placement)
+	_placing_name.text = Building.kind(type).name
+	_placing_chip.visible = true
 	_refresh_build()
 	_play("idle")
 	_focus = Building.center(_walk, _placement.at, base, _placement.rotation_steps)
 	_overview = false
 	_place_camera()
+	return true
+
+## Cancel or Android Back in the preview (C-228, SEN-C-227 README §4 item 5): the preview ends and the book opens again
+## where it was scrolled.
+func cancel_placement() -> void:
+	if _placement == null or _sending: return
+	end_placement()
+	open_book()
 
 ## Cells walking cannot use besides a new footprint: solid core obstacles, the buildings standing and reserved cells.
 func _walk_blocked(obstacles: Dictionary) -> Dictionary:
@@ -371,6 +525,7 @@ func end_placement() -> void:
 	if _placement == null: return
 	_placement.queue_free()
 	_placement = null
+	_placing_chip.visible = false
 	_show_placement_grid(false)
 	_sending = false
 	_farming.held = false
@@ -894,16 +1049,75 @@ func _build_ui() -> void:
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_canvas.add_child(_hint)
-	_build = UiCommandButton.new("Build Cottage", UiCommandButton.Kind.PRIMARY)
-	_build.name = "Build"
+	# C-228 (SEN-C-227 README §2): the Blueprints key where the Build key was, 180 × 48 clay side key (C-185 §3.1 E):
+	# the book's rolled blueprint at 32, `Blueprints`, and a cream disc at its right end with the blueprints in the bag.
+	_build = UiCommandButton.new("Blueprints", UiCommandButton.Kind.PRIMARY)
+	_build.name = "Blueprints"
 	_build.theme = UiKit.theme()
 	# 180 × 48; ParcelFarming places it beside the action key (place_side_button), clear of the key and quick bar.
 	_build.custom_minimum_size = Vector2(180, 48)
 	_build.clay = true   # C-186: the clay side key beside the clay action key (C-185 §3.1 E)
+	_build.icon = BLUEPRINT_ICON
+	_build.expand_icon = true
+	_build.add_theme_constant_override(&"icon_max_width", 32)
+	_build.add_theme_constant_override(&"h_separation", 6)
+	_build.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	# The rolled blueprint keeps its own colours (the clay key's ink would tint it).
+	for c in [&"icon_normal_color", &"icon_hover_color", &"icon_pressed_color", &"icon_hover_pressed_color", &"icon_focus_color",
+			&"icon_disabled_color"]:
+		_build.add_theme_color_override(c, Color.WHITE)
 	_build.visible = false
-	_build.activated.connect(begin_placement)
-	_build.unavailable_pressed.connect(func(reason: String): if _farming != null: _farming.show_notice(reason))
+	_build.activated.connect(open_book)
 	_canvas.add_child(_build)
+	_build_count = PanelContainer.new()
+	_build_count.name = "Count"
+	_build_count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var disc := StyleBoxFlat.new()
+	disc.bg_color = UiTokens.COLOR_SURFACE_RAISED
+	disc.set_corner_radius_all(13)
+	disc.anti_aliasing = true
+	_build_count.add_theme_stylebox_override(&"panel", UiClay.padded(disc, 7.0, 0.0))
+	_build_count.custom_minimum_size = Vector2(26, 26)
+	_build_count_label = UiKit.label("0", UiTokens.STYLE_C13_B, UiTokens.COLOR_ACTION_CLAY_HARVEST_SIDE_INK)
+	_build_count_label.add_theme_font_override(&"font", UiKit.font(&"extrabold"))
+	_build_count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_build_count_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_build_count.add_child(_build_count_label)
+	_build_count.set_anchors_preset(Control.PRESET_CENTER_RIGHT)
+	_build_count.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_build_count.offset_right = -12
+	_build_count.offset_left = -12 - 26
+	_build_count.offset_top = -15
+	_build_count.offset_bottom = 11
+	_build_count.visible = false
+	_build.add_child(_build_count)
+	# The blueprint being placed (SEN-C-227 README §4 item 2): left under the avatar, the place chip's dark glass.
+	_placing_chip = PanelContainer.new()
+	_placing_chip.name = "PlacingChip"
+	_placing_chip.theme = UiKit.theme()
+	_placing_chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_placing_chip.add_theme_stylebox_override(&"panel",
+		UiClay.padded(UiClay.glass_dark(UiTokens.SIZE_HUD_PLACE_H * 0.5), UiTokens.SPACE_S4, 0.0))
+	_placing_chip.custom_minimum_size.y = UiTokens.SIZE_HUD_PLACE_H
+	_placing_chip.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_placing_chip.offset_left = UiTokens.SIZE_SCREEN_EDGE
+	_placing_chip.offset_top = _header.offset_bottom + UiTokens.SPACE_S2
+	_placing_chip.offset_bottom = _placing_chip.offset_top + UiTokens.SIZE_HUD_PLACE_H
+	_placing_chip.visible = false
+	_canvas.add_child(_placing_chip)
+	var placing_row := HBoxContainer.new()
+	placing_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	placing_row.add_theme_constant_override(&"separation", UiTokens.SPACE_S2)
+	_placing_chip.add_child(placing_row)
+	var roll := UiKit.icon(BLUEPRINT_ICON, 24)
+	roll.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	placing_row.add_child(roll)
+	_placing_name = UiKit.label("", UiTokens.STYLE_TYPE_LABEL_ON_DARK)
+	_placing_name.name = "PlacingName"
+	_placing_name.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_placing_name.add_theme_font_override(&"font", UiKit.font(&"extrabold"))
+	_placing_name.add_theme_font_size_override(&"font_size", UiTokens.SIZE_HUD_PLACE_FONT)
+	placing_row.add_child(_placing_name)
 
 ## The place capsule as wide as its longer line (name or status), at most the screen less its 12 sides; past that
 ## the lines cut with … (a Label that may cut asks for no width of its own, so the width is measured here).
@@ -952,6 +1166,7 @@ func _request_back() -> void:
 	if _back_sent: return
 	_back_sent = true
 	end_placement()
+	close_book()
 	_movement = Vector2.ZERO
 	_controls.reset()
 	back_requested.emit()
@@ -967,6 +1182,11 @@ func close_modal() -> bool:
 	if is_instance_valid(_profile):
 		_profile.back()
 		return true
+	# C-228: Back in a placement goes back to the book (as Cancel), Back in the book closes it.
+	if _placement != null:
+		cancel_placement()
+		return true
+	if close_book(): return true
 	return _farming != null and (_farming.close_energy() or _farming.close_bag() or _farming.close_phone())
 
 ## The profile over the parcel (C-108; C-85 ①: the HUD avatar opens it): the parcel's HUD hides and its touches stop
@@ -975,6 +1195,7 @@ func open_profile() -> Control:
 	# A profile still fading out (MS-21) is still on its pages and its locale: a new one waits for it to go.
 	if is_instance_valid(_profile) or is_instance_valid(_profile_leaving) or _suspended or _back_sent: return null
 	end_placement()
+	close_book()
 	if not _route.is_empty(): _end_route("cancelled")
 	_movement = Vector2.ZERO
 	_controls.reset()
@@ -1045,6 +1266,7 @@ func suspend() -> void:
 	_release_parcel_aa()
 	_suspended = true
 	end_placement()
+	close_book()
 	if not _route.is_empty(): _end_route("cancelled")
 	_labour_left = 0.0
 	_put_pail_away()

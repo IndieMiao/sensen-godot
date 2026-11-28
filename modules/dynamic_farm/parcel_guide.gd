@@ -16,6 +16,8 @@ extends RefCounted
 ## Timber and Stone, sell carrots and eggs if the upgrade's coins are short, and upgrade the farm at Scott's; nothing once
 ## the farm is past Lv1 (and its coop fed). `stage` is that milestone (the
 ## phone's task rows, ParcelTasks), `step` what to do next for it. The new copy is for PM to finalise (C-45).
+## C-228 (0.4.7): the Build key became the Blueprints key (the blueprint book, any blueprint in any order), so the
+## build, well and coop lines point at Blueprints (SEN-C-227 README §6 draft; PM finalises it per C-45).
 
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const BLUEPRINT := "blueprint_cottage"
@@ -25,16 +27,16 @@ const CROP := "crop_carrot"
 const COOP := "coop"
 const WELL_BLUEPRINT := "blueprint_well"
 const TIPS := {
-	"build": "Tap Build Cottage to place your first home.",
+	"build": "Tap Blueprints to place your first home.",
 	"till": "Pick a spot in your yard and press Till.",
 	"sow": "Press Sow to plant Carrot Seeds in your soil.",
-	"well": "Tap Build Well to place your well.",
+	"well": "Tap Blueprints to place your well.",
 	"water": "Fill your pail at the well, then press Water on your seeds.",
 	"water_pail": "Press Water on your seeds.",
 	"harvest": "Your carrot is ripe. Press Harvest!",
 	"sell": "Head back to the map and tap Washington Square to sell your carrot.",
 	"blueprint": "Head back to the map and tap Washington Square for a coop blueprint.",
-	"coop": "Tap Build Coop to place your coop.",
+	"coop": "Tap Blueprints to place your coop.",
 	"feed": "Walk up to the feeder in your coop and press Feed.",
 	"buy_seeds": "Head back to the map and tap Washington Square to buy Carrot Seeds.",
 	"egg": "Your hen lays an egg soon. Walk over to pick it up.",

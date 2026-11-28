@@ -43,7 +43,7 @@ The scripts read them and fall back to the old defaults when they are not set, s
 | `ANDROID_SERIAL` | the Run's device (adb itself uses it when no `-s` is given) |
 | `CARDIGAN_EMULATOR_SERIAL` | the Run's emulator, `emulator-<port>` |
 | `CARDIGAN_EMULATOR_PORT` | the console port to start that emulator on (`emulator -port …`) |
-| `CARDIGAN_EMULATOR_GPU` | the GPU mode to start that emulator with (`emulator -gpu …`); default `host` |
+| `SENSEN_EMULATOR_GPU` | the GPU mode to start that emulator with (`emulator -gpu …`); default `host` |
 | `CARDIGAN_DEVICE_SERIAL` | the physical device the Run holds |
 
 - adb port: `build_worker_apk.sh` uses `ANDROID_ADB_SERVER_PORT`, else **5137** (until the slots are on, the
@@ -75,11 +75,14 @@ Scripts with their own private adb server and SDK for a laptop or gs66 (`pond_ar
 are not for Cardigan Runs. In a Run, start an emulator with `-port "$CARDIGAN_EMULATOR_PORT"` and never kill the
 Run's adb server yourself; the host closes it when the Run ends.
 
-GPU mode (C-240): `start_pond_art_emulator.sh` and the gs66 command below pass `-gpu "${CARDIGAN_EMULATOR_GPU:-host}"`.
-Unset or empty keeps the old `-gpu host`, so mac-mini, cardigan-ci and manual runs are unchanged. The Steam Deck's
-Run environment sets `CARDIGAN_EMULATOR_GPU=host` with `DISPLAY=:0` (its hardware GPU through the desktop session);
-another value such as `swiftshader_indirect` selects software rendering. The script refuses a value that is not a
-single mode name. Port, AVD and the other arguments do not depend on it.
+GPU mode (C-240, renamed in C-244): `start_pond_art_emulator.sh` and the gs66 command below pass
+`-gpu "${SENSEN_EMULATOR_GPU:-host}"`. Unset or empty keeps the old `-gpu host`, so mac-mini, cardigan-ci and manual
+runs are unchanged. The Steam Deck's machine binding sets `SENSEN_EMULATOR_GPU=host` with `DISPLAY=:0` (its hardware
+GPU through the desktop session); another value such as `swiftshader_indirect` selects software rendering. The
+variable is not `CARDIGAN_`-prefixed because that prefix is reserved and cannot go into a binding. The script refuses
+a value that is not a single mode name starting with a letter or digit (`^[A-Za-z0-9][A-Za-z0-9_-]*$`), so a value
+such as `-wipe-data` or one with spaces stops it before the emulator starts. Port, AVD and the other arguments do not
+depend on it.
 
 Background CPU measurements and limitations are recorded in
 [`docs/qa/android-background-cpu-2026-09-15.md`](../../docs/qa/android-background-cpu-2026-09-15.md).
@@ -226,7 +229,7 @@ export ANDROID_ADB_SERVER_PORT=5071   # a private adb server; leave 5037 and oth
 # Don't scan 5555+ for other people's emulators; an emulator started with the variable above registers itself.
 export ADB_LOCAL_TRANSPORT_MAX_PORT=5553
 nohup ~/Android/Sdk/emulator/emulator -avd Pixel_API_36 -port 5594 -no-window -no-audio -no-boot-anim \
-  -no-snapshot-save -gpu "${CARDIGAN_EMULATOR_GPU:-host}" -feature -Vulkan -memory 4096 -cores 4 > /tmp/emu-5594.log 2>&1 &
+  -no-snapshot-save -gpu "${SENSEN_EMULATOR_GPU:-host}" -feature -Vulkan -memory 4096 -cores 4 > /tmp/emu-5594.log 2>&1 &
 adb -P 5071 start-server
 adb -P 5071 -s emulator-5594 shell dumpsys SurfaceFlinger | grep -m1 GLES:   # expect the host GPU, not SwiftShader
 adb -P 5071 -s emulator-5594 shell settings put secure immersive_mode_confirmations confirmed

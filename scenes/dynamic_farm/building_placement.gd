@@ -19,6 +19,8 @@ const HALO_A := 0.5
 const GRID_LIFT := 0.026
 const EDGE_LIFT := 0.032
 const FILL_LIFT := 0.030
+## Rotate turns the model over this long, ease-out (SEN-C-227 README §8).
+const TURN_MS := 160.0
 
 var at := Vector2i.ZERO
 var rotation_steps := 0
@@ -41,6 +43,8 @@ var _edges: Array = []
 var _halo: Array = []
 var _sand: Array = []
 var _finger := -1
+## Rotate's turn in progress (TURN_MS), else null.
+var _turning: Tween
 static var _outline: ImageTexture
 
 ## `building` is the type, `footprint` its unturned width × depth; `taken` / `path` / `walk_blocked` as
@@ -98,15 +102,27 @@ func move_to(cell: Vector2i) -> void:
 	if reason != "" and reason != Building.OUTSIDE and not _cleared.is_empty() \
 			and Building.reason(_data, at, base, rotation_steps, _cleared.taken, _path, _cleared.walk_blocked, type) == "":
 		reason = Building.CLEAR
+	if _turning != null and _turning.is_valid(): _turning.kill()
 	_ghost.transform = Building.transform(_walk, at, base, rotation_steps)
 	_bar.reason = reason
 	_paint()
 
-## Rotate: a quarter turn about the footprint's middle (0 → 90 → 180 → 270 → 0°); the spot is judged again.
+## Rotate: a quarter turn about the footprint's middle (0 → 90 → 180 → 270 → 0°); the spot is judged again at once and
+## the model turns over TURN_MS, ease-out (C-228, SEN-C-227 README §4 item 3; before it jumped).
 func turn() -> void:
 	var was := rotation_steps
+	var from := _ghost.transform
 	rotation_steps = (rotation_steps + 1) % 4
 	move_to(Building.turned_at(at, base, was, rotation_steps))
+	if UiMotion.reduced or not is_inside_tree(): return
+	var to := _ghost.transform
+	_ghost.transform = from
+	var start_yaw := was * PI * 0.5
+	_turning = create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	_turning.tween_method(func(t: float):
+		_ghost.transform = Transform3D(Basis(Vector3.UP, start_yaw + t * PI * 0.5), from.origin.lerp(to.origin, t)),
+		0.0, 1.0, UiMotion.secs(TURN_MS))
+	_turning.tween_callback(func(): _ghost.transform = to)
 
 ## The save changed under the preview (a refused Build brings the current farm): judge the spot again.
 func retake(taken: Dictionary, walk_blocked: Dictionary, cleared := {}) -> void:
