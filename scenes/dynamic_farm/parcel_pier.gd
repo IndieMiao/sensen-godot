@@ -376,6 +376,15 @@ func send(commands: Array) -> Dictionary:
 
 func server_now() -> int: return Time.get_ticks_msec() + server_offset
 
+## The save read again at the bite (C-241): the server gives the cast's tier and seed only from the bite on. An answer
+## older than the save already held (a line-in that went through meanwhile) is not taken.
+func read_line() -> Dictionary:
+	if store == null: return {"ok": false, "code": "NETWORK"}
+	var result: Dictionary = await store.read()
+	if not is_inside_tree(): return result
+	if int(result.get("farm_version", -1)) >= farm_version: _adopt(result)
+	return result
+
 func _adopt(result: Dictionary) -> void:
 	if result.has("server_time"): server_offset = int(result.server_time) - Time.get_ticks_msec()
 	if result.get("farm") is Dictionary:

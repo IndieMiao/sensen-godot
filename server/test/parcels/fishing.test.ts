@@ -4,7 +4,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONTENT_DIR } from '../../src/domain/content.js';
 import { applyFarmCommands, emptyFarm, parseFarmCommands, welcome, withEconomy, type FarmCommand, type ParcelFarmState } from '../../src/parcels/farm.js';
-import { castDeadline, castSeed, initialReel, pickFish, reelTier, replayReel, rollRarity, stepReel, REPLAY_SLACK_MS,
+import { castDeadline, castSeed, castView, initialReel, pickFish, reelTier, replayReel, rollRarity, stepReel, REPLAY_SLACK_MS,
   type FishingRules, type ReelTier } from '../../src/parcels/fishing.js';
 import { hash32 as hash } from '../../src/parcels/requests.js';
 import { loadParcelRules, parseParcelRules } from '../../src/parcels/rules.js';
@@ -268,6 +268,85 @@ describe('fishing commands (C-232)', () => {
     const old = welcomed();
     expect(withEconomy(old).fishing).toBeUndefined();
     expect(run(old, [{ type: 'till', cell: '1,1' }]).fishing).toBeUndefined();
+  });
+});
+
+/**
+ * C-241 防刷：咬钩前收线全退体力、不扣鱼饵（C-223 的规则不变），所以咬钩前客户端拿到的东西里不能有能推出这一竿档次或鱼种的信息。
+ * 正式服的种子是服务端随机数（FarmContext.cast_seed），回给客户端的存档到咬钩时刻之前去掉 rarity 和 seed（castView）。
+ */
+describe('C-241 nothing before the bite tells the client what the cast holds', () => {
+  /** 按服务端随机来源投一竿（routes.ts 传的是 node:crypto randomInt，这里换成给定的种子）。 */
+  function castWith(state: ParcelFarmState, seed: number, now = T0, bait: string | null = null) {
+    const out = applyFarmCommands(rules, state, [{ type: 'cast_line', bait }], now, { parcel_id: PARCEL, cast_seed: () => seed });
+    if (!out.ok) throw new Error(out.code);
+    return { s: out.state, c: out.state.fishing!.cast! };
+  }
+
+  it('with a server random source the seed is that number, not one the parcel, the time and the cast count give', () => {
+    const { c } = castWith(atPier(), 0xDEADBEEF);
+    expect(c.seed).toBe(0xDEADBEEF);
+    expect(c.seed).not.toBe(castSeed(PARCEL, T0, 0));
+    expect(c.rarity).toBe(rollRarity(f, 0xDEADBEEF, null));
+    expect(c.bite_at - T0).toBe(f.bite_min_ms + castWait(0xDEADBEEF));
+    // Out-of-range sources are folded into 0 … 2^32−1 like the client's own seed.
+    expect(castWith(atPier(), 2 ** 32 + 5).c.seed).toBe(5);
+  });
+
+  it('the client view hides the tier and the seed until the server time reaches the bite, then shows the cast as saved', () => {
+    const { s, c } = castWith(atPier(), 123_456_789);
+    for (const at of [T0, c.bite_at - 1]) {
+      const v = castView(s.fishing, at)!;
+      expect(v.cast).toEqual({ at: T0, bite_at: c.bite_at, hook_ms: c.hook_ms, bait: null, rod: 'rod_starter' });
+      expect(JSON.stringify(v)).not.toMatch(/rarity|seed/);
+      // Nothing else of the save changes, and the saved cast keeps both.
+      expect({ ...v, cast: null }).toEqual({ ...s.fishing, cast: null });
+      expect(s.fishing!.cast).toMatchObject({ rarity: c.rarity, seed: 123_456_789 });
+    }
+    expect(castView(s.fishing, c.bite_at)).toEqual(s.fishing);
+    expect(castView(s.fishing, c.bite_at + 5000)).toEqual(s.fishing);
+    expect(castView(undefined, T0)).toBeUndefined();
+    const idle = atPier().fishing!;
+    expect(castView(idle, T0)).toBe(idle);
+  });
+
+  it('seeds that share a bite time still roll 60 : 30 : 10: the bite time tells nothing of the tier', () => {
+    // The bite time is all the client sees of a seed before the bite. Group many random seeds by their bite time: within a
+    // group the tiers are still spread as the weights say.
+    const byWait = new Map<number, number[]>();
+    let x = 7;
+    for (let i = 0; i < 60_000; i++) {
+      x = (Math.imul(x, 1664525) + 1013904223) >>> 0;
+      const w = castWait(x) % 10;   // ten bands of bite times
+      const n = byWait.get(w) ?? [0, 0, 0];
+      n[rollRarity(f, x, null) - 1]++;
+      byWait.set(w, n);
+    }
+    for (const n of byWait.values()) {
+      const total = n[0] + n[1] + n[2];
+      expect(Math.abs(n[2] / total - 0.1)).toBeLessThan(0.02);
+      expect(Math.abs(n[0] / total - 0.6)).toBeLessThan(0.03);
+    }
+  });
+
+  it('line in before the bite still gives all 5 back and keeps the bait; the server still replays the reel on the saved seed', () => {
+    const baited = atPier();
+    baited.bag.bait_worm = 2;
+    const { s, c } = castWith(baited, 987_654_321, T0, 'bait_worm');
+    expect(s.energy!.value).toBe(195);
+    const before = run(s, [{ type: 'cancel_line' }], c.bite_at - 1);
+    expect(before.fishing!.last).toMatchObject({ result: 'cancelled', refund: 5 });
+    expect(before).toMatchObject({ energy: { value: 200 }, bag: { bait_worm: 2 } });
+    // After the bite the client reads the seed and the tier and reels on them; the server replays the same seed.
+    const shown = castView(s.fishing, c.bite_at)!.cast!;
+    const tier = reelTier(f, shown.rarity, rodOf('rod_starter'));
+    const inputs = goodInputs(shown.seed, tier);
+    const out = run(s, [{ type: 'reel_line', hook_ms: 200, inputs }], doneAt(c, 200, inputs));
+    const fish = pickFish(f, 987_654_321, c.rarity);
+    expect(out.fishing!.last).toMatchObject({ result: 'landed', fish });
+    expect(out.bag).toMatchObject({ [fish]: 1 });
+    expect(out.bag.bait_worm).toBe(1);
+    expect(apply(out, [{ type: 'reel_line', hook_ms: 200, inputs }], doneAt(c, 200, inputs) + 1)).toMatchObject({ ok: false, code: 'NO_CAST' });
   });
 });
 

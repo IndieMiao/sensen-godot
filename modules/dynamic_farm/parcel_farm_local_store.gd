@@ -7,6 +7,7 @@ extends RefCounted
 ##   {ok, granted?, gift?, farm, farm_version, server_time} or
 ##   {ok:false, code, index, detail?, farm, farm_version, server_time}.
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
+const Fishing = preload("res://modules/dynamic_farm/parcel_fishing.gd")
 const DIR := "user://dynamic_farm_local"
 
 var block_id: String
@@ -56,7 +57,8 @@ func send(base_version: int, commands: Array) -> Dictionary:
 	if not outcome.ok:
 		return _failure(outcome.code, outcome.index, outcome.get("detail", {}), saved.farm, saved.version)
 	if not _save(outcome.state, saved.version + 1): return _failure("SAVE", 0, {}, saved.farm, saved.version)
-	return {"ok": true, "farm": outcome.state, "farm_version": saved.version + 1, "server_time": now}
+	# The server answers with the line in the water hidden until the bite (C-241, farmView); so does the stand-in.
+	return {"ok": true, "farm": Fishing.client_state(outcome.state, now), "farm_version": saved.version + 1, "server_time": now}
 
 func _failure(code: String, index: int, detail: Dictionary, farm: Dictionary, version: int) -> Dictionary:
 	var now: int = now_ms.call()

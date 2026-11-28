@@ -7,6 +7,9 @@ extends RefCounted
 ## The reel is P0's (FishingModel.step, P0FishingPanel.reel_tier): the server picks the cast's tier, seed and bite time;
 ## the client plays the reel on that seed and sends only how long after the bite it hooked and one bit per `reel.step_ms`
 ## (1 held, 0 let go). The server replays the bits on the seed and decides; a cast settles once.
+## C-241: a line in before the bite gives all its Energy back, so until the bite the save the server sends carries the
+## cast without its tier and seed (server castView, here cast_view): the panel reads the save again at the bite to get
+## them. The server's seed is its own random number; cast_seed stays for this local stand-in and the shared cases.
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const COMMANDS := ["visit_pier", "cast_line", "reel_line", "cancel_line"]
 ## A trace may last this much longer than the server counts since the bite (server REPLAY_SLACK_MS).
@@ -109,10 +112,15 @@ static func fishing_of(raw: Variant) -> Dictionary:
 	var w := ParcelFarm.whole_in
 	var c = raw.get("cast")
 	if c is Dictionary and ParcelFarm._number(c.get("at")) and ParcelFarm._number(c.get("bite_at")) and w.call(c.get("hook_ms"), 0, 600000) \
-			and w.call(c.get("rarity"), 1, 9) and w.call(c.get("seed"), 0, 0xFFFFFFFF) \
 			and (c.get("bait") == null or ParcelFarm._is_id(c.get("bait"))) and ParcelFarm._is_id(c.get("rod")):
-		out.cast = {"at": int(c.at), "bite_at": int(c.bite_at), "hook_ms": int(c.hook_ms), "rarity": int(c.rarity), "seed": int(c.seed),
-			"bait": c.get("bait"), "rod": c.rod}
+		var line := {"at": int(c.at), "bite_at": int(c.bite_at), "hook_ms": int(c.hook_ms), "bait": c.get("bait"), "rod": c.rod}
+		# Before the bite the server leaves out the tier and the seed (C-241): a line all the same, not yet shown.
+		if w.call(c.get("rarity"), 1, 9) and w.call(c.get("seed"), 0, 0xFFFFFFFF):
+			line.rarity = int(c.rarity)
+			line.seed = int(c.seed)
+			out.cast = line
+		elif c.get("rarity") == null and c.get("seed") == null:
+			out.cast = line
 	if w.call(raw.get("casts"), 0, ParcelFarm.MAX_ID): out.casts = int(raw.casts)
 	if raw.get("caught") is Dictionary:
 		for id in raw.caught:
@@ -127,6 +135,30 @@ static func fishing_of(raw: Variant) -> Dictionary:
 	if l is Dictionary and str(l.get("result", "")) in ["landed", "escaped", "cancelled"] and ParcelFarm._number(l.get("at")) \
 			and (l.get("fish") == null or ParcelFarm._is_id(l.get("fish"))) and w.call(l.get("refund"), 0, 10000):
 		out.last = {"result": l.result, "at": int(l.at), "fish": l.get("fish"), "refund": int(l.refund)}
+	return out
+
+## Whether a cast from the save shows its tier and seed (from the bite on; the local stand-in's own saves always do).
+static func shown(cast: Variant) -> bool:
+	return cast is Dictionary and cast.has("seed") and cast.has("rarity")
+
+## The `fishing` the client is given (server castView, C-241): before the server time reaches the bite, the cast without
+## its tier and seed; from the bite on, as saved. A copy; anything not a save's fishing comes back as it is.
+static func cast_view(raw: Variant, now: int) -> Variant:
+	if not raw is Dictionary or not raw.get("cast") is Dictionary or not ParcelFarm._number(raw.cast.get("bite_at")) \
+			or now >= int(raw.cast.bite_at):
+		return raw
+	var out: Dictionary = raw.duplicate(true)
+	out.cast.erase("rarity")
+	out.cast.erase("seed")
+	return out
+
+## A save as the client is given it: its `fishing` through cast_view (a shallow copy when that changes it).
+static func client_state(state: Dictionary, now: int) -> Dictionary:
+	if not state.has("fishing"): return state
+	var seen = cast_view(state.fishing, now)
+	if is_same(seen, state.fishing): return state
+	var out := state.duplicate()
+	out.fishing = seen
 	return out
 
 ## The best rod in the bag (the rules' `rods` run worst to best), {} with none.
