@@ -1,0 +1,239 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/gathering/Flint.glb" id="geo"]
+[ext_resource type="Shader" path="res://assets/dynamic_farm/gathering/gather_surface.gdshader" id="paint"]
+
+[sub_resource type="ShaderMaterial" id="active"]
+resource_local_to_scene = true
+shader = ExtResource("paint")
+shader_parameter/rock_height = 0.4383760392665863
+
+[sub_resource type="Animation" id="stage_0"]
+resource_name = "stage_0"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Flint/Whole:material_override:shader_parameter/fracture_stage")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0]}
+
+[sub_resource type="Animation" id="stage_1"]
+resource_name = "stage_1"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Flint/Whole:material_override:shader_parameter/fracture_stage")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [1]}
+
+[sub_resource type="Animation" id="stage_2"]
+resource_name = "stage_2"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Flint/Whole:material_override:shader_parameter/fracture_stage")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [2]}
+
+[sub_resource type="Animation" id="hit"]
+resource_name = "hit"
+length = 0.22
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Flint/Whole:scale")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0, 0.08, 0.155, 0.22), "transitions": PackedFloat32Array(1, 1, 1, 1), "update": 0, "values": [Vector3(1, 1, 1), Vector3(1.03, 0.94, 1.03), Vector3(0.991, 1.025, 0.991), Vector3(1, 1, 1)]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Art/Flint/Whole:material_override:shader_parameter/flash")
+tracks/1/interp = 1
+tracks/1/keys = {"times": PackedFloat32Array(0, 0.06), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [0.6, 0]}
+
+[sub_resource type="Animation" id="shatter"]
+resource_name = "shatter"
+length = 0.42
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Flint/Whole:visible")
+tracks/0/interp = 0
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Art/Flint/Scree:visible")
+tracks/1/interp = 0
+tracks/1/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [false, true]}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Art/Flint/Shard1:visible")
+tracks/2/interp = 0
+tracks/2/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [true, false]}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Art/Flint/Shard1:position")
+tracks/3/interp = 1
+tracks/3/keys = {"times": PackedFloat32Array(0.0, 0.035, 0.07, 0.105, 0.14, 0.175, 0.21, 0.245, 0.28, 0.315, 0.35, 0.385, 0.42), "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), "update": 0, "values": [Vector3(-0.140444, 0.232975, -0.115546), Vector3(-0.172621, 0.310644, -0.142018), Vector3(-0.204797, 0.371646, -0.16849), Vector3(-0.236974, 0.415981, -0.194963), Vector3(-0.26915, 0.44365, -0.221435), Vector3(-0.301327, 0.454652, -0.247907), Vector3(-0.333503, 0.448988, -0.274379), Vector3(-0.36568, 0.426656, -0.300852), Vector3(-0.397857, 0.387658, -0.327324), Vector3(-0.430033, 0.331994, -0.353796), Vector3(-0.46221, 0.259663, -0.380268), Vector3(-0.494386, 0.170665, -0.406741), Vector3(-0.526563, 0.065, -0.433213)]}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Art/Flint/Shard1:rotation_degrees")
+tracks/4/interp = 1
+tracks/4/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector3(0, 0, 0), Vector3(37, 28, -43)]}
+tracks/5/type = "value"
+tracks/5/path = NodePath("Art/Flint/Shard1:scale")
+tracks/5/interp = 1
+tracks/5/keys = {"times": PackedFloat32Array(0, 0.22, 0.42), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector3(1, 1, 1), Vector3(1, 1, 1), Vector3(0.01, 0.01, 0.01)]}
+tracks/6/type = "value"
+tracks/6/path = NodePath("Art/Flint/Shard2:visible")
+tracks/6/interp = 0
+tracks/6/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [true, false]}
+tracks/7/type = "value"
+tracks/7/path = NodePath("Art/Flint/Shard2:position")
+tracks/7/interp = 1
+tracks/7/keys = {"times": PackedFloat32Array(0.0, 0.035, 0.07, 0.105, 0.14, 0.175, 0.21, 0.245, 0.28, 0.315, 0.35, 0.385, 0.42), "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), "update": 0, "values": [Vector3(0.124224, 0.222466, -0.133169), Vector3(0.152646, 0.30101, -0.163637), Vector3(0.181067, 0.362888, -0.194105), Vector3(0.209489, 0.408099, -0.224574), Vector3(0.237911, 0.436644, -0.255042), Vector3(0.266333, 0.448522, -0.28551), Vector3(0.294754, 0.443733, -0.315979), Vector3(0.323176, 0.422277, -0.346447), Vector3(0.351598, 0.384155, -0.376915), Vector3(0.380019, 0.329366, -0.407383), Vector3(0.408441, 0.257911, -0.437852), Vector3(0.436863, 0.169789, -0.46832), Vector3(0.465285, 0.065, -0.498788)]}
+tracks/8/type = "value"
+tracks/8/path = NodePath("Art/Flint/Shard2:rotation_degrees")
+tracks/8/interp = 1
+tracks/8/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector3(0, 0, 0), Vector3(18, 53, -11)]}
+tracks/9/type = "value"
+tracks/9/path = NodePath("Art/Flint/Shard2:scale")
+tracks/9/interp = 1
+tracks/9/keys = {"times": PackedFloat32Array(0, 0.22, 0.42), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector3(1, 1, 1), Vector3(1, 1, 1), Vector3(0.01, 0.01, 0.01)]}
+tracks/10/type = "value"
+tracks/10/path = NodePath("Art/Flint/Shard3:visible")
+tracks/10/interp = 0
+tracks/10/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [true, false]}
+tracks/11/type = "value"
+tracks/11/path = NodePath("Art/Flint/Shard3:position")
+tracks/11/interp = 1
+tracks/11/keys = {"times": PackedFloat32Array(0.0, 0.035, 0.07, 0.105, 0.14, 0.175, 0.21, 0.245, 0.28, 0.315, 0.35, 0.385, 0.42), "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), "update": 0, "values": [Vector3(0.168109, 0.222864, 0.103436), Vector3(0.203596, 0.301375, 0.125271), Vector3(0.239083, 0.36322, 0.147106), Vector3(0.27457, 0.408398, 0.168941), Vector3(0.310058, 0.436909, 0.190776), Vector3(0.345545, 0.448754, 0.212611), Vector3(0.381032, 0.443932, 0.234446), Vector3(0.416519, 0.422443, 0.256281), Vector3(0.452007, 0.384288, 0.278116), Vector3(0.487494, 0.329466, 0.299951), Vector3(0.522981, 0.257977, 0.321786), Vector3(0.558468, 0.169822, 0.343621), Vector3(0.593956, 0.065, 0.365456)]}
+tracks/12/type = "value"
+tracks/12/path = NodePath("Art/Flint/Shard3:rotation_degrees")
+tracks/12/interp = 1
+tracks/12/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector3(0, 0, 0), Vector3(-1, 78, 21)]}
+tracks/13/type = "value"
+tracks/13/path = NodePath("Art/Flint/Shard3:scale")
+tracks/13/interp = 1
+tracks/13/keys = {"times": PackedFloat32Array(0, 0.22, 0.42), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector3(1, 1, 1), Vector3(1, 1, 1), Vector3(0.01, 0.01, 0.01)]}
+tracks/14/type = "value"
+tracks/14/path = NodePath("Art/Flint/Shard4:visible")
+tracks/14/interp = 0
+tracks/14/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [true, false]}
+tracks/15/type = "value"
+tracks/15/path = NodePath("Art/Flint/Shard4:position")
+tracks/15/interp = 1
+tracks/15/keys = {"times": PackedFloat32Array(0.0, 0.035, 0.07, 0.105, 0.14, 0.175, 0.21, 0.245, 0.28, 0.315, 0.35, 0.385, 0.42), "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), "update": 0, "values": [Vector3(-0.124248, 0.241918, 0.146352), Vector3(-0.151215, 0.318842, 0.178116), Vector3(-0.178181, 0.379098, 0.209879), Vector3(-0.205147, 0.422689, 0.241643), Vector3(-0.232114, 0.449612, 0.273406), Vector3(-0.25908, 0.459869, 0.30517), Vector3(-0.286046, 0.453459, 0.336934), Vector3(-0.313013, 0.430383, 0.368697), Vector3(-0.339979, 0.390639, 0.400461), Vector3(-0.366945, 0.33423, 0.432225), Vector3(-0.393912, 0.261153, 0.463988), Vector3(-0.420878, 0.17141, 0.495752), Vector3(-0.447844, 0.065, 0.527516)]}
+tracks/16/type = "value"
+tracks/16/path = NodePath("Art/Flint/Shard4:rotation_degrees")
+tracks/16/interp = 1
+tracks/16/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector3(0, 0, 0), Vector3(-20, 103, 53)]}
+tracks/17/type = "value"
+tracks/17/path = NodePath("Art/Flint/Shard4:scale")
+tracks/17/interp = 1
+tracks/17/keys = {"times": PackedFloat32Array(0, 0.22, 0.42), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector3(1, 1, 1), Vector3(1, 1, 1), Vector3(0.01, 0.01, 0.01)]}
+
+[sub_resource type="Animation" id="reset"]
+resource_name = "reset"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Flint/Whole:visible")
+tracks/0/interp = 0
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [true]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Art/Flint/Scree:visible")
+tracks/1/interp = 0
+tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Art/Flint/Whole:scale")
+tracks/2/interp = 1
+tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(1, 1, 1)]}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Art/Flint/Whole:material_override:shader_parameter/flash")
+tracks/3/interp = 1
+tracks/3/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0]}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Art/Flint/Whole:material_override:shader_parameter/fracture_stage")
+tracks/4/interp = 1
+tracks/4/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0]}
+tracks/5/type = "value"
+tracks/5/path = NodePath("Art/Flint/Shard1:visible")
+tracks/5/interp = 0
+tracks/5/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/6/type = "value"
+tracks/6/path = NodePath("Art/Flint/Shard1:scale")
+tracks/6/interp = 1
+tracks/6/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(1, 1, 1)]}
+tracks/7/type = "value"
+tracks/7/path = NodePath("Art/Flint/Shard1:position")
+tracks/7/interp = 1
+tracks/7/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(-0.140444, 0.232975, -0.115546)]}
+tracks/8/type = "value"
+tracks/8/path = NodePath("Art/Flint/Shard1:rotation_degrees")
+tracks/8/interp = 1
+tracks/8/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(0, 0, 0)]}
+tracks/9/type = "value"
+tracks/9/path = NodePath("Art/Flint/Shard2:visible")
+tracks/9/interp = 0
+tracks/9/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/10/type = "value"
+tracks/10/path = NodePath("Art/Flint/Shard2:scale")
+tracks/10/interp = 1
+tracks/10/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(1, 1, 1)]}
+tracks/11/type = "value"
+tracks/11/path = NodePath("Art/Flint/Shard2:position")
+tracks/11/interp = 1
+tracks/11/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(0.124224, 0.222466, -0.133169)]}
+tracks/12/type = "value"
+tracks/12/path = NodePath("Art/Flint/Shard2:rotation_degrees")
+tracks/12/interp = 1
+tracks/12/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(0, 0, 0)]}
+tracks/13/type = "value"
+tracks/13/path = NodePath("Art/Flint/Shard3:visible")
+tracks/13/interp = 0
+tracks/13/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/14/type = "value"
+tracks/14/path = NodePath("Art/Flint/Shard3:scale")
+tracks/14/interp = 1
+tracks/14/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(1, 1, 1)]}
+tracks/15/type = "value"
+tracks/15/path = NodePath("Art/Flint/Shard3:position")
+tracks/15/interp = 1
+tracks/15/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(0.168109, 0.222864, 0.103436)]}
+tracks/16/type = "value"
+tracks/16/path = NodePath("Art/Flint/Shard3:rotation_degrees")
+tracks/16/interp = 1
+tracks/16/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(0, 0, 0)]}
+tracks/17/type = "value"
+tracks/17/path = NodePath("Art/Flint/Shard4:visible")
+tracks/17/interp = 0
+tracks/17/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/18/type = "value"
+tracks/18/path = NodePath("Art/Flint/Shard4:scale")
+tracks/18/interp = 1
+tracks/18/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(1, 1, 1)]}
+tracks/19/type = "value"
+tracks/19/path = NodePath("Art/Flint/Shard4:position")
+tracks/19/interp = 1
+tracks/19/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(-0.124248, 0.241918, 0.146352)]}
+tracks/20/type = "value"
+tracks/20/path = NodePath("Art/Flint/Shard4:rotation_degrees")
+tracks/20/interp = 1
+tracks/20/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(0, 0, 0)]}
+
+[sub_resource type="AnimationLibrary" id="clips"]
+_data = {&"stage_0": SubResource("stage_0"), &"stage_1": SubResource("stage_1"), &"stage_2": SubResource("stage_2"), &"hit": SubResource("hit"), &"shatter": SubResource("shatter"), &"reset": SubResource("reset")}
+
+[node name="FlintTarget" type="Node3D"]
+
+[node name="Art" parent="." instance=ExtResource("geo")]
+
+[node name="Whole" parent="Art/Flint"]
+material_override = SubResource("active")
+
+[node name="Shard1" parent="Art/Flint"]
+visible = false
+
+[node name="Shard2" parent="Art/Flint"]
+visible = false
+
+[node name="Shard3" parent="Art/Flint"]
+visible = false
+
+[node name="Shard4" parent="Art/Flint"]
+visible = false
+
+[node name="Scree" parent="Art/Flint"]
+visible = false
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries/ = SubResource("clips")
+
+[editable path="Art"]

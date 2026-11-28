@@ -1,0 +1,649 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/aquatic_park/muni_pier.glb" id="1"]
+[ext_resource type="Shader" path="res://scenes/aquatic_park/bay_water.gdshader" id="2"]
+[ext_resource type="Texture2D" path="res://assets/aquatic_park/tidal_field.png" id="3"]
+
+[sub_resource type="ShaderMaterial" id="BaySurface"]
+shader = ExtResource("2")
+shader_parameter/contact_field = ExtResource("3")
+
+[sub_resource type="PlaneMesh" id="WaterPlane"]
+size = Vector2(160, 160)
+material = SubResource("BaySurface")
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor00"]
+points = PackedVector3Array(-2.75, -0.65, 8.5, 2.75, -0.65, 8.5, 2.82412, -0.65, 7.50242, -2.61548, -0.65, 6.68957, -2.75, -0.01, 8.5, 2.75, -0.01, 8.5, 2.82412, -0.01, 7.50242, -2.61548, -0.01, 6.68957)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor01"]
+points = PackedVector3Array(-2.61548, -0.65, 6.68957, 2.82412, -0.65, 7.50242, 3.04487, -0.65, 6.52674, -2.21487, -0.65, 4.91891, -2.61548, -0.01, 6.68957, 2.82412, -0.01, 7.50242, 3.04487, -0.01, 6.52674, -2.21487, -0.01, 4.91891)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor02"]
+points = PackedVector3Array(-2.21487, -0.65, 4.91891, 3.04487, -0.65, 6.52674, 3.40738, -0.65, 5.59441, -1.55698, -0.65, 3.22689, -2.21487, -0.01, 4.91891, 3.04487, -0.01, 6.52674, 3.40738, -0.01, 5.59441, -1.55698, -0.01, 3.22689)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor03"]
+points = PackedVector3Array(-1.55698, -0.65, 3.22689, 3.40738, -0.65, 5.59441, 3.9037, -0.65, 4.72589, -0.65625, -0.65, 1.65069, -1.55698, -0.01, 3.22689, 3.40738, -0.01, 5.59441, 3.9037, -0.01, 4.72589, -0.65625, -0.01, 1.65069)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor04"]
+points = PackedVector3Array(-0.65625, -0.65, 1.65069, 3.9037, -0.65, 4.72589, 4.52293, -0.65, 3.94026, 0.46754, -0.65, 0.22491, -0.65625, -0.01, 1.65069, 3.9037, -0.01, 4.72589, 4.52293, -0.01, 3.94026, 0.46754, -0.01, 0.22491)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor05"]
+points = PackedVector3Array(0.46754, -0.65, 0.22491, 4.52293, -0.65, 3.94026, 5.25147, -0.65, 3.25477, 1.7897, -0.65, -1.01913, 0.46754, -0.01, 0.22491, 4.52293, -0.01, 3.94026, 5.25147, -0.01, 3.25477, 1.7897, -0.01, -1.01913)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor06"]
+points = PackedVector3Array(1.7897, -0.65, -1.01913, 5.25147, -0.65, 3.25477, 6.07332, -0.65, 2.68447, 3.2812, -0.65, -2.0541, 1.7897, -0.01, -1.01913, 5.25147, -0.01, 3.25477, 6.07332, -0.01, 2.68447, 3.2812, -0.01, -2.0541)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor07"]
+points = PackedVector3Array(3.2812, -0.65, -2.0541, 6.07332, -0.65, 2.68447, 6.97042, -0.65, 2.24191, 4.90928, -0.65, -2.85728, 3.2812, -0.01, -2.0541, 6.07332, -0.01, 2.68447, 6.97042, -0.01, 2.24191, 4.90928, -0.01, -2.85728)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor08"]
+points = PackedVector3Array(4.90928, -0.65, -2.85728, 6.97042, -0.65, 2.24191, 7.92308, -0.65, 1.93678, 6.63819, -0.65, -3.41103, 4.90928, -0.01, -2.85728, 6.97042, -0.01, 2.24191, 7.92308, -0.01, 1.93678, 6.63819, -0.01, -3.41103)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor09"]
+points = PackedVector3Array(6.63819, -0.65, -3.41103, 7.92308, -0.65, 1.93678, 8.91038, -0.65, 1.7758, 8.42994, -0.65, -3.70318, 6.63819, -0.01, -3.41103, 7.92308, -0.01, 1.93678, 8.91038, -0.01, 1.7758, 8.42994, -0.01, -3.70318)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor10"]
+points = PackedVector3Array(8.42994, -0.65, -3.70318, 8.91038, -0.65, 1.7758, 9.91062, -0.65, 1.7625, 10.2452, -0.65, -3.72731, 8.42994, -0.01, -3.70318, 8.91038, -0.01, 1.7758, 9.91062, -0.01, 1.7625, 10.2452, -0.01, -3.72731)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor11"]
+points = PackedVector3Array(10.2452, -0.65, -3.72731, 9.91062, -0.65, 1.7625, 10.90185, -0.65, 1.89717, 12.04409, -0.65, -3.48291, 10.2452, -0.01, -3.72731, 9.91062, -0.01, 1.7625, 10.90185, -0.01, 1.89717, 12.04409, -0.01, -3.48291)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor12"]
+points = PackedVector3Array(10.90185, -0.65, 1.89717, 11.24751, -0.65, 2.34283, 11.65458, -0.65, 2.7332, 12.11432, -0.65, 3.05991, 12.61685, -0.65, 3.31594, 13.1514, -0.65, 3.49581, 13.70649, -0.65, 3.59565, 14.27021, -0.65, 3.61333, 14.83047, -0.65, 3.54845, 15.37523, -0.65, 3.40241, 15.89281, -0.65, 3.17836, 16.37211, -0.65, 2.88109, 16.80283, -0.65, 2.51698, 17.17573, -0.65, 2.09385, 17.48282, -0.65, 1.62078, 17.71749, -0.65, 1.10793, 17.87472, -0.65, 0.56629, 17.95112, -0.65, 0.00749, 17.94507, -0.65, -0.55648, 17.85669, -0.65, -1.11351, 17.68787, -0.65, -1.65165, 17.44224, -0.65, -2.15935, 17.12507, -0.65, -2.62572, 16.74318, -0.65, -3.04074, 16.30474, -0.65, -3.39552, 15.81917, -0.65, -3.68244, 15.2969, -0.65, -3.89533, 14.74913, -0.65, -4.02964, 14.18761, -0.65, -4.08247, 13.6244, -0.65, -4.05271, 13.07158, -0.65, -3.94097, 12.54101, -0.65, -3.74967, 12.04409, -0.65, -3.48291, 10.90185, -0.01, 1.89717, 11.24751, -0.01, 2.34283, 11.65458, -0.01, 2.7332, 12.11432, -0.01, 3.05991, 12.61685, -0.01, 3.31594, 13.1514, -0.01, 3.49581, 13.70649, -0.01, 3.59565, 14.27021, -0.01, 3.61333, 14.83047, -0.01, 3.54845, 15.37523, -0.01, 3.40241, 15.89281, -0.01, 3.17836, 16.37211, -0.01, 2.88109, 16.80283, -0.01, 2.51698, 17.17573, -0.01, 2.09385, 17.48282, -0.01, 1.62078, 17.71749, -0.01, 1.10793, 17.87472, -0.01, 0.56629, 17.95112, -0.01, 0.00749, 17.94507, -0.01, -0.55648, 17.85669, -0.01, -1.11351, 17.68787, -0.01, -1.65165, 17.44224, -0.01, -2.15935, 17.12507, -0.01, -2.62572, 16.74318, -0.01, -3.04074, 16.30474, -0.01, -3.39552, 15.81917, -0.01, -3.68244, 15.2969, -0.01, -3.89533, 14.74913, -0.01, -4.02964, 14.18761, -0.01, -4.08247, 13.6244, -0.01, -4.05271, 13.07158, -0.01, -3.94097, 12.54101, -0.01, -3.74967, 12.04409, -0.01, -3.48291)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor13"]
+points = PackedVector3Array(-2.03, -0.65, 10.88, 2.03, -0.65, 10.88, 2.75, -0.65, 8.5, -2.75, -0.65, 8.5, -2.03, -0.01, 10.88, 2.03, -0.01, 10.88, 2.75, -0.01, 8.5, -2.75, -0.01, 8.5)
+
+[sub_resource type="ConvexPolygonShape3D" id="Floor14"]
+points = PackedVector3Array(-5.1, -0.65, 13.3, -3, -0.65, 14.1, 0.4, -0.65, 14.35, 3.1, -0.65, 13.3, 3.74, -0.65, 11.9, 3.33, -0.65, 10.47, 2.8, -0.65, 9.86, 1.65, -0.65, 9.15, 1.44, -0.65, 8.46, -1.44, -0.65, 8.46, -2.65, -0.65, 8.1, -4.04, -0.65, 8.6, -5.41, -0.65, 9.9, -5.72, -0.65, 11.6, -5.1, -0.15, 13.3, -3, -0.15, 14.1, 0.4, -0.15, 14.35, 3.1, -0.15, 13.3, 3.74, -0.15, 11.9, 3.33, -0.15, 10.47, 2.8, -0.15, 9.86, 1.65, -0.15, 9.15, 1.44, -0.15, 8.46, -1.44, -0.15, 8.46, -2.65, -0.15, 8.1, -4.04, -0.15, 8.6, -5.41, -0.15, 9.9, -5.72, -0.15, 11.6)
+
+[sub_resource type="BoxShape3D" id="Coping00"]
+size = Vector3(1.03591, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping01"]
+size = Vector3(1.04349, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping02"]
+size = Vector3(1.04349, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping03"]
+size = Vector3(1.04349, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping04"]
+size = Vector3(1.04349, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping05"]
+size = Vector3(1.04349, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping06"]
+size = Vector3(1.04349, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping07"]
+size = Vector3(1.04349, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping08"]
+size = Vector3(1.04349, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping09"]
+size = Vector3(1.04349, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping10"]
+size = Vector3(1.04349, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping11"]
+size = Vector3(1.0776, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping12"]
+size = Vector3(0.6262, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping13"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping14"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping15"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping16"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping17"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping18"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping19"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping20"]
+size = Vector3(0.57701, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping21"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping22"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping23"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping24"]
+size = Vector3(0.57701, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping25"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping26"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping27"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping28"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping29"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping30"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping31"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping32"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping33"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping34"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping35"]
+size = Vector3(0.57701, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping36"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping37"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping38"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping39"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping40"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping41"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping42"]
+size = Vector3(0.57702, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping43"]
+size = Vector3(0.61761, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping44"]
+size = Vector3(1.86895, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping45"]
+size = Vector3(1.82826, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping46"]
+size = Vector3(1.82826, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping47"]
+size = Vector3(1.82826, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping48"]
+size = Vector3(1.82826, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping49"]
+size = Vector3(1.82826, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping50"]
+size = Vector3(1.82826, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping51"]
+size = Vector3(1.82826, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping52"]
+size = Vector3(1.82826, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping53"]
+size = Vector3(1.82826, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping54"]
+size = Vector3(1.82826, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping55"]
+size = Vector3(1.83584, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping56"]
+size = Vector3(2.43509, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Coping57"]
+size = Vector3(2.43509, 0.24, 0.19)
+
+[sub_resource type="BoxShape3D" id="Furniture00"]
+size = Vector3(0.38, 1.95, 0.38)
+
+[sub_resource type="BoxShape3D" id="Furniture01"]
+size = Vector3(0.38, 1.95, 0.38)
+
+[sub_resource type="BoxShape3D" id="Furniture02"]
+size = Vector3(0.38, 1.95, 0.38)
+
+[sub_resource type="BoxShape3D" id="Furniture03"]
+size = Vector3(1.64, 0.87, 0.57)
+
+[sub_resource type="BoxShape3D" id="Furniture04"]
+size = Vector3(1.64, 0.87, 0.57)
+
+[sub_resource type="BoxShape3D" id="Furniture05"]
+size = Vector3(0.85, 1.08, 0.4)
+
+[sub_resource type="BoxShape3D" id="Furniture06"]
+size = Vector3(0.71, 0.62, 0.46)
+
+[sub_resource type="BoxShape3D" id="Furniture07"]
+size = Vector3(0.43, 1.6, 0.38)
+
+[node name="AquaticParkPier" type="Node3D"]
+metadata/walk_polygon = PackedVector2Array(1.74053, 10.49, 2.36425, 8.42824, 2.43626, 7.45909, 2.44054, 7.43047, 2.66768, 6.42657, 2.67614, 6.39889, 3.04913, 5.43959, 3.06159, 5.41347, 3.57227, 4.51983, 3.58845, 4.49583, 4.22559, 3.68748, 4.24514, 3.66614, 4.99476, 2.96082, 5.01724, 2.94261, 5.86287, 2.35581, 5.8878, 2.34112, 6.81085, 1.88575, 6.83768, 1.87491, 7.8179, 1.56095, 7.84604, 1.55419, 8.8619, 1.38855, 8.89073, 1.38603, 9.9199, 1.37234, 9.94879, 1.3741, 11.03029, 1.52104, 11.16306, 1.5976, 11.53809, 2.08113, 11.9039, 2.43193, 12.31685, 2.7254, 12.76833, 2.95542, 13.24866, 3.11704, 13.74732, 3.20673, 14.25382, 3.22262, 14.75712, 3.16433, 15.24657, 3.03312, 15.7116, 2.83182, 16.14219, 2.56476, 16.52918, 2.23762, 16.8642, 1.85747, 17.14009, 1.43246, 17.35093, 0.97169, 17.49218, 0.4851, 17.56083, -0.01698, 17.55539, -0.52368, 17.476, -1.02407, 17.32431, -1.5076, 17.10365, -1.9637, 16.81868, -2.38271, 16.4756, -2.75555, 16.08162, -3.07436, 15.64545, -3.33209, 15.1762, -3.52337, 14.68411, -3.64402, 14.17958, -3.69149, 13.67357, -3.66476, 13.1769, -3.56436, 12.70024, -3.3925, 12.17418, -3.1101, 12.05273, -3.08815, 10.22143, -3.33695, 8.46409, -3.31359, 6.7295, -3.03076, 5.05582, -2.4947, 3.47974, -1.71718, 2.03587, -0.71525, 0.75587, 0.48911, -0.33201, 1.86933, -1.20399, 3.39522, -1.84086, 5.0332, -2.22869, 6.74737, -2.35569, 8.45654, -1.74053, 10.49)
+metadata/fish_edge = PackedVector2Array(1.89236, 8.43628, 1.97122, 7.37497, 2.22017, 6.27464, 2.62899, 5.2232, 3.18872, 4.24371, 3.88707, 3.35771, 4.70868, 2.58464, 5.63553, 1.94149, 6.64725, 1.44238, 7.72162, 1.09827, 8.83505, 0.91673, 9.96308, 0.90173, 11.36595, 1.09233, 11.88835, 1.76583, 12.20424, 2.06877, 12.56101, 2.3223, 12.95098, 2.52099, 13.3658, 2.66057, 13.79657, 2.73805, 14.23403, 2.75177, 14.6688, 2.70142, 15.09154, 2.5881, 15.4932, 2.41422, 15.86514, 2.18353, 16.19939, 1.90098, 16.48877, 1.57263, 16.72708, 1.20551, 16.90919, 0.80753, 17.0312, 0.3872, 17.0905, -0.04644, 17.0858, -0.48409, 17.01721, -0.91636, 16.8862, -1.33397, 16.69559, -1.72795, 16.44946, -2.08986, 16.1531, -2.41193, 15.81286, -2.68725, 15.43606, -2.9099, 15.03076, -3.07511, 14.60568, -3.17934, 14.16993, -3.22034, 13.73286, -3.19724, 13.30386, -3.11053, 12.89213, -2.96208, 12.20492, -2.59316, 10.19274, -2.86654, 8.50527, -2.8441, 6.83965, -2.57252, 5.23246, -2.05775, 3.71899, -1.31112, 2.33249, -0.34901, 1.1034, 0.80745, 0.05873, 2.13286, -0.7786, 3.59811, -1.39017, 5.17101, -1.76258, 6.81702, -1.89236, 8.46)
+metadata/water_polygon = PackedVector2Array(-4.6182, 7.99067, -4.32432, 7.80958, -2.93432, 7.30958, -2.66097, 7.30191, -2.61548, 6.68958, -2.21487, 4.91891, -1.55698, 3.22689, -0.65625, 1.65069, 0.46754, 0.22491, 1.7897, -1.01913, 3.2812, -2.0541, 4.90929, -2.85728, 6.63819, -3.41103, 8.42995, -3.70318, 10.2452, -3.72731, 12.04409, -3.48291, 12.54102, -3.74967, 13.07158, -3.94097, 13.6244, -4.0527, 14.18761, -4.08247, 14.74913, -4.02964, 15.2969, -3.89533, 15.81918, -3.68243, 16.30474, -3.39552, 16.74318, -3.04074, 17.12508, -2.62572, 17.44225, -2.15935, 17.68787, -1.65165, 17.85669, -1.11351, 17.94507, -0.55648, 17.95113, 0.00749, 17.87472, 0.56628, 17.71749, 1.10793, 17.48282, 1.62078, 17.17574, 2.09386, 16.80283, 2.51698, 16.37211, 2.88109, 15.89281, 3.17836, 15.37523, 3.40241, 14.83047, 3.54845, 14.27021, 3.61333, 13.70649, 3.59565, 13.1514, 3.49581, 12.61685, 3.31594, 12.11432, 3.05991, 11.65459, 2.7332, 11.24751, 2.34283, 10.90185, 1.89717, 9.91062, 1.7625, 8.91038, 1.7758, 7.92308, 1.93678, 6.97042, 2.24191, 6.07332, 2.68447, 5.25147, 3.25477, 4.52293, 3.94025, 3.9037, 4.72589, 3.40738, 5.59441, 3.04487, 6.52675, 2.82413, 7.50242, 2.75, 8.5, 8.76653, 8.5, 8.77459, 8.39156, 8.79856, 8.28565, 8.83798, 8.18425, 8.88589, 8.10042, 9.39056, 8.40604, 9.57498, 8.5, 18.62936, 8.5, 19.05525, 8.27728, 19.53455, 7.98001, 20.24562, 7.46322, 20.67634, 7.09911, 21.30423, 6.48402, 21.67713, 6.06089, 22.20836, 5.36075, 22.51545, 4.88768, 22.93876, 4.11731, 23.17343, 3.60446, 23.47963, 2.78059, 23.63686, 2.23895, 23.81942, 1.37906, 23.89582, 0.82026, 23.95077, -0.05687, 23.94472, -0.62084, 23.87094, -1.4967, 23.78256, -2.05373, 23.58159, -2.90947, 23.41277, -3.44761, 23.08896, -4.26475, 22.84333, -4.77245, 22.40361, -5.53349, 22.08644, -5.99986, 21.54028, -6.68847, 21.15839, -7.10349, 20.51742, -7.70498, 20.07898, -8.05976, 19.35705, -8.56112, 18.87148, -8.84804, 18.08399, -9.23857, 17.56172, -9.45146, 16.72574, -9.72271, 16.17797, -9.85702, 15.31115, -10.00326, 14.74963, -10.05609, 13.87101, -10.07411, 13.3078, -10.04435, 12.43568, -9.93378, 11.88286, -9.82204, 11.25217, -9.64562, 11.05295, -9.67269, 10.16545, -9.72678, 8.35019, -9.70265, 7.46437, -9.62498, 5.67262, -9.33283, 4.80804, -9.1251, 3.07913, -8.57135, 2.25475, -8.23812, 0.62667, -7.43494, -0.1394, -6.98355, -1.6309, -5.94858, -2.32188, -5.3889, -3.64404, -4.14486, -4.24469, -3.48924, -5.36848, -2.06346, -5.86565, -1.32625, -6.76638, 0.24995, -7.14914, 1.05255, -7.80703, 2.74457, -8.06696, 3.59488, -8.46757, 5.36554, -8.59899, 6.24498, -8.73351, 8.05541, -8.75, 8.5, -5.15495, 8.5)
+metadata/stand_polygon = PackedVector2Array(2.29, 8.49147, 2.29063, 8.47442, 2.36665, 7.45132, 2.37169, 7.41756, 2.59998, 6.40858, 2.60995, 6.37595, 2.98483, 5.4118, 2.99953, 5.381, 3.51278, 4.48284, 3.53186, 4.45454, 4.17222, 3.64211, 4.19528, 3.61694, 4.94868, 2.90806, 4.9752, 2.88658, 5.82509, 2.29682, 5.8545, 2.27949, 6.78221, 1.82183, 6.81386, 1.80904, 7.79902, 1.4935, 7.83221, 1.48552, 8.8532, 1.31905, 8.8872, 1.31607, 9.92157, 1.30231, 9.95564, 1.30439, 11.05334, 1.45353, 11.20994, 1.54383, 11.59025, 2.03417, 11.94862, 2.37784, 12.35322, 2.66536, 12.79556, 2.89073, 13.26604, 3.04904, 13.75473, 3.13694, 14.2508, 3.15249, 14.74403, 3.09538, 15.22344, 2.96685, 15.67909, 2.76961, 16.10092, 2.50799, 16.48006, 2.18748, 16.80828, 1.81505, 17.07859, 1.39864, 17.28515, 0.94722, 17.42353, 0.47051, 17.49078, -0.02137, 17.48546, -0.51772, 17.40766, -1.00806, 17.25906, -1.48173, 17.04286, -1.92861, 16.76372, -2.33907, 16.42754, -2.70441, 16.04164, -3.01667, 15.61425, -3.26921, 15.15455, -3.4566, 14.6724, -3.57482, 14.17813, -3.62132, 13.6824, -3.59513, 13.19581, -3.49677, 12.7288, -3.32839, 12.19753, -3.04319, 12.05428, -3.0173, 10.21715, -3.26689, 8.4702, -3.24367, 6.74598, -2.96253, 5.08211, -2.42961, 3.51537, -1.65669, 2.08004, -0.6607, 0.80763, 0.53652, -0.27381, 1.90858, -1.14064, 3.42546, -1.77374, 5.05374, -2.15926, 6.7577, -2.28873, 8.5, -1.48652, 8.5, -1.36587, 6.87629, -1.00657, 5.28822, -0.41656, 3.77077, 0.39126, 2.35714, 1.39917, 1.07838, 2.58493, -0.03731, 3.92258, -0.96552, 5.3828, -1.68589, 6.93331, -2.1825, 8.54031, -2.44453, 10.16834, -2.46617, 12.07202, -2.20754, 12.46439, -2.27846, 13.05542, -2.59574, 13.41194, -2.72429, 13.78331, -2.79935, 14.16167, -2.81934, 14.53895, -2.78385, 14.90696, -2.69361, 15.25788, -2.55057, 15.58407, -2.35782, 15.87865, -2.11945, 16.1352, -1.84065, 16.34831, -1.52729, 16.51334, -1.18618, 16.62676, -0.82464, 16.68613, -0.45046, 16.69019, -0.07152, 16.63886, 0.30392, 16.53323, 0.6678, 16.37557, 1.01236, 16.16925, 1.33019, 15.91874, 1.61444, 15.6293, 1.85912, 15.30734, 2.05881, 14.95963, 2.20932, 14.5936, 2.30745, 14.21717, 2.35104, 13.83847, 2.33917, 13.46556, 2.27209, 13.10637, 2.15123, 12.76874, 1.97922, 12.45986, 1.75971, 12.18644, 1.49751, 11.74574, 0.92932, 11.3168, 0.68197, 10.03393, 0.50768, 9.94061, 0.50199, 8.84689, 0.51653, 8.75375, 0.5247, 7.67417, 0.70073, 7.58326, 0.72257, 6.54157, 1.05622, 6.45489, 1.09125, 5.47395, 1.57517, 5.39339, 1.62264, 4.49473, 2.24624, 4.42208, 2.30508, 3.62546, 3.05464, 3.5623, 3.12357, 2.8852, 3.98263, 2.83292, 4.06015, 2.29021, 5.00984, 2.24997, 5.09423, 1.85358, 6.11369, 1.82625, 6.2031, 1.58487, 7.26997, 1.57105, 7.36244, 1.49173, 8.42994, 1.49, 8.47664, 1.49, 8.5, 2.29, 8.5)
+
+[node name="Promenade" parent="." instance=ExtResource("1")]
+
+[node name="Bay" type="MeshInstance3D" parent="."]
+position = Vector3(0, -1.45, 0)
+cast_shadow = 0
+mesh = SubResource("WaterPlane")
+
+[node name="Walkway" type="StaticBody3D" parent="."]
+
+[node name="Floor00" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor00")
+
+[node name="Floor01" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor01")
+
+[node name="Floor02" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor02")
+
+[node name="Floor03" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor03")
+
+[node name="Floor04" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor04")
+
+[node name="Floor05" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor05")
+
+[node name="Floor06" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor06")
+
+[node name="Floor07" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor07")
+
+[node name="Floor08" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor08")
+
+[node name="Floor09" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor09")
+
+[node name="Floor10" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor10")
+
+[node name="Floor11" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor11")
+
+[node name="Floor12" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor12")
+
+[node name="Floor13" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor13")
+
+[node name="Floor14" type="CollisionShape3D" parent="Walkway"]
+shape = SubResource("Floor14")
+
+[node name="Coping00" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(2.68562, 0.108, 7.98987)
+rotation = Vector3(0, 1.49663, 0)
+shape = SubResource("Coping00")
+
+[node name="Coping01" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(2.83501, 0.108, 6.99207)
+rotation = Vector3(0, 1.3483, 0)
+shape = SubResource("Coping01")
+
+[node name="Coping02" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(3.13105, 0.108, 6.02361)
+rotation = Vector3(0, 1.19996, 0)
+shape = SubResource("Coping02")
+
+[node name="Coping03" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(3.56698, 0.108, 5.10954)
+rotation = Vector3(0, 1.05163, 0)
+shape = SubResource("Coping03")
+
+[node name="Coping04" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(4.13321, 0.108, 4.26993)
+rotation = Vector3(0, 0.9033, 0)
+shape = SubResource("Coping04")
+
+[node name="Coping05" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(4.8173, 0.108, 3.52322)
+rotation = Vector3(0, 0.75496, 0)
+shape = SubResource("Coping05")
+
+[node name="Coping06" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(5.60424, 0.108, 2.88582)
+rotation = Vector3(0, 0.60663, 0)
+shape = SubResource("Coping06")
+
+[node name="Coping07" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(6.47674, 0.108, 2.37172)
+rotation = Vector3(0, 0.4583, 0)
+shape = SubResource("Coping07")
+
+[node name="Coping08" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(7.41564, 0.108, 1.99221)
+rotation = Vector3(0, 0.30996, 0)
+shape = SubResource("Coping08")
+
+[node name="Coping09" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(8.40032, 0.108, 1.75562)
+rotation = Vector3(0, 0.16163, 0)
+shape = SubResource("Coping09")
+
+[node name="Coping10" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(9.40914, 0.108, 1.66716)
+rotation = Vector3(0, 0.0133, 0)
+shape = SubResource("Coping10")
+
+[node name="Coping11" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(10.43687, 0.108, 1.73106)
+rotation = Vector3(0, -0.13504, 0)
+shape = SubResource("Coping11")
+
+[node name="Coping12" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(11.14021, 0.108, 2.03805)
+rotation = Vector3(0, -0.91108, 0)
+shape = SubResource("Coping12")
+
+[node name="Coping13" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(11.52165, 0.108, 2.46439)
+rotation = Vector3(0, -0.76446, 0)
+shape = SubResource("Coping13")
+
+[node name="Coping14" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(11.94354, 0.108, 2.81341)
+rotation = Vector3(0, -0.61784, 0)
+shape = SubResource("Coping14")
+
+[node name="Coping15" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(12.41189, 0.108, 3.09704)
+rotation = Vector3(0, -0.47121, 0)
+shape = SubResource("Coping15")
+
+[node name="Coping16" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(12.91665, 0.108, 3.3092)
+rotation = Vector3(0, -0.32459, 0)
+shape = SubResource("Coping16")
+
+[node name="Coping17" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(13.447, 0.108, 3.44534)
+rotation = Vector3(0, -0.17796, 0)
+shape = SubResource("Coping17")
+
+[node name="Coping18" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(13.99155, 0.108, 3.50254)
+rotation = Vector3(0, -0.03134, 0)
+shape = SubResource("Coping18")
+
+[node name="Coping19" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(14.5386, 0.108, 3.47956)
+rotation = Vector3(0, 0.11529, 0)
+shape = SubResource("Coping19")
+
+[node name="Coping20" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(15.07644, 0.108, 3.37691)
+rotation = Vector3(0, 0.26191, 0)
+shape = SubResource("Coping20")
+
+[node name="Coping21" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(15.5935, 0.108, 3.19678)
+rotation = Vector3(0, 0.40853, 0)
+shape = SubResource("Coping21")
+
+[node name="Coping22" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(16.0787, 0.108, 2.94304)
+rotation = Vector3(0, 0.55516, 0)
+shape = SubResource("Coping22")
+
+[node name="Coping23" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(16.52162, 0.108, 2.62114)
+rotation = Vector3(0, 0.70178, 0)
+shape = SubResource("Coping23")
+
+[node name="Coping24" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(16.91276, 0.108, 2.23798)
+rotation = Vector3(0, 0.84841, 0)
+shape = SubResource("Coping24")
+
+[node name="Coping25" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(17.24372, 0.108, 1.80178)
+rotation = Vector3(0, 0.99503, 0)
+shape = SubResource("Coping25")
+
+[node name="Coping26" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(17.5074, 0.108, 1.32191)
+rotation = Vector3(0, 1.14166, 0)
+shape = SubResource("Coping26")
+
+[node name="Coping27" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(17.69815, 0.108, 0.80867)
+rotation = Vector3(0, 1.28828, 0)
+shape = SubResource("Coping27")
+
+[node name="Coping28" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(17.81186, 0.108, 0.27307)
+rotation = Vector3(0, 1.4349, 0)
+shape = SubResource("Coping28")
+
+[node name="Coping29" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(17.8461, 0.108, -0.2734)
+rotation = Vector3(0, 1.58153, 0)
+shape = SubResource("Coping29")
+
+[node name="Coping30" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(17.80014, 0.108, -0.81901)
+rotation = Vector3(0, 1.72816, 0)
+shape = SubResource("Coping30")
+
+[node name="Coping31" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(17.67495, 0.108, -1.35205)
+rotation = Vector3(0, 1.87478, 0)
+shape = SubResource("Coping31")
+
+[node name="Coping32" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(17.47324, 0.108, -1.86108)
+rotation = Vector3(0, 2.0214, 0)
+shape = SubResource("Coping32")
+
+[node name="Coping33" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(17.19932, 0.108, -2.33517)
+rotation = Vector3(0, 2.16803, 0)
+shape = SubResource("Coping33")
+
+[node name="Coping34" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(16.85907, 0.108, -2.76416)
+rotation = Vector3(0, 2.31465, 0)
+shape = SubResource("Coping34")
+
+[node name="Coping35" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(16.45979, 0.108, -3.13884)
+rotation = Vector3(0, 2.46127, 0)
+shape = SubResource("Coping35")
+
+[node name="Coping36" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(16.01007, 0.108, -3.45116)
+rotation = Vector3(0, 2.6079, 0)
+shape = SubResource("Coping36")
+
+[node name="Coping37" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(15.51953, 0.108, -3.69443)
+rotation = Vector3(0, 2.75452, 0)
+shape = SubResource("Coping37")
+
+[node name="Coping38" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(14.99872, 0.108, -3.86342)
+rotation = Vector3(0, 2.90115, 0)
+shape = SubResource("Coping38")
+
+[node name="Coping39" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(14.45881, 0.108, -3.9545)
+rotation = Vector3(0, 3.04777, 0)
+shape = SubResource("Coping39")
+
+[node name="Coping40" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(13.91139, 0.108, -3.96573)
+rotation = Vector3(0, -3.08879, 0)
+shape = SubResource("Coping40")
+
+[node name="Coping41" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(13.36819, 0.108, -3.89686)
+rotation = Vector3(0, -2.94216, 0)
+shape = SubResource("Coping41")
+
+[node name="Coping42" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(12.84089, 0.108, -3.74937)
+rotation = Vector3(0, -2.79554, 0)
+shape = SubResource("Coping42")
+
+[node name="Coping43" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(12.32291, 0.108, -3.51682)
+rotation = Vector3(0, -2.64891, 0)
+shape = SubResource("Coping43")
+
+[node name="Coping44" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(11.15107, 0.108, -3.5013)
+rotation = Vector3(0, 3.00656, 0)
+shape = SubResource("Coping44")
+
+[node name="Coping45" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(9.33893, 0.108, -3.61325)
+rotation = Vector3(0, -3.1283, 0)
+shape = SubResource("Coping45")
+
+[node name="Coping46" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(7.55048, 0.108, -3.45643)
+rotation = Vector3(0, -2.97996, 0)
+shape = SubResource("Coping46")
+
+[node name="Coping47" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(5.80485, 0.108, -3.03701)
+rotation = Vector3(0, -2.83163, 0)
+shape = SubResource("Coping47")
+
+[node name="Coping48" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(4.14037, 0.108, -2.36422)
+rotation = Vector3(0, -2.6833, 0)
+shape = SubResource("Coping48")
+
+[node name="Coping49" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(2.5936, 0.108, -1.45281)
+rotation = Vector3(0, -2.53496, 0)
+shape = SubResource("Coping49")
+
+[node name="Coping50" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(1.19852, 0.108, -0.32282)
+rotation = Vector3(0, -2.38663, 0)
+shape = SubResource("Coping50")
+
+[node name="Coping51" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(-0.01425, 0.108, 1.00094)
+rotation = Vector3(0, -2.2383, 0)
+shape = SubResource("Coping51")
+
+[node name="Coping52" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(-1.01805, 0.108, 2.4894)
+rotation = Vector3(0, -2.08996, 0)
+shape = SubResource("Coping52")
+
+[node name="Coping53" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(-1.79086, 0.108, 4.10986)
+rotation = Vector3(0, -1.94163, 0)
+shape = SubResource("Coping53")
+
+[node name="Coping54" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(-2.31569, 0.108, 5.82675)
+rotation = Vector3(0, -1.7933, 0)
+shape = SubResource("Coping54")
+
+[node name="Coping55" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(-2.5813, 0.108, 7.60612)
+rotation = Vector3(0, -1.64496, 0)
+shape = SubResource("Coping55")
+
+[node name="Coping56" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(-2.295, 0.108, 9.65)
+rotation = Vector3(0, 1.87021, 0)
+shape = SubResource("Coping56")
+
+[node name="Coping57" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(2.295, 0.108, 9.65)
+rotation = Vector3(0, 1.27138, 0)
+shape = SubResource("Coping57")
+
+[node name="Furniture00" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(-0.13304, 0.965, 7.06053)
+rotation = Vector3(0, -0.14833, 0)
+shape = SubResource("Furniture00")
+
+[node name="Furniture01" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(4.55542, 0.965, 0.10841)
+rotation = Vector3(0, -1.03833, 0)
+shape = SubResource("Furniture01")
+
+[node name="Furniture02" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(13.34371, 0.965, -1.06018)
+rotation = Vector3(0, -0.2092, 0)
+shape = SubResource("Furniture02")
+
+[node name="Furniture03" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(1.1476, 0.425, 3.72697)
+rotation = Vector3(0, 1.05163, 0)
+shape = SubResource("Furniture03")
+
+[node name="Furniture04" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(7.95188, 0.425, -0.99462)
+rotation = Vector3(0, 0.16163, 0)
+shape = SubResource("Furniture04")
+
+[node name="Furniture05" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(13.28243, 0.53, 0.14333)
+rotation = Vector3(0, -0.2092, 0)
+shape = SubResource("Furniture05")
+
+[node name="Furniture06" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(12.70529, 0.3, 0.0208)
+rotation = Vector3(0, -0.2092, 0)
+shape = SubResource("Furniture06")
+
+[node name="Furniture07" type="CollisionShape3D" parent="Walkway"]
+position = Vector3(-3.46, 0.79, 11.62)
+rotation = Vector3(0, 0, 0)
+shape = SubResource("Furniture07")
+
+[node name="Entrance" type="Marker3D" parent="."]
+position = Vector3(0, -0.01, 10.45)

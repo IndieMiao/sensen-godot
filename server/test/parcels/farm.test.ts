@@ -1570,3 +1570,93 @@ describe('farm levels (C-152)', () => {
     }
   });
 });
+
+/**
+ * C-228（0.4.7 蓝图册）：左下角不再按规则表顺序只给一种建筑，包里有的蓝图想先盖哪个就盖哪个，四个朝向都行。
+ * 服务端本来就不看顺序；这里把“任意顺序都能盖”和三种拒绝（没有蓝图、占地冲突、材料不够）时存档一点不变钉住。
+ */
+describe('blueprint book: any blueprint in any order (C-228)', () => {
+  const at = (building: string, x: number, y: number, rotation = 0): FarmCommand => ({ type: 'place_building', building, x, y, rotation });
+  const tryIt = (state: ParcelFarmState, commands: FarmCommand[], now = T0) => applyFarmCommands(rules, state, commands, now);
+  /** 首次进入后，3 级，包里有五种建筑的蓝图各一张，木材、石头够盖牛棚和羊圈。 */
+  const stocked = (): ParcelFarmState => {
+    const s = welcomed();
+    s.level = 3;
+    s.bag = { ...s.bag, blueprint_well: 1, blueprint_coop: 1, blueprint_barn: 1, blueprint_sheep_pen: 1, wood: 35, stone: 25 };
+    return s;
+  };
+  /** 各建筑互不相压的位置（牛棚 11×6、羊圈 6×6、鸡场 7×5、小屋 3×3、井 1×1）。 */
+  const SPOTS: Record<string, [number, number]> = { barn: [20, 20], sheep_pen: [40, 20], coop: [20, 40], cottage: [40, 40], well: [50, 50] };
+  const orders = [
+    ['sheep_pen', 'well', 'barn', 'coop', 'cottage'],
+    ['well', 'barn', 'cottage', 'sheep_pen', 'coop'],
+    ['coop', 'cottage', 'well', 'sheep_pen', 'barn'],
+  ];
+
+  for (const order of orders) {
+    it(`places ${order.join(' → ')}: each takes its own blueprint and materials, none waits for another`, () => {
+      let s = stocked();
+      order.forEach((type, i) => {
+        const before = structuredClone(s.bag);
+        s = run(s, [at(type, ...SPOTS[type], i % 4)]);
+        const rule = rules.buildings[type];
+        expect(s.bag[rule.blueprint]).toBeUndefined();
+        for (const [item, need] of Object.entries(rule.materials ?? {})) expect(s.bag[item] ?? 0).toBe((before[item] ?? 0) - need);
+        expect(s.buildings.at(-1)).toMatchObject({ type, x: SPOTS[type][0], y: SPOTS[type][1], rotation: i % 4 });
+      });
+      expect(s.buildings.map(b => b.type)).toEqual(order);
+      expect(s.house).toMatchObject({ x: SPOTS.cottage[0], y: SPOTS.cottage[1] });
+      expect([s.bag.wood ?? 0, s.bag.stone ?? 0]).toEqual([0, 0]);
+    });
+  }
+
+  it('a barn before the cottage and the well: the farm without a home still feeds and its other blueprints still wait', () => {
+    const s = run(stocked(), [at('barn', 20, 20, 3)]);
+    expect(s.house).toBeNull();
+    expect(s.bag).toMatchObject({ blueprint_cottage: 1, blueprint_well: 1, blueprint_coop: 1, blueprint_sheep_pen: 1 });
+  });
+
+  /** 拒绝时：整批不生效、给出原因，传进去的存档一点没变。 */
+  const refusedUnchanged = (farm: ParcelFarmState, commands: FarmCommand[], expected: Record<string, unknown>) => {
+    const frozen = structuredClone(farm);
+    expect(tryIt(farm, commands)).toMatchObject({ ok: false, ...expected });
+    expect(farm).toEqual(frozen);
+  };
+
+  it('without the blueprint nothing is built and the save does not change, whichever type comes first', () => {
+    for (const type of Object.keys(SPOTS)) {
+      const s = stocked();
+      delete s.bag[rules.buildings[type].blueprint];
+      refusedUnchanged(s, [at(type, ...SPOTS[type])], { index: 0, code: 'NO_BLUEPRINT', detail: { item: rules.buildings[type].blueprint } });
+    }
+    // A later command in the batch refused: the earlier building is not kept either.
+    const s = stocked();
+    delete s.bag.blueprint_coop;
+    refusedUnchanged(s, [at('well', ...SPOTS.well), at('coop', ...SPOTS.coop)], { index: 1, code: 'NO_BLUEPRINT' });
+  });
+
+  it('on another building, tilled soil or a crop nothing is built and the save does not change', () => {
+    const withPen = run(stocked(), [at('sheep_pen', 40, 20)]);
+    refusedUnchanged(withPen, [at('cottage', 42, 22)], { code: 'BUILDING_OVERLAP' });
+    refusedUnchanged(withPen, [at('barn', 36, 18, 1)], { code: 'BUILDING_OVERLAP' });
+    const tilled = run(stocked(), [{ type: 'till', cell: '51,50' }]);
+    refusedUnchanged(tilled, [at('cottage', 50, 49)], { code: 'CELL_OCCUPIED', detail: { cells: ['51,50'] } });
+    refusedUnchanged(tilled, [at('well', 51, 50)], { code: 'CELL_OCCUPIED' });
+    // The barn's missing 2×2 corner (C-202; unturned it is cells 20–21 × 24–25) is free: the well stands there, the
+    // barn's real cells refuse it.
+    const barn = run(stocked(), [at('barn', 20, 20)]);
+    expect(tryIt(barn, [at('well', 20, 25)]).ok).toBe(true);
+    refusedUnchanged(barn, [at('well', 22, 20)], { code: 'BUILDING_OVERLAP' });
+  });
+
+  it('short of Timber or Stone nothing is built, the blueprint stays and the save does not change', () => {
+    for (const type of ['barn', 'sheep_pen']) {
+      for (const item of ['wood', 'stone']) {
+        const s = stocked();
+        const need = rules.buildings[type].materials![item];
+        s.bag[item] = need - 1;
+        refusedUnchanged(s, [at(type, ...SPOTS[type])], { code: 'NOT_ENOUGH', detail: { item, have: need - 1, need } });
+      }
+    }
+  });
+});
