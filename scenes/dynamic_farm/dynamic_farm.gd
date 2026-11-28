@@ -1062,6 +1062,10 @@ func _build_ui() -> void:
 	_build.add_theme_constant_override(&"icon_max_width", 32)
 	_build.add_theme_constant_override(&"h_separation", 6)
 	_build.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	# The rolled blueprint keeps its own colours (the clay key's ink would tint it).
+	for c in [&"icon_normal_color", &"icon_hover_color", &"icon_pressed_color", &"icon_hover_pressed_color", &"icon_focus_color",
+			&"icon_disabled_color"]:
+		_build.add_theme_color_override(c, Color.WHITE)
 	_build.visible = false
 	_build.activated.connect(open_book)
 	_canvas.add_child(_build)

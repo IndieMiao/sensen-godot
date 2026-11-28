@@ -40,6 +40,7 @@ var _thumbs: Callable
 func _init(entries_: Array = [], thumbs := Callable()) -> void:
 	super("Blueprints", HERO)
 	name = "BlueprintBook"
+	theme = UiKit.theme()
 	entries = entries_
 	_thumbs = thumbs
 	if entries.is_empty():
