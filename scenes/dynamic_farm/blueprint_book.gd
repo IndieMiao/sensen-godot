@@ -113,11 +113,14 @@ func _card(entry: Dictionary) -> Control:
 	var n := UiKit.label("×%d" % int(entry.count), UiTokens.STYLE_C11_XB, Color.WHITE)
 	n.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	count.add_child(n)
-	count.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	# Pinned to the paper's bottom-right corner, 4 in; it grows up and left to its own size.
+	count.anchor_left = 1.0
+	count.anchor_top = 1.0
+	count.anchor_right = 1.0
+	count.anchor_bottom = 1.0
 	count.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	count.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	count.offset_right = -4
-	count.offset_bottom = -4
+	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]: count.set_offset(side, -4.0)
 	paper.add_child(count)
 	var col := VBoxContainer.new()
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL

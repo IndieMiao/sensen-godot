@@ -1094,6 +1094,7 @@ func _build_ui() -> void:
 	# The blueprint being placed (SEN-C-227 README §4 item 2): left under the avatar, the place chip's dark glass.
 	_placing_chip = PanelContainer.new()
 	_placing_chip.name = "PlacingChip"
+	_placing_chip.theme = UiKit.theme()
 	_placing_chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_placing_chip.add_theme_stylebox_override(&"panel",
 		UiClay.padded(UiClay.glass_dark(UiTokens.SIZE_HUD_PLACE_H * 0.5), UiTokens.SPACE_S4, 0.0))
