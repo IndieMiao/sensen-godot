@@ -5,6 +5,8 @@ extends Node3D
 ## is the shared UiPlaceBar, `Cancel · Rotate · Build` (Rotate is the bar's middle key P0's Decorate uses, a quarter
 ## turn in place each press: 0, 90, 180, 270°, 所有者 SEN-C-134#22 第 3 题); with three keys the reason a spot is not
 ## valid shows above the bar. The caller sends the command and ends the mode.
+## C-229 moving a built building (SEN-C-227 README §5): the same preview, its main key `Move` (`confirm_word`), starting
+## where the building stands; `origin` (its cells there) keeps a white dashed outline of the old footprint.
 signal confirmed(at: Vector2i, rotation: int)
 signal cancelled
 
@@ -21,10 +23,21 @@ const EDGE_LIFT := 0.032
 const FILL_LIFT := 0.030
 ## Rotate turns the model over this long, ease-out (SEN-C-227 README §8).
 const TURN_MS := 160.0
+## C-229: the old footprint's outline when moving: white dashes, this many to a cell side, this share of it drawn.
+const ORIGIN_DASHES := 2
+const ORIGIN_DASH := 0.32
+const ORIGIN_WIDTH := 0.05
+const ORIGIN_LIFT := 0.034
+const ORIGIN_COLOR := Color(1, 1, 1, 0.9)
 
 var at := Vector2i.ZERO
 var rotation_steps := 0
 var reason := ""
+## The main key's verb (set before setup): `Build`, or `Move` when moving a built building (C-229).
+var confirm_word := "Build"
+## C-229: the cells the moved building stands on now (set before setup), outlined in white dashes; [] when placing.
+var origin: Array = []
+var _origin_dashes: Array[MeshInstance3D] = []
 ## The building type (a key of the rules' `buildings`) and its footprint unturned.
 var type := ""
 var base := Vector2i.ONE
@@ -86,13 +99,14 @@ func setup(building: String, footprint: Vector2i, data: Dictionary, walk: RefCou
 	add_child(_ghost)
 	_bar = UiPlaceBar.new()
 	_bar.theme = UiKit.theme()
-	_bar.confirm = "Build"
+	_bar.confirm = confirm_word
 	_bar.secondary = "Rotate"
 	_bar.confirmed.connect(func(): if reason == "": confirmed.emit(at, rotation_steps))
 	_bar.cancelled.connect(func(): cancelled.emit())
 	_bar.secondary_pressed.connect(turn)
 	canvas.add_child(_bar)
 	_bar.safe_bottom = _safe_bottom()
+	_draw_origin()
 	move_to(start)
 
 func move_to(cell: Vector2i) -> void:
@@ -225,6 +239,40 @@ func _squares(pool: Array, list: Array, outline: bool, lift: float) -> void:
 		if not q.visible: continue
 		q.position = _walk.point(list[i][0]) + Vector3(0, lift, 0)
 		(q.material_override as StandardMaterial3D).albedo_color = list[i][1]
+
+## C-229 the old footprint's outline: along each edge of `origin` with no `origin` cell beyond it, ORIGIN_DASHES white
+## dashes (README §5: the old place keeps a white dashed frame, its own outline; V-710 #1).
+func _draw_origin() -> void:
+	if origin.is_empty(): return
+	var own := {}
+	for cell: Vector2i in origin: own[cell] = true
+	var cell_m: float = _walk.cell_m
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = ORIGIN_COLOR
+	for cell: Vector2i in origin:
+		var middle: Vector3 = _walk.point(cell)
+		for step: Vector2i in Building.AROUND:
+			if own.has(cell + step): continue
+			var out: Vector3 = (_walk.point(cell + step) - middle) * 0.5
+			var along := Vector3(-out.z, 0.0, out.x).normalized()
+			for i in ORIGIN_DASHES:
+				var dash := MeshInstance3D.new()
+				dash.name = "OriginDash"
+				var plane := PlaneMesh.new()
+				plane.size = Vector2(cell_m * ORIGIN_DASH, ORIGIN_WIDTH)
+				dash.mesh = plane
+				dash.material_override = material
+				dash.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+				var offset := (float(i) + 0.5) / ORIGIN_DASHES - 0.5
+				var at := middle + out + along * offset * cell_m + Vector3(0, ORIGIN_LIFT, 0)
+				dash.transform = Transform3D(Basis(along, Vector3.UP, along.cross(Vector3.UP)), at)
+				add_child(dash)
+				_origin_dashes.append(dash)
+
+## The old footprint's dashes (C-229), [] when placing a new building.
+func origin_dashes() -> Array[MeshInstance3D]: return _origin_dashes
 
 ## A cell's edge: white border, clear inside (tinted per use); about 2 px at 36 px a cell.
 static func _outline_texture() -> ImageTexture:

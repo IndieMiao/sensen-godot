@@ -1662,3 +1662,184 @@ describe('blueprint book: any blueprint in any order (C-228)', () => {
     }
   });
 });
+
+/**
+ * C-229（0.4.7 已盖建筑的移动和收回，设计稿 SEN-C-227 D-555 README §5，所有者 SEN-Q-344 D1–D3）：
+ * move_building 挪位置和朝向，占地校验同 place_building（不算它自己原来的格），动物、掉落物、计时都跟着建筑；
+ * store_building 收回成蓝图：蓝图和规则材料全退，地上已下的产物进背包；小屋不收，喂过还没下的不收。
+ * 两条都不能刷蓝图或材料、不能丢产物：来回收、摆多少次，背包里的东西加起来不变。
+ */
+describe('moving and storing a building (C-229)', () => {
+  const at = (building: string, x: number, y: number, rotation = 0): FarmCommand => ({ type: 'place_building', building, x, y, rotation });
+  const move = (building: number, x: number, y: number, rotation = 0): FarmCommand => ({ type: 'move_building', building, x, y, rotation });
+  const store = (building: number): FarmCommand => ({ type: 'store_building', building });
+  const tryIt = (state: ParcelFarmState, commands: FarmCommand[], now = T0) => applyFarmCommands(rules, state, commands, now);
+  const MIN = 60_000;
+  /** 3 级，小屋、鸡场、牛棚、羊圈、井都盖好（id 1–5），包里有饲料。 */
+  const yard = (): ParcelFarmState => {
+    const s = welcomed();
+    s.level = 3;
+    s.bag = { ...s.bag, blueprint_well: 1, blueprint_coop: 1, blueprint_barn: 1, blueprint_sheep_pen: 1, wood: 35, stone: 25,
+      crop_carrot: 10, wild_herb: 9 };
+    return run(s, [at('cottage', 40, 40), at('coop', 20, 40), at('barn', 20, 20), at('sheep_pen', 40, 20), at('well', 50, 50)]);
+  };
+  const ID = { cottage: 1, coop: 2, barn: 3, sheep_pen: 4, well: 5 };
+  /** 背包里的东西加上盖着的建筑折回的蓝图和材料：移动、收回、再摆放都不改变它。 */
+  const holdings = (s: ParcelFarmState): Record<string, number> => {
+    const all: Record<string, number> = { ...s.bag };
+    for (const b of s.buildings)
+      for (const [item, n] of Object.entries({ [rules.buildings[b.type].blueprint]: 1, ...rules.buildings[b.type].materials }))
+        all[item] = (all[item] ?? 0) + n;
+    for (const d of s.drops) if (d.ready_at <= T0 + 3 * 3_600_000) all[d.item] = (all[d.item] ?? 0) + d.amount;
+    return all;
+  };
+  const refusedUnchanged = (farm: ParcelFarmState, commands: FarmCommand[], expected: Record<string, unknown>, now = T0) => {
+    const frozen = structuredClone(farm);
+    expect(tryIt(farm, commands, now)).toMatchObject({ ok: false, ...expected });
+    expect(farm).toEqual(frozen);
+  };
+
+  it('parses only well-formed commands', () => {
+    expect(parseFarmCommands([move(3, 1, 2, 3), store(4)])).toEqual([move(3, 1, 2, 3), store(4)]);
+    for (const bad of [{ type: 'move_building', building: 0, x: 1, y: 1, rotation: 0 }, { type: 'move_building', building: 1, x: -1, y: 1, rotation: 0 },
+      { type: 'move_building', building: 1, x: 1, y: 1, rotation: 4 }, { type: 'move_building', building: 1, x: 1, y: 1 },
+      { type: 'move_building', building: '1', x: 1, y: 1, rotation: 0 }, { type: 'store_building' }, { type: 'store_building', building: 1.5 },
+      { type: 'store_building', building: 2 ** 31 }])
+      expect(parseFarmCommands([bad])).toBeNull();
+  });
+
+  it('moves and turns any building, the cottage too; its own old cells do not count; nothing is spent', () => {
+    const s = yard();
+    const moved = run(s, [move(ID.coop, 21, 41, 1), move(ID.cottage, 41, 40, 3), move(ID.well, 60, 60, 2)]);
+    expect(moved.buildings.find(b => b.id === ID.coop)).toMatchObject({ type: 'coop', x: 21, y: 41, rotation: 1, width: 7, depth: 5, built_at: T0,
+      animals: ['hen_white', 'hen_brown', 'hen_white'] });
+    expect(moved.house).toMatchObject({ x: 41, y: 40, rotation: 3 });
+    expect(moved.buildings.map(b => b.id)).toEqual([1, 2, 3, 4, 5]);
+    expect(moved.bag).toEqual(s.bag);
+    expect(moved.energy).toEqual(s.energy);
+    // The barn keeps its cutout (C-202) where it goes.
+    const barn = run(s, [move(ID.barn, 22, 22, 2)]).buildings.find(b => b.id === ID.barn)!;
+    expect(barn).toMatchObject({ x: 22, y: 22, rotation: 2, cutouts: [[0, 0, 2, 2]] });
+  });
+
+  it('a move onto another building, tilled soil, a crop or off the grid is refused and the save does not change', () => {
+    const s = run(yard(), [{ type: 'till', cell: '60,60' }]);
+    refusedUnchanged(s, [move(ID.well, 41, 41)], { code: 'BUILDING_OVERLAP', detail: { cells: ['41,41'] } });
+    refusedUnchanged(s, [move(ID.cottage, 58, 58)], { code: 'CELL_OCCUPIED', detail: { cells: ['60,60'] } });
+    refusedUnchanged(s, [move(ID.coop, 1020, 10)], { code: 'OUT_OF_BOUNDS' });
+    refusedUnchanged(s, [move(99, 70, 70)], { code: 'NO_BUILDING', detail: { building: 99 } });
+    // An earlier move in the batch is not kept when a later one is refused.
+    refusedUnchanged(s, [move(ID.well, 70, 70), move(ID.cottage, 19, 19)], { index: 1, code: 'BUILDING_OVERLAP' });
+  });
+
+  it('animals, drops on the ground and drops on their way go with the building; the timer runs on; they are picked up there', () => {
+    const fed = run(yard(), [{ type: 'feed', building: ID.coop }, { type: 'feed', building: ID.sheep_pen }]);
+    const laid = run(fed, [{ type: 'feed', building: ID.coop }], T0 + 3 * MIN);
+    const moved = run(laid, [move(ID.coop, 60, 30, 2), move(ID.sheep_pen, 70, 40, 1)], T0 + 3 * MIN);
+    expect(moved.drops).toEqual(laid.drops);
+    expect(moved.drop_seq).toBe(laid.drop_seq);
+    const egg = moved.drops.find(d => d.building === ID.coop && d.ready_at <= T0 + 3 * MIN)!;
+    const picked = run(moved, [{ type: 'pick_up', drop: egg.id }], T0 + 3 * MIN);
+    expect(picked.bag.egg).toBe(1);
+    const wool = moved.drops.find(d => d.building === ID.sheep_pen)!;
+    expect(tryIt(moved, [{ type: 'pick_up', drop: wool.id }], T0 + 29 * MIN)).toMatchObject({ ok: false, code: 'NOT_READY', detail: { ready_at: T0 + 30 * MIN } });
+    expect(run(moved, [{ type: 'pick_up', drop: wool.id }], T0 + 30 * MIN).bag.wool).toBe(1);
+  });
+
+  it('storing gives back the blueprint and every material (D1); the building and its animals are gone; placing it again takes them', () => {
+    const s = yard();
+    const stored = run(s, [store(ID.barn), store(ID.sheep_pen), store(ID.coop), store(ID.well)]);
+    expect(stored.buildings.map(b => b.type)).toEqual(['cottage']);
+    expect(stored.bag).toEqual({ ...s.bag, blueprint_barn: 1, blueprint_sheep_pen: 1, blueprint_coop: 1, blueprint_well: 1,
+      wood: (s.bag.wood ?? 0) + 35, stone: (s.bag.stone ?? 0) + 25 });
+    expect(stored.house).toEqual(s.house);
+    // Again, anywhere: the animals are the rules' (C-209's way), the materials taken again.
+    const again = run(stored, [at('barn', 60, 20, 1), at('sheep_pen', 80, 20), at('coop', 60, 40), at('well', 20, 60)]);
+    expect(again.buildings.find(b => b.type === 'sheep_pen')!.animals).toEqual(['sheep', 'sheep', 'sheep', 'sheep']);
+    expect(again.bag).toEqual(s.bag);
+    expect(holdings(again)).toEqual(holdings(s));
+  });
+
+  it('cannot farm blueprints or materials: store / place / move over and over leaves what the player owns the same', () => {
+    let s = yard();
+    const start = holdings(s);
+    for (let i = 0; i < 5; i++) {
+      s = run(s, [store(s.buildings.find(b => b.type === 'barn')!.id)]);
+      expect(holdings(s)).toEqual(start);
+      s = run(s, [at('barn', 60 + i, 20, i % 4)]);
+      s = run(s, [move(s.buildings.find(b => b.type === 'barn')!.id, 70, 30 + i, (i + 1) % 4)]);
+      expect(holdings(s)).toEqual(start);
+    }
+    // The same building twice in one batch: the second finds nothing, the whole batch is refused.
+    refusedUnchanged(s, [store(ID.coop), store(ID.coop)], { index: 1, code: 'NO_BUILDING' });
+    // Stored, it cannot be moved; moved, the blueprint is still spent.
+    refusedUnchanged(s, [store(ID.coop), move(ID.coop, 80, 80)], { index: 1, code: 'NO_BUILDING' });
+    // A stored type over its limit with a blueprint already in the bag: one stands again, the second waits (limit 1).
+    const spare = structuredClone(s);
+    spare.bag.blueprint_coop = 1;
+    const two = run(spare, [store(ID.coop)]);
+    expect(two.bag.blueprint_coop).toBe(2);
+    refusedUnchanged(two, [at('coop', 60, 60), at('coop', 80, 80)], { index: 1, code: 'BUILDING_LIMIT' });
+  });
+
+  it('laid drops go into the bag when stored; drops still on their way refuse it (D2) without losing feed or product', () => {
+    const fed = run(yard(), [{ type: 'feed', building: ID.coop }, { type: 'feed', building: ID.barn }]);
+    // On their way: refused with the last one's time, nothing changes.
+    refusedUnchanged(fed, [store(ID.coop)], { code: 'PRODUCING', detail: { ready_at: T0 + 2 * MIN } }, T0 + MIN);
+    refusedUnchanged(fed, [store(ID.barn)], { code: 'PRODUCING', detail: { ready_at: T0 + 15 * MIN } }, T0 + 14 * MIN);
+    const twice = run(fed, [{ type: 'feed', building: ID.coop }], T0 + MIN);
+    refusedUnchanged(twice, [store(ID.coop)], { code: 'PRODUCING', detail: { ready_at: T0 + 3 * MIN } }, T0 + 2 * MIN);
+    // Laid: the eggs and the milk go into the bag with the blueprint and materials; their drops are gone, the ids never come back.
+    const stored = run(twice, [store(ID.coop), store(ID.barn)], T0 + 15 * MIN);
+    expect(stored.bag.egg).toBe(2);
+    expect(stored.bag.milk).toBe(1);
+    expect(stored.drops).toEqual([]);
+    expect(stored.drop_seq).toBe(twice.drop_seq);
+    expect(stored.bag.crop_carrot).toBe(twice.bag.crop_carrot);
+    const placed = run(stored, [at('coop', 20, 40), { type: 'feed', building: 6 }], T0 + 15 * MIN);
+    expect(placed.drops.map(d => d.id)).toEqual([twice.drop_seq + 1]);
+  });
+
+  it('the cottage is never stored (D3); an unknown building or a type the rules dropped is refused', () => {
+    const s = yard();
+    refusedUnchanged(s, [store(ID.cottage)], { code: 'CANNOT_STORE', detail: { building: ID.cottage } });
+    refusedUnchanged(s, [store(42)], { code: 'NO_BUILDING', detail: { building: 42 } });
+    const odd = structuredClone(s);
+    odd.buildings.push({ id: 9, type: 'silo', model: 'silo', x: 90, y: 90, width: 2, depth: 2, rotation: 0, built_at: T0 });
+    refusedUnchanged(odd, [store(9)], { code: 'UNKNOWN_BUILDING', detail: { building: 'silo' } });
+  });
+
+  it('moving and storing cost no Energy, even at 0', () => {
+    const s = yard();
+    s.energy = { value: 0, at: T0, rested_on: null };
+    const out = run(s, [move(ID.well, 70, 70), store(ID.well)]);
+    expect(out.energy!.value).toBe(0);
+  });
+
+  it('a stored well takes the watering with it: no well, no water; the pail keeps what it holds', () => {
+    let s = yard();
+    s.bag.pail = 1;
+    s = run(s, [{ type: 'draw_water', building: ID.well }]);
+    s = run(s, [store(ID.well)]);
+    expect(s.pail_water).toBe(3);
+    expect(tryIt(s, [{ type: 'draw_water', building: ID.well }])).toMatchObject({ ok: false, code: 'NO_WELL' });
+  });
+});
+
+/**
+ * C-229：客户端和服务端同一套移动和收回规则。tests/dynamic_farm/fixtures/arrange_cases.json 的每个用例在这里按服务端跑，
+ * 在 tests/dynamic_farm/test_building_arrange.gd 里按客户端 parcel_farm.gd 跑，两边结果都要等于文件里记的结果。
+ */
+describe('C-229 the client runs the same move and store cases (shared fixture)', () => {
+  const shared = JSON.parse(readFileSync(path.join(DEFAULT_CONTENT_DIR, '..', '..', '..', 'tests', 'dynamic_farm', 'fixtures', 'arrange_cases.json'), 'utf8'));
+  it('has the cases', () => expect(shared.cases.length).toBeGreaterThanOrEqual(12));
+  for (const c of shared.cases) {
+    it(c.name, () => {
+      const frozen = structuredClone(c.farm);
+      const r = applyFarmCommands(rules, c.farm, c.commands, c.now);
+      expect(r.ok ? { ok: true, buildings: r.state.buildings, house: r.state.house, drops: r.state.drops, drop_seq: r.state.drop_seq, bag: r.state.bag,
+        energy: r.state.energy } : { ok: false, index: r.index, code: r.code, detail: r.detail ?? {} }).toEqual(c.expect);
+      expect(c.farm).toEqual(frozen);
+    });
+  }
+});

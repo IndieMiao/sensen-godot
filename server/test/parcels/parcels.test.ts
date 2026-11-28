@@ -487,6 +487,42 @@ for (const [name, enabled, makeStores] of makers) {
       expect(home.json().parcel.farm).toMatchObject({ house: { x: 30, y: 30, rotation: 3 }, buildings: [{ type: 'well' }, { type: 'cottage' }] });
     });
 
+    it('C-229 move and store: the well moves and is stored back into a blueprint once; a replay or a cottage store is refused and keeps the save', async () => {
+      const ada = await account(app, 'Ada');
+      await claim(app, ada, A);
+      await enter(app, ada);
+      const first = await mine(app, ada);
+      const built = await command(app, ada, first.farm_version, [{ type: 'place_building', building: 'well', x: 20, y: 20, rotation: 0 },
+        { type: 'place_building', building: 'cottage', x: 30, y: 30, rotation: 0 }]);
+      expect(built.statusCode).toBe(200);
+      const v = built.json().parcel.farm_version;
+      const moved = await command(app, ada, v, [{ type: 'move_building', building: 1, x: 24, y: 22, rotation: 3 },
+        { type: 'move_building', building: 2, x: 31, y: 30, rotation: 1 }]);
+      expect(moved.statusCode).toBe(200);
+      expect(moved.json().parcel.farm).toMatchObject({ buildings: [{ id: 1, type: 'well', x: 24, y: 22, rotation: 3 }, { id: 2, type: 'cottage', x: 31, y: 30, rotation: 1 }],
+        house: { x: 31, y: 30, rotation: 1 } });
+      expect((await command(app, ada, v + 1, [{ type: 'move_building', building: 1, x: 24, y: 22, rotation: 5 }])).statusCode).toBe(400);
+      const saved = await mine(app, ada);
+      const cottage = await command(app, ada, v + 1, [{ type: 'store_building', building: 2 }]);
+      expect(cottage.statusCode).toBe(422);
+      expect(cottage.json()).toMatchObject({ code: 'CANNOT_STORE', parcel: { farm_version: v + 1 } });
+      expect((await command(app, ada, v + 1, [{ type: 'move_building', building: 1, x: 31, y: 31, rotation: 0 }])).json()).toMatchObject({ code: 'BUILDING_OVERLAP' });
+      expect(await mine(app, ada)).toEqual(saved);
+      const stored = await command(app, ada, v + 1, [{ type: 'store_building', building: 1 }]);
+      expect(stored.statusCode).toBe(200);
+      expect(stored.json().parcel.farm.buildings).toEqual([expect.objectContaining({ id: 2, type: 'cottage' })]);
+      expect(stored.json().parcel.farm.bag.blueprint_well).toBe(1);
+      // The same request again: its base_version no longer matches, so the blueprint is not given twice.
+      const replay = await command(app, ada, v + 1, [{ type: 'store_building', building: 1 }]);
+      expect(replay.statusCode).toBe(409);
+      expect((await mine(app, ada)).farm.bag.blueprint_well).toBe(1);
+      const again = await command(app, ada, v + 2, [{ type: 'place_building', building: 'well', x: 10, y: 10, rotation: 2 }]);
+      expect(again.statusCode).toBe(200);
+      expect(again.json().parcel.farm.bag.blueprint_well).toBeUndefined();
+      // Someone without a parcel cannot move or store anything.
+      expect((await command(app, await account(app, 'Bob'), 0, [{ type: 'store_building', building: 1 }])).json().code).toBe('NO_PARCEL');
+    });
+
     it('C-58 sell: too few is refused; a sale takes from the bag and pays the configured price, server-side only', async () => {
       const ada = await account(app, 'Ada');
       const v = await withCarrots(app, ada, A);
