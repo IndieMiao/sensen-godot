@@ -217,6 +217,10 @@ var _steering_now := false
 var swinging := false
 var _presenting := {}
 var _redraw_gathered := false
+## C-236: when the last hit landed (ticks ms); the next one lands no sooner than `common.min_hit_interval_ms` after it.
+var _last_contact_ms := -1_000_000
+## Every hit's contact time this visit (ticks ms; QA reads it).
+var contacts := []
 ## C-236: what the bar and the Energy chip keep showing until the gathered drop appears ({} / -1: the save's).
 var _held_bag = null
 var _held_energy := -1
@@ -591,6 +595,10 @@ func strike_down(t: Dictionary, command: Dictionary) -> Dictionary:
 		var done: int = damage.done(t.key, Time.get_ticks_msec())
 		var last := done + 1 >= hits
 		if last and t.kind in PULLED: gather_stage.begin_pull()
+		# SEN-Q-342 §5 / C-236#14: two hits land at least 0.9 s apart; a quicker press or the held key waits a beat first.
+		var gap_ms := int(GatherFx.common().get("min_hit_interval_ms", 900))
+		var wait := (_last_contact_ms + gap_ms - Time.get_ticks_msec()) / 1000.0 - GatherFx.contact_s(t.kind)
+		if wait > 0.0 and not await _hold(wait): break
 		var length: float = _body.gesture(t.kind, t.cells)
 		var contact := minf(GatherFx.contact_s(t.kind), length)
 		if not await _hold(contact):
@@ -598,6 +606,8 @@ func strike_down(t: Dictionary, command: Dictionary) -> Dictionary:
 			_body.cut_labour()
 			if last and t.kind in PULLED: gather_stage.refuse()
 			break
+		_last_contact_ms = Time.get_ticks_msec()
+		contacts.append(_last_contact_ms)
 		done = damage.hit(t.key, Time.get_ticks_msec())
 		if done >= hits:
 			result = await _settle(t, command)

@@ -7,6 +7,8 @@
     "hold_stops_when_done": true,
     "cancel_on_move": "drop_unstruck_swing",
     "damage_memory_ms": 30000,
+    "min_hit_interval_ms": 900,
+    "_min_hit_interval_ms": "SEN-Q-342 §5“两下之间最短 0.9 秒”，PM 定为客户端节奏保留（SEN-C-236#14）：相邻两下的击中时刻至少隔这么久，按住连打时在两下之间站一下。",
     "heal_ms": 400,
     "hitstop_ms": 40,
     "haptic_hit_ms": 12,

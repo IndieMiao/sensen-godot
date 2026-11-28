@@ -235,7 +235,10 @@ func _first_visit() -> Dictionary:
 		if kind == "tree":
 			_check(played.find("landed tree") >= 0 and played.find("drop wood") > played.find("landed tree"),
 				"the log pops out only once the tree is down (%s)" % [played])
-		if kind == "rock": _check("drop stone" in played, "a stone pops out of the pieces")
+		if kind == "rock":
+			_check("drop stone" in played, "a stone pops out of the pieces")
+			var c: Array = farming.contacts.slice(-2)
+			_check(c.size() == 2 and int(c[1]) - int(c[0]) >= 880, "held down, the two hits land 0.9 s apart (%s)" % [c])
 		_check(ITEMS[kind][0] in farming.bag_ids(), "%s shows in the bag" % ITEMS[kind][0])
 		_check(farming.farm.gathered.has(id), "%s is recorded" % id)
 		picked[kind] = id
@@ -294,6 +297,7 @@ func _walk_off_and_back(farming: Node, index: int) -> void:
 	var memory := GatherFx.damage()
 	memory.hit(id, 0)
 	_check(memory.done(id, 30000) == 1 and memory.done(id, 30001) == 0, "after 30 s the hits are forgotten")
+	_check(int(GatherFx.common().min_hit_interval_ms) == 900, "hits land at least 0.9 s apart (SEN-Q-342, C-236#14)")
 	_check(GatherFx.stage("tree", 1, 3) == 0 and GatherFx.stage("tree", 2, 3) == 1 and GatherFx.stage("tree", 4, 5) == 2,
 		"scar stages by >= the approved thresholds")
 
