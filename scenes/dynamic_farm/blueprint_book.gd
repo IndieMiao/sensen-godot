@@ -68,7 +68,9 @@ func _init(entries_: Array = [], thumbs := Callable()) -> void:
 func _ready() -> void:
 	get_viewport().size_changed.connect(_fit_scroll)
 	_fit_scroll()
-	_fit_scroll.call_deferred()
+	# A materials row (an HFlowContainer) knows how many lines it wraps to only after its first layout; the list's
+	# height follows it.
+	if _list != null: _list.minimum_size_changed.connect(_fit_scroll, CONNECT_DEFERRED)
 
 ## The list as tall as its cards, at most what leaves the panel within MAX_SCREEN of the screen.
 func _fit_scroll() -> void:
