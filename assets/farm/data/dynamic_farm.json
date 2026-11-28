@@ -193,19 +193,25 @@
       "sources": {
         "tree": {
           "item": "wood",
-          "amount": 1,
+          "amount": 2,
+          "energy": 3,
+          "hits": 3,
           "max_objects": 40,
           "models": ["wild_pz_tree_20", "wild_pz_tree_20_g", "wild_pz_pine_01", "wild_pz_pine_03"]
         },
         "flower": {
           "item": "wild_herb",
           "amount": 1,
+          "energy": 2,
+          "hits": 1,
           "max_objects": 80,
           "models": ["wild_pz_flower_20", "wild_pz_flower_23"]
         },
         "rock": {
           "item": "stone",
           "amount": 1,
+          "energy": 2,
+          "hits": 2,
           "max_objects": 30,
           "models": ["wild_pz_rock_08", "wild_pz_rock_13", "wild_pz_softrock_10"]
         }

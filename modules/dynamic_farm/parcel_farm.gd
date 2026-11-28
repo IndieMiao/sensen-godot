@@ -629,11 +629,16 @@ static func next_tick_in(rule_set: Dictionary, state: Dictionary, now: int) -> V
 	if int(e.value) >= max_energy(rule_set, state): return null
 	return maxi(0, int(e.at) + regen_ms(rule_set, state, now) - now)
 
-## Energy a command costs: a sown crop's own price, `energy.costs` for clearing, tilling and gathering, else 0.
+## Energy a command costs: a sown crop's own price, an outer object's kind's (C-236), `energy.costs` for clearing, tilling
+## and other gathering, else 0.
 static func energy_cost(rule_set: Dictionary, command: Dictionary) -> int:
 	if command.get("type") == "sow":
 		var crop = rule_set.crops.get(command.get("crop", ""))
 		return int(crop.energy) if crop is Dictionary else 0
+	# C-236: an outer object costs its kind's own price (a tree 3, a rock or a flower 2), once, as the server's energyCost.
+	if command.get("type") == "gather":
+		var own := Gather.energy_of(Gather.rules(), command.get("object"))
+		if own >= 0: return own
 	return int(rule_set.energy.costs.get(command.get("type", ""), 0))
 
 ## Spends `amount` (already checked); a full pool starts its timer now.

@@ -10,7 +10,8 @@
  * rested_on 最近一次休息的玩家日（YYYY-MM-DD），没休息过为 null。C-148 以前的存档没有这个字段，按满体力补上（energyOf）。
  */
 import type { FarmCommand, ParcelFarmState } from './farm.js';
-import type { ParcelRules } from './rules.js';
+import { gatherSourceOf, type ParcelRules } from './rules.js';
+import { parseObjectId } from './farm.js';
 
 export interface EnergyState { value: number; at: number; rested_on: string | null }
 export interface EnergyRules {
@@ -91,9 +92,17 @@ export function spendEnergy(rules: ParcelRules, s: ParcelFarmState, now: number,
   e.value -= amount;
 }
 
-/** 一条命令的体力价：播种看作物，清障碍、开垦、外围采集、打水、喂动物看 costs，其余 0。 */
+/**
+ * 一条命令的体力价：播种看作物，外围采集看这类物件的 energy（C-236：树 3、石 2、花 2，一个物件只结算一次；没写的类和
+ * 认不出的编号用 costs.gather），清障碍、开垦、打水、喂动物看 costs，其余 0。
+ */
 export function energyCost(rules: ParcelRules, c: FarmCommand): number {
   if (c.type === 'sow') return rules.crops[c.crop]?.energy ?? 0;
+  if (c.type === 'gather') {
+    const o = parseObjectId(c.object);
+    const own = o ? gatherSourceOf(rules, o.model)?.energy : undefined;
+    if (own !== undefined) return own;
+  }
   return Object.hasOwn(rules.energy.costs, c.type) ? rules.energy.costs[c.type] : 0;
 }
 

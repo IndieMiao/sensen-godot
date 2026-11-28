@@ -65,7 +65,7 @@ describe('C-148 numbers are P0’s (assets/p0/p0_content.json, server/src/p0/rul
 });
 
 describe('C-148 each action costs its Energy', () => {
-  it('clear 2, till 2, sow a carrot 3, gather 2, draw water 2; watering, harvest, sell, blueprint and buildings are free', () => {
+  it('clear 2, till 2, sow a carrot 3, gather a tree 3 (C-236, SEN-Q-342), draw water 2; watering, harvest, sell, blueprint and buildings are free', () => {
     let s = grant(rules, veteran(), T0)!.state;
     expect(energy(settle(s))).toBe(200);
     s = run(s, [{ type: 'place_house', x: 10, y: 10 }]);
@@ -77,17 +77,17 @@ describe('C-148 each action costs its Energy', () => {
     s = run(s, [{ type: 'sow', cell: '3,3', crop: 'crop_carrot' }]);
     expect(energy(s)).toBe(193);
     s = run(s, [{ type: 'gather', object: TREE }]);
-    expect(energy(s)).toBe(191);
+    expect(energy(s)).toBe(190);
     s = run(s, [{ type: 'place_building', building: 'well', x: 30, y: 30, rotation: 0 }]);
-    expect(energy(s)).toBe(191);
+    expect(energy(s)).toBe(190);
     s = run(s, [{ type: 'draw_water', building: 2 }]);
-    expect(energy(s)).toBe(189);
+    expect(energy(s)).toBe(188);
     s = run(s, [{ type: 'water', cell: '3,3' }]);
-    expect(energy(s)).toBe(189);
+    expect(energy(s)).toBe(188);
     // 60 s after watering the carrot is ripe; less than 4 min, so no point has come back yet.
     s = run(s, [{ type: 'harvest', cell: '3,3' }, { type: 'sell', item: 'crop_carrot', count: 1 }, { type: 'claim_blueprint', blueprint: 'coop' }], T0 + MIN);
-    expect(energy(s)).toBe(189);
-    expect(s.bag).toMatchObject({ blueprint_coop: 1, wood: 1 });
+    expect(energy(s)).toBe(188);
+    expect(s.bag).toMatchObject({ blueprint_coop: 1, wood: 2 });
   });
 
   it('a batch pays for every command in it', () => {
@@ -103,9 +103,9 @@ describe('C-148 not enough Energy: the server refuses and the save does not chan
     const sow = applyFarmCommands(rules, s, [{ type: 'sow', cell: '1,1', crop: 'crop_carrot' }], T0, ctx);
     expect(sow).toEqual({ ok: false, index: 0, code: 'NO_ENERGY', detail: { need: 3, have: 2, next_in: 3 * MIN } });
     expect(s).toEqual(before);
-    for (const c of [{ type: 'clear_obstacle', cell: '5,5' }, { type: 'till', cell: '2,2' }, { type: 'gather', object: TREE }] as FarmCommand[]) {
+    for (const [c, need] of [[{ type: 'clear_obstacle', cell: '5,5' }, 2], [{ type: 'till', cell: '2,2' }, 2], [{ type: 'gather', object: TREE }, 3]] as [FarmCommand, number][]) {
       const low = withEnergy(s, 1, T0);
-      expect(applyFarmCommands(rules, low, [c], T0, ctx)).toMatchObject({ ok: false, code: 'NO_ENERGY', detail: { need: 2, have: 1 } });
+      expect(applyFarmCommands(rules, low, [c], T0, ctx)).toMatchObject({ ok: false, code: 'NO_ENERGY', detail: { need, have: 1 } });
     }
     // Free actions still work at 0.
     expect(applyFarmCommands(rules, withEnergy(s, 0), [{ type: 'place_house', x: 10, y: 10 }], T0, ctx).ok).toBe(true);

@@ -1,0 +1,365 @@
+{
+  "_note": "SEN-C-234 采集表现设计稿 D-558 的动效参数（所有者 SEN-Q-345 批，Q1～Q6 按推荐），SEN-C-236 原样接入；客户端读，服务端不读。时长 ms，距离 m（3D）或 px（界面），角度度。外围的下数、体力、掉落数量不在这里，在 dynamic_farm.json 的 economy.gather（SEN-Q-342 数值表）；draft_hits 只是设计稿出图用的草案，不读。院子障碍物的下数在 core_obstacles（SEN-C-223 没给，按设计稿草案默认，可改）。所有者 SEN-C-234#50：草药采完整株拔起，不留根也不留叶（kinds.flower.spent = picked 即原地什么都不剩）。",
+  "version": "gather-fx-v1",
+  "common": {
+    "settle": "per_object_on_final_hit",
+    "hold_repeat": true,
+    "hold_stops_when_done": true,
+    "cancel_on_move": "drop_unstruck_swing",
+    "damage_memory_ms": 30000,
+    "heal_ms": 400,
+    "hitstop_ms": 40,
+    "haptic_hit_ms": 12,
+    "haptic_final_ms": 30,
+    "refuse_rewind_ms": 300,
+    "sfx_volume_db": -6,
+    "sfx_pitch_jitter": 0.06,
+    "particles_alive_cap": 64,
+    "reward_gate": "server_ack",
+    "_reward_gate": "所有掉落、界面飞入、飘字都等回包：出现时刻 = max(画面时刻, 回包)。没回包前只播动作和受击。",
+    "damage_stage_compare": ">=",
+    "_damage_stage_compare": "hits_done / hits >= 阈值 即进入该档（树 2/5 = 0.4 进浅档、4/5 = 0.8 进深档）"
+  },
+  "kinds": {
+    "tree": {
+      "verb": "Chop",
+      "icon": "axe",
+      "tool": "axe",
+      "clip": "labour_chop",
+      "clip_fallback": "labour_clear",
+      "draft_hits": 5,
+      "cycle": {
+        "windup": 220,
+        "strike": 80,
+        "recover": 260
+      },
+      "hit": {
+        "shake_deg": 4,
+        "shake_swings": 2,
+        "shake_ms": 260,
+        "leaves": 3,
+        "chips": 4
+      },
+      "damage_stages": [
+        0.4,
+        0.8
+      ],
+      "fall": {
+        "crack_delay": 120,
+        "tilt_deg": 88,
+        "tilt_ms": 760,
+        "tilt_ease": "quad_in",
+        "bounce_deg": 8,
+        "bounce_ms": 220,
+        "rest_ms": 260,
+        "fade_ms": 300,
+        "sink_m": 0.1,
+        "dust": 10,
+        "leaves": 12,
+        "camera_shake_m": 0.05,
+        "camera_shake_ms": 180
+      },
+      "drop": {
+        "spawn": "along_trunk",
+        "arc_m": 0.45,
+        "pop_ms": 360,
+        "bounce_ms": 120,
+        "hold_ms": 200
+      },
+      "spent": "stump",
+      "sfx": {
+        "hit": "chop_hit",
+        "final": "tree_crack",
+        "land": "tree_thud"
+      },
+      "refuse": {
+        "rewind_ms": 300
+      }
+    },
+    "rock": {
+      "verb": "Break",
+      "icon": "pickaxe",
+      "tool": "pickaxe",
+      "clip": "labour_break",
+      "clip_fallback": "labour_till",
+      "draft_hits": 3,
+      "cycle": {
+        "windup": 280,
+        "strike": 80,
+        "recover": 280
+      },
+      "hit": {
+        "squash": [
+          1.03,
+          0.94
+        ],
+        "squash_ms": 80,
+        "spring_ms": 140,
+        "flash_ms": 60,
+        "flash_energy": 0.6,
+        "shards": 5,
+        "sparks": 2
+      },
+      "damage_stages": [
+        0.34,
+        0.67
+      ],
+      "fall": {
+        "chunks": 4,
+        "chunk_radius_m": 0.5,
+        "chunk_arc_m": 0.3,
+        "chunk_ms": 420,
+        "shrink_ms": 200,
+        "dust": 8
+      },
+      "drop": {
+        "spawn": "one_chunk",
+        "arc_m": 0.3,
+        "pop_ms": 300,
+        "bounce_ms": 100,
+        "hold_ms": 160
+      },
+      "spent": "rubble",
+      "sfx": {
+        "hit": "stone_hit",
+        "final": "stone_crumble"
+      },
+      "refuse": {
+        "rewind_ms": 300
+      }
+    },
+    "flower": {
+      "verb": "Pick",
+      "icon": "flower-2",
+      "tool": "hand",
+      "clip": "labour_pluck",
+      "clip_fallback": "labour_harvest",
+      "draft_hits": 1,
+      "cycle": {
+        "crouch": 260,
+        "tug": 340,
+        "rise": 300
+      },
+      "hit": {
+        "stretch_y": 1.15,
+        "lean_deg": 8,
+        "petals": 7,
+        "petal_ms": 900,
+        "head_lift_m": 0.25
+      },
+      "drop": {
+        "spawn": "in_hand",
+        "ui_pop_at": 700,
+        "ui_pop_rule": "max(ui_pop_at, server_ack)"
+      },
+      "spent": "picked",
+      "sfx": {
+        "hit": "rustle",
+        "final": "pluck_pop"
+      },
+      "haptic_final_ms": 12,
+      "refuse": {
+        "head_fade_ms": 200,
+        "settle_ms": 300,
+        "settle_ease": "back_out"
+      }
+    },
+    "weed": {
+      "verb": "Pull",
+      "icon": "hand",
+      "tool": "hand",
+      "clip": "labour_pluck",
+      "clip_fallback": "labour_harvest",
+      "like": "flower",
+      "draft_hits": 1,
+      "hit": {
+        "stretch_y": 1.1,
+        "lean_deg": 8,
+        "clippings": 6
+      },
+      "spent": "cleared",
+      "sfx": {
+        "hit": "rustle",
+        "final": "pluck_pop"
+      },
+      "haptic_final_ms": 12,
+      "_note": "院子杂草（Q4 同意时用）：动作同 flower，花瓣换成 clippings，清掉后格子空出来"
+    },
+    "bush": {
+      "verb": "Chop",
+      "icon": "axe",
+      "tool": "axe",
+      "like": "tree",
+      "draft_hits": 2,
+      "fall": {
+        "mode": "shrink",
+        "shrink_ms": 300,
+        "leaves": 8,
+        "dust": 4
+      },
+      "spent": "cleared",
+      "_note": "院子灌木（Q4 同意时用）：动作同 tree，下数更少，最后一下整丛压扁缩没，不倒下"
+    }
+  },
+  "pickup": {
+    "magnet_ms": 320,
+    "magnet_ease": "quad_in",
+    "ui_pop_ms": 200,
+    "ui_fly_ms": 520,
+    "land_bump": 1.15,
+    "land_bump_ms": 200,
+    "stagger_ms": 60,
+    "max_icons": 5,
+    "sfx": "item_pickup",
+    "float_at": "drop_shown",
+    "_float_at": "+N 物品 和 −N Energy 两行同时出现，时刻 = 掉落出现（树、石头：3D 掉落弹出那一刻；采花：界面图标弹出那一刻），都在回包之后"
+  },
+  "particles": {
+    "chips": {
+      "color": [
+        "#C8955A",
+        "#E2B57A"
+      ],
+      "size_m": [
+        0.03,
+        0.06
+      ],
+      "life_ms": 500,
+      "speed_mps": [
+        1.2,
+        2.2
+      ],
+      "gravity": 9.0,
+      "spread_deg": 50
+    },
+    "leaves": {
+      "color": [
+        "#7DB04A",
+        "#A3CF6A"
+      ],
+      "size_m": [
+        0.05,
+        0.08
+      ],
+      "life_ms": 1100,
+      "speed_mps": [
+        0.3,
+        0.8
+      ],
+      "gravity": 1.2,
+      "sway_hz": 1.5
+    },
+    "dust": {
+      "color": [
+        "#E8DCC0"
+      ],
+      "size_m": [
+        0.12,
+        0.25
+      ],
+      "life_ms": 600,
+      "speed_mps": [
+        0.4,
+        0.9
+      ],
+      "gravity": -0.2,
+      "fade": "out"
+    },
+    "shards": {
+      "color": [
+        "#A8A59C",
+        "#8C8A82"
+      ],
+      "size_m": [
+        0.03,
+        0.05
+      ],
+      "life_ms": 450,
+      "speed_mps": [
+        1.4,
+        2.4
+      ],
+      "gravity": 9.0,
+      "spread_deg": 70
+    },
+    "sparks": {
+      "color": [
+        "#FFE07A"
+      ],
+      "size_m": [
+        0.02,
+        0.03
+      ],
+      "life_ms": 180,
+      "speed_mps": [
+        2.0,
+        3.0
+      ],
+      "gravity": 0.0,
+      "unshaded": true
+    },
+    "petals": {
+      "color": [
+        "#E59AC8",
+        "#F5C3E0"
+      ],
+      "size_m": [
+        0.03,
+        0.05
+      ],
+      "life_ms": 900,
+      "speed_mps": [
+        0.3,
+        0.7
+      ],
+      "gravity": 0.8,
+      "sway_hz": 2.0
+    },
+    "clippings": {
+      "color": [
+        "#8DBF5A",
+        "#B5D98A"
+      ],
+      "size_m": [
+        0.02,
+        0.04
+      ],
+      "life_ms": 700,
+      "speed_mps": [
+        0.4,
+        0.9
+      ],
+      "gravity": 3.0,
+      "sway_hz": 1.0
+    }
+  },
+  "reduced_motion": {
+    "tree_fall": "fade_300",
+    "camera_shake": false,
+    "hitstop": false,
+    "particles_scale": 0.5
+  },
+  "core_obstacles": {
+    "_note": "院子障碍物 role → 表现种类和下数（SEN-Q-345 Q4）。服务端仍是一条 clear_obstacle、2 体力、不掉东西；清掉后连树桩、碎石一起消失，格子空出。下数是 SEN-C-236 的默认（C-223 没给）：树 3、石 2 同外围，灌木 2、杂草 1 照设计稿草案。",
+    "tree": {
+      "kind": "tree",
+      "hits": 3
+    },
+    "bush": {
+      "kind": "bush",
+      "hits": 2
+    },
+    "stone": {
+      "kind": "rock",
+      "hits": 2
+    },
+    "weed": {
+      "kind": "weed",
+      "hits": 1
+    }
+  },
+  "sfx": {
+    "_note": "SEN-C-236 用 tools/audio/gather_sfx.py 合成的 8 个短音效（不用外部素材），res://assets/audio/gather/<名字>.wav；音量 common.sfx_volume_db、音高随机 common.sfx_pitch_jitter。",
+    "dir": "res://assets/audio/gather"
+  }
+}

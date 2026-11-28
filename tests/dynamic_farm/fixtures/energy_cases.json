@@ -130,7 +130,7 @@
    }
   },
   {
-   "name": "gather costs 2",
+   "name": "gather a tree costs its 3 (C-236, SEN-Q-342)",
    "farm": {
     "v": 1,
     "house": null,
@@ -165,7 +165,7 @@
    "expect": {
     "ok": true,
     "energy": {
-     "value": 148,
+     "value": 147,
      "at": 1795464000000,
      "rested_on": null
     }
@@ -302,7 +302,7 @@
     "index": 0,
     "code": "NO_ENERGY",
     "detail": {
-     "need": 2,
+     "need": 3,
      "have": 1,
      "next_in": 240000
     }
