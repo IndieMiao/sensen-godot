@@ -41,6 +41,13 @@ const COUNT_BUMP_MS := 200.0
 ## The main farm's pop and dust (a Homestead look swapped in), reused for a building just built (C-114).
 const Fence = preload("res://scenes/p0/p0_fence.gd")
 const HOUSE_DUST_SCALE := 4.0
+## Stepping out of a building put down over the player (C-247): rings this far apart, the nearest clear point within
+## STEP_OUT_RINGS as before, a point the camera sees them at (body heights STEP_OUT_SEEN_Y, m) first within
+## STEP_OUT_SEEN_RINGS.
+const STEP_OUT_RING_M := 0.1
+const STEP_OUT_RINGS := 40
+const STEP_OUT_SEEN_RINGS := 80
+const STEP_OUT_SEEN_Y: Array[float] = [0.3, 1.2]
 const Farming = preload("res://scenes/dynamic_farm/parcel_farming.gd")
 const FarmPath = preload("res://modules/dynamic_farm/farm_path.gd")
 const LocalFarmStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -865,13 +872,39 @@ func _build_building(building: Dictionary) -> void:
 		_focus = _actor.position
 		_place_camera()
 
-## The nearest clear point to `from`, searched in rings of 0.1 m.
+## The nearest clear point to `from`, searched in rings of STEP_OUT_RING_M. C-247: first the nearest one the camera
+## sees the player at (no building's model between, `seen`), so a building put down over the player does not leave them
+## behind its roof (V-779); only when none is within STEP_OUT_SEEN_RINGS, the nearest clear one as before.
 func _step_out(from: Vector3) -> Vector3:
-	for ring in range(1, 40):
+	var boxes := _building_boxes()
+	var nearest = null
+	for ring in range(1, STEP_OUT_SEEN_RINGS):
 		for k in 32:
-			var p := from + Vector3.FORWARD.rotated(Vector3.UP, TAU * k / 32.0) * ring * 0.1
-			if _walk.clear_position(p): return p
-	return _walk.point(_data.spawn)
+			var p := from + Vector3.FORWARD.rotated(Vector3.UP, TAU * k / 32.0) * ring * STEP_OUT_RING_M
+			if not _walk.clear_position(p): continue
+			if seen(p, boxes): return p
+			if nearest == null and ring < STEP_OUT_RINGS: nearest = p
+	return nearest if nearest != null else _walk.point(_data.spawn)
+
+## C-247: whether the camera sees a player standing at `at`: from each of STEP_OUT_SEEN_Y over it, the line to the
+## camera (orthographic: along its back axis) passes through none of `boxes` (_building_boxes, by default now).
+func seen(at: Vector3, boxes = null) -> bool:
+	if _camera == null: return true
+	var back := _camera.global_basis.z.normalized()
+	for box: AABB in (boxes if boxes is Array else _building_boxes()):
+		for y: float in STEP_OUT_SEEN_Y:
+			if box.intersects_ray(at + Vector3(0, y, 0), back) != null: return false
+	return true
+
+## The world bounds of every shown standing building's model parts.
+func _building_boxes() -> Array:
+	var out := []
+	for built: Dictionary in _buildings.values():
+		var node = built.get("node")
+		if not node is Node3D or not is_instance_valid(node) or not (node as Node3D).is_visible_in_tree(): continue
+		for mesh: VisualInstance3D in (node as Node3D).find_children("*", "VisualInstance3D", true, false):
+			if mesh.is_visible_in_tree(): out.append(mesh.global_transform * mesh.get_aabb())
+	return out
 
 # For the parcel's opaque silhouettes use two coverage samples instead of four;
 # never raise a player's lower setting. This is viewport-local, not a project
@@ -966,8 +999,14 @@ func _process(delta: float) -> void:
 		elif loading_timed_out(delta):
 			_fail("The farm preview could not finish loading.")
 		return
-	if not _focused or _placement != null: return
+	if not _focused: return
 	var dt := clampf(delta,0,0.1)
+	if _placement != null:
+		# C-247: a placement or Move preview holds the player and the camera, but the farm's clock goes on as in the
+		# arrange mode: the Energy chip's `+1 in m:ss` counts, animals walk and lay (V-779). Held: no key, no pickup.
+		if _farming != null:
+			_farming.update(dt, _walk.cell_at(_actor.position + _facing * _walk.cell_m * 0.8), false, _actor.position, _facing)
+		return
 	var input := _movement
 	input = input.limit_length(1.0)
 	# Until the save is applied the parcel is covered; the player waits at the arrival point.

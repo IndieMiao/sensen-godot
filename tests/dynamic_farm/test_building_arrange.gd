@@ -8,7 +8,9 @@ extends SceneTree
 ## stored (the question lists its blueprint; D1): it goes, its blueprint is in the bag, the mode stays. The coop is
 ## moved: its own preview starts where it stands, `Move` its key, its old outline dashed; Cancel leaves it; moved
 ## elsewhere it stands there with its hens and both eggs. Back folds the card, then ends the mode; Done ends it too.
-## Reopened, everything is where it was left.
+## Reopened, everything is where it was left. C-247 (V-779): an egg laid with the card up shows on it at once; the
+## Energy countdown goes on under the Move preview; the cottage moved over the player leaves them where the camera
+## sees them, not behind its roof.
 ## Run in the private preview project (README), optionally with `-- <farm.json>`.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -141,6 +143,14 @@ func _settled() -> void:
 	while (scene._placement != null or scene._sending) and Time.get_ticks_msec() < deadline: await process_frame
 	for _i in 3: await process_frame
 
+## The step-out before C-247: the nearest clear point in rings of 0.1 m, wherever the camera is.
+func _nearest_clear(from: Vector3) -> Variant:
+	for ring in range(1, 40):
+		for k in 32:
+			var q := from + Vector3.FORWARD.rotated(Vector3.UP, TAU * k / 32.0) * ring * 0.1
+			if scene._walk.clear_position(q): return q
+	return null
+
 func _id_of(type: String) -> int:
 	for b: Dictionary in scene.buildings_state():
 		if b.type == type: return int(b.id)
@@ -202,6 +212,14 @@ func _arrange() -> void:
 	arrange.store_key.pressed.emit()
 	await process_frame
 	_check(not arrange.asking and scene.buildings_state().size() == 3, "the grey Store asks nothing and sends nothing")
+	# C-247: the egg on its way is laid while the card is up: the facts say so within the second, Store turns back.
+	for d: Dictionary in farming.farm.drops:
+		if int(d.id) == 2: d.ready_at = farming.server_now() - 1
+	arrange._process(1.0)
+	var lines: Array = arrange.card.find_children("Fact*", "Label", true, false).map(func(l: Label): return l.text)
+	_check(arrange.facts == ["3 Hens", "2 Egg on the ground"] and lines == arrange.facts,
+		"C-247: laid with the card up, the facts update at once: %s, shown %s" % [arrange.facts, lines])
+	_check(arrange.store_key != null and arrange.store_key.reason == "", "C-247: laid, Store is no longer grey")
 	# The cottage: Move only (D3).
 	var home := _id_of("cottage")
 	arrange.tap(arrange.markers[home].position + Vector2(22, 22))
@@ -245,6 +263,18 @@ func _arrange() -> void:
 	var yard = farming.livestock._yards.get(coop_id)
 	_check(not scene._buildings[coop_id].node.visible and yard != null and not yard.root.visible,
 		"the coop and its hens hide behind the preview")
+	# C-247: the Energy chip's `+1 in m:ss` counts on under the preview (the clock moved 5 s on).
+	farming.farm.energy = {"value": 10, "at": farming.server_now(), "rested_on": null}
+	for _i in 2: await process_frame
+	var regen_before: String = farming.energy_chip.regen
+	farming._clock_offset_ms += 5000
+	for _i in 2: await process_frame
+	var regen_after: String = farming.energy_chip.regen
+	var want := "+1 in " + str(load("res://modules/p0/p0_logic.gd").duration(float(farming.energy_now().next_in)))
+	_check(scene._placement == p and regen_before.begins_with("+1 in ") and regen_after != regen_before and regen_after == want,
+		"C-247: under the Move preview the Energy countdown goes on: %s -> %s (want %s)" % [regen_before, regen_after, want])
+	farming._clock_offset_ms -= 5000
+	farming.farm.erase("energy")
 	p._bar.cancelled.emit()
 	await process_frame
 	_check(scene._placement == null and scene._arrange != null and arrange.visible and _state_of(coop_id) == before,
@@ -276,6 +306,44 @@ func _arrange() -> void:
 	_check(farming.farm.drops.size() == 2 and farming.farm.drops.all(func(d): return int(d.building) == coop_id), "both eggs go with it")
 	_check(scene._buildings[coop_id].node.visible and farming.livestock._yards[coop_id].root.visible, "moved, the coop and its hens show")
 	_check(scene._arrange == arrange and arrange.visible and scene._placement == null, "back in the arrange mode")
+	# C-247: the cottage moved over the player, who stands by its back wall: they step out where the camera sees them,
+	# not behind its roof (the nearest clear point, as before, was behind it).
+	arrange.select(home)
+	await process_frame
+	arrange.move_key.pressed.emit()
+	await process_frame
+	p = scene._placement
+	var home_start: Vector2i = p.at
+	var spot = null
+	for r in range(3, 30):
+		for dy in range(-r, r + 1):
+			for dx in [-r, r]:
+				for cell in [home_start + Vector2i(dx, dy), home_start + Vector2i(dy, dx)]:
+					if spot != null: break
+					p.move_to(cell)
+					if p.reason == "": spot = cell
+	_check(spot != null, "C-247: the cottage fits elsewhere (%s)" % [spot])
+	var back: Vector3 = scene._camera.global_basis.z
+	var far := Vector3(-back.x, 0.0, -back.z).normalized()
+	var middle: Vector3 = Building.center(scene._walk, p.at, p.base, p.rotation_steps)
+	var stand: Vector3 = Vector3(middle.x, scene._walk.position.y, middle.z) + far * (float(mini(p.base.x, p.base.y)) * scene._walk.cell_m * 0.5 - 0.3)
+	_check(scene._walk.clear_position(stand), "C-247: the player can stand there before the cottage comes")
+	scene._walk.position = stand
+	scene._actor.position = stand
+	p._bar.confirmed.emit()
+	await _settled()
+	# The landing pop (Fence.POP_S) over, the cottage at its full size for the sight checks.
+	var pop_end := Time.get_ticks_msec() + int(float(load("res://scenes/p0/p0_fence.gd").POP_S) * 1000.0) + 300
+	while Time.get_ticks_msec() < pop_end: await process_frame
+	var standing := _state_of(home)
+	_check(Building.at_of(standing) == spot, "C-247: the cottage stands over where the player stood: %s" % [standing])
+	var now_at: Vector3 = scene._actor.position
+	_check(now_at.distance_to(stand) > 0.01 and scene._walk.clear_position(now_at) and now_at.distance_to(stand) < 6.0,
+		"C-247: the player stepped out to a clear point %.2f m away" % now_at.distance_to(stand))
+	_check(scene.seen(now_at), "C-247: the camera sees the player there (not behind the roof): %s" % [now_at])
+	var nearest: Variant = _nearest_clear(stand)
+	_check(nearest != null and not scene.seen(nearest),
+		"C-247 control: the nearest clear point (the old step-out) is hidden behind the cottage: %s" % [nearest])
 	# Back folds the card, then ends the mode.
 	arrange.select(home)
 	await process_frame
