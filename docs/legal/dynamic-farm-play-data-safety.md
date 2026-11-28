@@ -5,7 +5,7 @@ SEN-C-204。适用动态农场 App（`com.gensen.mapfarm`），在正式服打�
 ## 现有答案
 
 - 本仓库里没有动态农场的数据安全表单答案。
-- 已有的答案是 Gensen App（`app.gensen.maps`）的，在仓库外（`docs/governance/release-process.md` 第 7 步指向 `pm/legal/store-2026-11/store-forms-1113.md`），本卡没读到，没有核对。
+- 已有的答案是 Gensen App（`app.gensen.maps`）的，在仓库外（`docs/governance/release-process.md` 第 7 步指向 `pm/legal/store-2026-11/store-forms-1113.md`），本卡未核（SEN-C-204#12）。
 - 动态农场的表单如果已经填过（例如账号、邮箱），按下面逐项补；没填过就以下面为准，其它数据类型另行补齐。
 
 ## 逐项答案
@@ -51,5 +51,5 @@ Mixpanel 是替我们做分析的服务商，按 Play 的定义，转给代为�
 
 ### 4. 和隐私政策对齐
 
-- 隐私政策网址填动态农场自己的政策（还没有，见 `docs/legal/dynamic-farm-privacy-analytics.md`）。不能填 Gensen App 的 https://gensen.app/privacy-android，那份写的是不用注册、没有第三方统计服务。
+- 隐私政策网址填动态农场自己的政策（SEN-C-242 写，分析一节见 `docs/legal/dynamic-farm-privacy-analytics.md`）。不能填 Gensen App 的 https://gensen.app/privacy-android，那份写的是不用注册、没有第三方统计服务。
 - 政策里的“产品分析”一节和本表单的应用活动、用户 ID、删除三项对应。

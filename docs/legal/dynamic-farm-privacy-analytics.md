@@ -1,6 +1,6 @@
 # 动态农场隐私政策：产品分析一节（Mixpanel）
 
-SEN-C-204。草稿：玩家可见文本由 PM 按 SEN-C-45 定稿，再交所有者本人确认后才能合入；合入不等于发布，网页发布另走所有者批准。
+SEN-C-204。玩家可见文本已由 PM 按 SEN-C-45 定稿（SEN-C-204#12），交所有者本人确认后才能合入；合入不等于发布，网页发布另走所有者批准。
 
 ## 现有隐私政策在哪
 
@@ -29,7 +29,7 @@ We use Mixpanel, a US company, to see how the game is used so we can improve it.
 - do something on your farm, such as tilling or selling, and whether it worked
 - sell items or claim a blueprint
 
-Each record has your account's internal ID, the time, the map area your farm is in, and game details such as the item, amount and coins earned. It does not include your email, nickname, profile, IP address, location coordinates or which plot is yours. Records are sent from our server, not your phone, so Mixpanel does not receive your IP address or device details.
+Each record has your account's internal ID, the time, the map area your farm is in, and game details such as the item, amount and coins earned. It does not include your email, nickname, profile, IP address, location coordinates or which plot is yours.
 
 Mixpanel stores this data in the United States. We use it only to improve the game, not for ads.
 
@@ -46,7 +46,7 @@ When you delete your account, we ask Mixpanel to delete this data. Mixpanel comp
 - 在农场里操作（例如翻地、出售），以及是否成功
 - 出售物品或领取蓝图
 
-每条记录包含你账号的内部编号、时间、农场所在的地图区域，以及物品、数量、所得金币这类游戏信息；不包含你的邮箱、昵称、个人资料、IP 地址、位置坐标，也不包含你是哪块地。记录由我们的服务器发出，不经过你的手机，所以 Mixpanel 拿不到你的 IP 地址和设备信息。
+每条记录包含你账号的内部编号、时间、农场所在的地图区域，以及物品、数量、所得金币这类游戏信息；不包含你的邮箱、昵称、个人资料、IP 地址、位置坐标，也不包含你是哪块地。
 
 Mixpanel 把这些数据存放在美国。我们只用它改进游戏，不用于广告。
 
@@ -68,7 +68,7 @@ Mixpanel 把这些数据存放在美国。我们只用它改进游戏，不用�
 
 ## 放进整份政策时要一起写的地方
 
-动态农场的整份政策还没写，写的时候和这一节对齐：
+动态农场的整份政策和设置里的入口在 SEN-C-242 写，和这一节对齐：
 
 - “我们使用的服务”表加一行：Mixpanel（美国公司）｜产品分析｜上面列的游戏记录和账号内部编号，不含邮箱、IP 和位置坐标。
 - “存放在哪里”写上：分析数据由 Mixpanel 存在美国。
