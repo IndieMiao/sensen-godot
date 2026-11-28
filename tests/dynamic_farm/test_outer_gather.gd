@@ -12,6 +12,7 @@ const Shade = preload("res://modules/dynamic_farm/farm_shade.gd")
 const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Fixture = preload("res://tests/dynamic_farm/selection_fixtures.gd")
+const GatherFx = preload("res://modules/dynamic_farm/gather_fx.gd")
 const PINS_PATH := "res://tests/dynamic_farm/fixtures/outer_gather_ids.json"
 const T0 := 1_800_000_000_000
 const DAY_MS := 86_400_000
@@ -31,6 +32,7 @@ func _check(ok: bool, label: String) -> void:
 
 func _run() -> void:
 	_rules()
+	_presentation()
 	_ids()
 	_commands()
 	if FileAccess.file_exists(PINS_PATH): pins = JSON.parse_string(FileAccess.get_file_as_string(PINS_PATH))
@@ -46,7 +48,8 @@ func _run() -> void:
 	print("OUTER_GATHER checks=%d failures=%d" % [checks, failures])
 	quit(1 if failures else 0)
 
-## The owner's answer (C-30#29 q4, C-30#36): hand-picked, one item, 24 h; kinds map to the recipe's models.
+## The owner's answer (C-30#29 q4, C-30#36): 24 h, kinds map to the recipe's models. C-236 (SEN-Q-342 §5, SEN-Q-345 Q3):
+## a tree 3 hits, 3 Energy, 2 Timber; a rock 2 hits, 2 Energy, 1 Stone; a flower 1 pick, 2 Energy, 1 Wild Herb.
 func _rules() -> void:
 	var gather := Gather.rules()
 	var recipe: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(Scenery.RECIPE_PATH))
@@ -55,6 +58,7 @@ func _rules() -> void:
 	_check(gather.recipe_version == outer.version, "ids lock the outer recipe version (%s)" % outer.version)
 	_check(gather.respawn_ms == DAY_MS, "grows back after 24 hours")
 	var expected := {"tree": "wood", "flower": "wild_herb", "rock": "stone"}
+	var numbers := {"tree": [3, 3, 2], "flower": [1, 2, 1], "rock": [2, 2, 1]}
 	_check(gather.sources.keys().size() == 3, "three kinds")
 	var trees: Array = outer.grove.tree_weights.keys() + [outer.grove.young_pine_id]
 	var rocks: Array = outer.rock_pile.main_ids + outer.rock_pile.companion_ids
@@ -65,7 +69,8 @@ func _rules() -> void:
 	var materials: Dictionary = p0.content().materials
 	for kind: String in expected:
 		var src: Dictionary = gather.sources.get(kind, {})
-		_check(src.get("item") == expected[kind] and src.get("amount") == 1, "%s gives one %s" % [kind, expected[kind]])
+		_check(src.get("item") == expected[kind] and [src.get("hits"), src.get("energy"), src.get("amount")] == numbers[kind],
+			"%s: %s hits, Energy, %s (SEN-Q-342)" % [kind, numbers[kind], expected[kind]])
 		_check(src.get("max_objects") == int(outer.targets[kind].cap), "%s cap equals the recipe's" % kind)
 		for model in models[kind]:
 			_check(gather.kind_of.get(model) == kind, "%s is a %s" % [model, kind])
@@ -83,6 +88,33 @@ func _rules() -> void:
 	bad.respawn_seconds = 60
 	bad.sources["rock"] = {"item": "stone", "amount": 1, "max_objects": 1, "models": ["a"]}
 	_check(Gather.parse(bad).is_empty(), "a model in two kinds is refused")
+	bad.sources.erase("rock")
+	_check(not Gather.parse(bad).is_empty() and Gather.parse(bad).sources.tree.energy == -1 and Gather.parse(bad).sources.tree.hits == 1,
+		"without energy / hits: the general price, one hit")
+	for change: Dictionary in [{"energy": -1}, {"energy": 1001}, {"energy": 1.5}, {"hits": 0}, {"hits": 21}]:
+		var odd := bad.duplicate(true)
+		odd.sources.tree.merge(change, true)
+		_check(Gather.parse(odd).is_empty(), "out of the server's bounds: %s" % change)
+
+## C-236: SEN-C-234's approved presentation (D-558) as the client reads it: verbs and tools per kind, every gatherable
+## model and yard obstacle with its C-235 scene, the yard's hits, the clips, the eight synthesised sounds.
+func _presentation() -> void:
+	_check(GatherFx.config().get("version") == "gather-fx-v1", "gather_presentation.json reads")
+	var verbs := {"tree": ["Chop", "axe"], "rock": ["Break", "pickaxe"], "flower": ["Pick", "hand"], "weed": ["Pull", "hand"], "bush": ["Chop", "axe"]}
+	for kind: String in verbs:
+		_check([GatherFx.verb(kind), GatherFx.tool_of(kind)] == verbs[kind] and GatherFx.tool_icon(kind) != null, "%s: %s" % [kind, verbs[kind]])
+	_check(GatherFx.clip("tree") == "gather/labour_chop" and GatherFx.clip("rock") == "gather/labour_break" and GatherFx.clip("weed") == "gather/labour_pluck",
+		"C-235's clips: chop, break, pluck")
+	_check(is_equal_approx(GatherFx.contact_s("tree"), 0.3) and is_equal_approx(GatherFx.cycle_s("rock"), 0.64), "contact 300 ms, a rock hit 640 ms")
+	_check(GatherFx.core("tree") == {"kind": "tree", "hits": 3} and GatherFx.core("stone") == {"kind": "rock", "hits": 2}
+		and GatherFx.core("bush") == {"kind": "bush", "hits": 2} and GatherFx.core("weed") == {"kind": "weed", "hits": 1}, "the yard's obstacles")
+	var recipe: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(Scenery.RECIPE_PATH))
+	var models: Array = Gather.rules().kind_of.keys()
+	for role: String in recipe.core_obstacles.roles: models += recipe.core_obstacles.roles[role].ids
+	for model: String in models: _check(GatherFx.scene_of(model) != null, "%s has its gathering scene" % model)
+	for name in ["chop_hit", "tree_crack", "tree_thud", "stone_hit", "stone_crumble", "rustle", "pluck_pop", "item_pickup"]:
+		_check(GatherFx.sound(name) != null, "sound %s" % name)
+	_check(GatherFx.stage("rock", 1, 2) == 1 and GatherFx.stage("rock", 1, 3) == 0 and GatherFx.stage("tree", 2, 5) == 1, "stages >= thresholds")
 
 ## The C-58 id shape, as the server's parseObjectId reads it.
 func _ids() -> void:
@@ -106,12 +138,19 @@ func _commands() -> void:
 		{"type": "gather", "object": rock}], T0, own)
 	_check(step.ok, "one tree, flower and rock gather in one batch")
 	state = step.state
-	_check(state.bag == {"wood": 1, "wild_herb": 1, "stone": 1}, "each gives one of its material")
+	_check(state.bag == {"wood": 2, "wild_herb": 1, "stone": 1}, "a tree 2 Timber, a flower and a rock one of theirs")
+	_check(int(state.energy.value) == ParcelFarm.max_energy(rules, state) - 3 - 2 - 2, "whole prices once each: 3 + 2 + 2 Energy")
+	for pair: Array in [[tree, 3], [flower, 2], [rock, 2]]:
+		_check(ParcelFarm.energy_cost(rules, {"type": "gather", "object": pair[0]}) == pair[1], "the key's price is the object's (%s)" % pair[1])
+	var tired := ParcelFarm.empty_state()
+	tired.energy = {"value": 2, "at": T0, "rested_on": null}
+	var short := ParcelFarm.apply(rules, tired, [{"type": "gather", "object": tree}], T0, own)
+	_check(not short.ok and short.code == "NO_ENERGY" and tired.gathered.is_empty(), "2 Energy is short of a tree's 3: nothing gathered")
 	_check(state.gathered == {tree: T0, flower: T0, rock: T0}, "the gather times are kept")
 	var again := ParcelFarm.apply(rules, state, [{"type": "gather", "object": tree}], T0 + DAY_MS - 1, own)
 	_check(not again.ok and again.code == "NOT_RESPAWNED" and again.detail.ready_at == T0 + DAY_MS, "not again before 24 h")
 	var later := ParcelFarm.apply(rules, state, [{"type": "gather", "object": tree}], T0 + DAY_MS, own)
-	_check(later.ok and later.state.bag.wood == 2, "again after 24 h")
+	_check(later.ok and later.state.bag.wood == 4, "again after 24 h")
 	_check(later.ok and later.state.gathered.size() == 1, "grown-back records are dropped")
 	var codes := {
 		"NOT_YOUR_PARCEL": ["p-B:%s:wild_pz_tree_20:40,3:0" % gather.recipe_version, own],

@@ -1,15 +1,32 @@
 extends SceneTree
-## C-60 in the real scene, on the local save: next to a tree, a flower and a rock the key reads
-## Gather and one press puts one Timber / Wild Herb / Stone in the bag; the picked tree and rock
-## fade, the flower is hidden, and none can be picked again until 24 h of server time have passed.
-## Reopening keeps all of it with the same ids. The walk (reserved cells, bound profiles and every
-## walkable lattice point) is identical before and after gathering and after reopening.
+## C-60 / C-236 in the real scene, on the local save. Next to a tree the key reads `Chop · 3 Energy` with the axe badge,
+## next to a rock `Break · 2 Energy` (the pick), next to a wild herb `Pick · 2 Energy` (the hand) (SEN-Q-345 Q1,
+## SEN-Q-342). A tree takes three presses, a rock two (or one held press), a herb one: hits before the last send nothing;
+## the last sends the one `gather`, and only then the drop, `+2 Timber` / `−3 Energy` and the bag. A felled tree leaves
+## its stump, a broken rock its scree, a picked herb nothing (C-234#50), until 24 h of server time have passed. Walking
+## off between hits keeps them for 30 s; the stick before a hit lands takes it back; a refused last hit puts the
+## object back and gives nothing. Reopening keeps all of it with the same ids. The walk (reserved cells, bound
+## profiles and every walkable lattice point) is identical before and after gathering and after reopening.
 ## `-- <farm.json> ...` (CI passes the r4 fixtures): the first file is used; default p-3139010.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const DEFAULT_FARM := "res://tests/dynamic_farm/fixtures/r4/p-3139010.json"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
 const DAY_MS := 86_400_000
 const ITEMS := {"tree": ["wood", "Timber"], "flower": ["wild_herb", "Wild Herb"], "rock": ["stone", "Stone"]}
+const GatherFx = preload("res://modules/dynamic_farm/gather_fx.gd")
+## Per kind (SEN-Q-342): [key verb, hits, Energy, amount].
+const NUMBERS := {"tree": ["Chop", 3, 3, 2], "rock": ["Break", 2, 2, 1], "flower": ["Pick", 1, 2, 1]}
+
+## Answers every command with a refusal (the store's own reply stands for a server that disagreed).
+class Refusing:
+	extends RefCounted
+	var inner: RefCounted
+	func _init(store: RefCounted) -> void: inner = store
+	func enter() -> Dictionary: return await inner.enter()
+	func send(_version: int, _commands: Array) -> Dictionary:
+		var now: Dictionary = await inner.enter()
+		return {"ok": false, "code": "NOT_RESPAWNED", "detail": {}, "farm": now.get("farm"), "farm_version": now.get("farm_version"),
+			"server_time": now.get("server_time")}
 var checks := 0
 var failures := 0
 var raw: Dictionary
@@ -73,15 +90,15 @@ func _walk_snapshot(walk: RefCounted) -> Dictionary:
 	return {"reserved": walk.reserved.keys().size(), "reserved_hash": str(walk.reserved.keys()).hash(),
 		"buckets": buckets, "open": "\n".join(open).sha256_text(), "open_count": open.size()}
 
-## Instances drawn in the outer layer: [fresh, gathered].
+## Instances drawn in the outer layer: [growing, spent pieces (stumps, scree)].
 func _drawn(farming: Node) -> Array:
 	var fresh := 0
-	var faded := 0
+	var spent := 0
 	for batch in farming._outer_root.get_children():
 		if not batch is MultiMeshInstance3D or batch.is_queued_for_deletion(): continue
-		if str(batch.name).begins_with("Gathered"): faded += batch.multimesh.instance_count
+		if str(batch.name).begins_with("Spent_"): spent += batch.multimesh.instance_count
 		else: fresh += batch.multimesh.instance_count
-	return [fresh, faded]
+	return [fresh, spent]
 
 ## Stands the player on open ground just beside object `index` and faces it.
 func _stand_by(farming: Node, index: int) -> bool:
@@ -111,31 +128,32 @@ func _key(farming: Node) -> Array:
 	await process_frame
 	return [farming._key.verb, farming._key.cost, farming._key.state]
 
-## Presses the key and waits for the press to finish (C-73: a gather plays the harvest labour
-## clip and its result lands as the clip ends). Returns {clips, moved, early} as in
-## test_parcel_farming_scene: the rig's animations while busy, the distance walked and whether
-## the farm changed while the clip was still playing.
-func _press(farming: Node) -> Dictionary:
-	var seen := {"clips": {}, "moved": 0.0, "early": false, "shook": false}
+## Presses the key (a tap, or held down until the press is over with `hold`) and waits for it to finish. Returns
+## {clips, moved, early, versions}: the rig's clips meanwhile, the distance walked, whether the farm changed before the
+## last hit's contact and the farm versions seen.
+func _press(farming: Node, hold := false) -> Dictionary:
+	var seen := {"clips": {}, "moved": 0.0, "early": false, "floats": []}
 	var start: Vector3 = scene._walk.position
-	var version: int = farming.farm_version
 	var player := scene._rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
-	# MS-08 (C-211): the object a gather press picks rocks on its batch instance, then stands as it was.
-	var target := -1
-	if farming.current.get("verb") == "gather" and str(farming.current.get("refusal", "")) == "":
-		target = int(farming.gatherables[farming.current.object].index)
 	farming._key.pressed_down.emit()
+	if not hold: farming._key.released.emit()
 	await process_frame
 	var deadline := Time.get_ticks_msec() + 30000
-	while farming.busy and Time.get_ticks_msec() < deadline:
+	while (farming.busy or farming.swinging) and Time.get_ticks_msec() < deadline:
 		if player != null: seen.clips[player.current_animation] = true
-		if scene._labour_left > 0.0 and farming.farm_version != version: seen.early = true
-		if target >= 0 and farming.shaking == target and not farming._outer_instance(target).is_empty(): seen.shook = true
+		for text in _floats(farming): if not text in seen.floats: seen.floats.append(text)
 		await process_frame
-	_check(not farming.busy, "a press finishes")
+	if hold: farming._key.released.emit()
+	_check(not farming.busy and not farming.swinging, "a press finishes")
 	for i in 2: await process_frame
 	seen.moved = start.distance_to(scene._walk.position)
 	return seen
+
+## Waits until the stage has let the object go (its last clip played out), at most a few seconds.
+func _settled(farming: Node) -> void:
+	var deadline := Time.get_ticks_msec() + 6000
+	while farming.gather_stage.active() and Time.get_ticks_msec() < deadline: await process_frame
+	for i in 3: await process_frame
 
 ## Picks the first standable object of each kind and gathers it. Returns {kind: id}.
 func _first_visit() -> Dictionary:
@@ -155,7 +173,7 @@ func _first_visit() -> Dictionary:
 	scene._walk.position = farming.gatherables[far].origin + Vector3(8, 0, 8)
 	scene._actor.position = scene._walk.position
 	farming.picked_object = far
-	_check(await _key(farming) == ["Gather", "Move closer", UiSceneAction.State.UNAVAILABLE], "out of reach: Move closer")
+	_check(await _key(farming) == ["Chop", "Move closer", UiSceneAction.State.UNAVAILABLE], "out of reach: Move closer")
 	# The tap ray picks the object drawn under the finger.
 	var object: Dictionary = farming.gatherables[chosen.rock]
 	var screen: Vector2 = scene._camera.unproject_position(object.origin + Vector3(0, object.box.size.y * 0.5, 0))
@@ -173,42 +191,65 @@ func _first_visit() -> Dictionary:
 	_check(core.x >= 0 and farming.picked == core and farming.picked_object == -1, "a tap on a core cell keeps the cell")
 	scene._on_tapped(screen)
 	var picked := {}
-	var faded := 0
+	var spent := 0
 	var hidden := 0
 	for kind: String in ["tree", "flower", "rock"]:
 		var index: int = chosen[kind]
+		var numbers: Array = NUMBERS[kind]
 		_stand_by(farming, index)
 		farming.picked_object = index
 		var key := await _key(farming)
-		# C-148: the second line is the Energy price (P0's key: Gather · 2 Energy), no longer the item's name.
-		_check(key == ["Gather", "2 Energy", UiSceneAction.State.DEFAULT], "beside a %s the key reads Gather, 2 Energy: %s" % [kind, key])
+		# C-236: the object's own verb and its whole price; the badge is its tool.
+		_check(key == [numbers[0], "%d Energy" % numbers[2], UiSceneAction.State.DEFAULT], "beside a %s the key reads %s: %s" % [kind, numbers, key])
+		_check(farming._keys.tool_icon == GatherFx.tool_icon(GatherFx.OUTER[kind]), "the %s's tool on the badge" % kind)
 		var had := int(farming.farm.bag.get(ITEMS[kind][0], 0))
 		var energy_had: int = farming.energy_value()
-		var seen := await _press(farming)
-		_check(seen.clips.has("labour_harvest") and not seen.early and seen.moved < 0.01,
-			"gathering a %s: no walk, the harvest clip, the result as it ends (%s)" % [kind, seen])
-		_check(seen.shook, "the %s rocks as it is pressed (MS-08)" % kind)
-		var fading: Array = farming._outer_root.get_children().filter(func(b): return str(b.name).begins_with("GatheredFading"))
-		if farming._outer_layout[farming.gatherables[index].index].solid:
-			var m: ShaderMaterial = (fading[0] as GeometryInstance3D).material_override if not fading.is_empty() else null
-			_check(m != null and m != farming._spent_material and float(m.get_shader_parameter(&"amount")) < 1.0,
-				"the picked %s fades into the grey on its own material (MS-08)" % kind)
-			await create_timer(0.4).timeout
-			_check(m != null and is_equal_approx(float(m.get_shader_parameter(&"amount")), 1.0), "…all grey after 300 ms (%s)" % kind)
-		else:
-			_check(fading.is_empty(), "a picked flower is hidden, nothing fades (%s)" % kind)
-		_check(int(farming.farm.bag.get(ITEMS[kind][0], 0)) == had + 1, "one %s in the bag" % ITEMS[kind][0])
-		_check(farming.energy_value() == energy_had - 2, "gathering a %s costs 2 Energy (C-148)" % kind)
-		_check(farming.last_gains == {ITEMS[kind][0]: 1} and ("+1 " + ITEMS[kind][1]) in _floats(farming),
-			"the gain floats up and flies into the bag (%s)" % kind)
-		_check(ITEMS[kind][0] in farming.bag_ids(),
-			"%s shows in the bag" % ITEMS[kind][0])
 		var id: String = farming.gatherables[index].id
+		if kind == "tree": await _walk_off_and_back(farming, index)
+		# Hits before the last send nothing (SEN-Q-345 Q3): a tap is one hit.
+		var floats := []
+		for hit in range(farming.damage.done(id, Time.get_ticks_msec()), numbers[1] - 1):
+			var version: int = farming.farm_version
+			var seen := await _press(farming, kind == "rock")
+			floats = seen.floats
+			if kind == "rock": break   # held down: the rock's two hits in one press
+			_check(farming.farm_version == version and farming.energy_value() == energy_had and int(farming.farm.bag.get(ITEMS[kind][0], 0)) == had,
+				"hit %d of the %s sends nothing" % [hit + 1, kind])
+			_check(farming.damage.done(id, Time.get_ticks_msec()) == hit + 1, "the %s has taken %d hits" % [kind, hit + 1])
+			_check(seen.clips.has(GatherFx.clip(kind)) and seen.moved < 0.01, "the %s is struck with its own clip (%s)" % [kind, seen])
+			_check(farming.gather_stage.active() and farming.gather_stage.key() == id, "the %s's own scene stands in for it" % kind)
+			# (Headless, the dummy renderer keeps no instance transforms: the stage's record of the one it hid is checked.)
+			var hid: Array = farming.gather_stage._hidden
+			_check(hid.size() == 3 and hid[0] == farming._outer_instance(farming.gatherables[index].index)[0],
+				"its batch instance is hidden meanwhile")
+		if kind != "rock":
+			var seen := await _press(farming)
+			floats = seen.floats
+			_check(seen.clips.has(GatherFx.clip(kind)) and seen.moved < 0.01, "the last hit on the %s plays its clip (%s)" % [kind, seen])
+		var played: Array = farming.gather_stage.played
+		_check("finish %s" % GatherFx.OUTER[kind] in played, "the %s's last hit plays its end (%s)" % [kind, played.slice(-6)])
+		_check(int(farming.farm.bag.get(ITEMS[kind][0], 0)) == had + numbers[3], "%d %s in the bag" % [numbers[3], ITEMS[kind][0]])
+		_check(farming.energy_value() == energy_had - numbers[2], "the %s cost its %d Energy once" % [kind, numbers[2]])
+		_check(farming.last_gains == {ITEMS[kind][0]: numbers[3]} and ("+%d %s" % [numbers[3], ITEMS[kind][1]]) in floats
+			and ("−%d Energy" % numbers[2]) in floats, "the gain and the Energy float up (%s: %s)" % [kind, floats])
+		if kind == "tree":
+			var stage: Node3D = farming.gather_stage
+			var origin: Vector3 = farming.gatherables[index].origin
+			_check(stage.drop_at.y - origin.y > 0.2, "V-774: the log pops off the trunk above the ground, not under it (%s)" % stage.drop_at)
+			_check(played.find("landed tree") >= 0 and played.find("drop wood") > played.find("landed tree"),
+				"the log pops out only once the tree is down (%s)" % [played])
+		if kind == "rock":
+			_check("drop stone" in played, "a stone pops out of the pieces")
+			var c: Array = farming.contacts.slice(-2)
+			_check(c.size() == 2 and int(c[1]) - int(c[0]) >= 880, "held down, the two hits land 0.9 s apart (%s)" % [c])
+		_check(ITEMS[kind][0] in farming.bag_ids(), "%s shows in the bag" % ITEMS[kind][0])
 		_check(farming.farm.gathered.has(id), "%s is recorded" % id)
 		picked[kind] = id
-		if farming._outer_layout[farming.gatherables[index].index].solid: faded += 1
+		await _settled(farming)
+		if farming._outer_layout[farming.gatherables[index].index].solid: spent += 1
 		else: hidden += 1
-		_check(_drawn(farming) == [farming._outer_layout.size() - faded - hidden, faded], "after the %s: picked ones faded or hidden" % kind)
+		_check(_drawn(farming) == [farming._outer_layout.size() - spent - hidden, spent],
+			"after the %s: a stump or scree is left, a herb leaves nothing (%s)" % [kind, _drawn(farming)])
 		farming.picked_object = index
 		key = await _key(farming)
 		_check(key[0] == "Regrowing" and not str(key[1]).is_empty() and key[1] != ITEMS[kind][1] and key[2] == UiSceneAction.State.UNAVAILABLE,
@@ -219,22 +260,79 @@ func _first_visit() -> Dictionary:
 		# Even sent anyway, the store refuses it.
 		var forced: Dictionary = await farming.send({"type": "gather", "object": id})
 		_check(not forced.ok and forced.code == "NOT_RESPAWNED", "the save refuses a second %s" % kind)
-	_check(faded == 2 and hidden == 1, "tree and rock fade, the flower is hidden")
+	_check(spent == 2 and hidden == 1, "tree and rock leave a stump and scree, the herb is gone")
+	var stumps: Array = farming._outer_root.get_children().filter(func(b): return str(b.name).begins_with("Spent_"))
+	_check(stumps.size() == 2, "one stump batch, one scree batch")
+	await _refused(farming, chosen)
 	_check(_walk_snapshot(walk) == before, "gathering leaves the walk and collision as they were")
-	_check(farming.farm.bag.get("wood") == 1 and farming.farm.bag.get("wild_herb") == 1 and farming.farm.bag.get("stone") == 1,
-		"one of each material")
+	_check(farming.farm.bag.get("wood") == 2 and farming.farm.bag.get("wild_herb") == 1 and farming.farm.bag.get("stone") == 1,
+		"2 Timber, 1 Wild Herb, 1 Stone")
 	picked["walk"] = before
 	picked["ids"] = objects.map(func(o): return o.id)
 	scene.queue_free()
 	await process_frame
 	return picked
 
+## The stick before a hit lands takes it back; walking off after one keeps it (30 s), coming back goes on from there.
+func _walk_off_and_back(farming: Node, index: int) -> void:
+	var id: String = farming.gatherables[index].id
+	farming._key.pressed_down.emit()
+	farming._key.released.emit()
+	await process_frame
+	scene._movement = Vector2(1, 0)
+	var deadline := Time.get_ticks_msec() + 3000
+	while farming.swinging and Time.get_ticks_msec() < deadline: await process_frame
+	scene._movement = Vector2.ZERO
+	_check(farming.damage.done(id, Time.get_ticks_msec()) == 0, "the stick during the wind-up takes the hit back")
+	_stand_by(farming, index)
+	farming.picked_object = index
+	await _key(farming)
+	await _press(farming)
+	_check(farming.damage.done(id, Time.get_ticks_msec()) == 1, "one chop landed")
+	var away: Vector3 = farming.gatherables[index].origin + Vector3(6, 0, 6)
+	scene._walk.position = away
+	scene._actor.position = away
+	for i in 10: await process_frame
+	_stand_by(farming, index)
+	farming.picked_object = index
+	await _key(farming)
+	_check(farming.damage.done(id, Time.get_ticks_msec()) == 1, "walking off and back keeps the chop (30 s)")
+	var memory := GatherFx.damage()
+	memory.hit(id, 0)
+	_check(memory.done(id, 30000) == 1 and memory.done(id, 30001) == 0, "after 30 s the hits are forgotten")
+	_check(int(GatherFx.common().min_hit_interval_ms) == 900, "hits land at least 0.9 s apart (SEN-Q-342, C-236#14)")
+	_check(GatherFx.stage("tree", 1, 3) == 0 and GatherFx.stage("tree", 2, 3) == 1 and GatherFx.stage("tree", 4, 5) == 2,
+		"scar stages by >= the approved thresholds")
+
+## A last hit the server refuses (another tree, the store standing in for a server that disagreed): the tree stands up
+## again, nothing is given or charged, nothing is recorded.
+func _refused(farming: Node, chosen: Dictionary) -> void:
+	var index := -1
+	for i in farming.gatherables.size():
+		if farming.gatherables[i].kind == "tree" and i != chosen.tree and _stand_by(farming, i):
+			index = i
+			break
+	if index < 0: return
+	farming.picked_object = index
+	await _key(farming)
+	var real: RefCounted = farming.store
+	farming.store = Refusing.new(real)
+	var bag: Dictionary = farming.farm.bag.duplicate()
+	var energy: int = farming.energy_value()
+	await _press(farming, true)
+	farming.store = real
+	_check("refuse tree" in farming.gather_stage.played, "a refused last hit puts the tree back")
+	_check(farming.farm.bag == bag and farming.energy_value() == energy and not farming.farm.gathered.has(farming.gatherables[index].id),
+		"refused: nothing given, nothing charged")
+	await _settled(farming)
+	_check(not farming.gather_stage.active(), "the stage lets the tree go again")
+
 func _reopen(picked: Dictionary) -> void:
 	shift[0] += 60_000
 	var farming := await _open()
 	_check(farming.gatherables.map(func(o): return o.id) == picked.ids, "reopening numbers the objects the same way")
 	_check(_walk_snapshot(scene._walk) == picked.walk, "the walk is the same with picked objects on reopening")
-	_check(_drawn(farming) == [farming._outer_layout.size() - 3, 2], "picked objects stay faded / hidden after reopening")
+	_check(_drawn(farming) == [farming._outer_layout.size() - 3, 2], "the stump and scree are still there after reopening, the herb still gone")
 	for kind: String in ["tree", "flower", "rock"]:
 		var index := -1
 		for i in farming.gatherables.size():
@@ -243,6 +341,7 @@ func _reopen(picked: Dictionary) -> void:
 		farming.picked_object = index
 		var key := await _key(farming)
 		_check(key[0] == "Regrowing" and key[2] == UiSceneAction.State.UNAVAILABLE, "after reopening the %s still waits" % kind)
+	_check(farming.damage.done(picked.tree, Time.get_ticks_msec()) == 0, "leaving the scene drops the hits")
 	scene.queue_free()
 	await process_frame
 
@@ -259,9 +358,9 @@ func _grown_back(picked: Dictionary) -> void:
 		if farming.gatherables[i].id == picked.tree: index = i
 	_stand_by(farming, index)
 	farming.picked_object = index
-	_check(await _key(farming) == ["Gather", "2 Energy", UiSceneAction.State.DEFAULT], "the tree can be gathered again")
-	await _press(farming)
-	_check(farming.farm.bag.get("wood") == 2, "a second Timber after 24 h")
+	_check(await _key(farming) == ["Chop", "3 Energy", UiSceneAction.State.DEFAULT], "the tree can be chopped again")
+	await _press(farming, true)
+	_check(farming.farm.bag.get("wood") == 4, "held down, three chops fell it again: 2 more Timber after 24 h")
 	scene.queue_free()
 	await process_frame
 

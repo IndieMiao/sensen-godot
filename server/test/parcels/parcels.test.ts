@@ -113,13 +113,13 @@ async function r4Farm(app: FastifyInstance, token: string, parcel = A) {
   const res = await command(app, token, 3, [{ type: 'sow', cell: '2,1', crop: 'crop_carrot' }]);
   expect(res.statusCode).toBe(200);
   const farm = res.json().parcel;
-  expect(farm).toMatchObject({ dataset_version: DATASET, farm_version: 4, farm: { coins: 12, sales: 1, bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1, pail: 1 } } });
+  expect(farm).toMatchObject({ dataset_version: DATASET, farm_version: 4, farm: { coins: 12, sales: 1, bag: { hoe_starter: 1, blueprint_coop: 1, wood: 2, pail: 1 } } });
   expect(Object.keys(farm.farm.crops)).toEqual(['1,1', '2,1']);
   return farm;
 }
 /** 换到 r6 之后应有的样子：格子上的清空，每棵作物退一颗种子、每栋建筑退它的蓝图（小屋、井），其余（水桶和桶里的水）不动。 */
 const rebased = (before: { farm: Record<string, unknown> }) => ({ ...before.farm, buildings: [], house: null, cleared: [], tilled: [], crops: {}, gathered: {},
-  bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1, pail: 1, seed_carrot: 2, blueprint_cottage: 1, blueprint_well: 1 } });
+  bag: { hoe_starter: 1, blueprint_coop: 1, wood: 2, pail: 1, seed_carrot: 2, blueprint_cottage: 1, blueprint_well: 1 } });
 const GIFT = { hoe_starter: 1, seed_carrot: 3, blueprint_cottage: 1 };
 /** C-151 的一次性补发：井的蓝图和水桶。 */
 const WATERING = { blueprint_well: 1, pail: 1 };
@@ -568,13 +568,14 @@ for (const [name, enabled, makeStores] of makers) {
       const short = await command(app, ada, 1, [{ type: 'upgrade_farm' }]);
       expect(short.statusCode).toBe(422);
       expect(short.json()).toMatchObject({ code: 'NOT_ENOUGH', detail: { item: 'wood', have: 0, need: 6 }, parcel: { farm_version: 1, farm: { level: 1 } } });
-      // 40 trees and 20 rocks of one's own outer ring (2 Energy each), 34 Timber and 16 Stone sold for 100 coins: Lv2's 100 coins (Q-282), 6 Timber and 4 Stone.
+      // 20 trees (3 Energy, 2 Timber each, C-236) and 20 rocks (2 Energy each) of one's own outer ring, 34 Timber and 16 Stone sold for
+      // 100 coins: Lv2's 100 coins (Q-282), 6 Timber and 4 Stone.
       const tree = (x: number) => ({ type: 'gather', object: `${A.parcel_id}:outer-groves-v2:wild_pz_tree_20:${x},7:0` });
       const rock = (x: number) => ({ type: 'gather', object: `${A.parcel_id}:outer-groves-v2:wild_pz_rock_08:${x},9:0` });
-      expect((await command(app, ada, 1, Array.from({ length: 40 }, (_, i) => tree(40 + i)))).statusCode).toBe(200);
+      expect((await command(app, ada, 1, Array.from({ length: 20 }, (_, i) => tree(40 + i)))).statusCode).toBe(200);
       const stocked = await command(app, ada, 2, [...Array.from({ length: 20 }, (_, i) => rock(40 + i)),
         { type: 'sell', item: 'wood', count: 34 }, { type: 'sell', item: 'stone', count: 16 }]);
-      expect(stocked.json().parcel.farm).toMatchObject({ coins: 100, bag: { wood: 6, stone: 4 }, energy: { value: 80 } });
+      expect(stocked.json().parcel.farm).toMatchObject({ coins: 100, bag: { wood: 6, stone: 4 }, energy: { value: 100 } });
       // 9 coins short after a seed: refused whole, nothing taken.
       expect((await command(app, ada, 3, [{ type: 'buy', item: 'seed_carrot', count: 1 }, { type: 'upgrade_farm' }])).json())
         .toMatchObject({ code: 'NOT_ENOUGH_COINS', index: 1, detail: { coins: 91, need: 100 }, parcel: { farm_version: 3, farm: { coins: 100, level: 1 } } });
@@ -582,7 +583,7 @@ for (const [name, enabled, makeStores] of makers) {
       const up = await command(app, ada, 3, [{ type: 'upgrade_farm' }]);
       expect(up.statusCode).toBe(200);
       const farm = up.json().parcel.farm;
-      expect(farm).toMatchObject({ level: 2, coins: 0, energy: { value: 80 } });
+      expect(farm).toMatchObject({ level: 2, coins: 0, energy: { value: 100 } });
       expect(farm.bag.wood).toBeUndefined();
       expect(farm.bag.stone).toBeUndefined();
       expect((await mine(app, ada)).farm).toMatchObject({ level: 2, coins: 0 });
@@ -612,7 +613,7 @@ for (const [name, enabled, makeStores] of makers) {
       expect(blueprints.filter(r => r.statusCode === 200)).toHaveLength(1);
       const after = await mine(app, ada);
       expect(after).toMatchObject({ farm_version: v + 4, farm: { coins: 24, sales: 2, blueprints_claimed: { coop: T0 + 60_000 } } });
-      expect(after.farm.bag).toMatchObject({ wood: 1, blueprint_coop: 1 });
+      expect(after.farm.bag).toMatchObject({ wood: 2, blueprint_coop: 1 });
       // Even with a fresh base version, a second gather or claim is refused.
       expect((await command(app, ada, v + 4, [{ type: 'gather', object: tree }])).json().code).toBe('NOT_RESPAWNED');
       expect((await command(app, ada, v + 4, [{ type: 'claim_blueprint', blueprint: 'coop' }])).json().code).toBe('BLUEPRINT_CLAIMED');
@@ -638,9 +639,9 @@ for (const [name, enabled, makeStores] of makers) {
       clock = T0 + 24 * 3600_000 - 1;
       expect((await command(app, ada, 2, [{ type: 'gather', object: adaTree }])).json()).toMatchObject({ code: 'NOT_RESPAWNED', detail: { ready_at: T0 + 24 * 3600_000 } });
       clock = T0 + 24 * 3600_000;
-      const again = await command(app, ada, 2, [{ type: 'gather', object: adaTree }, { type: 'sell', item: 'wood', count: 2 }, { type: 'claim_blueprint', blueprint: 'coop' }]);
+      const again = await command(app, ada, 2, [{ type: 'gather', object: adaTree }, { type: 'sell', item: 'wood', count: 4 }, { type: 'claim_blueprint', blueprint: 'coop' }]);
       expect(again.statusCode).toBe(200);
-      expect(again.json().parcel.farm).toMatchObject({ coins: 4, sales: 1, bag: { blueprint_coop: 1 } });
+      expect(again.json().parcel.farm).toMatchObject({ coins: 8, sales: 1, bag: { blueprint_coop: 1 } });
       expect(again.json().parcel.farm.bag.wood).toBeUndefined();
     });
 
@@ -709,7 +710,8 @@ for (const [name, enabled, makeStores] of makers) {
         const poor = await command(barnApp, ada, v, [{ type: 'claim_blueprint', blueprint: 'barn' }]);
         expect(poor.statusCode).toBe(422);
         expect(poor.json()).toMatchObject({ code: 'NOT_ENOUGH_COINS', detail: { coins: 0, need: 2 }, parcel: { farm_version: v } });
-        const built = await command(barnApp, ada, v, [{ type: 'gather', object: tree(7) }, { type: 'gather', object: tree(8) },
+        // C-236: one tree gives 2 Timber.
+        const built = await command(barnApp, ada, v, [{ type: 'gather', object: tree(7) },
           { type: 'sell', item: 'wood', count: 1 }, { type: 'claim_blueprint', blueprint: 'barn' },
           { type: 'place_building', building: 'barn', x: 22, y: 22, rotation: 1 }, { type: 'feed', building: 2 }]);
         expect(built.statusCode).toBe(200);
@@ -1019,8 +1021,8 @@ for (const [name, enabled, makeStores] of makers) {
       const short = await command(app, ada, version, [{ type: 'deliver_request', request: 1 }]);
       expect(short.statusCode).toBe(422);
       expect(short.json()).toMatchObject({ code: 'NOT_ENOUGH', detail: { item: 'crop_carrot', have: 2, need: 5 }, parcel: { farm_version: version } });
-      // Four trees for the timber, then deliver it: Jasmine's 2 × 4 + 10 (SEN-Q-281).
-      const trees = [41, 42, 43, 44].map(x => ({ type: 'gather', object: `${A.parcel_id}:outer-groves-v2:wild_pz_tree_20:${x},7:0` }));
+      // Two trees for the four timber (C-236: 2 each), then deliver it: Jasmine's 2 × 4 + 10 (SEN-Q-281).
+      const trees = [41, 42].map(x => ({ type: 'gather', object: `${A.parcel_id}:outer-groves-v2:wild_pz_tree_20:${x},7:0` }));
       const res = await command(app, ada, version, [...trees, { type: 'deliver_request', request: 2 }]);
       expect(res.statusCode).toBe(200);
       const farm = res.json().parcel.farm;
@@ -1117,7 +1119,7 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
       const read = await mine(restarted, ada);
       expect(read).toEqual(saved);
       expect(read.farm).toMatchObject({ coins: 24, sales: 1, gathered: { [tree]: T0 + 60_000 }, blueprints_claimed: { coop: T0 + 60_000 },
-        bag: { wood: 1, blueprint_coop: 1 } });
+        bag: { wood: 2, blueprint_coop: 1 } });
       expect((await command(restarted, ada, read.farm_version, [{ type: 'gather', object: tree }])).json().code).toBe('NOT_RESPAWNED');
       expect((await command(restarted, ada, read.farm_version, [{ type: 'claim_blueprint', blueprint: 'coop' }])).json().code).toBe('BLUEPRINT_CLAIMED');
     } finally { await restarted.close(); await after.end(); }

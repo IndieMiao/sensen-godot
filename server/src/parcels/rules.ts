@@ -22,8 +22,10 @@ export interface CropRule { seed: string; grow_seconds: number; yield: number; e
 /**
  * 外围一类物件（树、花丛、石堆）：采一次得 amount 个 item；models 是美术配方里该类的模型名；
  * max_objects 是一块地上该类最多摆多少个（等于配方 outer_groves.targets.<类>.cap），刷新期内最多采这么多个不同物件。
+ * C-236（SEN-Q-342 数值表第 5 节，SEN-Q-345 Q3）：energy 是采完这一个物件的全部体力（只在最后一下结算一次），
+ * 不写时用 energy.costs.gather；hits 是客户端要打几下（树 3、石 2、花 1），只管表现，服务端只校验范围、不记下数。
  */
-export interface GatherSource { item: string; amount: number; max_objects: number; models: string[] }
+export interface GatherSource { item: string; amount: number; max_objects: number; models: string[]; energy?: number; hits?: number }
 /**
  * 一种可摆放的建筑（C-150）：模型名、放下要扣的蓝图、未转向时的占地（宽沿格 x、深沿格 y）和一块地上最多几栋。
  * 转 90°/270° 时宽深互换。客户端按同一个类型编号取模型和碰撞（modules/dynamic_farm/farm_building.gd）。
@@ -259,7 +261,7 @@ function parseFarmLevels(r: ParcelRules, fail: (what: string) => never): void {
   }
 }
 
-/** 价格、采集、蓝图条件的边界：卖出和买入单价 1–100000，蓝图售价 0–100000（不写为 0），刷新 1 秒–30 天，每次 1–99 个，模型名不跨类重复。 */
+/** 价格、采集、蓝图条件的边界：卖出和买入单价 1–100000，蓝图售价 0–100000（不写为 0），刷新 1 秒–30 天，每次 1–99 个，模型名不跨类重复；采一个物件 0–1000 体力、1–20 下（C-236）。 */
 function parseEconomy(e: EconomyRules | undefined, fail: (what: string) => never): void {
   if (!e || typeof e !== 'object') fail('economy 缺失');
   const isMap = (v: unknown): v is Record<string, unknown> => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
@@ -274,7 +276,8 @@ function parseEconomy(e: EconomyRules | undefined, fail: (what: string) => never
   const models = new Set<string>();
   for (const [kind, src] of Object.entries(g.sources)) {
     if (!isId(kind) || !isMap(src) || !isId(src.item) || !count(src.amount, 1, 99) || !count(src.max_objects, 1, 1000)
-      || !Array.isArray(src.models) || !src.models.length)
+      || !Array.isArray(src.models) || !src.models.length
+      || (src.energy !== undefined && !count(src.energy, 0, 1000)) || (src.hits !== undefined && !count(src.hits, 1, 20)))
       fail(`economy.gather.sources.${kind} 不对`);
     for (const m of src.models) {
       if (!isId(m) || models.has(m)) fail(`economy.gather 模型 ${m} 格式不对或重复`);

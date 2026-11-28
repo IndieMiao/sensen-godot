@@ -175,14 +175,14 @@ describe('parcel economy (C-58)', () => {
     return s;
   };
 
-  it('ships the C-30#29 numbers: carrot 12, timber 2, wild herb 1, stone 2; 24 h respawn; coop blueprint after the first sale', () => {
+  it('ships the C-30#29 prices (carrot 12, timber 2, wild herb 1, stone 2), C-236\'s gather amounts (SEN-Q-342: a tree 2 Timber); 24 h respawn; coop blueprint after the first sale', () => {
     // C-154: the egg (Q-237); C-181: milk, author default awaiting the owner.
     // C-232: the seven Aquatic Park fish at their P0 prices (SEN-C-223 §6.1, SEN-Q-342).
     expect(rules.economy.sell_prices).toEqual({ crop_carrot: 12, wood: 2, wild_herb: 1, stone: 2, egg: 20, milk: 45, wool: 30,
       fish_crucian: 3, fish_carp: 4, fish_mullet: 4, fish_perch: 7, fish_bass: 7, fish_mackerel: 8, fish_seabass: 14 });
     expect(rules.economy.gather.respawn_seconds).toBe(24 * 3600);
     expect(Object.fromEntries(Object.entries(rules.economy.gather.sources).map(([k, v]) => [k, [v.item, v.amount]])))
-      .toEqual({ tree: ['wood', 1], flower: ['wild_herb', 1], rock: ['stone', 1] });
+      .toEqual({ tree: ['wood', 2], flower: ['wild_herb', 1], rock: ['stone', 1] });
     // C-181: the barn's blueprint is bought at Scott's, no sale needed: 600 coins from farm level 2 (C-192, SEN-Q-282).
     expect(rules.economy.blueprints).toEqual({ coop: { item: 'blueprint_coop', amount: 1, min_sales: 1 },
       barn: { item: 'blueprint_barn', amount: 1, min_sales: 0, min_level: 2, coins: 600 },
@@ -270,20 +270,20 @@ describe('parcel economy (C-58)', () => {
     expect(parseFarmCommands([{ type: 'sell', item: 7, count: 1 }])).toBeNull();
   });
 
-  it('gather: gives one of the configured item; again within 24 h of server time is refused, after that it is back', () => {
+  it('gather: gives the configured items; again within 24 h of server time is refused, after that it is back', () => {
     const s = welcomed();
     const tree = obj('wild_pz_tree_20', '41,7');
     const a = runAt(s, [{ type: 'gather', object: tree }, { type: 'gather', object: obj('wild_pz_flower_23', '40,9') },
       { type: 'gather', object: obj('wild_pz_rock_13', '3,30') }]);
-    expect(a.bag).toMatchObject({ wood: 1, wild_herb: 1, stone: 1 });
+    expect(a.bag).toMatchObject({ wood: 2, wild_herb: 1, stone: 1 });
     expect(a.gathered[tree]).toBe(T0);
     expect(tryAt(a, [{ type: 'gather', object: tree }], T0 + DAY - 1)).toEqual({ ok: false, index: 0, code: 'NOT_RESPAWNED', detail: { ready_at: T0 + DAY } });
     // Two objects of one model in one cell are told apart by their ordinal.
-    expect(runAt(a, [{ type: 'gather', object: obj('wild_pz_tree_20', '41,7', ME.parcel_id, RECIPE, 1) }]).bag.wood).toBe(2);
+    expect(runAt(a, [{ type: 'gather', object: obj('wild_pz_tree_20', '41,7', ME.parcel_id, RECIPE, 1) }]).bag.wood).toBe(4);
     // The same object twice in one batch: the second is refused and nothing lands.
     expect(tryAt(s, [{ type: 'gather', object: tree }, { type: 'gather', object: tree }])).toMatchObject({ ok: false, index: 1, code: 'NOT_RESPAWNED' });
     const b = runAt(a, [{ type: 'gather', object: tree }], T0 + DAY);
-    expect(b.bag.wood).toBe(2);
+    expect(b.bag.wood).toBe(4);
     // Respawned records are dropped when the next gather lands; only live ones are kept.
     expect(b.gathered).toEqual({ [tree]: T0 + DAY });
   });
@@ -316,9 +316,65 @@ describe('parcel economy (C-58)', () => {
     expect(s.bag.stone).toBe(cap);
     expect(tryAt(s, [{ type: 'gather', object: obj('wild_pz_rock_13', '200,40') }])).toEqual({ ok: false, index: 0, code: 'TOO_MANY_OBJECTS', detail: { max: cap } });
     // Other kinds are counted separately; after the respawn the rocks are available again.
-    expect(runAt(s, [{ type: 'gather', object: obj('wild_pz_tree_20', '200,40') }]).bag.wood).toBe(1);
+    expect(runAt(s, [{ type: 'gather', object: obj('wild_pz_tree_20', '200,40') }]).bag.wood).toBe(2);
     expect(runAt(s, [{ type: 'gather', object: obj('wild_pz_rock_13', '200,40') }], T0 + DAY).bag.stone).toBe(cap + 1);
     expect(parseFarmCommands([{ type: 'gather' }])).toBeNull();
+  });
+
+  // C-236（SEN-Q-345 Q3, SEN-Q-342 §5）: a tree takes 3 hits and a rock 2 on the client; only the last hit sends the one
+  // `gather`, which charges the whole object's Energy and gives all its drops. Hits before it never reach the server.
+  it('C-236 gather: one settlement per object, the whole price at once (tree 3, rock 2, flower 2) and all its drops', () => {
+    expect(Object.fromEntries(Object.entries(rules.economy.gather.sources).map(([k, v]) => [k, [v.hits, v.energy, v.amount]])))
+      .toEqual({ tree: [3, 3, 2], flower: [1, 2, 1], rock: [2, 2, 1] });
+    const s = welcomed();
+    const before = maxEnergy(rules, s);
+    const a = runAt(s, [{ type: 'gather', object: obj('wild_pz_pine_01', '41,7') }]);
+    expect(a.bag.wood).toBe(2);
+    expect(a.energy!.value).toBe(before - 3);
+    const b = runAt(a, [{ type: 'gather', object: obj('wild_pz_softrock_10', '3,30') }, { type: 'gather', object: obj('wild_pz_flower_20', '40,9') }]);
+    expect(b.bag).toMatchObject({ wood: 2, stone: 1, wild_herb: 1 });
+    expect(b.energy!.value).toBe(before - 3 - 2 - 2);
+  });
+
+  it('C-236 gather: short of the whole object\'s Energy nothing is gathered or charged (after its own checks, as before)', () => {
+    const tired = (value: number): ParcelFarmState => ({ ...welcomed(), energy: { value, at: T0, rested_on: null } });
+    const tree = obj('wild_pz_tree_20_g', '41,7');
+    for (const [object, need] of [[tree, 3], [obj('wild_pz_rock_08', '3,30'), 2], [obj('wild_pz_flower_23', '40,9'), 2]] as const) {
+      const s = tired(need - 1);
+      const out = tryAt(s, [{ type: 'gather', object }]);
+      expect(out).toMatchObject({ ok: false, index: 0, code: 'NO_ENERGY', detail: { need, have: need - 1 } });
+      expect(s.gathered).toEqual({});
+      expect(s.bag.wood ?? 0).toBe(0);
+      expect(runAt(tired(need), [{ type: 'gather', object }]).energy!.value).toBe(0);
+    }
+    // Its own refusals come first: a regrowing tree is NOT_RESPAWNED even with no Energy left.
+    const cut = runAt(tired(3), [{ type: 'gather', object: tree }]);
+    expect(tryAt(cut, [{ type: 'gather', object: tree }], T0 + 1)).toMatchObject({ ok: false, code: 'NOT_RESPAWNED' });
+  });
+
+  it('C-236 gather: walking off after some hits and coming back charges and drops once; a second settlement is refused', () => {
+    // The client keeps the hits; walking away sends nothing, so the farm is untouched until the last hit.
+    const s = welcomed();
+    const tree = obj('wild_pz_tree_20', '41,7');
+    const once = runAt(s, [{ type: 'gather', object: tree }], T0 + 30_000);
+    // The same object settled again (a resent last hit, a second device) is refused and changes nothing.
+    const again = tryAt(once, [{ type: 'gather', object: tree }], T0 + 31_000);
+    expect(again).toMatchObject({ ok: false, code: 'NOT_RESPAWNED' });
+    expect(once.bag.wood).toBe(2);
+    expect(once.energy!.value).toBe(maxEnergy(rules, s) - 3);
+    expect(Object.keys(once.gathered)).toEqual([tree]);
+  });
+
+  it('C-236 rules: per-kind Energy 0–1000 and hits 1–20 are checked at load time; a kind without them costs energy.costs.gather', () => {
+    const eco = rules.economy;
+    const bad = (sources: unknown) => () => parseParcelRules({ ...rules, economy: { ...eco, gather: { ...eco.gather, sources } } });
+    const tree = eco.gather.sources.tree;
+    for (const change of [{ energy: -1 }, { energy: 1.5 }, { energy: 1001 }, { hits: 0 }, { hits: 21 }, { hits: 2.5 }])
+      expect(bad({ ...eco.gather.sources, tree: { ...tree, ...change } })).toThrow();
+    const plain = parseParcelRules({ ...structuredClone(rules), economy: { ...structuredClone(eco), gather: { ...structuredClone(eco.gather),
+      sources: { ...structuredClone(eco.gather.sources), tree: { item: 'wood', amount: 1, max_objects: 40, models: tree.models } } } } });
+    const out = applyFarmCommands(plain, welcomed(), [{ type: 'gather', object: obj('wild_pz_tree_20', '41,7') }], T0, ME);
+    expect(out.ok && out.state.energy!.value).toBe(maxEnergy(plain, welcomed()) - rules.energy.costs.gather);
   });
 
   it('coop blueprint: refused before the first sale, given once after it, never again', () => {
@@ -450,13 +506,13 @@ describe('rebase onto a newer dataset (C-136, Q-168)', () => {
     if (!out.ok) throw new Error(out.code);
     s = out.state;
     // One crop is dry, one watered and growing: both are in the ground and each gives its seed back; the well its blueprint.
-    expect(s).toMatchObject({ coins: 12, sales: 1, bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1, pail: 1 }, welcomed_at: T0, pail_water: 2 });
+    expect(s).toMatchObject({ coins: 12, sales: 1, bag: { hoe_starter: 1, blueprint_coop: 1, wood: 2, pail: 1 }, welcomed_at: T0, pail_water: 2 });
     expect(s.bag.seed_carrot).toBeUndefined();
     const before = structuredClone(s);
     const moved = rebaseFarm(rules, s, T0);
     // The pail and what is left in it are not on cells: they stay, as do the one-off grants already given.
     expect(moved).toEqual({ ...before, buildings: [], house: null, cleared: [], tilled: [], crops: {}, gathered: {},
-      bag: { hoe_starter: 1, blueprint_coop: 1, wood: 1, pail: 1, seed_carrot: 2, blueprint_cottage: 1, blueprint_well: 1 } });
+      bag: { hoe_starter: 1, blueprint_coop: 1, wood: 2, pail: 1, seed_carrot: 2, blueprint_cottage: 1, blueprint_well: 1 } });
     expect(s).toEqual(before); // the input is untouched
     // The cottage goes back up on the new cells with the returned blueprint.
     expect(run(moved, [{ type: 'place_house', x: 2, y: 2 }]).house).toMatchObject({ x: 2, y: 2 });

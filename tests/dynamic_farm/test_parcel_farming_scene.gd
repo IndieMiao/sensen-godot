@@ -144,19 +144,23 @@ func _press(farming: Node, cell: Vector2i) -> Dictionary:
 	farming.pick(cell)
 	await process_frame
 	await process_frame
-	var seen := {"clips": {}, "moved": 0.0, "early": false, "pail": false}
+	var seen := {"clips": {}, "moved": 0.0, "early": false, "pail": false, "floats": [], "verbs": {}}
 	var start: Vector3 = scene._walk.position
 	var version: int = farming.farm_version
 	var player := scene._rig.get_node_or_null("AnimationPlayer") as AnimationPlayer
 	farming._key.pressed_down.emit()
 	var deadline := Time.get_ticks_msec() + 30000
-	while farming.busy and Time.get_ticks_msec() < deadline:
+	# C-236: a yard obstacle takes its hits with the key held (busy only while walking and while the clear is out).
+	while (farming.busy or farming.swinging) and Time.get_ticks_msec() < deadline:
 		if player != null: seen.clips[player.current_animation] = true
 		var pail = scene._rig.get_node_or_null("BucketGesture")
 		if pail != null and pail.visible and scene._labour_left > 0.0: seen.pail = true
 		if scene._labour_left > 0.0 and farming.farm_version != version: seen.early = true
+		for text in _floats(farming): if not text in seen.floats: seen.floats.append(text)
+		if farming.swinging: seen.verbs[farming._key.verb] = true
 		await process_frame
-	_check(not farming.busy, "a press finishes")
+	_check(not farming.busy and not farming.swinging, "a press finishes")
+	farming._key.released.emit()
 	await process_frame
 	seen.moved = start.distance_to(scene._walk.position)
 	return seen
@@ -272,7 +276,8 @@ func _first_visit() -> void:
 	_check(farming._keys.tool_icon != null and not farming._keys.switch_visible, "the action key shows the hoe, no switch")
 	await _bag_drawer(farming)
 	var walk = scene._walk
-	# Clear a tree (a 2×2 block) with one press on a cell other than its anchor.
+	# Clear a tree (a 2×2 block) on a cell other than its anchor: C-236 (SEN-Q-345 Q4) it is chopped, three chops with the
+	# key held, and only the last one sends the one `clear_obstacle` (2 Energy, as before).
 	var tree := {}
 	for item: Dictionary in farming._core_plan.layout:
 		if item.solid and item.get("cells", []).size() > 1:
@@ -286,8 +291,9 @@ func _first_visit() -> void:
 	var key: Array
 	var all_clear := block.size() == 4
 	for at: Vector2i in block:
-		all_clear = all_clear and farming.obstacle_cells().has(at) and await _key(farming, at) == ["Clear", "2 Energy", UiSceneAction.State.DEFAULT]
-	_check(all_clear, "every cell under the tree offers Clear, none Till")
+		all_clear = all_clear and farming.obstacle_cells().has(at) and await _key(farming, at) == ["Chop", "2 Energy", UiSceneAction.State.DEFAULT]
+	_check(all_clear, "every cell under the tree offers Chop (its Clear), none Till")
+	_check(farming._keys.tool_icon == preload("res://assets/ui/icons/lucide/axe.svg"), "the axe on the badge")
 	_check(not _beside(block), "the tree starts out of reach")
 	# The stick cancels the walk: nothing is sent.
 	farming.pick(block.back())
@@ -303,14 +309,18 @@ func _first_visit() -> void:
 	_check(walking and scene._route.is_empty() and not farming.busy and farming.farm_version == version and farming.farm.cleared.is_empty(), "the stick cancels a walk, nothing sent")
 	var seen := await _press(farming, block.back())
 	_check(seen.moved > data.cell_m and _beside(block), "the player walks beside the tree and faces it")
-	_check(seen.clips.has("labour_clear") and not seen.early, "the clear clip plays, the tree goes as it ends")
-	_check(farming.farm.cleared == [ParcelFarm.key(obstacle)] and _obstacle_instances(farming) == before - 1, "one press clears it, named by its anchor")
+	# The last chop sends at its contact, before its follow-through ends (SEN-C-234 §3), so the farm changes mid-clip.
+	_check(seen.clips.has("gather/labour_chop"), "the chop clip plays, the tree goes with the last chop (%s)" % [seen])
+	_check(seen.verbs.keys() == ["Chop"], "V-774: the key reads Chop until the tree is gone, never Till under the falling tree (%s)" % [seen.verbs])
+	_check(farming.gather_stage.played.count("hit tree 1/3 stage 0") == 1 and farming.gather_stage.played.has("hit tree 2/3 stage 1")
+		and farming.gather_stage.played.has("finish tree"), "three chops, the third fells it (%s)" % [farming.gather_stage.played])
+	_check(farming.farm.cleared == [ParcelFarm.key(obstacle)] and _obstacle_instances(farming) == before - 1, "the held press clears it, named by its anchor")
 	var freed := true
 	for at: Vector2i in block:
-		freed = freed and not farming.obstacle_cells().has(at) and (await _key(farming, at))[0] != "Clear"
+		freed = freed and not farming.obstacle_cells().has(at) and not (await _key(farming, at))[0] in ["Clear", "Chop"]
 	_check(freed and walk.clear_position(walk.point(obstacle)), "and frees the whole block and the walk")
 	_check(farming.farm.bag.get("hoe_starter") == 1 and farming.energy_value() == 198, "clearing uses no item, 2 Energy (C-148)")
-	_check("−2 Energy" in _floats(farming), "the Energy it cost floats up: %s" % [_floats(farming)])
+	_check("−2 Energy" in seen.floats, "the Energy it cost floats up: %s" % [seen.floats])
 	# Till, sow, wait, harvest.
 	var cell := _free_cell(data, farming)
 	_check(await _key(farming, cell) == ["Till", "2 Energy", UiSceneAction.State.DEFAULT], "a free core cell offers Till for 2 Energy")

@@ -13,9 +13,12 @@ extends Node3D
 ## is the UI v3 modal panel and gains the v3 float (C-105). Nothing of P0Ui / P0Runtime; the
 ## parcel's own coins (C-59) show in the scene's top bar as the main HUD's coins capsule, its
 ## Energy (C-148) beside them as the main HUD's Energy chip.
-## Outer gathering (C-60, ParcelGather): near a tree, flower or rock of the extension the key
-## picks it by hand; a picked one stays faded (trees, rocks) or hidden (flowers, which never
-## block) until it grows back. Gathering never touches the walk, the layout or collision.
+## Outer gathering (C-60, ParcelGather): near a tree, flower or rock of the extension the key gathers it until it grows
+## back. Gathering never touches the walk, the layout or collision. C-236 (SEN-C-234 D-558, owner SEN-Q-345; numbers
+## SEN-Q-342): the key reads `Chop` / `Break` / `Pick` with the object's whole price; a tree takes 3 chops, a rock 2
+## hits, a herb one pull (GatherStage plays them with C-235's art); the last one sends the one `gather`, and its drops,
+## floats and flights wait for the reply. A felled tree leaves its stump, a broken rock its scree, a pulled herb nothing
+## (C-234#50) until they grow back. The yard's obstacles (Q4) are chopped, broken and pulled the same way, then gone.
 ## With a body (the scene, C-73) a press first walks the player beside the cell and plays the
 ## main farm's labour clip; the command goes out with the clip and its result lands as it ends.
 ## Livestock (C-154, ParcelLivestock): near a coop's feeder the key reads `Feed` (`1 Energy`); a carrot goes in, and
@@ -34,7 +37,9 @@ const Scenery = preload("res://modules/dynamic_farm/farm_scenery.gd")
 const ParcelItems = preload("res://modules/dynamic_farm/parcel_items.gd")
 const Gather = preload("res://modules/dynamic_farm/parcel_gather.gd")
 const Guide = preload("res://modules/dynamic_farm/parcel_guide.gd")
-const GATHERED_SHADER = preload("res://modules/dynamic_farm/gathered_prop.gdshader")
+const GatherFx = preload("res://modules/dynamic_farm/gather_fx.gd")
+const GatherStage = preload("res://scenes/dynamic_farm/gather_stage.gd")
+const Palette = preload("res://modules/dynamic_farm/farm_palette.gd")
 const CropArt = preload("res://modules/dynamic_farm/parcel_crop_art.gd")
 const Livestock = preload("res://scenes/dynamic_farm/parcel_livestock.gd")
 const LivestockArt = preload("res://modules/dynamic_farm/farm_livestock.gd")
@@ -77,6 +82,8 @@ const BAG_ORDER := ["hoe_starter", "pail", "seed_carrot", "crop_carrot"]
 ## C-151: `Water` is P0's key (P0Logic, the plot's Water); `Fill` draws the pail at the well (打水, SEN-C-151).
 const VERBS := {"clear": "Clear", "till": "Till", "sow": "Sow", "harvest": "Harvest", "rest": "Rest", "gather": "Gather",
 	"feed": "Feed", "fill": "Fill", "water": "Water"}
+## C-236: kinds whose one hit is a pull (the herb, the yard's weed): the plant comes up into the hand.
+const PULLED := ["flower", "weed"]
 ## C-148: Rested today / Energy full are P0's Rest copy (P0Logic.energy_card, rest_state).
 ## C-151: the pail's refusals in the hoe's form (`Need a hoe`): Need a pail / Pail empty / Pail full.
 const REFUSALS := {Space.OUTSIDE: "Not farmland", Space.PATH: "On the path", Space.HOUSE: "House here",
@@ -195,13 +202,28 @@ var _sway_last := {}
 var sway_triggers := 0
 ## Layout indices drawn as gathered: index -> true.
 var _spent := {}
-var _spent_material: ShaderMaterial
-## The outer object a gather press is picking (its layout index), -1 none: its reply fades it grey (MS-08).
-var _gathering := -1
 ## Layout index → [the batch drawing it, its instance] for the objects drawn as they grow (Scenery.build's `drawn`).
 var _outer_drawn := {}
-## The outer object rocking now (its layout index), -1 none.
-var shaking := -1
+## C-236: the core layout's drawn instances (index -> [batch, instance]), kept up to date as obstacles are cleared.
+var _core_drawn := {}
+## C-236: the gathering in 3D (GatherStage), the hits landed so far (GatherFx.Damage, this visit only), the key held
+## down (hits go on until the object is done), a press during a hit (one more after it), the stick this frame, a hit
+## playing, and outer objects whose last hit is still playing (layout index -> true: drawn by GatherStage, not the batch).
+var gather_stage: Node3D
+var damage: RefCounted
+var _key_held := false
+var _queued := false
+var _steering_now := false
+var swinging := false
+var _presenting := {}
+var _redraw_gathered := false
+## C-236: when the last hit landed (ticks ms); the next one lands no sooner than `common.min_hit_interval_ms` after it.
+var _last_contact_ms := -1_000_000
+## Every hit's contact time this visit (ticks ms; QA reads it).
+var contacts := []
+## C-236: what the bar and the Energy chip keep showing until the gathered drop appears ({} / -1: the save's).
+var _held_bag = null
+var _held_energy := -1
 
 ## The first visit's next step (C-35, ParcelGuide) as the main farm's TipCard, under the top bar.
 var _tip: UiTipCard
@@ -262,6 +284,8 @@ func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: Ref
 		var item: Dictionary = _core_plan.layout[index]
 		_anchors[item.cell] = index
 		for cell: Vector2i in item.get("cells", [item.cell]): _obstacles[cell] = item.cell
+	var core_drawn: Array = core.get("drawn", [])
+	for i in mini(core_drawn.size(), _core_plan.layout.size()): _core_drawn[i] = core_drawn[i]
 	_path = Space.protected_path(data)
 	_gather = Gather.rules()
 	if outer.get("root") is Node3D and outer.get("layout") is Array:
@@ -281,6 +305,12 @@ func setup(data: Dictionary, walk: RefCounted, core: Dictionary, farm_store: Ref
 	livestock = Livestock.new()
 	livestock.setup(walk)
 	add_child(livestock)
+	damage = GatherFx.damage()
+	gather_stage = GatherStage.new()
+	gather_stage.name = "GatherStage"
+	if body != null and body.has_method("shake_camera"):
+		gather_stage.shake_camera = func(m: float, ms: float): if not UiMotion.reduced: body.shake_camera(m, ms)
+	add_child(gather_stage)
 	wet_soil_preview = bool(ProjectSettings.get_setting(WET_SOIL_SETTING, false))
 	_build_marker()
 	_build_ui(canvas)
@@ -332,9 +362,14 @@ func loaded() -> bool:
 ## Called by the scene every frame with the player's cell in front; `steering`: the stick is in
 ## use. For gathering, also the player's position and facing direction.
 func update(delta: float, facing_cell: Vector2i, steering: bool, player = null, facing := Vector3.ZERO) -> void:
+	_steering_now = steering
 	if steering:
 		picked = null
 		picked_object = -1
+	# C-236: hits not followed up within the memory run out; the scar on the object standing in closes.
+	if damage != null and not swinging:
+		var gone: Array = damage.expire(Time.get_ticks_msec())
+		if gather_stage != null and gather_stage.key() in gone: gather_stage.release()
 	target = job if job != null else (picked if picked != null else facing_cell)
 	_placed = player is Vector3
 	if _placed:
@@ -343,7 +378,7 @@ func update(delta: float, facing_cell: Vector2i, steering: bool, player = null, 
 	if sway: _update_sway(delta)
 	# C-154: animals move; a laid drop in reach is picked up by itself (not while another command is out or a mode holds).
 	if livestock != null and not farm.is_empty():
-		var reached: Array = livestock.update(delta, _player, server_now(), busy or held or not _placed or not _picking.is_empty())
+		var reached: Array = livestock.update(delta, _player, server_now(), busy or swinging or held or not _placed or not _picking.is_empty())
 		if not reached.is_empty(): pick_up(reached)
 	_redraw_left -= delta
 	if _redraw_left <= 0.0:
@@ -401,16 +436,30 @@ func gather_target() -> int:
 			best = i
 	return best
 
-## The key for gathering object `index`: {verb, refusal, command, object, ready_in_ms?}.
+## The key for gathering object `index`: {verb, kind, refusal, command, object, ready_in_ms?}; `kind` (C-236) is how it
+## is gathered (tree: Chop, rock: Break, flower: Pick).
 func _gather_action(index: int) -> Dictionary:
 	var object: Dictionary = gatherables[index]
+	var kind := str(GatherFx.OUTER.get(object.kind, object.kind))
 	var now := server_now()
 	var ready := Gather.ready_at(_gather, farm, object.id, now)
 	if ready > 0:
-		return {"verb": "gather", "refusal": REGROWING, "command": {}, "object": index, "ready_in_ms": ready - now}
+		return {"verb": "gather", "kind": kind, "refusal": REGROWING, "command": {}, "object": index, "ready_in_ms": ready - now}
 	if gap(index) > GATHER_REACH_M:
-		return {"verb": "gather", "refusal": TOO_FAR, "command": {}, "object": index}
-	return {"verb": "gather", "refusal": "", "command": {"type": "gather", "object": object.id}, "object": index}
+		return {"verb": "gather", "kind": kind, "refusal": TOO_FAR, "command": {}, "object": index}
+	return {"verb": "gather", "kind": kind, "refusal": "", "command": {"type": "gather", "object": object.id}, "object": index}
+
+## C-236 (SEN-Q-345 Q4): how the yard obstacle on `cell` is cleared (tree, bush, rock, weed), "" when it is none.
+func core_kind(cell: Vector2i) -> String:
+	var anchor = _obstacles.get(cell)
+	if anchor == null or not _anchors.has(anchor): return ""
+	return str(GatherFx.core(str(_core_plan.layout[_anchors[anchor]].get("role", ""))).get("kind", ""))
+
+## The key's verb word: Chop / Break / Pick / Pull for gathering and clearing (C-236, SEN-Q-345 Q1), else VERBS.
+func verb_label(action: Dictionary) -> String:
+	var kind := str(action.get("kind", ""))
+	if not kind.is_empty() and action.get("verb") in ["gather", "clear"]: return GatherFx.verb(kind)
+	return str(VERBS.get(action.get("verb", ""), ""))
 
 func _refresh_key() -> void:
 	if held:
@@ -418,6 +467,11 @@ func _refresh_key() -> void:
 		_keys.set_shown(false)
 		_keys.visible = false
 		_bar.visible = false
+		return
+	# C-236 (V-774): while an object is being gathered the key keeps showing it, until its fall, breaking or pull has
+	# played out (a yard tree's cell offers Till only once the tree is gone; a felled outer tree reads Regrowing after).
+	if swinging and not current.is_empty() and not farm.is_empty():
+		_marker.visible = true
 		return
 	current = {} if farm.is_empty() else Space.action(rules, _data, _path, _obstacles, farm, target, server_now())
 	# C-154: a coop's floor is never farmed (no key there); at its feeder the key feeds.
@@ -436,6 +490,9 @@ func _refresh_key() -> void:
 	var object := -1 if farm.is_empty() else gather_target()
 	if object >= 0 and (picked_object >= 0 or (picked == null and (current.is_empty() or not str(current.refusal).is_empty()))):
 		current = _gather_action(object)
+	if current.get("verb") == "clear":
+		var kind := core_kind(target)
+		if not kind.is_empty(): current.kind = kind
 	_marker.visible = not current.is_empty()
 	_keys.set_shown(_marker.visible or farm.is_empty())   # MS-23
 	key_cost = 0
@@ -461,7 +518,7 @@ func _refresh_key() -> void:
 		_key.verb = "Growing"
 		_key.cost = P0Logic.key_ready(float(current.ripe_in_ms))
 	elif current.verb == "gather":
-		_key.verb = "Regrowing" if current.refusal == REGROWING else "Gather"
+		_key.verb = "Regrowing" if current.refusal == REGROWING else verb_label(current)
 		_key.cost = P0Logic.key_ready(float(current.ready_in_ms)) if current.refusal == REGROWING \
 			else "Move closer" if current.refusal == TOO_FAR else _price()
 	elif current.verb == "rest":
@@ -471,10 +528,12 @@ func _refresh_key() -> void:
 		_key.verb = VERBS.feed
 		_key.cost = str(current.key_text) if refused else _price()
 	else:
-		_key.verb = VERBS[current.verb]
+		_key.verb = verb_label(current)
 		_key.cost = REFUSALS.get(current.refusal, _price())
-	# The key's badge is the tool or item the press uses: the hoe for farming, the feed (a carrot) at a feeder.
-	var badge: Texture2D = item_icon(str(current.feed_item)) if current.get("verb") == "feed" else _tool_badge()
+	# The key's badge is the tool or item the press uses: the hoe for farming, the feed (a carrot) at a feeder; C-236: the
+	# axe at a tree or bush, the pick at a rock, the hand at a herb or weed (LOCK-02's tool badge).
+	var badge: Texture2D = item_icon(str(current.feed_item)) if current.get("verb") == "feed" \
+		else GatherFx.tool_icon(str(current.kind)) if current.has("kind") else _tool_badge()
 	if _keys.tool_icon != badge: _keys.tool_icon = badge
 	_key.state = UiSceneAction.State.UNAVAILABLE if refused else UiSceneAction.State.INSUFFICIENT if key_short \
 		else UiSceneAction.State.DEFAULT
@@ -486,13 +545,19 @@ func _price() -> String:
 
 func _on_key() -> void:
 	if held: return
+	_key_held = true
+	# C-236: a press during a hit asks for one more after it (the key held down keeps going on its own).
+	if swinging:
+		_queued = true
+		return
 	if unavailable and not busy:
 		await enter()
 		return
 	if busy or current.is_empty(): return
 	if key_short:
-		# Short of Energy: the press opens the Energy card and sends nothing (LOCK-09 / LOCK-10).
-		open_energy_card(key_cost, VERBS.get(current.verb, ""))
+		# Short of Energy: the press opens the Energy card and sends nothing (LOCK-09 / LOCK-10). C-236: before the first hit,
+		# for the object's whole price.
+		open_energy_card(key_cost, verb_label(current))
 		return
 	if not str(current.refusal).is_empty():
 		# The whole sentence where the key shows a shorter one (the feeder's `Need 2 more Carrot`, C-192).
@@ -504,41 +569,184 @@ func _on_key() -> void:
 	elif current.verb == "feed": await feed(current)
 	else: await work(target, current)
 
-## One gather press (C-60): the object is already in reach, so the player only faces it and plays
-## the hand-picking (harvest) labour clip while the command goes out (C-73's beat, no walk).
-## MS-08 (C-185 §3.2 / §4, C-211): the object rocks twice on the press and, picked, fades into the gathered grey.
+## One gather press (C-60): the object is already in reach, so the player only faces it (no walk). C-236: each press is
+## one hit (`strike_down`), the last one sends the `gather`; it replaces MS-08's two rocks and the grey (SEN-Q-345 Q6).
 func gather(action: Dictionary) -> Dictionary:
-	var index := int(gatherables[action.object].index)
-	shake_object(index)
-	_gathering = index
-	var result: Dictionary
-	if _body == null: result = await send(action.command)
-	else:
-		_body.labour("harvest", [_walk.cell_at(gatherables[action.object].origin)], LABOUR_S)
-		result = await send(action.command, LABOUR_S)
-	_gathering = -1
+	var object: Dictionary = gatherables[action.object]
+	var index := int(object.index)
+	var item: Dictionary = _outer_layout[index] if index < _outer_layout.size() else {}
+	return await strike_down({"key": object.id, "model": object.asset, "kind": str(action.get("kind", "tree")),
+		"hits": int(object.get("hits", 1)), "rest": item.get("transform", Transform3D(Basis(), object.origin)),
+		"drawn": _outer_instance(index), "cells": [_walk.cell_at(object.origin)], "outer": index, "item": object.item},
+		action.command)
+
+## C-236: the hits on one object (`t`: key, model, kind, hits, rest, drawn, cells, outer (layout index, -1 in the yard),
+## item) until it is done, the stick moves, or the key is let go. A hit plays its clip; the stick before its contact
+## takes it back (nothing counted), after it only skips the follow-through. Hits are remembered for 30 s (`damage`); the
+## one that finishes the object sends `command` and plays the fall, the breaking or the pull while the reply comes.
+## Without the 3D scene (headless stores) one press settles at once, as before.
+func strike_down(t: Dictionary, command: Dictionary) -> Dictionary:
+	if gather_stage == null or _body == null or not _body.has_method("gesture"): return await send(command)
+	if gather_stage.key() != t.key:
+		if not gather_stage.key().is_empty(): damage.forget(gather_stage.key())
+		var drawn: Array = t.get("drawn", [])
+		gather_stage.focus(t.key, t.model, t.kind, t.rest, drawn, _player, _instance_tint(drawn), _instance_mesh(drawn, t.kind),
+			_bloom(str(t.model), (t.rest as Transform3D).origin))
+	swinging = true
+	var result := {"ok": false, "code": "CANCELLED"}
+	var hits := maxi(1, int(t.hits))
+	while is_inside_tree():
+		_queued = false
+		var done: int = damage.done(t.key, Time.get_ticks_msec())
+		var last := done + 1 >= hits
+		if last and t.kind in PULLED: gather_stage.begin_pull()
+		# SEN-Q-342 §5 / C-236#14: two hits land at least 0.9 s apart; a quicker press or the held key waits a beat first.
+		var gap_ms := int(GatherFx.common().get("min_hit_interval_ms", 900))
+		var wait := (_last_contact_ms + gap_ms - Time.get_ticks_msec()) / 1000.0 - GatherFx.contact_s(t.kind)
+		if wait > 0.0 and not await _hold(wait): break
+		var length: float = _body.gesture(t.kind, t.cells)
+		var contact := minf(GatherFx.contact_s(t.kind), length)
+		if not await _hold(contact):
+			# Wound up and let go: this hit never landed (a pulled herb drops back where it was).
+			_body.cut_labour()
+			if last and t.kind in PULLED: gather_stage.refuse()
+			break
+		_last_contact_ms = Time.get_ticks_msec()
+		contacts.append(_last_contact_ms)
+		done = damage.hit(t.key, Time.get_ticks_msec())
+		if done >= hits:
+			result = await _settle(t, command)
+			break
+		gather_stage.strike(done, hits)
+		_hitstop()
+		if not await _hold(length - contact): _body.cut_labour()
+		if not is_inside_tree(): break
+		result = {"ok": true, "code": "HIT", "done": done, "hits": hits}
+		if not (_key_held or _queued) or _steering_now: break
+		# The key held down: the next hit, as long as the object is still the key's and nothing else holds the screen.
+		if held or current.is_empty() or str(current.get("refusal", "")) != "" or key_short: break
+	swinging = false
 	return result
 
-## MS-08: outer object `index` (in the outer layout) rocks ±`motion/angle/gatherShake` twice over
-## `motion/duration/gatherShake` (linear) about its foot, then stands as it was. Reduced: it stays still.
-func shake_object(index: int) -> void:
-	if UiMotion.reduced or not is_inside_tree(): return
-	var at := _outer_instance(index)
-	if at.is_empty(): return
-	var batch: MultiMeshInstance3D = at[0]
-	var i: int = at[1]
-	var rest: Transform3D = _outer_layout[index].transform
-	# A sway from side to side across the view: about the ground's z axis, through its foot.
-	var swing := func(k: float) -> void:
-		if not is_instance_valid(batch) or i >= batch.multimesh.instance_count: return
-		var a := deg_to_rad(UiTokens.MOTION_ANGLE_GATHER_SHAKE) * sin(TAU * 2.0 * k)
-		batch.multimesh.set_instance_transform(i, Transform3D(Basis(Vector3.BACK, a) * rest.basis, rest.origin))
-	shaking = index
-	var tw := create_tween()
-	tw.tween_method(swing, 0.0, 1.0, UiMotion.secs(UiTokens.MOTION_DURATION_GATHER_SHAKE_MS))
-	tw.tween_callback(func():
-		swing.call(0.0)
-		if shaking == index: shaking = -1)
+## Waits `seconds` of the hit; false when the stick moved meanwhile (the caller cuts the hit short).
+func _hold(seconds: float) -> bool:
+	var until := Time.get_ticks_msec() + int(seconds * 1000.0)
+	while Time.get_ticks_msec() < until:
+		await get_tree().process_frame
+		if not is_inside_tree(): return false
+		if _steering_now: return false
+	return true
+
+## The approved 40 ms hit-stop on contact (not under reduced motion): the gatherer's clip holds for a beat.
+func _hitstop() -> void:
+	var ms := int(GatherFx.common().get("hitstop_ms", 40))
+	if UiMotion.reduced or ms <= 0 or not _body.has_method("hitstop"): return
+	_body.hitstop(ms)
+
+## The finishing hit: the object goes (fall / pieces / pull) while `command` goes out; what it gave shows no sooner
+## than the picture says and never before the reply (`common.reward_gate`): a log or a stone pops out where the tree
+## fell or the rock broke, its `+2 Timber` and `−3 Energy` rise from it, it flies into the player and on into the bar;
+## a herb's icon pops from the player's head (`max(700 ms, reply)`). Refused, the object comes back and nothing is given.
+func _settle(t: Dictionary, command: Dictionary) -> Dictionary:
+	var kind := str(t.kind)
+	var outer := int(t.get("outer", -1))
+	if kind in PULLED: _body.hold_plant(t.model, true, _instance_mesh(t.get("drawn", []), kind))
+	var picture_s: float = gather_stage.finish(UiMotion.reduced)
+	var shown_at := Time.get_ticks_msec() + int(picture_s * 1000.0)
+	if outer >= 0: _presenting[outer] = true
+	var energy_before := energy_value()
+	_held_bag = farm.get("bag", {}).duplicate()
+	_held_energy = energy_before
+	var result := await send(command, 0.0, false)
+	if not is_inside_tree(): return result
+	if Time.get_ticks_msec() < shown_at:
+		await get_tree().create_timer((shown_at - Time.get_ticks_msec()) / 1000.0).timeout
+		if not is_inside_tree(): return result
+	damage.forget(t.key)
+	_held_bag = null
+	_held_energy = -1
+	_draw_bag()
+	if not result.get("ok", false):
+		gather_stage.refuse()
+		if kind in PULLED: _body.hold_plant(t.model, false, null, true)
+		await get_tree().create_timer(UiMotion.secs(float(GatherFx.common().get("refuse_rewind_ms", 300)))).timeout
+		if outer >= 0: _presenting.erase(outer)
+		if is_inside_tree(): gather_stage.release()
+		return result
+	var gains: Dictionary = result.get("gains", {})
+	var spent := energy_before - energy_value()
+	var pickup: Dictionary = GatherFx.config().get("pickup", {})
+	if kind in PULLED:
+		# A herb: the icon pops from over the player's head and flies on into the bar with the floats.
+		var head := _player_screen()
+		_gather_floats(gains, spent, head, true)
+		gather_stage.picked_up()
+		_body.hold_plant(t.model, false)
+	else:
+		var drop: Node3D = gather_stage.reward(str(t.get("item", ""))) if not gains.is_empty() else null
+		var from: Vector2 = _body.screen_point(drop.global_position, 0.3) if drop != null else _gain_screen(command)
+		_gather_floats(gains, spent, from, false)
+		if drop != null:
+			var drop_rule: Dictionary = GatherFx.kind(kind).get("drop", {})
+			await get_tree().create_timer(UiMotion.secs(float(drop_rule.get("pop_ms", 360)) + float(drop_rule.get("hold_ms", 200)))).timeout
+			if not is_inside_tree(): return result
+			gather_stage.pull_drop(func() -> Vector3: return _body.player_position() + Vector3(0, 0.9, 0))
+			await get_tree().create_timer(UiMotion.secs(float(pickup.get("magnet_ms", 320)))).timeout
+			if not is_inside_tree(): return result
+		fly_gains(_player_screen())
+	# The outer object stays the stage's until its last clip has played (the crown sinks and fades), then its stump or
+	# scree joins the spent batch; a yard obstacle fades out whole (nothing is left where it was cleared).
+	if outer >= 0:
+		await get_tree().create_timer(_clip_left()).timeout
+		if not is_inside_tree(): return result
+		_presenting.erase(outer)
+		_redraw_gathered = true
+		_draw_gathered()
+		gather_stage.release(true)
+	else:
+		await get_tree().create_timer(_clip_left()).timeout
+		if is_inside_tree(): gather_stage.vanish()
+	return result
+
+## The gathering's two lines (V-774, design figure 2): `+2 Timber` on top, `−3 Energy` under it, a line apart from the
+## first frame. The stack grows upward, so the Energy goes first (line 0) and the items above it (line 1 on).
+func _gather_floats(gains: Dictionary, spent: int, from: Vector2, fly: bool) -> void:
+	_float_batch = {}
+	announce_energy(-spent, from)
+	announce_gains(gains, from, false, fly, 1 if spent != 0 else 0)
+
+## How long the object's last clip still plays (s).
+func _clip_left() -> float:
+	var target: Node = gather_stage.get_node_or_null("GatherTarget")
+	var anim := target.get_node_or_null("AnimationPlayer") as AnimationPlayer if target != null else null
+	if anim == null or not anim.is_playing(): return 0.0
+	return maxf(0.0, anim.current_animation_length - anim.current_animation_position) / maxf(anim.speed_scale, 0.01)
+
+## The batch colour of a drawn instance (the autumn trees' tint), white without one.
+func _instance_tint(drawn: Array) -> Color:
+	if drawn.size() < 2 or not is_instance_valid(drawn[0]): return Color.WHITE
+	var mm: MultiMesh = (drawn[0] as MultiMeshInstance3D).multimesh
+	return mm.get_instance_color(drawn[1]) if mm.use_colors and int(drawn[1]) < mm.instance_count else Color.WHITE
+
+## A plant's recoloured batch mesh (C-235: the same on the ground and in the hand), null for trees and rocks.
+func _instance_mesh(drawn: Array, kind: String) -> Mesh:
+	if not kind in PULLED or drawn.size() < 2 or not is_instance_valid(drawn[0]): return null
+	return (drawn[0] as MultiMeshInstance3D).multimesh.mesh
+
+## V-723: a herb's petal colour, the brightest colour its palette variant paints (the lilac-white, the white).
+func _bloom(asset: String, origin: Vector3) -> Color:
+	var palette: Dictionary = _recipe.get("prop_palette", {}) if _recipe is Dictionary else {}
+	var variants = palette.get("assets", {}).get(asset)
+	var pick := Palette.pick(palette, asset, origin) if variants is Array else -1
+	if pick < 0 or pick >= variants.size(): return GatherStage.PETAL_PINK
+	var best := GatherStage.PETAL_PINK
+	var lightest := -1.0
+	for value in variants[pick].get("map", {}).values():
+		var c := Color("#" + str(value))
+		if c.get_luminance() > lightest:
+			lightest = c.get_luminance()
+			best = c
+	return best
 
 ## The batch drawing outer object `index` and its instance there: [MultiMeshInstance3D, i], or [] (not drawn, gone).
 func _outer_instance(index: int) -> Array:
@@ -657,6 +865,18 @@ func work(cell: Vector2i, action: Dictionary) -> Dictionary:
 		job = null
 		if reached == "unreachable": _toast.show_toast(UNREACHABLE, ToastLayer.Severity.REFUSED)
 		return {"ok": false, "code": reached.to_upper()}
+	# C-236 (SEN-Q-345 Q4): a yard obstacle is chopped, broken or pulled like the outer ones; its last hit sends the clear.
+	if action.get("verb") == "clear" and not str(action.get("kind", "")).is_empty() and _body.has_method("gesture"):
+		busy = false
+		var anchor = _obstacles.get(cell)
+		var index: int = _anchors.get(anchor, -1) if anchor != null else -1
+		if index >= 0:
+			var item: Dictionary = _core_plan.layout[index]
+			var hits := int(GatherFx.core(str(item.get("role", ""))).get("hits", 1))
+			var outcome := await strike_down({"key": "core:%s" % ParcelFarm.key(anchor), "model": item.asset, "kind": action.kind,
+				"hits": hits, "rest": item.transform, "drawn": _core_drawn.get(index, []), "cells": cells, "outer": -1, "item": ""}, action.command)
+			job = null
+			return outcome
 	# C-151: Fill and Water play C-153's pail actions, as long as they last (the scene's labour_seconds).
 	var seconds: float = _body.labour_seconds(action.verb, LABOUR_S) if _body.has_method("labour_seconds") else LABOUR_S
 	_body.labour(action.verb, cells, seconds)
@@ -690,8 +910,9 @@ func work_cells(cell: Vector2i, action: Dictionary) -> Array[Vector2i]:
 	return cells
 
 ## Sends one command; the store's reply replaces the local farm either way. `hold_s`: the reply is
-## shown no sooner than this after sending (the labour clip's length).
-func send(command: Dictionary, hold_s := 0.0) -> Dictionary:
+## shown no sooner than this after sending (the labour clip's length). `announce` false (C-236): the caller shows the
+## gains itself, later (they are in the result's `gains`); refusals are shown here either way.
+func send(command: Dictionary, hold_s := 0.0, announce := true) -> Dictionary:
 	busy = true
 	var shown_at := Time.get_ticks_msec() + int(hold_s * 1000.0)
 	var before: Dictionary = farm.get("bag", {}).duplicate()
@@ -703,18 +924,20 @@ func send(command: Dictionary, hold_s := 0.0) -> Dictionary:
 	if not is_inside_tree(): return result
 	_adopt(result)
 	if result.get("ok", false):
-		if command.type in ["harvest", "gather"]:
-			var gains := {}
-			for id: String in farm.bag:
-				var gained := int(farm.bag.get(id, 0)) - int(before.get(id, 0))
-				if gained > 0: gains[id] = gained
-			announce_gains(gains, _gain_screen(command))
+		var gains := {}
+		for id: String in farm.bag:
+			var gained := int(farm.bag.get(id, 0)) - int(before.get(id, 0))
+			if gained > 0: gains[id] = gained
+		result["gains"] = gains
+		if not announce: return result
+		if command.type in ["harvest", "gather"]: announce_gains(gains, _gain_screen(command))
 		var cost := ParcelFarm.energy_cost(rules, command)
 		announce_energy(-cost if cost > 0 else energy_value() - energy_before if command.type == "rest" else 0, _gain_screen(command))
 	elif result.get("code") == "NO_ENERGY":
 		# The server's clock disagreed with the key's: the same card as a short key (LOCK-09).
 		var detail: Dictionary = result.get("detail", {})
-		open_energy_card(int(detail.get("need", ParcelFarm.energy_cost(rules, command))), VERBS.get(_verb_of(command), ""))
+		var label := verb_label(current) if current.get("command") == command else str(VERBS.get(_verb_of(command), ""))
+		open_energy_card(int(detail.get("need", ParcelFarm.energy_cost(rules, command))), label)
 	elif result.get("code") == "VERSION_CONFLICT":
 		_toast.show_toast("Your farm was updated. Try again.", ToastLayer.Severity.INFO)
 	elif result.get("code") == "NOT_RESPAWNED":
@@ -760,7 +983,7 @@ func _refresh_energy() -> void:
 	if e.is_empty(): return
 	# The HUD's third line as P0Logic.hud_state words it: `+1 in 2:41`, or `Full`.
 	var regen := "Full" if e.next_in == null else "+1 in " + P0Logic.duration(float(e.next_in))
-	energy_chip.show_energy(int(e.value), int(e.max), regen, key_cost if key_short else 0)
+	energy_chip.show_energy(_held_energy if _held_energy >= 0 else int(e.value), int(e.max), regen, key_cost if key_short else 0)
 
 ## P0's Energy card (LOCK-09) for an action short of Energy: facts, the RECOVER tiles that only guide, and the one
 ## button `Free to do now` that closes it. Only Rest is on the parcel today; away from a cottage it reads `At home`.
@@ -903,6 +1126,14 @@ func _drop_cleared() -> void:
 		var proxy = _proxies[_anchors[cell]]
 		if proxy != null: _walk.remove_prop(proxy)
 		_removed[cell] = true
+	# C-236: where each remaining obstacle is drawn now (a yard target hides its own instance in the new batches).
+	_core_drawn = {}
+	var kept := 0
+	for i in _core_plan.layout.size():
+		var item: Dictionary = _core_plan.layout[i]
+		if _removed.has(item.cell) or gone.has(item.cell): continue
+		if kept < art.drawn.size(): _core_drawn[i] = art.drawn[kept]
+		kept += 1
 	art.root.name = _core_root.name
 	var parent := _core_root.get_parent()
 	var index := _core_root.get_index()
@@ -914,36 +1145,36 @@ func _drop_cleared() -> void:
 	for cell: Vector2i in _obstacles.keys():
 		if _removed.has(_obstacles[cell]): _obstacles.erase(cell)
 
-## Redraws the outer layer when the set of gathered objects changes: picked trees and rocks
-## fade, picked flowers (non-blocking) are hidden, all come back once grown. Art only: the walk
-## keeps every profile bound at load, so reach and collision never change.
+## Redraws the outer layer when the set of gathered objects changes. C-236: a felled tree leaves its stump, a broken rock
+## its scree (C-235's pieces, one batch per model, in the tree's tint), a pulled herb nothing at all (C-234#50: no root,
+## no leaves); all come back once grown. An object whose last hit is still playing is GatherStage's and drawn by none
+## of these. Art only: the walk keeps every profile bound at load, so reach and collision never change.
 func _draw_gathered() -> void:
 	if _outer_root == null or farm.is_empty(): return
 	var now := server_now()
 	var spent := {}
 	for object: Dictionary in gatherables:
 		if Gather.ready_at(_gather, farm, object.id, now) > 0: spent[object.index] = true
-	if spent == _spent: return
+	if spent == _spent and not _redraw_gathered: return
 	var fresh := []
 	var fresh_at := []
-	var faded := []
-	# MS-08: the object this gather just picked fades into the grey (its own material), the others are grey already.
-	var fading := []
+	var pieces := {}   # model -> [transforms, tints]
 	for i in _outer_layout.size():
-		if not spent.has(i):
-			fresh.append(_outer_layout[i])
+		var item: Dictionary = _outer_layout[i]
+		if not spent.has(i) and not _presenting.has(i):
+			fresh.append(item)
 			fresh_at.append(i)
-		elif not _outer_layout[i].solid: continue
-		elif i == _gathering and not _spent.has(i): fading.append(_outer_layout[i])
-		else: faded.append(_outer_layout[i])
+		elif spent.has(i) and not _presenting.has(i) and item.solid:
+			if not pieces.has(item.asset): pieces[item.asset] = [[], []]
+			pieces[item.asset][0].append(item.transform)
+			pieces[item.asset][1].append(_spent_tint(i))
 	var art := Scenery.build({"layout": fresh}, _walk, _recipe, false)
-	var picked_art := Scenery.build({"layout": faded}, _walk, _recipe, false)
-	var fading_art := Scenery.build({"layout": fading}, _walk, _recipe, false)
-	if not art.ok or not picked_art.ok or not fading_art.ok:
-		for built: Dictionary in [art, picked_art, fading_art]:
-			if built.ok: built.root.free()
-		return
+	if not art.ok: return
 	_spent = spent
+	_redraw_gathered = false
+	var tints := {}
+	for i: int in _outer_drawn: tints[i] = _instance_tint(_outer_drawn[i])
+	_spent_tints.merge(tints, true)
 	_outer_drawn = {}
 	for k in fresh_at.size(): _outer_drawn[fresh_at[k]] = art.drawn[k]
 	for child in _outer_root.get_children():
@@ -952,30 +1183,29 @@ func _draw_gathered() -> void:
 	for child in art.root.get_children():
 		art.root.remove_child(child)
 		_outer_root.add_child(child)
-	if _spent_material == null:
-		_spent_material = ShaderMaterial.new()
-		_spent_material.shader = GATHERED_SHADER
-	for child in picked_art.root.get_children():
-		picked_art.root.remove_child(child)
-		child.name = "Gathered" + child.name
-		(child as GeometryInstance3D).material_override = _spent_material
-		_outer_root.add_child(child)
-	if fading_art.root.get_child_count() > 0:
-		var fade := _spent_material.duplicate() as ShaderMaterial
-		fade.set_shader_parameter(&"amount", 0.0)
-		for child in fading_art.root.get_children():
-			fading_art.root.remove_child(child)
-			child.name = "GatheredFading" + child.name
-			(child as GeometryInstance3D).material_override = fade
-			_outer_root.add_child(child)
-		if is_inside_tree():
-			var tw := create_tween().set_trans(UiTokens.MOTION_EASING_STANDARD[0]).set_ease(UiTokens.MOTION_EASING_STANDARD[1])
-			tw.tween_method(func(v: float): fade.set_shader_parameter(&"amount", v), 0.0, 1.0,
-				UiMotion.secs(UiTokens.MOTION_DURATION_GATHER_FADE_MS))
-		else: fade.set_shader_parameter(&"amount", 1.0)
 	art.root.free()
-	picked_art.root.free()
-	fading_art.root.free()
+	for model: String in pieces:
+		var piece: Dictionary = GatherStage.spent_piece(model)
+		if piece.is_empty(): continue
+		var batch := MultiMeshInstance3D.new()
+		batch.name = "Spent_" + model
+		batch.multimesh = MultiMesh.new()
+		batch.multimesh.transform_format = MultiMesh.TRANSFORM_3D
+		batch.multimesh.use_colors = true
+		batch.multimesh.mesh = piece.mesh
+		batch.multimesh.instance_count = pieces[model][0].size()
+		for j in pieces[model][0].size():
+			batch.multimesh.set_instance_transform(j, pieces[model][0][j])
+			batch.multimesh.set_instance_color(j, pieces[model][1][j])
+		batch.material_override = piece.material
+		batch.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_outer_root.add_child(batch)
+
+## The colour an outer object was drawn in while it grew (the autumn trees), for its stump.
+var _spent_tints := {}
+func _spent_tint(index: int) -> Color:
+	if _outer_drawn.has(index): return _instance_tint(_outer_drawn[index])
+	return _spent_tints.get(index, Color.WHITE)
 
 ## Crop sway on or off (C-141; QA compares the two). Off draws the carrots still, as before.
 func set_sway(on: bool) -> void:
@@ -1032,10 +1262,16 @@ func _draw_crops() -> void:
 
 ## The bag's items in bar order: the farming items first, then anything else with a name.
 func bag_ids() -> Array:
-	var ids: Array = BAG_ORDER.filter(func(id): return int(farm.get("bag", {}).get(id, 0)) > 0)
-	for id: String in farm.get("bag", {}):
-		if id not in ids and _names.has(id) and int(farm.bag[id]) > 0: ids.append(id)
+	var bag := shown_bag()
+	var ids: Array = BAG_ORDER.filter(func(id): return int(bag.get(id, 0)) > 0)
+	for id: String in bag:
+		if id not in ids and _names.has(id) and int(bag[id]) > 0: ids.append(id)
 	return ids
+
+## The bag as the bar and the drawer show it: the save's, except while a gathering's reply waits for its drop to show
+## (C-236 `common.reward_gate`: the counts roll only as the gain appears), when it is the bag from before.
+func shown_bag() -> Dictionary:
+	return _held_bag if _held_bag is Dictionary else farm.get("bag", {})
 
 ## Quick bar and bag drawer follow the save: counts change as each reply lands.
 func _draw_bag() -> void:
@@ -1048,7 +1284,7 @@ func _draw_bag() -> void:
 	for id: String in ids:
 		if slots.size() >= _bar.slot_count: break
 		if id == seed or blueprints.has(id): continue
-		slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": int(farm.bag[id])})
+		slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": int(shown_bag()[id])})
 	_bar.slots = slots
 	_bar.seeds_item = {} if seed.is_empty() else {"id": seed, "icon": item_icon(seed)}
 	if _bag == null and phone == null and _energy_layer == null: _bar.visible = not farm.is_empty() and not held
@@ -1091,7 +1327,7 @@ func _draw_bag_slots(ids: Array) -> void:
 		if i < ids.size():
 			var id: String = ids[i]
 			slot.name = "Slot_" + id
-			slot.item = {"id": id, "icon": item_icon(id), "qty": int(farm.bag[id])}
+			slot.item = {"id": id, "icon": item_icon(id), "qty": int(shown_bag()[id])}
 			slot.is_new = bag_fresh.has(id)
 			_bag_slots[id] = slot
 		else:
@@ -1134,10 +1370,11 @@ func show_notice(text: String) -> void:
 ## most five; a float for the same item still up adds to it (`+3 Carrot`); past four lines a kind joins the newest
 ## line. With the bag or the phone open, or the bar away, nothing flies: the float only, and the Bag end bumps once
 ## when the bar comes back (land_pending). `pickup`: the egg / milk path, the icon flies at once (MS-05).
-## Items without a name or icon in the content table are skipped.
-func announce_gains(gains: Dictionary, from: Vector2, pickup := false) -> void:
+## Items without a name or icon in the content table are skipped. `fly` false (C-236): the floats only; `fly_gains` sends
+## the icons later, from where the gathered drop reached the player.
+func announce_gains(gains: Dictionary, from: Vector2, pickup := false, fly := true, first_line := 0) -> void:
 	last_gains = {}
-	var lines := 0
+	var lines := first_line
 	var flights := 0
 	var newest: UiGainFloat = null
 	var on_screen := _bag == null and phone == null and _bar.is_visible_in_tree()
@@ -1165,6 +1402,7 @@ func announce_gains(gains: Dictionary, from: Vector2, pickup := false) -> void:
 			_gain_lines[id] = {"line": line, "count": count}
 			newest = line
 			lines += 1
+		if not fly: continue
 		if not on_screen:
 			_land_waiting = true
 		elif flights < UiTokens.MOTION_LIMIT_REWARD_ICONS:
@@ -1172,6 +1410,19 @@ func announce_gains(gains: Dictionary, from: Vector2, pickup := false) -> void:
 			if UiRewardFly.launch(_ui, from, to, icon, UiRewardFly.stagger_s(flights), func(): UiMotion.land(to), pickup) != null:
 				flights += 1
 	_float_batch = {"ms": Time.get_ticks_msec(), "lines": lines}
+
+## C-236: the last gain's icons (`last_gains`) fly from `from` into the quick bar now (MS-05's path, as a pickup).
+func fly_gains(from: Vector2) -> void:
+	var on_screen := _bag == null and phone == null and _bar.is_visible_in_tree()
+	var flights := 0
+	for id: String in last_gains:
+		if not on_screen:
+			_land_waiting = true
+			continue
+		if flights >= UiTokens.MOTION_LIMIT_REWARD_ICONS: break
+		var to := landing_for(id)
+		if UiRewardFly.launch(_ui, from, to, item_icon(id), UiRewardFly.stagger_s(flights), func(): UiMotion.land(to), true) != null:
+			flights += 1
 
 func _player_screen() -> Vector2:
 	if _body != null and _body.has_method("screen_point"): return _body.screen_point(_body.player_position(), 1.9)
@@ -1364,6 +1615,7 @@ func _build_ui(canvas: CanvasLayer) -> void:
 	_key = _keys.key()
 	_key.name = "MainKey"
 	_key.pressed_down.connect(_on_key)
+	_key.released.connect(func(): _key_held = false)   # C-236: hits go on while the key is held
 	# C-148: the main HUD's Energy chip; the scene puts it in its top bar (it is not under _ui).
 	energy_chip = UiEnergyChip.new(true)   # C-186: the clay capsule (C-185 §3.1 A)
 	energy_chip.name = "Energy"

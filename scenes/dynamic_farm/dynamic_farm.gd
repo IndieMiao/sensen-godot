@@ -76,6 +76,12 @@ const PAIL_ACTIONS = preload("res://assets/dynamic_farm/watering/bucket_actions.
 const PAIL_LIBRARY := &"pail"
 ## Labour verbs played with the pail -> their action in PAIL_ACTIONS.
 const PAIL_MOTIONS := {"fill": "draw", "water": "pour"}
+## C-236: C-235's gathering grip (the axe, the pick and a pulled-up herb in the right hand; a child of the rig beside
+## its Skeleton3D, like the pail) and its three actions, the rig's `gather` library: labour_chop / labour_break /
+## labour_pluck (0.56 / 0.64 / 0.90 s). One plays per hit; the tool shows only while it does.
+const GATHER_GRIP = preload("res://assets/dynamic_farm/gathering/GatherGrip.tscn")
+const GATHER_ACTIONS = preload("res://assets/dynamic_farm/gathering/gather_actions.tres")
+const GatherFx = preload("res://modules/dynamic_farm/gather_fx.gd")
 ## The scene gives up loading (its shade masks and the player's look) after this much time in drawn frames (C-168).
 ## Time with no frames does not count: building the scene in _ready (about 19 s under an emulator's software renderer),
 ## a lost Android render surface, the app in the background. Counted wall time from _ready, a slow build alone spent it,
@@ -175,6 +181,11 @@ var _labour_left := 0.0
 var _showing_house := false
 ## The pail in the hand (PAIL_GESTURE), made the first time Fill or Water plays; hidden between them.
 var _pail: Node3D
+## C-236: the gathering grip on the rig (null until the first hit) and the camera's shake: metres, seconds left of it.
+var _grip: Node3D
+var _shake_m := 0.0
+var _shake_left := 0.0
+var _shake_s := 0.0
 
 func setup(args: Dictionary) -> void:
 	_args = args.duplicate(true)
@@ -270,7 +281,8 @@ func _ready() -> void:
 			if bool(ProjectSettings.get_setting(LOCAL_SAVE_SETTING, false)): store = LocalFarmStore.new(_data.block_id)
 			else: store = RemoteFarmStore.new(net.client if net != null else null, _data.block_id, _data.dataset_version)
 		_paths = FarmPath.new(_walk)
-		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies, "recipe": _plan.recipe}, store, _canvas,
+		_farming.setup(_data, _walk, {"plan": _plan.core_obstacles, "root": core_art.root, "proxies": core_art.proxies, "recipe": _plan.recipe,
+			"drawn": core_art.drawn}, store, _canvas,
 			self, {"layout": _plan.layout, "root": _props, "recipe": _plan.recipe, "drawn": art.drawn})
 		_hint.hide()
 		_farming.state_changed.connect(_on_farm_changed)
@@ -1031,6 +1043,7 @@ func _process(delta: float) -> void:
 		if _labour_left <= 0.0:
 			_play("idle")
 			_put_pail_away()
+			_put_tools_away()
 	else:
 		if steering and not _route.is_empty(): _end_route("cancelled")
 		if not _route.is_empty():
@@ -1056,6 +1069,7 @@ func _process(delta: float) -> void:
 		_farming.update(dt, _walk.cell_at(_actor.position + _facing * _walk.cell_m * 0.8), steering,
 			_actor.position, _facing)
 	if steering: _showing_house = false
+	if _shake_left > 0.0: _shake_left = maxf(0.0, _shake_left - dt)
 	if not _overview and not _showing_house and _arrange == null:
 		var size := get_viewport().get_visible_rect().size
 		var safe := Rect2(size*Vector2(0.23,0.26),size*Vector2(0.54,0.48))
@@ -1111,6 +1125,7 @@ func labour(verb: String, cells: Array, seconds: float) -> void:
 		_play("%s/%s" % [PAIL_LIBRARY, PAIL_MOTIONS[verb]])
 		return
 	_put_pail_away()
+	_put_tools_away()
 	_play(AnimPlaceholders.clip_for(verb))
 	if AnimPlaceholders.is_placeholder(verb) and _rig != null: AnimPlaceholders.play_fallback(_rig, seconds)
 
@@ -1133,6 +1148,89 @@ func _take_pail() -> bool:
 
 func _put_pail_away() -> void:
 	if _pail != null: _pail.visible = false
+
+## C-236: one gathering hit of `kind` (tree, rock, flower, bush, weed) facing `cells`: its clip from the start (each
+## press re-arms it), the axe or the pick in hand (none for a pull), the player held still for the clip. Returns the
+## clip's length; without the clip (no rig) the main farm's labour clip of its fallback for the cycle's length.
+func gesture(kind: String, cells: Array) -> float:
+	_face_cells(cells)
+	var clip := GatherFx.clip(kind)
+	var player := _rig.get_node_or_null("AnimationPlayer") as AnimationPlayer if _rig != null else null
+	if clip.is_empty() or player == null or _rig.get_node_or_null("Skeleton3D") == null:
+		var seconds := GatherFx.cycle_s(kind)
+		labour(str(GatherFx.kind(kind).get("clip_fallback", "labour_harvest")).trim_prefix("labour_"), cells, seconds)
+		return seconds
+	if not player.has_animation_library(GatherFx.LIBRARY): player.add_animation_library(GatherFx.LIBRARY, GATHER_ACTIONS)
+	_put_pail_away()
+	var grip := _take_grip()
+	var tool := str(GatherFx.GRIP.get(GatherFx.tool_of(kind), ""))
+	for name in ["Axe", "Pickaxe"]:
+		var node := grip.get_node_or_null("Hand/Grip/" + name) as Node3D
+		if node != null: node.visible = name == tool
+	_clip = ""   # the same clip again starts again
+	player.stop()
+	_play(clip)
+	var length := player.get_animation(clip).length
+	_labour_left = length
+	return length
+
+## The hit was cut short (the stick moved before contact, or after it to skip the follow-through): the player is free.
+func cut_labour() -> void:
+	if _labour_left <= 0.0: return
+	_labour_left = 0.0
+	_play("idle")
+	_put_tools_away()
+
+## C-236: the pulled-up herb or weed `model` in the right hand (C-235: it stays there until the reply), recoloured with
+## its batch's `mesh`; `shown` false puts it away. `refused`: it fades out first (the grip's `refuse`, 0.2 s).
+func hold_plant(model: String, shown: bool, mesh: Mesh = null, refused := false) -> void:
+	var grip := _take_grip()
+	if grip == null: return
+	var player := grip.get_node_or_null("AnimationPlayer") as AnimationPlayer
+	var held := str(GatherFx.HELD.get(model, ""))
+	for name: String in GatherFx.HELD.values():
+		var node := grip.get_node_or_null("Hand/Grip/" + name) as Node3D
+		if node == null: continue
+		if shown:
+			node.visible = name == held
+			if name == held and mesh != null:
+				for part: MeshInstance3D in node.find_children("pg_*", "MeshInstance3D", true, false): part.mesh = mesh
+		elif not refused: node.visible = false
+	if shown and player != null and player.has_animation("reset"): player.play("reset")
+	if not shown and refused and player != null and player.has_animation("refuse"):
+		player.play("refuse")
+		get_tree().create_timer(player.get_animation("refuse").length).timeout.connect(func():
+			for name: String in GatherFx.HELD.values():
+				var node := grip.get_node_or_null("Hand/Grip/" + name) as Node3D
+				if node != null: node.visible = false
+			if player.has_animation("reset"): player.play("reset"))
+
+func _take_grip() -> Node3D:
+	if _rig == null or _rig.get_node_or_null("Skeleton3D") == null: return null
+	if _grip == null:
+		_grip = GATHER_GRIP.instantiate() as Node3D
+		_grip.name = "GatherGrip"
+		_rig.add_child(_grip)
+	return _grip
+
+func _put_tools_away() -> void:
+	if _grip == null: return
+	for name in ["Axe", "Pickaxe"]:
+		var node := _grip.get_node_or_null("Hand/Grip/" + name) as Node3D
+		if node != null: node.visible = false
+
+## C-236: the gatherer's clip holds still for `ms` on contact (the approved hit-stop).
+func hitstop(ms: int) -> void:
+	var player := _rig.get_node_or_null("AnimationPlayer") as AnimationPlayer if _rig != null else null
+	if player == null: return
+	player.speed_scale = 0.0
+	get_tree().create_timer(ms / 1000.0).timeout.connect(func(): if is_instance_valid(player): player.speed_scale = 1.0)
+
+## C-236: the camera shakes `metres` for `ms` (a tree landing; never under reduced motion, the caller's rule).
+func shake_camera(metres: float, ms: float) -> void:
+	_shake_m = metres
+	_shake_s = ms / 1000.0
+	_shake_left = _shake_s
 
 ## Standing on a cell beside `cells`, not on one of them, near enough to reach.
 func _within_reach(cells: Array) -> bool:
@@ -1196,7 +1294,11 @@ func _end_route(result: String) -> void:
 func _place_camera() -> void:
 	if _camera == null: return
 	_camera.size = _normal_size * _zoom
-	CameraRules.place(_camera,_focus)
+	var shake := Vector3.ZERO
+	if _shake_left > 0.0 and _shake_s > 0.0:
+		var k := _shake_left / _shake_s
+		shake = Vector3(sin(_shake_left * 90.0), 0.0, cos(_shake_left * 70.0)) * _shake_m * k
+	CameraRules.place(_camera,_focus + shake)
 	CameraRules.fit_ground_depth(_camera, Cliff.LOWEST_Y, 5.0)
 
 func set_review_overview(enabled: bool) -> void:
@@ -1567,6 +1669,7 @@ func suspend() -> void:
 	if not _route.is_empty(): _end_route("cancelled")
 	_labour_left = 0.0
 	_put_pail_away()
+	_put_tools_away()
 	_movement = Vector2.ZERO
 	_controls.reset()
 	_canvas.visible = false

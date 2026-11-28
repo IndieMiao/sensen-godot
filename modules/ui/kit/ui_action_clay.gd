@@ -11,6 +11,8 @@ const GROUPS := {
 	"Sow": Group.SOW,
 	"Water": Group.WATER, "Fill": Group.WATER,
 	"Harvest": Group.HARVEST, "Gather": Group.HARVEST, "Feed": Group.HARVEST,
+	# C-236 (SEN-Q-345 Q1, LOCK-02): gathering's verbs per object, still the harvest group.
+	"Chop": Group.HARVEST, "Break": Group.HARVEST, "Pick": Group.HARVEST, "Pull": Group.HARVEST,
 	"Rest": Group.REST,
 	"Growing": Group.OFF, "Regrowing": Group.OFF,
 }
@@ -25,6 +27,10 @@ const ICONS := {
 	"Fill": preload("res://assets/ui/icons/lucide/droplet.svg"),
 	"Harvest": preload("res://assets/ui/icons/lucide/carrot.svg"),
 	"Gather": preload("res://assets/ui/icons/lucide/leaf.svg"),
+	"Chop": preload("res://assets/ui/icons/lucide/axe.svg"),
+	"Break": preload("res://assets/ui/icons/lucide/pickaxe.svg"),
+	"Pick": preload("res://assets/ui/icons/lucide/flower-2.svg"),
+	"Pull": preload("res://assets/ui/icons/lucide/hand.svg"),
 	"Feed": preload("res://assets/ui/icons/lucide/wheat.svg"),
 	"Rest": preload("res://assets/ui/icons/lucide/moon.svg"),
 	"Growing": preload("res://assets/ui/icons/lucide/clock-3.svg"),

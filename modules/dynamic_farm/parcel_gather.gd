@@ -1,7 +1,8 @@
 extends RefCounted
 ## Outer gathering on the owner's own parcel (C-60; owner rules C-30#29 question 4, C-30#36):
-## the trees, flowers and rocks C-20 placed in the extension are picked by hand, no tool,
-## one item each, and grow back after the server's respawn time. Kinds, items, amounts, the
+## the trees, flowers and rocks C-20 placed in the extension are gathered and grow back after the server's respawn time.
+## C-236 (SEN-Q-342 §5): a tree takes 3 chops for 2 Timber (3 Energy), a rock 2 for 1 Stone (2), a flower one pick (2);
+## the hits are the client's, the one `gather` on the last settles the whole object (SEN-Q-345 Q3). Kinds, items, amounts, the
 ## respawn time and the per-kind cap are `economy.gather` of assets/farm/data/dynamic_farm.json,
 ## the file the server validates (C-58 rules.ts); this client copy only reads them.
 ##
@@ -32,8 +33,10 @@ static func rules() -> Dictionary:
 		_rules = parse(raw.get("economy", {}).get("gather") if raw is Dictionary and raw.get("economy") is Dictionary else null)
 	return _rules
 
-## {recipe_version, respawn_ms, sources: {kind: {item, amount, max_objects, models}}, kind_of: {model: kind}}
+## {recipe_version, respawn_ms, sources: {kind: {item, amount, max_objects, models, energy, hits}}, kind_of: {model: kind}}
 ## with the server's bounds: respawn 1 s–30 days, 1–99 per gather, cap 1–1000, a model in one kind only.
+## C-236 (SEN-Q-342 §5, SEN-Q-345 Q3): `energy` is the whole object's price, paid once on the last hit (0–1000; -1 when the
+## kind does not say: `energy.costs.gather` then), `hits` how many hits it takes (1–20, 1 when not said; client only).
 static func parse(raw: Variant) -> Dictionary:
 	if not raw is Dictionary or not _is_id(raw.get("recipe_version")) or not _whole_in(raw.get("respawn_seconds"), 1, 30 * 24 * 3600) \
 			or not raw.get("sources") is Dictionary or raw.sources.is_empty():
@@ -42,15 +45,24 @@ static func parse(raw: Variant) -> Dictionary:
 	for kind in raw.sources:
 		var src = raw.sources[kind]
 		if not _is_id(kind) or not src is Dictionary or not _is_id(src.get("item")) or not _whole_in(src.get("amount"), 1, 99) \
-				or not _whole_in(src.get("max_objects"), 1, 1000) or not src.get("models") is Array or src.models.is_empty():
+				or not _whole_in(src.get("max_objects"), 1, 1000) or not src.get("models") is Array or src.models.is_empty() \
+				or (src.has("energy") and not _whole_in(src.energy, 0, 1000)) or (src.has("hits") and not _whole_in(src.hits, 1, 20)):
 			return {}
 		for model in src.models:
 			if not _is_id(model) or out.kind_of.has(model): return {}
 			out.kind_of[model] = kind
-		out.sources[kind] = {"item": src.item, "amount": int(src.amount), "max_objects": int(src.max_objects), "models": src.models.duplicate()}
+		out.sources[kind] = {"item": src.item, "amount": int(src.amount), "max_objects": int(src.max_objects), "models": src.models.duplicate(),
+			"energy": int(src.get("energy", -1)), "hits": int(src.get("hits", 1))}
 	return out
 
-## The gatherable instances of a drawn outer layout: [{id, index, kind, item, amount, asset, cell, origin, box}],
+## The Energy `object` (an id) costs, as the server's energyCost: its kind's `energy`, else -1 (use `energy.costs.gather`).
+static func energy_of(gather: Dictionary, object: Variant) -> int:
+	var o = parse_id(object)
+	if o == null or gather.is_empty(): return -1
+	var kind = gather.kind_of.get(o.model)
+	return int(gather.sources[kind].energy) if kind != null else -1
+
+## The gatherable instances of a drawn outer layout: [{id, index, kind, item, amount, hits, asset, cell, origin, box}],
 ## `index` into `layout`. [] when the layout's recipe version is not the one the rules lock.
 static func objects(layout: Array, walk: RefCounted, block_id: String, gather: Dictionary, outer_version: String) -> Array:
 	var out := []
@@ -69,7 +81,7 @@ static func objects(layout: Array, walk: RefCounted, block_id: String, gather: D
 		if ordinal > MAX_ORDINAL: continue
 		var src: Dictionary = gather.sources[kind]
 		out.append({"id": "%s:%d" % [base, ordinal], "index": index, "kind": kind, "item": src.item, "amount": src.amount,
-			"asset": item.asset, "cell": cell, "origin": origin, "box": item.box})
+			"hits": src.hits, "asset": item.asset, "cell": cell, "origin": origin, "box": item.box})
 	return out
 
 ## {parcel_id, recipe_version, model, cell ("x,y"), ordinal} or null, like the server's parseObjectId.
