@@ -24,6 +24,7 @@ import { loadStarterZones, starterZoneSwitchFromEnv } from './parcels/starter_zo
 import { signupClosedFromEnv } from './accounts/routes.js';
 import { anonymousSignupLimitsFromEnv, guestAccountsClosedFromEnv } from './http/signup_limits.js';
 import { accountLimitsFromEnv } from './accounts/limits.js';
+import { createAnalytics, mixpanelConfigFromEnv } from './analytics/mixpanel.js';
 
 const need = (k: string): string => {
   const v = process.env[k];
@@ -45,6 +46,9 @@ const guestAccountsClosed = guestAccountsClosedFromEnv(process.env);
 if (guestAccountsClosed === null) { console.error('GUEST_ACCOUNTS 只能是 open 或 closed'); process.exit(1); }
 const accountLimits = accountLimitsFromEnv(process.env);
 if ('invalid' in accountLimits) { console.error(`${accountLimits.invalid} 只能是 1–1000000 的整数`); process.exit(1); }
+// Product analytics (C-203): off unless MIXPANEL_PROJECT_TOKEN and MIXPANEL_API_HOST are both set.
+const mixpanel = mixpanelConfigFromEnv(process.env);
+if (mixpanel && 'invalid' in mixpanel) { console.error(mixpanel.invalid); process.exit(1); }
 
 const ROOT = process.env.ASSET_ROOT ?? path.resolve(process.cwd(), '..');
 const CONTENT_DIR = path.join(ROOT, 'assets', 'farm', 'data');
@@ -115,6 +119,7 @@ function googleConfig() {
 }
 
 const parcelStore = new PgParcelStore(pool);
+const analytics = createAnalytics(mixpanel);
 const app = await buildApp({
   store, content, contentVersion: cv,
   blueprintDir: BLUEPRINT_DIR, regionsFile: path.join(CONTENT_DIR, 'regions.json'),
@@ -147,10 +152,13 @@ const app = await buildApp({
   // Starter zone (C-130): while on, players without a parcel may only claim inside it; PARCEL_STARTER_ZONE=0/1 overrides the file.
   parcels: { store: parcelStore, rules: loadParcelRules(CONTENT_DIR), reselect: parcelReselectFromEnv(process.env), guestWrites: parcelGuestWrites,
     starterZones },
+  analytics,
 });
 // Guests' parcels idle over PARCEL_IDLE_RECLAIM_DAYS (default 30, 0 = never) return to the map (C-100).
 const stopReclaim = scheduleIdleReclaim(parcelStore, parcelIdleDays, () => Date.now(), line => console.log(line));
 app.addHook('onClose', async () => { stopReclaim(); });
+// Events still queued are sent on shutdown; a failure there is only logged.
+app.addHook('onClose', async () => { await analytics.close(); });
 
 // Only one room writer may serve this database. HTTP-only replicas set REALTIME_ENABLED=0.
 // A lost lock connection closes the gateway instead of allowing two authorities to diverge.
@@ -170,4 +178,4 @@ if (process.env.REALTIME_ENABLED !== '0') {
 
 const port = Number(process.env.PORT ?? 3000);
 await app.listen({ port, host: '0.0.0.0' });
-console.log(`farm-server listening on ${port} content=${cv} cities=${cities.size} ip_city=${ipLocator ? 'on' : 'off'} guest_writes=${process.env.GUEST_WRITES === '1'} parcel_reselect=${parcelReselectFromEnv(process.env)} parcel_guest_writes=${parcelGuestWrites} parcel_idle_days=${parcelIdleDays} anonymous_signups=${anonymousSignupLimits.perNetwork}/${anonymousSignupLimits.perBlock}/${anonymousSignupLimits.total} starter_zone=${starterZones.enabled ? starterZones.zones.map(z => z.id).join(',') || 'none' : 'off'} signup=${signupClosed ? 'closed' : 'open'} guest_accounts=${guestAccountsClosed ? 'closed' : 'open'}`);
+console.log(`farm-server listening on ${port} content=${cv} cities=${cities.size} ip_city=${ipLocator ? 'on' : 'off'} guest_writes=${process.env.GUEST_WRITES === '1'} parcel_reselect=${parcelReselectFromEnv(process.env)} parcel_guest_writes=${parcelGuestWrites} parcel_idle_days=${parcelIdleDays} anonymous_signups=${anonymousSignupLimits.perNetwork}/${anonymousSignupLimits.perBlock}/${anonymousSignupLimits.total} starter_zone=${starterZones.enabled ? starterZones.zones.map(z => z.id).join(',') || 'none' : 'off'} signup=${signupClosed ? 'closed' : 'open'} guest_accounts=${guestAccountsClosed ? 'closed' : 'open'} analytics=${mixpanel ? new URL(mixpanel.host).host : 'off'}`);

@@ -23,6 +23,8 @@ import { IdTokenError } from './firebase_token.js';
 import { DEFAULT_ACCOUNT_LIMITS, type AccountLimits } from './limits.js';
 import { networkKey } from '../http/network.js';
 import { createHmac } from 'node:crypto';
+import { EVENTS, accountCreatedInsertId } from '../analytics/events.js';
+import { NO_ANALYTICS, type Analytics } from '../analytics/mixpanel.js';
 
 export interface AccountRouteDeps {
   store: Store;
@@ -50,6 +52,8 @@ export interface AccountRouteDeps {
   signupClosed?: boolean;
   /** 登录与发信上限（C-132）；见 limits.ts。 */
   limits?: Partial<AccountLimits>;
+  /** 产品分析上报（C-203）：注册和登录；不传不上报。 */
+  analytics?: Analytics;
 }
 
 /** 不存在的账号也照样查一次可信网络，免得多一次查询的耗时泄露注册与否。 */
@@ -86,6 +90,11 @@ const bearer = (req: FastifyRequest) => {
 export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
   auth: (req: FastifyRequest) => Promise<PlayerRow | null>) {
   const log = deps.log ?? (line => console.log(line));
+  const analytics = deps.analytics ?? NO_ANALYTICS;
+  /** 新账号报 account_created（时间取账号建立时间、去重键固定，补发脚本再报也只算一次）；老账号登录报 login。 */
+  const trackSignIn = (user: UserRow, method: 'email' | 'google' | 'apple', created: boolean) => created
+    ? analytics.track(EVENTS.accountCreated, user.id, { method }, { time: user.created_at, insertId: accountCreatedInsertId(user.id) })
+    : analytics.track(EVENTS.login, user.id, { method }, { time: deps.now() });
   const isQa = (email: string) => Boolean(deps.qaEmailDomain && deps.qaEmailCode && email.endsWith('@' + deps.qaEmailDomain));
   const bodyEmail = (req: FastifyRequest) => normalizeEmail((req.body as { email?: unknown } | undefined)?.email);
 
@@ -184,6 +193,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     }
     const session = await deps.store.authUser(created.user.id, deps.now());
     await trustNetwork(created.user.id, req);
+    trackSignIn(created.user, 'email', true);
     // Over the mail limit the account still exists; the code can be asked for again later.
     const mailWait = await mailQuotaWait(email, req);
     const sent = mailWait === null ? await sendCode(email, 'verify') : { ok: false };
@@ -203,6 +213,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     if (!await verifyPassword(body.password, user.password_hash)) return reply.code(401).send({ code: 'INVALID_CREDENTIALS', server_time: deps.now() });
     const session = await deps.store.authUser(user.id, deps.now());
     await trustNetwork(user.id, req);
+    trackSignIn(user, 'email', false);
     return reply.send({ token: session.token, ...userView(user, session.player, deps.now()), server_time: deps.now() });
   });
 
@@ -262,6 +273,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     if (!resolved) return reply.code(409).send({ code: 'EMAIL_IN_USE', server_time: deps.now() });
     const session = await deps.store.authUser(resolved.user.id, deps.now());
     await trustNetwork(resolved.user.id, req);
+    trackSignIn(resolved.user, 'google', resolved.created);
     return reply.code(resolved.created ? 201 : 200).send({ token: session.token, ...userView(resolved.user, session.player, deps.now()),
       created: resolved.created, server_time: deps.now() });
   });
@@ -297,6 +309,7 @@ export function registerAccounts(app: FastifyInstance, deps: AccountRouteDeps,
     }
     const session = await deps.store.authUser(user.id, deps.now());
     await trustNetwork(user.id, req);
+    trackSignIn(user, 'apple', created);
     return reply.code(created ? 201 : 200).send({ token: session.token, ...userView(user, session.player, deps.now()),
       created, server_time: deps.now() });
   });
