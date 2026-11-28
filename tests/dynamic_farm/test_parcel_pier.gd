@@ -3,6 +3,8 @@ extends SceneTree
 ## contours (SEN-C-233's when it is in the build, else the stand-in pier), the first visit's Starter Rod, a tap on the
 ## water at two different points of the edge walks there and casts toward the tap (the owner on SEN-C-233#50: the
 ## whole edge fishes), the reel plays (auto_play) and the save takes the server-side result, the bait chip, Back to the map.
+## C-250: the farm top bar's clay Energy chip (LOCK-06) beside the place shows the save's Energy; a cast takes 5 off it at
+## once; amber short of a cast, red at 0.
 ## The device runs in Simplified Chinese throughout: the panel's key and hint stay English (W-801's V-773 on C-232).
 ##   godot --headless --path . --script res://tests/dynamic_farm/test_parcel_pier.gd
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -72,6 +74,18 @@ func _run() -> void:
 	# First visit: the Starter Rod, once.
 	_check(int(pier.farm.bag.get("rod_starter", 0)) == 1 and Fishing.fishing_of(pier.farm.fishing).gifted_at != null, "the first visit gives a Starter Rod")
 	_check(pier.toast.current_text() == "Received Starter Rod ×1", "… and says so")
+	# C-250: the Energy chip (LOCK-06) in the top bar, right of the place capsule, as the farm's top bar has it.
+	var chip: UiEnergyChip = pier.energy_chip
+	var full: int = ParcelFarm.max_energy(ParcelFarm.rules(), pier.farm)
+	_check(chip != null and chip.visible and chip.clay and chip.get_parent() == pier._top and chip.get_index() == pier._top.get_node("Place").get_index() + 1,
+		"the farm's clay Energy chip sits in the top bar right after the place")
+	_check(chip.energy == full and chip.energy_max == full and chip.value_label.text == "%d/%d" % [full, full] and chip.regen_text() == "Full"
+		and chip.state() == UiHud.Energy.FULL, "it shows the save's Energy: %s, %s" % [chip.value_label.text, chip.regen_text()])
+	var place: Rect2 = pier._top.get_node("Place").get_global_rect()
+	var face: Rect2 = chip.visual_rect()
+	var screen_w: float = pier.get_viewport().get_visible_rect().size.x
+	_check(face.position.x >= place.end.x and face.end.x <= screen_w - UiTokens.SIZE_SCREEN_EDGE + 0.5 and is_equal_approx(face.size.x, UiTokens.SIZE_HUD_CLAY_ENERGY_W),
+		"its %d px capsule fits beside the place on a %d px screen (%.0f–%.0f)" % [UiTokens.SIZE_HUD_CLAY_ENERGY_W, screen_w, face.position.x, face.end.x])
 	# Two taps on the water on two sides of the pier: two different edge points, both cast toward the tap.
 	var spots := _two_spots(pier)
 	_check(spots.size() == 2, "two water points with an edge point each")
@@ -100,6 +114,13 @@ func _run() -> void:
 		var want: Dictionary = a if i == 0 else b
 		_check(Vector2(stood.x, stood.z).distance_to(Vector2(want.origin.x, want.origin.z)) <= pier.ARRIVE_M + pier.CELL_M,
 			"tap %d: the player stands at its edge point" % (i + 1))
+		if i == 0:
+			deadline = Time.get_ticks_msec() + 10000
+			while pier.panel.phase in ["ready", "casting"] and Time.get_ticks_msec() < deadline: await process_frame
+			await process_frame
+			var cost := int(ParcelFarm.rules().fishing.cast_energy)
+			_check(pier.panel.phase in ["waiting", "hook", "playing"] and chip.energy == full - cost and chip.regen_text().begins_with("+1 in "),
+				"the cast takes %d off the chip at once (%d → %d, %s)" % [cost, full, chip.energy, chip.regen_text()])
 		deadline = Time.get_ticks_msec() + 45000
 		while pier.panel.phase != "result" and Time.get_ticks_msec() < deadline:
 			seen[pier.panel._primary.text] = true
@@ -120,6 +141,12 @@ func _run() -> void:
 	var f: Dictionary = ParcelFarm.rules().fishing
 	_check(int(Fishing.fishing_of(pier.farm.fishing).casts) == 2, "two casts went to the save")
 	_check(int(pier.farm.energy.value) <= energy_before - 2 * int(f.refund_fail) + 1, "each cast cost Energy")
+	_check(chip.energy == pier.energy_now().value, "the chip follows the save after the reels (%d)" % chip.energy)
+	# The farm's colour rule: amber only when short of the next action (a cast), red at 0.
+	for case in [[int(f.cast_energy) - 1, UiHud.Energy.LOW], [0, UiHud.Energy.EMPTY], [int(f.cast_energy), UiHud.Energy.NORMAL]]:
+		pier.farm.energy = {"value": case[0], "at": pier.server_now(), "rested_on": null}
+		await process_frame
+		_check(chip.energy == case[0] and chip.state() == case[1], "%d Energy: the chip is %s" % [case[0], UiHud.Energy.keys()[case[1]]])
 	# The bait chip: none → Worm Bait → none.
 	_check(pier.baits_in_bag() == ["bait_worm"] and pier._bait_key.visible and pier.selected_bait() == null, "the chip shows with a Worm in the bag, no bait picked")
 	pier.cycle_bait()

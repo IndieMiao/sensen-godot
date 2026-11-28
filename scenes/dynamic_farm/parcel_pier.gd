@@ -11,7 +11,8 @@ extends Node3D
 ## Fishing goes through the home's parcel save (store: read / send, as the room's keepers): ParcelFishingPanel and
 ## FishingPresentation (the P0 pond's pose, rod, line, float, landing arc), the walking camera unchanged (LOCK-24 ①:
 ## the farm's scale, pitch and yaw). The first visit sends `visit_pier` (the Starter Rod, once); the bait chip picks
-## the bait in the bag for the next cast. The top bar's back (or Android Back) returns to the map.
+## the bait in the bag for the next cast. The top bar's back (or Android Back) returns to the map; beside the place, the
+## farm's clay Energy capsule (LOCK-06, C-250) shows the save's Energy as one fishes.
 ## Without the model (a build before SEN-C-233 lands) a plain straight pier stands in, with the same four contours.
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Fishing = preload("res://modules/dynamic_farm/parcel_fishing.gd")
@@ -60,6 +61,8 @@ var cam: Camera3D
 var panel: PierPanel
 var view: FishingPresentation
 var toast: ToastLayer
+## C-250: the farm top bar's Energy chip (LOCK-06, the C-186 clay capsule) as is; display only here (no LOCK-09 panel).
+var energy_chip: UiEnergyChip
 ## The bait for the next cast ("" none), picked on the bait chip from what the bag holds.
 var bait := ""
 ## A tap on the water waiting for the player to reach its edge point: {origin, target}.
@@ -262,6 +265,7 @@ func walk_to(p: Vector3) -> bool:
 
 func _process(dt: float) -> void:
 	if _suspended or actor == null: return
+	_refresh_energy()
 	if not is_instance_valid(view):
 		actor.set_input(_joy)
 	actor.step(dt)
@@ -383,7 +387,9 @@ func _adopt(result: Dictionary) -> void:
 		if not next.is_empty():
 			farm = next
 			farm_version = int(result.get("farm_version", farm_version))
-	if is_inside_tree(): _refresh_bait()
+	if is_inside_tree():
+		_refresh_bait()
+		_refresh_energy()
 
 ## The save as it stands (no welcome gift); the first visit sends `visit_pier` for the Starter Rod.
 func _read_farm() -> void:
@@ -426,6 +432,25 @@ func _refresh_bait() -> void:
 	_bait_key.icon = ParcelItems.icon_of(bait) if bait != "" else P0Logic.icon("hook")
 	_bait_key.tooltip_text = ParcelItems.name_of(bait) if bait != "" else "No bait"
 	_bait_count.text = "×%d" % int(farm.get("bag", {}).get(bait, 0)) if bait != "" else ""
+
+# ---------------------------------------------------------------- Energy
+## The save's Energy now, as the farm's top bar settles it (ParcelFarming.energy_now): {value, max, next_in}; {} unread.
+func energy_now() -> Dictionary:
+	var rules := ParcelFarm.rules()
+	if farm.is_empty() or rules.is_empty(): return {}
+	var probe := farm.duplicate()
+	var now := server_now()
+	var e := ParcelFarm.settle_energy(rules, probe, now)
+	return {"value": int(e.value), "max": ParcelFarm.max_energy(rules, probe), "next_in": ParcelFarm.next_tick_in(rules, probe, now)}
+
+## The chip follows the settled value every frame (`+1 in 2:41` ticks between replies); amber short of one cast.
+func _refresh_energy() -> void:
+	if energy_chip == null: return
+	var e := energy_now()
+	energy_chip.visible = not e.is_empty()
+	if e.is_empty(): return
+	var regen := "Full" if e.next_in == null else "+1 in " + P0Logic.duration(float(e.next_in))
+	energy_chip.show_energy(int(e.value), int(e.max), regen, int(ParcelFarm.rules().fishing.cast_energy))
 
 # ---------------------------------------------------------------- leaving
 func leave() -> void:
@@ -515,6 +540,13 @@ func _top_bar() -> HBoxContainer:
 	chip.detail_label().name = "City"
 	chip.detail_label().text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 	bar.add_child(chip)
+	# C-250: the farm's clay Energy capsule (LOCK-06), its links reaching back to the place capsule.
+	energy_chip = UiEnergyChip.new(true)
+	energy_chip.name = "Energy"
+	energy_chip.theme = UiKit.theme()
+	energy_chip.visible = false
+	energy_chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	bar.add_child(energy_chip)
 	return bar
 
 func _safe_top() -> float:
