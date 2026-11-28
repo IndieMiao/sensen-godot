@@ -3,6 +3,7 @@ extends SceneTree
 ## contours (SEN-C-233's when it is in the build, else the stand-in pier), the first visit's Starter Rod, a tap on the
 ## water at two different points of the edge walks there and casts toward the tap (the owner on SEN-C-233#50: the
 ## whole edge fishes), the reel plays (auto_play) and the save takes the server-side result, the bait chip, Back to the map.
+## The device runs in Simplified Chinese throughout: the panel's key and hint stay English (W-801's V-773 on C-232).
 ##   godot --headless --path . --script res://tests/dynamic_farm/test_parcel_pier.gd
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 const Fishing = preload("res://modules/dynamic_farm/parcel_fishing.gd")
@@ -12,6 +13,9 @@ const SCENE := "res://scenes/dynamic_farm/parcel_pier.tscn"
 const T0 := 1795392000000
 const DIR := "user://test_parcel_pier"
 const PARCEL := "p-3512001"
+## The thumb key's and the hint line's English (P0FishingPanel's words, C-232#28).
+const KEYS := ["Cast", "Wait", "Hook", "Reel", "Saving", "Again", "Retry", "Reeling in"]
+const GUIDES := ["Tap to cast · tap again when a fish bites", "Hold to reel · release to ease"]
 var checks := 0
 var failures := 0
 var _start := 0
@@ -48,6 +52,9 @@ func _run() -> void:
 	store.now_ms = func() -> int: return T0 + Time.get_ticks_msec() - _start
 	store._save(ParcelFarm.normalize({"v": 1, "house": null, "cleared": [], "tilled": [], "crops": {}, "bag": {"bait_worm": 2},
 		"welcomed_at": T0 - 86400000, "coins": 40}), 3)
+	var device_locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("zh_CN")
+	_check(TranslationServer.translate("Cast") != "Cast", "the device locale is zh_CN with its translations (Cast → %s)" % TranslationServer.translate("Cast"))
 	var pier: Node3D = (load(SCENE) as PackedScene).instantiate()
 	pier.setup({"store": store, "parcel_id": PARCEL})
 	router.stack.append(pier)
@@ -81,6 +88,7 @@ func _run() -> void:
 	var deck: Vector3 = pier.walkable_point(pier.entrance)
 	_check(pier.cast_plan(Vector3(deck.x, pier.water_y, deck.z)).is_empty(), "a point under the deck is not a cast")
 	var energy_before := int(pier.farm.energy.value)
+	var seen := {}
 	for i in 2:
 		var spot: Vector3 = spots[i]
 		var screen: Vector2 = pier.cam.unproject_position(spot)
@@ -93,7 +101,11 @@ func _run() -> void:
 		_check(Vector2(stood.x, stood.z).distance_to(Vector2(want.origin.x, want.origin.z)) <= pier.ARRIVE_M + pier.CELL_M,
 			"tap %d: the player stands at its edge point" % (i + 1))
 		deadline = Time.get_ticks_msec() + 45000
-		while pier.panel.phase != "result" and Time.get_ticks_msec() < deadline: await process_frame
+		while pier.panel.phase != "result" and Time.get_ticks_msec() < deadline:
+			seen[pier.panel._primary.text] = true
+			if pier.panel._guide.visible: seen[pier.panel._guide.text] = true
+			await process_frame
+		seen[pier.panel._primary.text] = true
 		var last = Fishing.fishing_of(pier.farm.fishing).last
 		_check(pier.panel.phase == "result" and last is Dictionary and str(last.result) in ["landed", "escaped"],
 			"tap %d: the reel played out and the save took its result (%s)" % [i + 1, str(last)])
@@ -103,6 +115,8 @@ func _run() -> void:
 		await pier.panel.close()
 		await process_frame
 		_check(not is_instance_valid(pier.view) and pier.actor.state != "locked", "closing the panel hands the player back")
+	var foreign := seen.keys().filter(func(t: String) -> bool: return not t in KEYS and not t in GUIDES)
+	_check(seen.size() >= 3 and foreign.is_empty(), "on a zh_CN device the key and the hint stay English (%s; not English: %s)" % [seen.keys(), foreign])
 	var f: Dictionary = ParcelFarm.rules().fishing
 	_check(int(Fishing.fishing_of(pier.farm.fishing).casts) == 2, "two casts went to the save")
 	_check(int(pier.farm.energy.value) <= energy_before - 2 * int(f.refund_fail) + 1, "each cast cost Energy")
@@ -116,6 +130,8 @@ func _run() -> void:
 	pier.leave()
 	for i in 3: await process_frame
 	_check(router.pops == 1, "Back pops the pier")
+	_check(TranslationServer.get_locale() == "zh_CN", "leaving the pier gives the device its locale back (%s)" % TranslationServer.get_locale())
+	TranslationServer.set_locale(device_locale)
 	_finish(router, real_router)
 
 ## Two water points ~3 m out from fish_edge at a fifth and four fifths of its length, each on the side the water is.

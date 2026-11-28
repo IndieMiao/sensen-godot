@@ -76,6 +76,9 @@ var _pinch = ElasticZoom.new(ZOOM_RANGE.x, ZOOM_RANGE.y)
 var _leaving := false
 var _suspended := false
 var _joy := Vector2.ZERO
+## The device's locale while the pier is open (the panel's P0 strings go through L10n, so the pier is English like the
+## rest of the dynamic farm, C-82#48; the profile page does the same).
+var _locale := ""
 
 func setup(args: Dictionary) -> void:
 	store = args.get("store") as RefCounted
@@ -83,6 +86,8 @@ func setup(args: Dictionary) -> void:
 
 func _ready() -> void:
 	name = "ParcelPier"
+	_locale = TranslationServer.get_locale()
+	TranslationServer.set_locale("en")
 	_build_world()
 	_build_walk()
 	_build_actor()
@@ -92,6 +97,9 @@ func _ready() -> void:
 	add_child(panel)
 	panel.closed.connect(_end_fishing)
 	_read_farm()
+
+func _exit_tree() -> void:
+	if not _locale.is_empty(): TranslationServer.set_locale(_locale)
 
 # ---------------------------------------------------------------- world
 func _build_world() -> void:
