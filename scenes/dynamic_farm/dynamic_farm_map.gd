@@ -26,6 +26,9 @@ extends Control
 ## (`sensen/dynamic_farm/account_restore`: the internal and release packages) opens the map only with an account: without
 ## one the sign-in panel stands over an empty screen with no way past it (no ✕) until the player signs in or signs up;
 ## signing out puts it back and takes the map and its parcels away.
+## C-243 (Google Play: deletion in the app): Settings › Delete account on the profile, over the map or the parcel
+## (parcel_profile.gd), deletes the account; the sign-in panel then comes back as after Sign out, saying so
+## (ACCOUNT_DELETED). Deleted over the parcel, the parcel goes back to the map, which shows the panel instead of reloading.
 const Api := preload("res://modules/dynamic_farm/map/geo_api.gd")
 const Selection := preload("res://modules/dynamic_farm/map/selection_controller.gd")
 const CameraInput := preload("res://modules/dynamic_farm/map/geo_native_camera.gd")
@@ -79,6 +82,8 @@ const SIGNED_IN_NO_NAME := "Signed in"
 const SIGN_OUT_ASK := "Sign out on this phone?"
 ## The saved account was kept because the server could not confirm it (5xx, rate limit or no network).
 const ACCOUNT_KEPT := "Can't reach the server. You're still signed in."
+## The sign-in panel's line after Settings › Delete account (C-243).
+const ACCOUNT_DELETED := "Your account has been deleted."
 ## UI v3 (C-106, C-85 ⑤ as approved in Q-124): the pieces, the board's copy and the art.
 const MapUi := preload("res://scenes/dynamic_farm/map_ui.gd")
 const CITY := "San Francisco"
@@ -255,11 +260,12 @@ func signed_in_first() -> bool:
 
 ## The sign-in panel with no ✕ (AccountPanel.set_gate) over the map's empty screen; the map's own keys are hidden. It closes
 ## only once signed in (sign-up signs in too).
-func _sign_in_gate() -> bool:
+func _sign_in_gate(notice := "") -> bool:
 	_gated = true
 	_hud.hide()
 	if _camera != null: _camera.input_enabled = false
-	var panel: CanvasLayer = load(ACCOUNT_PANEL).open(self, "sign_in", "", true, true) # the v3 look (C-85 ④), in English (C-144)
+	# the v3 look (C-85 ④), in English (C-144)
+	var panel: CanvasLayer = load(ACCOUNT_PANEL).open(self, "sign_in", "", true, true, notice)
 	panel.set_gate(true)
 	var signed_in: bool = await panel.closed
 	_gated = false
@@ -749,18 +755,27 @@ func _sign_out() -> void:
 	await net.sign_out(false)
 	_signing_out = false
 	if not is_inside_tree(): return
+	await _signed_out()
+
+## After Sign out or Delete account: the map goes with the account, the sign-in panel (with `notice`) comes back.
+func _signed_out(notice := "") -> void:
 	_account_changed()
-	if account_required() and not net.account.signed_in(): await _gate_map()
+	if account_gone(): await _gate_map(notice)
+
+## A package that needs an account has none (signed out, or deleted on the parcel's profile: C-243).
+func account_gone() -> bool:
+	var net := get_node_or_null("/root/Net")
+	return account_required() and net != null and not net.account.signed_in()
 
 ## Takes the map away for the sign-in panel and brings it back for the account that signs in.
-func _gate_map() -> void:
+func _gate_map(notice := "") -> void:
 	_gated = true # before the parcels are cleared, so nothing redrawn meanwhile lets the map move
 	if _camera != null: _camera.stop()
 	if _selector != null: _selector.pause() # clears the parcel layers and hides the native map
 	if _claims != null: _claims.pause(); _claims.forget()
 	if _entry != null: _entry.close_card()
 	if _pier != null: _pier.close_card()
-	if not await _sign_in_gate(): return
+	if not await _sign_in_gate(notice): return
 	_account_changed()
 	if _suspended or _leaving: return # resume() loads the map again
 	# Google's account picker leaves the app while the panel is up: that pause made the Godot viewport opaque and
@@ -1050,6 +1065,7 @@ func _open_profile() -> void:
 	if _camera != null: view = Vector3(float(_camera.center[1]), float(_camera.center[0]), float(_camera.zoom))
 	_profile = load(PROFILE).open(self, view, _profile_home())
 	_profile.closed.connect(_profile_closed)
+	_profile.account_deleted.connect(_signed_out.bind(ACCOUNT_DELETED))
 	_hud.hide()
 	if _camera != null: _camera.input_enabled = false
 
@@ -1160,6 +1176,9 @@ func resume() -> void:
 	# C-188 (R-01..R-03): back from a trip's scene the iris opens from its place, where the avatar now stands.
 	if _travel != null and not _inside.is_empty():
 		_travel.come_back(_inside, _inside); _inside = ""; _show_card()
+	# C-243: the account went while the parcel was open (deleted on its profile): the sign-in panel, not the map for no one.
+	if account_gone():
+		_signed_out(ACCOUNT_DELETED if get_node("/root/Net").deleted_here else ""); return
 	_presentation_epoch += 1
 	if _bridge != null:
 		get_viewport().transparent_bg = true

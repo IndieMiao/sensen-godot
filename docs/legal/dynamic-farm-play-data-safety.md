@@ -43,7 +43,7 @@ Mixpanel 是替我们做分析的服务商，按 Play 的定义，转给代为�
 
 | 问题 | 答案 |
 |---|---|
-| 删除账号的方式 | 应用内：My account › Delete account。网页：`https://farm.sensenjoy.cn/dynamicfarm/v1/account/delete`（邮箱加密码或验证码，已上线，返回 200） |
+| 删除账号的方式 | 应用内（登录后）：Profile（地图左下角的头像键，或农场里顶栏的头像）› 右上角齿轮 Settings › Delete account，再在确认页点 Delete permanently；有密码的账号（邮箱注册）要再输一次密码，只用 Google 登录的账号直接确认（SEN-C-243）。网页：`https://farm.sensenjoy.cn/dynamicfarm/v1/account/delete`（邮箱加密码或验证码，已上线，返回 200） |
 | 删除账号时删除哪些数据 | 账号、个人资料和农场从我们的数据库删除；同时请求 Mixpanel 删除这个账号的全部分析数据，Mixpanel 最长 30 天删完 |
 | 是否可以不删账号只删部分数据 | 否：没有单独删除分析数据的入口 |
 

@@ -1,0 +1,11 @@
+[gd_scene format=3]
+[ext_resource type="Material" path="res://assets/dynamic_farm/cottage_kitchen/contact_mat.tres" id="Mat"]
+
+[sub_resource type="PlaneMesh" id="Disk"]
+size = Vector2(1,1)
+material = ExtResource("Mat")
+
+[node name="ContactShadow" type="MeshInstance3D"]
+cast_shadow = 0
+gi_mode = 0
+mesh = SubResource("Disk")
