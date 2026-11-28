@@ -643,21 +643,33 @@ func item_name(id: String) -> String: return _farming.item_name(id)
 func item_icon(id: String) -> Texture2D: return _farming.item_icon(id)
 
 ## Where building `id`'s marker goes on the screen: over its model's top (or MARKER_LIFT over its middle without
-## one), null when that is behind the camera.
+## one), null when that is behind the camera. C-254: the marker keeps off the top bar (LOCK-06): its hit area never
+## goes over the bar's bottom, so a building pushed up under the bar keeps its marker just below it, still tappable;
+## once the whole building is up behind the bar (or off the screen's top) it has none.
 func marker_point(id: int) -> Variant:
 	var built: Dictionary = _buildings.get(id, {})
 	var b: Dictionary = built.get("state", {})
 	if b.is_empty() or _camera == null: return null
 	var middle := Building.center(_walk, Building.at_of(b), Building.base_of(b), int(b.rotation))
 	var top := middle.y
+	# The building's lowest point on the screen (its model's box corners, or its middle without one).
+	var low := -INF
+	if not _camera.is_position_behind(middle): low = _camera.unproject_position(middle).y
 	var node = built.get("node")
 	if node is Node3D:
 		for mesh: VisualInstance3D in (node as Node3D).find_children("*", "VisualInstance3D", true, false):
 			var box := mesh.global_transform * mesh.get_aabb()
 			top = maxf(top, box.end.y)
+			for i in 8:
+				var corner := box.get_endpoint(i)
+				if not _camera.is_position_behind(corner): low = maxf(low, _camera.unproject_position(corner).y)
 	var at := Vector3(middle.x, top + Arrange.MARKER_LIFT, middle.z)
 	if _camera.is_position_behind(at): return null
-	return _camera.unproject_position(at)
+	var bar := top_bar_bottom()
+	if low < bar: return null
+	var point := _camera.unproject_position(at)
+	point.y = maxf(point.y, bar + Arrange.MARKER_HIT * 0.5)
+	return point
 
 ## The building whose cells are under `screen`, 0 for none.
 func building_at_screen(screen: Vector2) -> int:

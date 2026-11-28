@@ -13,7 +13,8 @@ extends Control
 ## Store asks first (`Store <name>?`, what goes back into the bag: the blueprint with the animals that go with it, the
 ## materials, the drops on the ground; D1) with `Cancel` / `Store`. A tap on open ground, ✕ or Back folds the card.
 ## A drag on the scene pans the camera (LOCK-01's modal edit exception: no stick). The host (dynamic_farm.gd) does the
-## sending, the move preview and the building's going; this node asks it through the signals.
+## sending, the move preview and the building's going; this node asks it through the signals. C-254: a marker keeps
+## off the top bar (LOCK-06): the host puts it just under the bar, or none once its building is up behind it.
 
 signal done
 signal move_requested(id: int)
