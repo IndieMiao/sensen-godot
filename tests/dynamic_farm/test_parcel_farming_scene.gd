@@ -11,7 +11,7 @@ extends SceneTree
 ## the map on r8, an r6 home opens its r6 farm and its enter names r6 (Q-172: not moved); an r4 home opens in r8 and its
 ## enter names r8 (moved, Q-168). C-151: Build Well, dry carrots that do not grow, Fill at the well for 2 Energy, Water
 ## three cells from one pail (wet soil, growing from then), Pail empty for the fourth until the pail is filled again.
-## C-152: at Lv1 one well stands, a spare well blueprint offers nothing; at Lv3 the Build key offers the second and the
+## C-152: at Lv1 one well stands, a spare well blueprint's card reads Farm Lv3 needed; at Lv3 the book offers the second and the
 ## Energy chip tops at 220. C-171: beside the coop's feeder a tapped cell with a step to do keeps its key (the well's Fill, a
 ## free cell's Till); untapped, or tapped on a cell with nothing to do, the key feeds. C-192: at the barn's feeder the key
 ## shows whole: `Need 2 more Carrot` too wide for it reads `Need 2 more` (the tap's toast keeps the sentence); with the
@@ -250,12 +250,12 @@ func _first_visit() -> void:
 	farming._tip.tapped.emit()
 	_check(_tip(farming) == "", "a tap closes the card")
 	# C-186 (C-185 §3.1 D): the seeds sit on the Seeds end, the four middle slots hold the rest in bag order.
-	_check(farming._bar.visible and _bar_counts(farming) == {"hoe_starter": 1, "pail": 1, "blueprint_cottage": 1, "blueprint_well": 1},
-		"quick bar shows hoe, pail and the blueprints")
-	_check(farming._bar.slots.map(func(slot): return slot.id) == ["hoe_starter", "pail", "blueprint_cottage", "blueprint_well"],
+	# C-228 (SEN-C-227 D4): the blueprints stay in the bag and the blueprint book, off the quick bar.
+	_check(farming._bar.visible and _bar_counts(farming) == {"hoe_starter": 1, "pail": 1},
+		"quick bar shows hoe and pail, no blueprints")
+	_check(farming._bar.slots.map(func(slot): return slot.id) == ["hoe_starter", "pail"],
 		"the tools first, the pail beside the hoe (C-151)")
 	_check(farming._bar.seeds_item.get("id") == "seed_carrot" and farming._bar.seeds_end().visible, "the Seeds end shows the carrot seeds")
-	_check(farming._bar.slots[2].icon == load("res://modules/dynamic_farm/parcel_items.gd").icon_of("blueprint_cottage"), "the blueprint has the parcel adapter's placeholder icon (C-59)")
 	_check(farming._bar.slots[0].icon == UiArt.item("row_tool") and farming._bar.seeds_item.icon == UiArt.item("seed_carrot"),
 		"the hoe and the seeds show C-86's v3 item art (C-105)")
 	_check(farming._bar.slots[1].icon == load("res://modules/dynamic_farm/parcel_items.gd").icon_of("pail") and farming._bar.slots[1].icon != null,
@@ -335,14 +335,12 @@ func _first_visit() -> void:
 	farming.wet_soil_preview = false
 	farming._draw_crops()
 	# C-151: the dry carrot waits for water: the guide asks for the well, the key for water the pail does not hold yet.
-	_check(_tip(farming) == "Tap Build Well to place your well.", "a dry carrot and no well: the card asks for the well: " + _tip(farming))
+	_check(_tip(farming) == "Tap Blueprints to place your well.", "a dry carrot and no well: the card asks for the well: " + _tip(farming))
 	_check(await _key(farming, cell) == ["Water", "Pail empty", UiSceneAction.State.UNAVAILABLE], "a dry carrot: Water, the pail empty")
 	version = farming.farm_version
 	await _press(farming, cell)
 	_check(farming._toast.current_text() == "Pail empty" and farming.farm_version == version, "pressed with an empty pail: says so, sends nothing")
-	scene._build.activated.emit()
-	await process_frame
-	_check(scene._placement != null and scene._placement.type == "well", "Build Well opens the placement for the well")
+	_check(await _place_from_book("well"), "the book's Well card opens the placement for the well")
 	scene._placement._bar.confirmed.emit()
 	for _i in 3: await process_frame
 	var well_cell := Building.at_of(ParcelFarm.wells(farming.rules, farming.farm)[0])
@@ -439,17 +437,17 @@ func _reopen() -> void:
 	_check(flaky.covered_at_call and not farming._cover.visible, "covered while entering, uncovered with the save applied")
 	_check(farming.farm.bag.get("seed_carrot") == 1 and farming.farm.bag.get("hoe_starter") == 1, "reopening grants nothing more")
 	_check(farming.last_gains.is_empty() and _floats(farming).is_empty(), "no second gift announced")
-	_check(_bar_counts(farming) == {"hoe_starter": 1, "pail": 1, "crop_carrot": 1, "blueprint_cottage": 1} \
+	_check(_bar_counts(farming) == {"hoe_starter": 1, "pail": 1, "crop_carrot": 1} \
 		and farming._bar.seeds_item.get("id") == "seed_carrot", "the quick bar matches the save")
-	var names: Array = farming._bar.cells().slice(0, 4).map(func(c): return str(c.get("_name").text).replace("\n", " "))
-	_check(names == ["Starter Hoe", "Pail", "Carrot", "Cottage Blueprint"], "quick bar names stay English: %s" % [names])
+	var names: Array = farming._bar.cells().slice(0, 3).map(func(c): return str(c.get("_name").text).replace("\n", " "))
+	_check(names == ["Starter Hoe", "Pail", "Carrot"], "quick bar names stay English: %s" % [names])
 	scene.suspend()
 	_check(TranslationServer.get_locale() == "zh_CN", "suspended, the locale is unchanged")
 	scene.resume()
 	await process_frame
 	_check(TranslationServer.get_locale() == "zh_CN", "resumed, the locale is still unchanged")
-	names = farming._bar.cells().slice(0, 4).map(func(c): return str(c.get("_name").text).replace("\n", " "))
-	_check(names == ["Starter Hoe", "Pail", "Carrot", "Cottage Blueprint"], "resumed, quick bar names stay English: %s" % [names])
+	names = farming._bar.cells().slice(0, 3).map(func(c): return str(c.get("_name").text).replace("\n", " "))
+	_check(names == ["Starter Hoe", "Pail", "Carrot"], "resumed, quick bar names stay English: %s" % [names])
 	_check(farming.farm.cleared.size() == 1 and _obstacle_instances(farming) == farming._core_plan.layout.size() - 1, "the cleared obstacle stays gone")
 	_check(farming._crop_art.counts().soil == {"dry": 0, "wet": 1}, "tilled soil is still drawn, wet where watered")
 	var key: Array
@@ -618,6 +616,17 @@ func _energy_comes_back() -> void:
 	DirAccess.remove_absolute(energy_dir)
 
 ## The guide's card text on screen (C-35), "" when it is hidden.
+## C-228: the Blueprints key opens the book, the type's Place starts its preview; true when that preview is up.
+func _place_from_book(type: String) -> bool:
+	if not scene.book_open(): scene._build.activated.emit()
+	await process_frame
+	var book = scene._book
+	if book == null or not book.keys.has(type):
+		return false
+	book.keys[type].pressed.emit()   # as a tap: a grey key only shakes
+	await process_frame
+	return scene._placement != null and scene._placement.type == type
+
 func _tip(farming: Node) -> String:
 	return farming._tip.tip if farming._tip.visible else ""
 
@@ -635,15 +644,15 @@ func _bar_counts(farming: Node) -> Dictionary:
 		if slot is Dictionary and slot.has("id"): counts[slot.id] = slot.quantity
 	return counts
 
-## House placement (C-33) holds the farming UI: no key, no quick bar, the drawer closed; Build Cottage sits beside the
-## key, clear of it and of the bar (C-74#17).
+## House placement (C-33) holds the farming UI: no key, no quick bar, the drawer closed; the Blueprints key (the Build
+## key before C-228) sits beside the key, clear of it and of the bar (C-74#17).
 func _held(farming: Node) -> void:
 	var build: Control = scene._build
 	var key: Rect2 = farming._key.get_global_rect()
 	var bar: Rect2 = farming._bar.get_global_rect()
 	var at: Rect2 = build.get_global_rect()
 	_check(at.size.x >= 180 and not at.intersects(key) and not at.intersects(bar) and is_equal_approx(at.end.y, key.end.y),
-		"Build Cottage sits on the key's baseline, clear of the key and the bar: %s / %s / %s" % [at, key, bar])
+		"Blueprints sits on the key's baseline, clear of the key and the bar: %s / %s / %s" % [at, key, bar])
 	farming._bar.bag_requested.emit()
 	await process_frame
 	farming.held = true
@@ -710,13 +719,13 @@ func _bag_drawer(farming: Node) -> void:
 	await create_timer(0.4).timeout
 	_check(not is_instance_valid(scrim), "…and frees its scrim")
 
-## C-33 on a fresh save (the welcome blueprint, no house): Build Cottage while a press is still
-## walking to its cell ends the walk and sends nothing; the player holds still under the preview.
+## C-33 on a fresh save (the welcome blueprint, no house): opening the blueprint book (C-228) while a press is still
+## walking to its cell ends the walk and sends nothing; the player holds still under the book and the preview.
 func _placement_takes_over() -> void:
 	var house_dir := dir + "_house"
 	var farming := await _open(LocalStore.new(raw.block_id, house_dir))
-	_check(scene._build.visible, "a fresh save offers Build Cottage")
-	_check(_tip(farming) == "Tap Build Cottage to place your first home.", "the guide's first card points at Build Cottage")
+	_check(scene._build.visible and scene._build.label == "Blueprints", "a fresh save shows the Blueprints key")
+	_check(_tip(farming) == "Tap Blueprints to place your first home.", "the guide's first card points at Blueprints")
 	var far := _free_cell(scene_data(), farming, [scene._walk.cell_at(scene._walk.position)])
 	farming.pick(far)
 	await process_frame
@@ -727,9 +736,11 @@ func _placement_takes_over() -> void:
 	scene._build.activated.emit()
 	await process_frame
 	var at: Vector3 = scene._walk.position
+	_check(walking and scene.book_open() and scene._route.is_empty() and not farming.busy, "opening the book gives up the walk")
+	scene._book.keys["cottage"].pressed.emit()
 	for _i in 5: await process_frame
-	_check(walking and scene._placement != null and scene._route.is_empty() and not farming.busy,
-		"opening the placement gives up the walk")
+	_check(scene._placement != null and not scene.book_open() and scene._route.is_empty() and not farming.busy,
+		"the book's Place opens the placement")
 	_check(_tip(farming) == "", "no card while the house is being placed")
 	_check(scene._walk.position == at and farming.farm_version == version and farming.farm.tilled.is_empty(),
 		"the player holds still and nothing was sent")
@@ -745,8 +756,7 @@ func _placement_takes_over() -> void:
 func _house_pops_once() -> void:
 	var house_dir := dir + "_pop"
 	await _open(LocalStore.new(raw.block_id, house_dir))
-	scene._build.activated.emit()
-	await process_frame
+	await _place_from_book("cottage")
 	scene._placement._bar.confirmed.emit()
 	var built = scene.buildings_state()[0] if scene.buildings_state().size() == 1 else null
 	var house: Node3D = scene._buildings.get(1, {}).get("node")
@@ -786,9 +796,8 @@ func _house_pops_once() -> void:
 func _placement_turns() -> void:
 	var turn_dir := dir + "_turn"
 	await _open(LocalStore.new(raw.block_id, turn_dir))
-	_check(scene._build.label == "Build Cottage", "the Build key names the cottage")
-	scene._build.activated.emit()
-	await process_frame
+	_check(scene._build.label == "Blueprints" and scene._build_count_label.text == "2", "the Blueprints key counts the cottage and the well")
+	await _place_from_book("cottage")
 	var p = scene._placement
 	_check(p._bar.secondary == "Rotate" and p._bar.confirm == "Build" and p._bar.cancel == "Cancel", "the bar: Cancel · Rotate · Build")
 	_check(p.type == "cottage" and p.base == Vector2i(3, 3), "the cottage's footprint from the rules")
@@ -798,6 +807,8 @@ func _placement_turns() -> void:
 	for i in 4:
 		p._bar.secondary_pressed.emit()
 		turns.append(p.rotation_steps)
+		# C-228: the model turns over 160 ms; the spot is judged at once.
+		await create_timer(0.25).timeout
 		var facing: Vector3 = p._ghost.transform.basis.z
 		still = still and p.at == start and facing.is_equal_approx(Vector3.BACK.rotated(Vector3.UP, p.rotation_steps * PI * 0.5))
 	_check(turns == [1, 2, 3, 0] and still, "Rotate turns the preview a quarter in place each press (%s)" % [turns])
@@ -809,7 +820,8 @@ func _placement_turns() -> void:
 	var built: Array = scene.buildings_state()
 	_check(reason == "" and built.size() == 1 and int(built[0].rotation) == 2 and Building.at_of(built[0]) == start and built[0].type == "cottage",
 		"Build places the cottage turned half way round: %s" % [built])
-	_check(scene._build.label == "Build Well" and scene._placement == null, "one cottage: the Build key moves on to the well (C-151)")
+	_check(scene._build.visible and scene._build_count_label.text == "1" and scene._placement == null and not scene.book_open(),
+		"built: back on the farm, not in the book; the key counts the well left")
 	scene.queue_free()
 	await process_frame
 	await _open(LocalStore.new(raw.block_id, turn_dir))
@@ -862,16 +874,16 @@ func _watering_loop() -> void:
 	_check(farming.last_gains.is_empty(), "the grant comes once")
 	_check(farming._crop_art.counts().soil == {"dry": 4, "wet": 0} and farming._crop_art.counts().stages == [0, 4, 0, 0, 0, 0, 0],
 		"ten minutes on, the four dry carrots are still at sowing: %s" % [farming._crop_art.counts()])
-	_check(scene._build.visible and scene._build.label == "Build Well", "the blueprint offers Build Well")
-	_check(_tip(farming) == "Tap Build Well to place your well.", "the card asks for the well: " + _tip(farming))
-	scene._build.activated.emit()
-	await process_frame
+	_check(scene._build.visible and scene.book_entries().map(func(e): return e.type) == ["well"], "the book offers the well")
+	_check(_tip(farming) == "Tap Blueprints to place your well.", "the card asks for the well: " + _tip(farming))
+	await _place_from_book("well")
 	var p = scene._placement
 	_check(p != null and p.type == "well" and p.base == Vector2i(1, 1) and p._bar.secondary == "Rotate", "the well's placement: 1×1, Rotate as the cottage's")
 	p._bar.confirmed.emit()
 	for _i in 3: await process_frame
 	var wells: Array = ParcelFarm.wells(farming.rules, farming.farm)
-	_check(wells.size() == 1 and not scene._build.visible, "the well stands; one at level 1, so the Build key goes")
+	_check(wells.size() == 1 and scene._build.visible and not scene._build_count.visible and scene.book_entries().is_empty(),
+		"the well stands; no blueprint left, the key stays without a number (buildings stand) and the book is empty")
 	if wells.is_empty(): return
 	var well: Dictionary = wells[0]
 	var built: Dictionary = scene._buildings.get(int(well.id), {})
@@ -953,13 +965,14 @@ func _level_wells() -> void:
 	DirAccess.make_dir_recursive_absolute(level_dir)
 	store._save(seeded, 3)
 	var farming := await _open(store)
-	_check(scene._build.visible and scene._build.label == "Build Well", "Lv1 without a well: Build Well")
-	scene._build.activated.emit()
-	await process_frame
+	_check(scene.book_entries().size() == 1 and scene.book_entries()[0].reason == "", "Lv1 without a well: the book places a well")
+	await _place_from_book("well")
 	scene._placement._bar.confirmed.emit()
 	for _i in 3: await process_frame
-	_check(ParcelFarm.wells(farming.rules, farming.farm).size() == 1 and farming.farm.bag.blueprint_well == 1 and not scene._build.visible,
-		"Lv1: one well stands; the spare blueprint offers no second")
+	_check(ParcelFarm.wells(farming.rules, farming.farm).size() == 1 and farming.farm.bag.blueprint_well == 1
+		and scene.book_entries().size() == 1 and scene.book_entries()[0].reason == "Farm Lv3 needed" and not await _place_from_book("well"),
+		"Lv1: one well stands; the spare blueprint's card reads Farm Lv3 needed and places nothing")
+	scene.close_book()
 	var saved: Dictionary = store.read()
 	saved.farm.level = 3
 	store._save(saved.farm, int(saved.farm_version))
@@ -968,12 +981,11 @@ func _level_wells() -> void:
 	farming = await _open(store)
 	# The save's 200 (full at Lv1) stays; the top is now Lv3's 220, and the 20 come back with time.
 	_check(scene._header.get_node("Energy").value_label.text == "200/220", "Lv3: the chip tops at 220: " + scene._header.get_node("Energy").value_label.text)
-	_check(scene._build.visible and scene._build.label == "Build Well", "Lv3: the spare blueprint offers the second well")
-	scene._build.activated.emit()
-	await process_frame
+	_check(scene.book_entries().size() == 1 and scene.book_entries()[0].reason == "", "Lv3: the spare blueprint places the second well")
+	await _place_from_book("well")
 	scene._placement._bar.confirmed.emit()
 	for _i in 3: await process_frame
-	_check(ParcelFarm.wells(farming.rules, farming.farm).size() == 2 and not scene._build.visible, "Lv3: two wells stand")
+	_check(ParcelFarm.wells(farming.rules, farming.farm).size() == 2 and scene.book_entries().is_empty(), "Lv3: two wells stand")
 	scene.queue_free()
 	await process_frame
 	for name in DirAccess.get_files_at(level_dir): DirAccess.remove_absolute(level_dir.path_join(name))
@@ -1002,8 +1014,7 @@ func _feeder_yields_to_tapped_cell() -> void:
 	var farming := await _open(store)
 	# C-175#53: the uncleared yard has no room for the coop; its preview starts where the fewest trees, bushes, rocks and
 	# weeds stand in the way and says to clear them, instead of "Outside your yard" / "Space taken" under the player.
-	scene._build_type = "coop"
-	scene.begin_placement()
+	scene.begin_placement("coop")
 	var place = scene._placement
 	_check(place != null and place.type == "coop" and place.reason == Building.CLEAR and place._bar.reason == Building.CLEAR,
 		"an uncleared yard: the coop's preview asks to clear the plants and rocks there (%s)" % [place.reason if place != null else "no preview"])
@@ -1028,9 +1039,7 @@ func _feeder_yields_to_tapped_cell() -> void:
 		await farming.send({"type": "place_building", "building": "coop", "x": at.x, "y": at.y, "rotation": turns})
 		break
 	for _i in 3: await process_frame
-	if scene._build.visible:
-		scene._build.activated.emit()
-		await process_frame
+	if await _place_from_book("well"):
 		scene._placement._bar.confirmed.emit()
 		for _j in 3: await process_frame
 	var wells: Array = ParcelFarm.wells(farming.rules, farming.farm)

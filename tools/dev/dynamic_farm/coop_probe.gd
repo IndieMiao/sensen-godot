@@ -49,9 +49,9 @@ func _run() -> void:
 	_seed(save_dir, cleared)
 	await _open(save_dir)
 	var id: String = raw.block_id
-	report.entered = {"build": scene._build_type, "build_label": scene._build.label, "build_visible": scene._build.visible}
+	report.entered = {"build": scene.book_entries().map(func(e): return e.type), "build_label": scene._build.label, "build_visible": scene._build.visible}
 	await _shot(id + "-1-build-key")
-	scene.begin_placement()
+	scene.begin_placement("coop")
 	var p = scene._placement
 	report.start = {"at": [p.at.x, p.at.y], "reason": p.reason, "bar": [p._bar.cancel, p._bar.secondary, p._bar.confirm]}
 	await _shot(id + "-2-place")

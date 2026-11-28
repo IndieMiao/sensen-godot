@@ -1043,15 +1043,24 @@ func _draw_bag() -> void:
 	var slots := []
 	# C-186 (C-185 §3.1 D, C-185#79): the seed the key sows sits on the Seeds end, not in a middle slot.
 	var seed := seed_shown(ids)
+	# C-228 (SEN-C-227 D4, owner SEN-Q-344): blueprints stay in the bag and the blueprint book, not on the quick bar.
+	var blueprints := blueprint_items()
 	for id: String in ids:
 		if slots.size() >= _bar.slot_count: break
-		if id == seed: continue
+		if id == seed or blueprints.has(id): continue
 		slots.append({"id": id, "icon": item_icon(id), "title": _names.get(id, id), "quantity": int(farm.bag[id])})
 	_bar.slots = slots
 	_bar.seeds_item = {} if seed.is_empty() else {"id": seed, "icon": item_icon(seed)}
 	if _bag == null and phone == null and _energy_layer == null: _bar.visible = not farm.is_empty() and not held
 	_keys.tool_icon = _tool_badge()
 	if _bag != null: _draw_bag_slots(ids)
+
+## The rules' building blueprints (item id -> true): kept off the quick bar (C-228).
+func blueprint_items() -> Dictionary:
+	var out := {}
+	for rule in rules.get("buildings", {}).values():
+		if rule is Dictionary and rule.get("blueprint") is String: out[rule.blueprint] = true
+	return out
 
 ## The seed the Seeds end shows: the rules' sowing seed while the bag holds it, else the bag's first seed, else "".
 func seed_shown(ids: Array) -> String:
