@@ -1,0 +1,56 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/hearth.glb" id="hearth"]
+[ext_resource type="Material" path="res://assets/dynamic_farm/cottage_kitchen/room_matte.tres" id="Mat"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/kettle.glb" id="kettle"]
+[ext_resource type="PackedScene" path="res://assets/rooms/_shared/fx/fx_hearth_fire.tscn" id="FX"]
+
+[sub_resource type="BoxShape3D" id="shape_hearth"]
+size = Vector3(1.17, 1.54, 1)
+
+[node name="Stove" type="Node3D"]
+
+[node name="hearth" parent="." instance=ExtResource("hearth")]
+position = Vector3(-1.95, 0.082, -2.53)
+
+[node name="hearth_001" parent="hearth"]
+material_override = ExtResource("Mat")
+
+[node name="kettle" parent="." instance=ExtResource("kettle")]
+position = Vector3(-1.95, 1.405, -2.32)
+
+[node name="kettle_001" parent="kettle"]
+material_override = ExtResource("Mat")
+
+[node name="Solid" type="StaticBody3D" parent="hearth"]
+
+[node name="hearth" type="CollisionShape3D" parent="hearth/Solid"]
+position = Vector3(0, 0.77, 0)
+shape = SubResource("shape_hearth")
+
+[node name="use_stove_1" type="Marker3D" parent="."]
+position = Vector3(-1.95, 1.377, -2.32)
+
+[node name="cam_stove_1" type="Marker3D" parent="."]
+position = Vector3(-1.95, 1.637, -2.26)
+
+[node name="HearthGlow" type="OmniLight3D" parent="."]
+position = Vector3(-1.95, 0.53, -1.9)
+light_color = Color(1, 0.608, 0.208, 1)
+light_energy = 0.72
+omni_range = 1.25
+omni_attenuation = 1.6
+
+[node name="Flame" parent="." instance=ExtResource("FX")]
+position = Vector3(-1.95, 0.29, -2.26)
+emission_box = Vector3(0.13, 0.005, 0.035)
+flame_height = 0.42
+flame_count = 16
+spark_count = 4
+light_path = NodePath("../HearthGlow")
+light_energy = 0.72
+flicker_strength = 0.0486
+
+[editable path="hearth"]
+
+[editable path="kettle"]

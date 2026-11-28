@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/props/stove_pot/stove_pot.glb" id="Pot"]
+
+[node name="CookingPot" type="Node3D"]
+
+[node name="Pot" parent="." instance=ExtResource("Pot")]
+
+[node name="pot_big" parent="Pot"]
+visible = false
+
+[editable path="Pot"]

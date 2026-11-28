@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cottage_kitchen/rack_stock.glb" id="Stock"]
+[ext_resource type="Material" path="res://assets/dynamic_farm/cottage_kitchen/room_matte.tres" id="Mat"]
+
+[node name="SpiceRack" type="Node3D"]
+
+[node name="Stock" parent="." instance=ExtResource("Stock")]
+position = Vector3(0.85, 1.75, -2.84)
+
+[node name="shelf" parent="Stock"]
+material_override = ExtResource("Mat")
+
+[node name="jar_1" parent="Stock"]
+visible = false
+material_override = ExtResource("Mat")
+
+[node name="jar_2" parent="Stock"]
+visible = false
+material_override = ExtResource("Mat")
+
+[node name="jar_3" parent="Stock"]
+visible = false
+material_override = ExtResource("Mat")
+
+[node name="jar_4" parent="Stock"]
+visible = false
+material_override = ExtResource("Mat")
+
+[node name="use_spice_rack" type="Marker3D" parent="."]
+position = Vector3(0.85, 1.8, -2.84)
+
+[editable path="Stock"]

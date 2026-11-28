@@ -1,0 +1,41 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/props/warming_cabinet/warming_cabinet.glb" id="Stock"]
+
+[sub_resource type="BoxShape3D" id="shape_cabinet"]
+size = Vector3(0.56, 1.32, 0.5)
+
+[node name="WarmingCabinet" type="Node3D"]
+
+[node name="Stock" parent="." instance=ExtResource("Stock")]
+position = Vector3(-2.85, 0.082, 1.65)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="dish_1" parent="Stock"]
+visible = false
+
+[node name="dish_2" parent="Stock"]
+visible = false
+
+[node name="dish_3" parent="Stock"]
+visible = false
+
+[node name="dish_4" parent="Stock"]
+visible = false
+
+[node name="dish_5" parent="Stock"]
+visible = false
+
+[node name="dish_6" parent="Stock"]
+visible = false
+
+[node name="Solid" type="StaticBody3D" parent="Stock"]
+
+[node name="cabinet" type="CollisionShape3D" parent="Stock/Solid"]
+position = Vector3(0, 0.66, 0.25)
+shape = SubResource("shape_cabinet")
+
+[node name="use_warming_cabinet" type="Marker3D" parent="."]
+position = Vector3(-2.6, 1.402, 1.65)
+
+[editable path="Stock"]

@@ -1,0 +1,329 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://assets/dynamic_farm/cottage_kitchen/room_matte.tres" id="Mat"]
+[ext_resource type="Texture2D" path="res://assets/rooms/basic_room/room_albedo_ao.png" id="Atlas"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/room_shell.glb" id="room_shell"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/window_wall.glb" id="window_wall"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/back_wall.glb" id="back_wall"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/arched_window.glb" id="arched_window"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/window_garden.glb" id="window_garden"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/window_plant.glb" id="window_plant"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/green_door.glb" id="green_door"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/entry_mat.glb" id="entry_mat"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/sink_cabinet.glb" id="sink_cabinet"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/utensil_crock.glb" id="utensil_crock"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/wall_shelf.glb" id="wall_shelf"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/shelf_plant.glb" id="shelf_plant"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/hanging_towel.glb" id="hanging_towel"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/dining_table.glb" id="dining_table"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/checked_runner.glb" id="checked_runner"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/chair.glb" id="chair"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/bench.glb" id="bench"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/daisy_jug.glb" id="daisy_jug"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/floor_plant.glb" id="floor_plant"]
+[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/cookbook_wall.glb" id="cookbook_wall"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cottage_kitchen/hearth.tscn" id="Stove"]
+
+[sub_resource type="StandardMaterial3D" id="Garden"]
+shading_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("Atlas")
+
+[sub_resource type="BoxShape3D" id="shape_room_shell0"]
+size = Vector3(6.45, 0.24, 6.45)
+
+[sub_resource type="BoxShape3D" id="shape_room_shell1"]
+size = Vector3(0.25, 3.6, 6.45)
+
+[sub_resource type="BoxShape3D" id="shape_room_shell2"]
+size = Vector3(6.45, 3.6, 0.25)
+
+[sub_resource type="BoxShape3D" id="shape_room_shell3"]
+size = Vector3(0.12, 1.1, 6.45)
+
+[sub_resource type="BoxShape3D" id="shape_room_shell4"]
+size = Vector3(6.45, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="shape_sink_cabinet0"]
+size = Vector3(1.8, 1.2, 0.86)
+
+[sub_resource type="BoxShape3D" id="shape_dining_table0"]
+size = Vector3(1.88, 1.2, 1.18)
+
+[sub_resource type="BoxShape3D" id="shape_chair0"]
+size = Vector3(0.63, 1.32, 0.63)
+
+[sub_resource type="BoxShape3D" id="shape_bench0"]
+size = Vector3(1.08, 0.68, 0.45)
+
+[sub_resource type="CylinderShape3D" id="shape_floor_plant"]
+radius = 0.22
+height = 0.45
+
+[sub_resource type="BoxShape3D" id="shape_chair_opposite0"]
+size = Vector3(0.63, 1.32, 0.63)
+
+[node name="CottageKitchen" type="Node3D"]
+
+[node name="room_shell" parent="." instance=ExtResource("room_shell")]
+position = Vector3(0, 0, 0)
+
+[node name="room_shell_001" parent="room_shell"]
+material_override = ExtResource("Mat")
+
+[node name="Solid" type="StaticBody3D" parent="room_shell"]
+
+[node name="room_shell0" type="CollisionShape3D" parent="room_shell/Solid"]
+position = Vector3(0, -0.04, 0)
+shape = SubResource("shape_room_shell0")
+
+[node name="room_shell1" type="CollisionShape3D" parent="room_shell/Solid"]
+position = Vector3(-3.1, 1.8, 0)
+shape = SubResource("shape_room_shell1")
+
+[node name="room_shell2" type="CollisionShape3D" parent="room_shell/Solid"]
+position = Vector3(0, 1.8, -3.1)
+shape = SubResource("shape_room_shell2")
+
+[node name="room_shell3" type="CollisionShape3D" parent="room_shell/Solid"]
+position = Vector3(3.23, 0.55, 0)
+shape = SubResource("shape_room_shell3")
+
+[node name="room_shell4" type="CollisionShape3D" parent="room_shell/Solid"]
+position = Vector3(0, 0.55, 3.23)
+shape = SubResource("shape_room_shell4")
+
+[node name="window_wall" parent="." instance=ExtResource("window_wall")]
+position = Vector3(-3.1, 0, 0)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="window_wall_001" parent="window_wall"]
+material_override = ExtResource("Mat")
+
+[node name="back_wall" parent="." instance=ExtResource("back_wall")]
+position = Vector3(0, 0, -3.1)
+
+[node name="back_wall_001" parent="back_wall"]
+material_override = ExtResource("Mat")
+
+[node name="arched_window" parent="." instance=ExtResource("arched_window")]
+position = Vector3(-3, 0, -0.1)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="arched_window_001" parent="arched_window"]
+material_override = ExtResource("Mat")
+
+[node name="window_garden" parent="." instance=ExtResource("window_garden")]
+position = Vector3(-3.25, 0, -0.1)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="window_garden_001" parent="window_garden"]
+material_override = SubResource("Garden")
+cast_shadow = 0
+
+[node name="window_plant" parent="." instance=ExtResource("window_plant")]
+position = Vector3(-2.82, 1.4, 0.48)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="window_plant_001" parent="window_plant"]
+material_override = ExtResource("Mat")
+
+[node name="green_door" parent="." instance=ExtResource("green_door")]
+position = Vector3(2.03, 0.05, -2.985)
+
+[node name="green_door_001" parent="green_door"]
+material_override = ExtResource("Mat")
+
+[node name="entry_mat" parent="." instance=ExtResource("entry_mat")]
+position = Vector3(2.03, 0.092, -2.4)
+
+[node name="entry_mat_001" parent="entry_mat"]
+material_override = ExtResource("Mat")
+
+[node name="sink_cabinet" parent="." instance=ExtResource("sink_cabinet")]
+position = Vector3(0.15, 0.082, -2.62)
+
+[node name="sink_cabinet_001" parent="sink_cabinet"]
+material_override = ExtResource("Mat")
+
+[node name="Solid" type="StaticBody3D" parent="sink_cabinet"]
+
+[node name="sink_cabinet0" type="CollisionShape3D" parent="sink_cabinet/Solid"]
+position = Vector3(0, 0.6, 0)
+shape = SubResource("shape_sink_cabinet0")
+
+[node name="utensil_crock" parent="." instance=ExtResource("utensil_crock")]
+position = Vector3(-0.49, 1.25, -2.7)
+
+[node name="utensil_crock_001" parent="utensil_crock"]
+material_override = ExtResource("Mat")
+
+[node name="wall_shelf" parent="." instance=ExtResource("wall_shelf")]
+position = Vector3(-0.42, 2.29, -2.87)
+
+[node name="wall_shelf_001" parent="wall_shelf"]
+material_override = ExtResource("Mat")
+
+[node name="shelf_plant" parent="." instance=ExtResource("shelf_plant")]
+position = Vector3(0.23, 2.38, -2.73)
+
+[node name="shelf_plant_001" parent="shelf_plant"]
+material_override = ExtResource("Mat")
+
+[node name="hanging_towel" parent="." instance=ExtResource("hanging_towel")]
+position = Vector3(-0.13, 1.84, -2.925)
+
+[node name="hanging_towel_001" parent="hanging_towel"]
+material_override = ExtResource("Mat")
+
+[node name="dining_table" parent="." instance=ExtResource("dining_table")]
+position = Vector3(0.1, 0.082, 0.75)
+
+[node name="dining_table_001" parent="dining_table"]
+material_override = ExtResource("Mat")
+
+[node name="Solid" type="StaticBody3D" parent="dining_table"]
+
+[node name="dining_table0" type="CollisionShape3D" parent="dining_table/Solid"]
+position = Vector3(0, 0.6, 0)
+shape = SubResource("shape_dining_table0")
+
+[node name="checked_runner" parent="." instance=ExtResource("checked_runner")]
+position = Vector3(0.1, 1.233, 0.75)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="checked_runner_001" parent="checked_runner"]
+material_override = ExtResource("Mat")
+
+[node name="chair" parent="." instance=ExtResource("chair")]
+position = Vector3(1.37, 0.082, 0.75)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="chair_001" parent="chair"]
+material_override = ExtResource("Mat")
+
+[node name="Solid" type="StaticBody3D" parent="chair"]
+
+[node name="chair0" type="CollisionShape3D" parent="chair/Solid"]
+position = Vector3(0, 0.66, 0)
+shape = SubResource("shape_chair0")
+
+[node name="bench" parent="." instance=ExtResource("bench")]
+position = Vector3(2.85, 0.082, 0.75)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="bench_001" parent="bench"]
+material_override = ExtResource("Mat")
+
+[node name="Solid" type="StaticBody3D" parent="bench"]
+
+[node name="bench0" type="CollisionShape3D" parent="bench/Solid"]
+position = Vector3(0, 0.34, 0)
+shape = SubResource("shape_bench0")
+
+[node name="daisy_jug" parent="." instance=ExtResource("daisy_jug")]
+position = Vector3(0.2, 1.262, 0.73)
+
+[node name="daisy_jug_001" parent="daisy_jug"]
+material_override = ExtResource("Mat")
+
+[node name="floor_plant" parent="." instance=ExtResource("floor_plant")]
+position = Vector3(2.68, 0.09, -2.07)
+
+[node name="floor_plant_001" parent="floor_plant"]
+material_override = ExtResource("Mat")
+
+[node name="Solid" type="StaticBody3D" parent="floor_plant"]
+
+[node name="floor_plant" type="CollisionShape3D" parent="floor_plant/Solid"]
+position = Vector3(0, 0.225, 0)
+shape = SubResource("shape_floor_plant")
+
+[node name="cookbook_wall" parent="." instance=ExtResource("cookbook_wall")]
+position = Vector3(-2.96, 2.29, -2.27)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="cookbook_wall_001" parent="cookbook_wall/cookbook_wall"]
+material_override = ExtResource("Mat")
+
+[node name="chair_opposite" parent="." instance=ExtResource("chair")]
+position = Vector3(-1.17, 0.082, 0.75)
+rotation = Vector3(0, -1.5708, 0)
+
+[node name="chair_001" parent="chair_opposite"]
+material_override = ExtResource("Mat")
+
+[node name="Solid" type="StaticBody3D" parent="chair_opposite"]
+
+[node name="chair_opposite0" type="CollisionShape3D" parent="chair_opposite/Solid"]
+position = Vector3(0, 0.66, 0)
+shape = SubResource("shape_chair_opposite0")
+
+[node name="Stove" parent="." instance=ExtResource("Stove")]
+
+[node name="Anchors" type="Node3D" parent="."]
+
+[node name="spawn" type="Marker3D" parent="Anchors"]
+position = Vector3(2.03, 0.085, -0.8)
+rotation = Vector3(0, 3.14159, 0)
+
+[node name="exit" type="Marker3D" parent="Anchors"]
+position = Vector3(2.03, 0.085, -2.6)
+
+[node name="badge_exit" type="Marker3D" parent="Anchors"]
+position = Vector3(2.03, 1.6, -2.75)
+
+[node name="badge_stove" type="Marker3D" parent="Anchors"]
+position = Vector3(-1.95, 1.55, -2.5)
+
+[node name="stand_stove" type="Marker3D" parent="Anchors"]
+position = Vector3(-1.95, 0.085, -1.75)
+
+[node name="stand_spice_rack" type="Marker3D" parent="Anchors"]
+position = Vector3(0.85, 0.085, -1.65)
+
+[node name="stand_warming_cabinet" type="Marker3D" parent="Anchors"]
+position = Vector3(-1.95, 0.085, 1.65)
+rotation = Vector3(0, 1.5708, 0)
+
+[editable path="room_shell"]
+
+[editable path="window_wall"]
+
+[editable path="back_wall"]
+
+[editable path="arched_window"]
+
+[editable path="window_garden"]
+
+[editable path="window_plant"]
+
+[editable path="green_door"]
+
+[editable path="entry_mat"]
+
+[editable path="sink_cabinet"]
+
+[editable path="utensil_crock"]
+
+[editable path="wall_shelf"]
+
+[editable path="shelf_plant"]
+
+[editable path="hanging_towel"]
+
+[editable path="dining_table"]
+
+[editable path="checked_runner"]
+
+[editable path="chair"]
+
+[editable path="bench"]
+
+[editable path="daisy_jug"]
+
+[editable path="floor_plant"]
+
+[editable path="cookbook_wall"]
+
+[editable path="chair_opposite"]
