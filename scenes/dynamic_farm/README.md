@@ -215,3 +215,20 @@ through the door (farm-dev's rule); the door or the top bar's back returns to th
 Lock scope (C-115#9): LOCK-07 / 16 as on the main farm; Scott is no resident (no dialogue bar, LOCK-18) and the room
 holds both roles (LOCK-19 is the main farm's). Tests: `tests/dynamic_farm/test_parcel_outpost.gd`, the map's pin and card
 in `test_claim_controller.gd`, `geo_screen` in `test_map_camera.gd`.
+
+## Aquatic Park pier (C-232)
+
+The map's second place pin (`town_entry.gd` `pier()`: P0's coast pond glyph, short name `Aquatic Park`, card
+`Aquatic Park Pier` · `Fishing`, Distance, Go) at the Municipal Pier's foot (37.8066, -122.4242); one place card at a
+time, Go travels there as to Washington Square (C-188) and opens `parcel_pier.tscn`. The pier reads SEN-C-233's model
+(`scenes/aquatic_park/aquatic_park_pier.tscn`): its root's `Entrance` and the metadata contours `walk_polygon`,
+`stand_polygon`, `fish_edge` and `water_polygon` (local x/z metres, C-233#72), the water height from its `Bay`; without
+the model a straight stand-in pier with the same contours. The farm's camera (LOCK-24 ①), the room's touchpad (stick,
+tap, double tap, pinch). A tap on the water walks to the nearest point of `fish_edge` and casts toward the tap (the
+owner on SEN-C-233#50: the whole edge fishes); P0's FishingPresentation and fishing panel take over
+(`parcel_fishing_panel.gd`, on the parcel save: `cast_line`, the reel on the cast's seed, `reel_line` replayed by the
+server, `cancel_line`). The first visit sends `visit_pier` (the Starter Rod). The bait chip (bottom left, only with bait
+in the bag) picks the next cast's bait. Jasmine sells the fish; after the first visit her shelf has the rods and baits
+(`parcel_counter.gd`). Rules and numbers: `docs/plans/C-232.md`; tests: `tests/dynamic_farm/test_parcel_fishing.gd`
+(shared `fixtures/fishing_cases.json`), `test_parcel_pier.gd`, the pin in `test_claim_controller.gd` and
+`test_map_travel.gd`, the shelf in `test_parcel_town.gd`; review pictures: `tools/dev/dynamic_farm/pier_shots.gd`.

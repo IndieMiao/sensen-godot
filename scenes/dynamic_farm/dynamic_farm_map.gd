@@ -7,6 +7,8 @@ extends Control
 ## Washington Square Travel Post (town_entry.gd), opens its place card; Go opens the 3D room (parcel_outpost.tscn) where
 ## Jasmine (Market) and Scott (Carpenter) trade through the home's parcel save. Like "Enter my farm" it is only in
 ## packages with `own_farm` (C-59#29): internal test packages and the release package (C-98).
+## C-232 (0.4.7): a second fixed place pin, the Aquatic Park pier (TownEntry.pier()), carded and travelled to the same
+## way; Go opens the pier (parcel_pier.tscn), where the player fishes into the home's parcel save. One place card at a time.
 ## C-110: the map frames the player's home on entry and has a "My home" key; the account chip (Sign in, or the name
 ## with Sign out behind it) stays at the top right whether or not a parcel is selected.
 ## The guide (C-35, C-61) gives the next step: in the hint under the top row with nothing selected, on the home's card.
