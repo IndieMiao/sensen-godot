@@ -329,7 +329,7 @@ func _map_guide(page: Control, selector: Node, home_pick: Dictionary) -> void:
 		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"egg": 1}}, true), "Tap Washington Square to sell your egg."],
 		[claimed.merged({"buildings": [coop], "drop_seq": 1}, true), "Enter my farm and gather Timber and Stone."],
 		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4}, "coins": 95}, true), "Enter my farm and grow carrots to sell."],
-		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4, "crop_carrot": 2}, "coins": 95}, true), "Tap Washington Square to sell carrots and eggs."],
+		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4, "crop_carrot": 2}, "coins": 95}, true), "Tap Washington Square to sell farm goods."],
 		[claimed.merged({"buildings": [coop], "drop_seq": 1, "bag": {"wood": 6, "stone": 4}, "coins": 100}, true), "Tap Washington Square to upgrade your farm."],
 		[claimed.merged({"buildings": [coop], "drop_seq": 1, "level": 2}, true), "Tap Washington Square to deliver a request at the Request Board."],
 		# C-190: 0.4.6 past the upgrade: the barn's coins and blueprint, its Timber and Stone; the sheep pen's requests, Lv3, coins.

@@ -14,7 +14,8 @@
  * QA_CONTROL_PORT set, a second listener on 127.0.0.1 takes `POST /qa/test-save` with `{"set": {"<path>": value, …}}`
  * and writes those fields into the farm of the last parcel claimed (`coins`, `level`, `requests_done`, `bag.wood`,
  * `board.done_today`, `board.slots.0.req`, …; null deletes). It bumps the farm version like a command, so close the
- * app first and reopen it to read the new save. Each write prints `QA_TEST_SAVE <path>=<value>` for the record.
+ * app first and reopen it to read the new save. Each write prints `QA_TEST_SAVE <path>=<value>` for the record. A path
+ * with `__proto__`, `constructor` or `prototype`, or whose parent is not in the farm, gets 400 and writes nothing.
  */
 import { createServer } from 'node:http';
 import path from 'node:path';
@@ -65,21 +66,33 @@ const app = await buildApp({
 app.addHook('onResponse', async (req, reply) => { console.log(`QA_REQ ${req.method} ${req.url.split('?')[0]} ${reply.statusCode}`); });
 await app.listen({ port: Number(process.env.PORT ?? 3975), host: '127.0.0.1' });
 
-async function testSave(set: Record<string, unknown>): Promise<Record<string, unknown>> {
+/** Path segments a test save refuses (C-190#65), so a path cannot reach the prototypes. */
+const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
+
+/** status: 400 for a bad path (a refused segment, or a parent that is not in the farm), 409 when nothing is claimed. */
+async function testSave(set: Record<string, unknown>): Promise<{ status: number; body: Record<string, unknown> }> {
+  for (const key of Object.keys(set)) {
+    if (key.split('.').some(k => !k || FORBIDDEN_KEYS.has(k))) return { status: 400, body: { error: 'bad path', path: key } };
+  }
   const player = parcels.lastPlayer;
   const row = player ? await parcels.mine(player) : null;
-  if (!player || !row) return { error: 'no parcel claimed yet' };
+  if (!player || !row) return { status: 409, body: { error: 'no parcel claimed yet' } };
+  const entries = Object.entries(set);
   const out = await parcels.updateFarm(player, row.farm_version, farm => {
-    for (const [key, value] of Object.entries(set)) {
+    for (const [index, [key, value]] of entries.entries()) {
       const keys = key.split('.');
-      let at: Record<string, unknown> = farm as unknown as Record<string, unknown>;
-      for (const k of keys.slice(0, -1)) at = at[k] as Record<string, unknown>;
+      let at: unknown = farm;
+      for (const k of keys.slice(0, -1)) at = isRecord(at) && Object.hasOwn(at, k) ? at[k] : undefined;
+      if (!isRecord(at)) return { ok: false, index, code: 'bad_path', detail: { path: key } };
       if (value === null) delete at[keys[keys.length - 1]]; else at[keys[keys.length - 1]] = value;
-      console.log(`QA_TEST_SAVE ${key}=${JSON.stringify(value)}`);
     }
     return { ok: true, state: farm };
   }, now());
-  return out.kind === 'applied' ? { farm_version: out.parcel.farm_version, farm: out.parcel.farm } : { error: out.kind };
+  if (out.kind === 'rejected') return { status: 400, body: { error: 'bad path', ...out.detail } };
+  if (out.kind !== 'applied') return { status: 409, body: { error: out.kind } };
+  for (const [key, value] of entries) console.log(`QA_TEST_SAVE ${key}=${JSON.stringify(value)}`);
+  return { status: 200, body: { farm_version: out.parcel.farm_version, farm: out.parcel.farm } };
 }
 if (process.env.QA_CONTROL_PORT) {
   createServer((req, res) => {
@@ -96,7 +109,7 @@ if (process.env.QA_CONTROL_PORT) {
       let set: unknown;
       try { set = (JSON.parse(body) as { set?: unknown }).set; } catch { reply(400, { error: 'bad json' }); return; }
       if (!set || typeof set !== 'object') { reply(400, { error: 'set required' }); return; }
-      testSave(set as Record<string, unknown>).then(v => reply('error' in v ? 409 : 200, v), (e: unknown) => reply(500, { error: String(e) }));
+      testSave(set as Record<string, unknown>).then(v => reply(v.status, v.body), (e: unknown) => reply(500, { error: String(e) }));
     });
   }).listen(Number(process.env.QA_CONTROL_PORT), '127.0.0.1');
 }

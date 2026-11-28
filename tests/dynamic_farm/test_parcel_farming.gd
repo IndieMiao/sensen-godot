@@ -413,9 +413,15 @@ func _guide() -> void:
 	materials.bag.crop_carrot = 1
 	_check(Guide.step(materials, now) == "sell_for_coins" and Guide.stage(materials, now) == "upgrade",
 		"guide: Timber and Stone but 5 coins short, a carrot in the bag -> sell it at Washington Square")
-	_check(Guide.TIPS.sell_for_coins == "Need more coins to upgrade. Sell carrots and eggs at Washington Square.", "guide: the card's sell-for-coins line (C-175#79): " + Guide.TIPS.sell_for_coins)
+	_check(Guide.TIPS.sell_for_coins == "Need more coins to upgrade. Sell farm goods at Washington Square.", "guide: the card's sell-for-coins line (C-190#65): " + Guide.TIPS.sell_for_coins)
+	_check(Guide.MAP_TIPS.sell_for_coins == "Tap Washington Square to sell farm goods.", "guide: the map's sell-for-coins line (C-190#65): " + Guide.MAP_TIPS.sell_for_coins)
 	materials.bag.erase("crop_carrot")
 	materials.bag.erase("egg")
+	# C-190#65: milk or wool alone is something to sell too, not a reason to grow carrots.
+	for product: String in ["milk", "wool"]:
+		var goods: Dictionary = materials.duplicate(true)
+		goods.bag[product] = 1
+		_check(Guide.step(goods, now) == "sell_for_coins", "guide: coins short and only " + product + " in the bag -> sell it")
 	_check(Guide.step(materials, now) == "earn_coins", "guide: coins short and nothing to sell -> grow carrots")
 	_check(Guide.TIPS.earn_coins == "Need more coins to upgrade. Grow carrots to sell.", "guide: the card's earn-coins line (C-175#79): " + Guide.TIPS.earn_coins)
 	materials.coins = int(price.coins)

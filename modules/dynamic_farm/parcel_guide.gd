@@ -13,7 +13,7 @@ extends RefCounted
 ## only for Water. Past the first sale the guide follows 0.4.5's content instead of C-61's gathering loop, whose
 ## "sell what you gathered" sold the Timber and Stone the farm upgrade (C-152) needs: Scott's coop blueprint, build the
 ## coop (C-154), feed a hen (growing or buying a carrot first when the bag has none), pick up and sell the egg, gather
-## Timber and Stone, sell carrots and eggs if the upgrade's coins are short, and upgrade the farm at Scott's; nothing once
+## Timber and Stone, sell farm goods if the upgrade's coins are short, and upgrade the farm at Scott's; nothing once
 ## the farm is past Lv1 (and its coop fed). `stage` is that milestone (the
 ## phone's task rows, ParcelTasks), `step` what to do next for it. The new copy is for PM to finalise (C-45).
 ## C-190 (0.4.6 run-through) goes on past the upgrade with 0.4.6's content: deliver a first request at the Request Board
@@ -49,7 +49,7 @@ const TIPS := {
 	"sell_egg": "Head back to the map and tap Washington Square to sell your egg.",
 	"gather_upgrade": "Gather Timber from trees and Stone from rocks for your farm upgrade.",
 	"upgrade": "Head back to the map and tap Washington Square. Scott upgrades your farm.",
-	"sell_for_coins": "Need more coins to upgrade. Sell carrots and eggs at Washington Square.",
+	"sell_for_coins": "Need more coins to upgrade. Sell farm goods at Washington Square.",
 	"earn_coins": "Need more coins to upgrade. Grow carrots to sell.",
 	"request": "Tap Washington Square on the map and deliver a request at the Request Board.",
 	"barn_coins": "Save up coins for the Barn Blueprint. Deliver requests and sell at Washington Square.",
@@ -73,7 +73,7 @@ const MAP_TIPS := {
 	"sell_egg": "Tap Washington Square to sell your egg.",
 	"gather_upgrade": "Enter my farm and gather Timber and Stone.",
 	"upgrade": "Tap Washington Square to upgrade your farm.",
-	"sell_for_coins": "Tap Washington Square to sell carrots and eggs.",
+	"sell_for_coins": "Tap Washington Square to sell farm goods.",
 	"earn_coins": "Enter my farm and grow carrots to sell.",
 	"request": "Tap Washington Square to deliver a request at the Request Board.",
 	"barn_coins": "Tap Washington Square to deliver requests and sell.",
@@ -253,7 +253,7 @@ static func _short_of_materials(farm: Dictionary, rules: Dictionary, type: Strin
 		if int(farm.get("bag", {}).get(item, 0)) < int(materials[item]): return true
 	return false
 
-## The next farm level's step (C-152, C-175#51): gather its Timber and Stone, sell carrots and eggs or grow some when its
+## The next farm level's step (C-152, C-175#51): gather its Timber and Stone, sell farm goods or grow some when its
 ## coins are short, then upgrade at Scott's.
 static func _upgrade_step(farm: Dictionary, rules: Dictionary) -> String:
 	var bag: Dictionary = farm.get("bag", {})
@@ -263,8 +263,10 @@ static func _upgrade_step(farm: Dictionary, rules: Dictionary) -> String:
 	for item: String in items:
 		if int(bag.get(item, 0)) < int(items[item]): return "gather_upgrade"
 	if int(farm.get("coins", 0)) < int(next.get("coins", 0)):
-		# Short of coins (C-175#51): sell the carrots and eggs in the bag, or grow and collect some first.
-		for item: String in [CROP, str(_livestock(rules).get("product", ""))]:
+		# Short of coins (C-175#51): sell the farm goods in the bag (carrots and the eggs, milk and wool, C-190#65), or
+		# grow and collect some first.
+		for item: String in [CROP, str(_livestock(rules).get("product", "")), str(_livestock(rules, BARN).get("product", "")),
+				str(_livestock(rules, SHEEP_PEN).get("product", ""))]:
 			if not item.is_empty() and int(bag.get(item, 0)) > 0: return "sell_for_coins"
 		return "earn_coins"
 	return "upgrade"
