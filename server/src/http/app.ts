@@ -38,6 +38,7 @@ import { registerAccounts, type AccountRouteDeps } from '../accounts/routes.js';
 import { createLogMailer, type Mailer } from '../accounts/mailer.js';
 import type { PlayerRow } from './store.js';
 import { registerParcelRoutes, type ParcelRouteDeps } from '../parcels/routes.js';
+import type { Analytics } from '../analytics/mixpanel.js';
 
 export interface AppDeps {
   store: Store;
@@ -91,7 +92,9 @@ export interface AppDeps {
   /** Password attempts by email and network, and verification emails by recipient and in total (C-132); see accounts/limits.ts. */
   accountLimits?: AccountRouteDeps['limits'];
   /** Dynamic farm parcel claims and parcel farms (C-31); absent leaves the /v1/parcels routes out. */
-  parcels?: Omit<ParcelRouteDeps, 'now'>;
+  parcels?: Omit<ParcelRouteDeps, 'now' | 'analytics'>;
+  /** Product analytics (C-203): sign-ups, sign-ins and parcel actions; absent reports nothing. */
+  analytics?: Analytics;
 }
 
 interface Regions {
@@ -411,12 +414,12 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     });
   });
 
-  if (deps.parcels) registerParcelRoutes(app, { ...deps.parcels, now: deps.now }, { auth, writer });
+  if (deps.parcels) registerParcelRoutes(app, { ...deps.parcels, now: deps.now, analytics: deps.analytics }, { auth, writer });
 
   registerAccounts(app, {
     store: deps.store, pepper: deps.pepper, now: deps.now, mailer: deps.mailer ?? createLogMailer(),
     qaEmailDomain: deps.qaEmailDomain, qaEmailCode: deps.qaEmailCode, apple: deps.apple, appleRevoker: deps.appleRevoker, google: deps.google,
-    signupClosed: deps.signupClosed, limits: deps.accountLimits,
+    signupClosed: deps.signupClosed, limits: deps.accountLimits, analytics: deps.analytics,
     closeSessions: async playerId => { online?.closePlayer(playerId); },
     beforeDelete: async playerId => { await online?.forgetPlayer(playerId); },
   }, auth);
