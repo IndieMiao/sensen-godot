@@ -198,7 +198,11 @@ export type FarmCommand =
   | FishingCommand;
 
 /** 命令执行时服务端核实过的上下文：本人地块编号（来自 token 查到的那一行，不来自请求体）。 */
-export interface FarmContext { parcel_id: string }
+export interface FarmContext {
+  parcel_id: string;
+  /** C-241：投竿种子的服务端随机来源（0 到 2^32-1，routes.ts 传密码学随机数）；不传时按地块、时间、第几竿算（fishing.ts castSeed）。 */
+  cast_seed?: () => number;
+}
 
 export type FarmOutcome =
   | { ok: true; state: ParcelFarmState }
@@ -782,7 +786,7 @@ export function applyFarmCommands(rules: ParcelRules, state: ParcelFarmState, co
       }
       case 'visit_pier': case 'cast_line': case 'reel_line': case 'cancel_line': {
         // 在码头沿边（C-232）：服务端没有码头几何，“人在码头”由客户端限定；结果由服务端定（fishing.ts）。
-        const refusal = fishingCommand(rules, s, c, now, ctx?.parcel_id ?? '', fail);
+        const refusal = fishingCommand(rules, s, c, now, ctx?.parcel_id ?? '', fail, ctx?.cast_seed);
         if (refusal) return refusal;
         break;
       }

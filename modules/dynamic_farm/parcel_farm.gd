@@ -786,6 +786,8 @@ static func view(rule_set: Dictionary, state: Dictionary, now: int) -> Dictionar
 	if not out.has("requests_done"): out.requests_done = 0
 	retire_draft_buildings(rule_set, out)
 	settle_board(rule_set, out, now)
+	# C-241: the line in the water without its tier and seed until the bite, as the server's farmView.
+	if out.has("fishing"): out.fishing = Fishing.cast_view(out.fishing, now)
 	return out
 
 ## The slot holding request `id` on the state's board, or {}.

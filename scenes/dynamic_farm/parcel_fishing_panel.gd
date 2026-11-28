@@ -1,11 +1,14 @@
 extends P0FishingPanel
 ## The pier's fishing panel (C-232): the old polished panel (one thumb button: Cast → Hook → hold to Reel, the gauge
 ## beside the float, the outcome notice; LOCK-24) on the parcel save. Only the backend changes, as P0FishingPanel did for
-## P0: `cast_line` gets the server's line (tier, seed, bite time) back; the bite and the hook window are timed on this
+## P0: `cast_line` gets the server's line (bite time; tier and seed from the bite on, C-241) back; the bite and hook window are timed on this
 ## device from the server's bite time; the reel runs locally on the cast's seed (ParcelFishing.step, the server's own
 ## steps) and sends `reel_line` with how long after the bite it hooked and one bit per step. The server replays the bits
 ## and decides; the result is the save's `fishing.last`. A missed bite, a stall or Stop after the bite sends
 ## `cancel_line` (got away, 3 back); before the bite it gives all 5 back.
+## C-241: until the bite the server's save holds the cast without its tier and seed (so a client cannot line in a cast it
+## does not like for free); at the bite the panel reads the save again (host.read_line) and reels on what it shows. A
+## Hook tapped before that answer is timed at the tap and the reel starts when the answer is in.
 ## FishingPresentation (pose, rod, line, float, landing arc) reads phase, held, model, landing and last_result().
 ## It extends P0FishingPanel for its look only: the gauge kept off the player's box (player_rect, set by the pier each
 ## frame) and the Hook key's pop; nothing of the P0 runtime (rt stays null).
@@ -36,6 +39,10 @@ const LINES := {
 	"no_bait": "That bait has run out.",
 	"unreachable": "Couldn't reach the server. Tap Cast to retry.",
 }
+## How often the bite read is tried again while the save still hides the cast, and how long past the hook window a
+## tapped Hook waits for it before the line comes in.
+const REVEAL_RETRY_S := 0.25
+const REVEAL_GRACE_MS := 4000
 
 ## The pier: send(commands) -> the store's result, farm (the save it holds), server_now() and selected_bait().
 var host: Node
@@ -43,6 +50,9 @@ var _line := {}
 var _bite_local := 0
 var _hook_local := 0
 var _hook_ms := 0
+## When Hook was tapped (this device's clock), -1 before; the reel starts once the cast shows its tier and seed.
+var _hook_at := -1
+var _revealing := false
 
 ## The last settled cast for the landing arc ({outcome, fish_id, tier}).
 func last_result() -> Dictionary:
@@ -69,7 +79,7 @@ func _action() -> void:
 		_suppress_next_click = false
 		return
 	if busy or phase == "playing": return
-	if phase == "hook": _start_reel()
+	if phase == "hook": _hook()
 	elif phase in ["ready", "result", "error"]: _parcel_cast()
 
 func _now() -> int: return Time.get_ticks_msec()
@@ -82,6 +92,7 @@ func _parcel_cast() -> void:
 	model = {}
 	_last = {}
 	_reported = false
+	_hook_at = -1
 	phase = "casting"
 	_show_notice(LINES.casting)
 	cast_started.emit()
@@ -121,11 +132,38 @@ func _refusal(result: Dictionary) -> String:
 		"NETWORK": return LINES.unreachable
 	return FishingPanel.error_text(str(result.get("code", "")))
 
+## Hook tapped: timed now; the reel starts at once when the cast shows its tier and seed, else when the bite read answers.
+func _hook() -> void:
+	if _hook_at >= 0: return
+	_hook_at = _now()
+	if Fishing.shown(_line): _start_reel()
+	elif not _revealing: _reveal()
+
+## The save read again from the bite on until it shows this cast's tier and seed (C-241). Stops once the line is in or
+## cast again; a Hook still waiting when the read cannot be had brings the line in.
+func _reveal() -> void:
+	_revealing = true
+	var at := int(_line.get("at", -1))
+	while true:
+		await host.read_line()
+		if not is_inside_tree() or not visible or _reported or phase != "hook" or int(_line.get("at", -1)) != at: break
+		var cast = _fishing().cast
+		if Fishing.shown(cast) and int(cast.at) == at:
+			_line = cast
+			if _hook_at >= 0: _start_reel()
+			break
+		if _now() > _hook_local + REVEAL_GRACE_MS:
+			if _hook_at >= 0: _line_in()
+			break
+		await get_tree().create_timer(REVEAL_RETRY_S).timeout
+		if not is_inside_tree(): break
+	_revealing = false
+
 func _start_reel() -> void:
 	var f: Dictionary = ParcelFarm.rules().fishing
 	var tier := Fishing.reel_tier(f, int(_line.rarity), Fishing.rod_of(f, str(_line.rod)))
 	set_meta("tier", tier)
-	_hook_ms = clampi(_now() - _bite_local, 0, int(_line.hook_ms))
+	_hook_ms = clampi((_hook_at if _hook_at >= 0 else _now()) - _bite_local, 0, int(_line.hook_ms))
 	model = Fishing.initial(f, int(_line.seed))
 	inputs = ""
 	_accumulator = 0
@@ -139,7 +177,9 @@ func _process(dt: float) -> void:
 	if not visible or host == null or busy: return
 	var now := _now()
 	if phase in ["waiting", "hook"]:
-		if now > _hook_local:
+		if _hook_at >= 0:
+			pass   # hooked in time; the reel starts when the bite read shows the cast (_reveal)
+		elif now > _hook_local:
 			_show_notice(LINES.missed, LINES.escaped_head, "failed")
 			_line_in()
 		elif now >= _bite_local and phase != "hook":
@@ -147,8 +187,9 @@ func _process(dt: float) -> void:
 			_show_notice(LINES.bite)
 			Input.vibrate_handheld(80)
 			_refresh_button()
+			if not Fishing.shown(_line) and not _revealing: _reveal()
 		elif phase == "hook" and auto_play and now > _bite_local + 300:
-			_start_reel()
+			_hook()
 	elif phase == "playing":
 		if dt > 0.5:   # a stalled frame (the app hidden, a hitch): the fish gets away
 			_line_in()

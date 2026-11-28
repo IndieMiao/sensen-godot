@@ -792,9 +792,21 @@ for (const [name, enabled, makeStores] of makers) {
       // Cast: −5 Energy; the tier, seed and bite time are the server's.
       let res = await command(app, ada, 2, [{ type: 'cast_line' }]);
       expect(res.statusCode).toBe(200);
-      const c = res.json().parcel.farm.fishing.cast;
+      const hidden = res.json().parcel.farm.fishing.cast;
       expect(res.json().parcel.farm.energy.value).toBe(195);
-      expect(c).toMatchObject({ at: T0, rod: 'rod_starter', bait: null, seed: castSeed(A.parcel_id, T0, 0) });
+      // C-241: until the bite the client gets no tier and no seed, neither in the answer nor on a read, nor on a refusal.
+      expect(hidden).toEqual({ at: T0, bite_at: hidden.bite_at, hook_ms: 2200, rod: 'rod_starter', bait: null });
+      clock = hidden.bite_at - 1;
+      expect((await mine(app, ada)).farm.fishing.cast).toEqual(hidden);
+      const early = await command(app, ada, 3, [{ type: 'reel_line', hook_ms: 0, inputs: '1' }]);
+      expect(early.json()).toMatchObject({ code: 'TOO_EARLY', parcel: { farm_version: 3 } });
+      expect(early.json().parcel.farm.fishing.cast).toEqual(hidden);
+      // At the bite a read gives them; the seed is the server's random number, not one the parcel, time and count give.
+      clock = hidden.bite_at;
+      const c = (await mine(app, ada)).farm.fishing.cast;
+      expect(c).toMatchObject({ ...hidden, rarity: expect.any(Number) });
+      expect(Number.isInteger(c.seed) && c.seed >= 0 && c.seed < 2 ** 32).toBe(true);
+      expect(c.seed).not.toBe(castSeed(A.parcel_id, T0, 0));
       // A trace played to a catch, sent once the bite and the reel have had their time.
       const tier = reelTier(f, c.rarity, f.rods[0]);
       const sim = initialReel(f, c.seed);
@@ -834,6 +846,7 @@ for (const [name, enabled, makeStores] of makers) {
         // Cancelled before the bite: all 196 back. Cast again and let it get away: 4 left.
         await command(tiredApp, bob, v, [{ type: 'cast_line' }]);
         const line = (await mine(tiredApp, bob)).farm.fishing.cast;
+        expect(line.rarity).toBeUndefined();
         clock = line.bite_at;
         await command(tiredApp, bob, v + 1, [{ type: 'cancel_line' }]);
         const low = await mine(tiredApp, bob);

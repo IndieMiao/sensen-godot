@@ -4,11 +4,17 @@
  * 收线小游戏照 P0（modules/fishing/fishing_model.gd、scenes/p0/p0_fishing_panel.gd 的 reel_tier）：鱼在条里上下游，按住往上、
  * 松开往下，鱼在绿条里进度涨、在外面掉，涨满上钩，掉光或到时脱钩。
  *
- * 服务端定结果：投竿（cast_line）时按服务端时间和本块地编号定这一竿的随机种子、鱼的档次、咬钩时刻；收线（reel_line）时客户端只交
+ * 服务端定结果：投竿（cast_line）时定这一竿的随机种子、鱼的档次、咬钩时刻；收线（reel_line）时客户端只交
  * 提竿离咬钩多少毫秒和每 step_ms 一位的按键记录（1 按住、0 松开），服务端用同一个种子、同一套模拟重放，涨满才给鱼，
  * 鱼种按种子在这一档里挑。结算完这一竿就清掉：同一竿不能再领（NO_CAST），整批重发由 base_version 挡住。
  * 按键记录的时长不能长过服务端从咬钩到现在的时间（加 REPLAY_SLACK_MS），快进、编造提前交的记录被拒（REEL_INPUT）。
  * 客户端 modules/dynamic_farm/parcel_fishing.gd 照同一份规则一字不差地再算一遍（tests/dynamic_farm/fixtures/fishing_cases.json）。
+ *
+ * 防刷（C-241）：咬钩前收线全退体力、不扣鱼饵，所以咬钩前客户端不能知道这一竿是什么鱼，否则改过的客户端可以“不是稀有就收线重投”。
+ *   - 正式服的种子是服务端的密码学随机数（routes.ts 经 FarmContext.cast_seed 传进来），不能从地块编号、投竿时间、第几竿推出来；
+ *     咬钩时刻由种子算出，只泄露种子的一小部分位，看不出档次。没有 cast_seed（客户端本地替身、共用用例）时仍按 castSeed 算。
+ *   - 回给客户端的存档（routes.ts farmView → castView）在服务端时间到咬钩之前不带这一竿的 rarity 和 seed；到了咬钩时刻
+ *     客户端再读一次存档（GET /parcels/mine）拿到它们，照旧在本机玩收线、交按键记录。存进库的存档照旧完整，重放判定不变。
  *
  * “人在码头沿边”和别的动作一样由客户端限定（服务端没有码头几何）。多人同屏这一版不做；存档里只有本人的一竿，不占码头的位置。
  *
@@ -206,7 +212,7 @@ export function replayReel(f: FishingRules, seed: number, tier: ReelTier, inputs
   return s.outcome === 'playing' ? null : s;
 }
 
-/** 这一竿的随机种子：本块地、服务端时间、第几竿（客户端本地替身用同一个算法）。 */
+/** 没有服务端随机数时这一竿的种子：本块地、投竿时间、第几竿（客户端本地替身、共用用例用同一个算法）。正式服不用它（C-241）。 */
 export const castSeed = (parcel: string, now: number, casts: number): number => hash32(`${parcel}:${now}:${casts}`);
 
 /** 按种子抽档次：权重加上鱼饵的加减（不低于 0），没有鱼的档不抽。 */
@@ -262,6 +268,16 @@ export function parseFishingCommand(c: Record<string, unknown>, maxSteps = 10_00
 
 type Fail<R> = (code: string, detail?: Record<string, unknown>) => R;
 
+/**
+ * 回给客户端的 fishing（C-241）：服务端时间 at 还没到这一竿的咬钩时刻时，去掉 rarity 和 seed（能推出鱼档次和鱼种的只有这两项），
+ * 别的照旧；到了咬钩时刻原样给。不改传入的对象；没有 fishing 返回 undefined。
+ */
+export function castView(raw: FishingState | undefined, at: number): FishingState | undefined {
+  if (!raw || !raw.cast || at >= raw.cast.bite_at) return raw;
+  const { rarity: _rarity, seed: _seed, ...hidden } = raw.cast;
+  return { ...raw, cast: hidden as CastState };
+}
+
 /** 退体力（脱钩 3、咬钩前收线 5）：先结算到 now，加到上限为止；到上限时计时停在 now。 */
 function refund(rules: ParcelRules, s: ParcelFarmState, now: number, n: number): number {
   const e = settleEnergy(rules, s, now), max = maxEnergy(rules, s);
@@ -289,8 +305,10 @@ function settle(rules: ParcelRules, s: ParcelFarmState, fs: FishingState, now: n
 
 /**
  * 一条钓鱼命令（farm.ts applyFarmCommands 里调用，体力已结算到 now）。成功返回 null 并改 s.fishing，拒绝返回原因、不改存档。
+ * randomSeed 是服务端的随机种子来源（C-241，0 到 2^32-1）；不传时按 castSeed 算（客户端本地替身、共用用例）。
  */
-export function fishingCommand<R>(rules: ParcelRules, s: ParcelFarmState, c: FishingCommand, now: number, parcel: string, fail: Fail<R>): R | null {
+export function fishingCommand<R>(rules: ParcelRules, s: ParcelFarmState, c: FishingCommand, now: number, parcel: string, fail: Fail<R>,
+  randomSeed?: () => number): R | null {
   const f = rules.fishing;
   if (!f) return fail('NO_FISHING');
   const fs = fishingOf(s.fishing);
@@ -314,7 +332,7 @@ export function fishingCommand<R>(rules: ParcelRules, s: ParcelFarmState, c: Fis
       if (e.value < f.cast_energy) return fail('NO_ENERGY', { need: f.cast_energy, have: e.value, next_in: nextTickIn(rules, s, now) });
       if (e.value >= maxEnergy(rules, s)) e.at = now;
       e.value -= f.cast_energy;
-      const seed = castSeed(parcel, now, fs.casts);
+      const seed = randomSeed ? randomSeed() >>> 0 : castSeed(parcel, now, fs.casts);
       fs.casts += 1;
       const wait = c.bait ? f.baits[c.bait].wait : 1;
       const bite = Math.round((f.bite_min_ms + (hash32(`${seed}:b`) % f.bite_spread_ms)) * wait);

@@ -4,12 +4,14 @@
  * 装上即建号（C-100，PARCEL_GUEST_WRITES=1）只放开认领、进入（发赠品）和地块内命令（存档、市场、木匠）给游客；
  * 放弃重选和 Journey 其它写接口不变。接口与表结构说明见 docs/plans/C-31.md、docs/plans/C-100.md。
  */
+import { randomInt } from 'node:crypto';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { PlayerRow } from '../http/store.js';
 import { EVENTS, farmCommandEvents } from '../analytics/events.js';
 import { NO_ANALYTICS, type Analytics } from '../analytics/mixpanel.js';
 import { energyOf } from './energy.js';
 import { applyFarmCommands, emptyFarm, grant, parseFarmCommands, rebaseFarm, retireDraftBuildings, welcome, withEconomy } from './farm.js';
+import { castView } from './fishing.js';
 import { settleBoard } from './requests.js';
 import { communityOf, isNewerDataset, type ParcelRules } from './rules.js';
 import { activeZone, zoneView, type StarterZones } from './starter_zone.js';
@@ -27,7 +29,12 @@ export interface ParcelRouteDeps {
   starterZones?: StarterZones;
   /** 产品分析上报（C-203）；不传不上报。 */
   analytics?: Analytics;
+  /** 投竿种子（C-241）：0 到 2^32-1；不传用密码学随机数，客户端推不出来。测试可以换成固定的。 */
+  castSeed?: () => number;
 }
+
+/** 投竿种子的默认来源（C-241）：node:crypto 的随机整数，0 到 2^32-1。 */
+const randomCastSeed = (): number => randomInt(0x1_0000_0000);
 
 interface Auth {
   auth: (req: FastifyRequest) => Promise<PlayerRow | null>;
@@ -69,18 +76,21 @@ function parseBbox(raw: unknown): [number, number, number, number] | null {
  * 农场按当前字段补齐后给客户端：缺的经济字段补开局值，缺的体力补满（C-148，energyOf）；委托板补到现在（C-191，settleBoard：
  * 到点的空格抽上单子、过期的换掉，抽到的和下一条命令补位抽到的是同一张）；C-202 之前的旧牛棚拆掉退还（C-209，retireDraftBuildings，
  * 进入时写回）。只补显示，不写回。
+ * C-241：水里那一竿到咬钩时刻之前不带 rarity 和 seed（fishing.ts castView），客户端到咬钩时再读一次拿到。
  */
 const farmView = (rules: ParcelRules, farm: OwnedParcel['farm'], at: number) => {
   const f = withEconomy(farm);
   retireDraftBuildings(rules, f);
   f.energy = energyOf(rules, f, at);
   settleBoard(rules, f, at);
+  if (f.fishing !== undefined) f.fishing = castView(f.fishing, at);
   return f;
 };
 
 export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps, { auth, writer }: Auth): void {
   const now = deps.now;
   const analytics = deps.analytics ?? NO_ANALYTICS;
+  const castSeed = deps.castSeed ?? randomCastSeed;
   const parcelView = (p: OwnedParcel) => ({
     community_id: p.community_id, layer: p.layer, parcel_id: p.parcel_id, dataset_version: p.dataset_version,
     center: [p.center.lng, p.center.lat], claimed_at: p.claimed_at, farm_version: p.farm_version, farm: farmView(deps.rules, p.farm, now()),
@@ -238,7 +248,7 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
     const commands = parseFarmCommands(b?.commands);
     if (!Number.isInteger(b?.base_version) || !commands) return reply.code(400).send({ code: 'SCHEMA', server_time: now() });
     const at = now();
-    const out = await deps.store.updateFarm(p.id, b!.base_version as number, (farm, parcel) => applyFarmCommands(deps.rules, farm, commands, at, { parcel_id: parcel.parcel_id }), at);
+    const out = await deps.store.updateFarm(p.id, b!.base_version as number, (farm, parcel) => applyFarmCommands(deps.rules, farm, commands, at, { parcel_id: parcel.parcel_id, cast_seed: castSeed }), at);
     if (out.kind !== 'no_parcel')
       for (const e of farmCommandEvents(deps.rules, commands, out, out.parcel.community_id)) analytics.track(e.event, p.user_id, e.props, { time: at });
     switch (out.kind) {

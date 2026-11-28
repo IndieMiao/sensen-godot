@@ -3,6 +3,7 @@ extends SceneTree
 ## contours (SEN-C-233's when it is in the build, else the stand-in pier), the first visit's Starter Rod, a tap on the
 ## water at two different points of the edge walks there and casts toward the tap (the owner on SEN-C-233#50: the
 ## whole edge fishes), the reel plays (auto_play) and the save takes the server-side result, the bait chip, Back to the map.
+## C-241: the cast waits for its bite without a tier or seed and the reel plays on what the read at the bite shows.
 ## The device runs in Simplified Chinese throughout: the panel's key and hint stay English (W-801's V-773 on C-232).
 ##   godot --headless --path . --script res://tests/dynamic_farm/test_parcel_pier.gd
 const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
@@ -101,10 +102,18 @@ func _run() -> void:
 		_check(Vector2(stood.x, stood.z).distance_to(Vector2(want.origin.x, want.origin.z)) <= pier.ARRIVE_M + pier.CELL_M,
 			"tap %d: the player stands at its edge point" % (i + 1))
 		deadline = Time.get_ticks_msec() + 45000
+		var hidden_waits := 0
+		var shown_reels := 0
 		while pier.panel.phase != "result" and Time.get_ticks_msec() < deadline:
 			seen[pier.panel._primary.text] = true
 			if pier.panel._guide.visible: seen[pier.panel._guide.text] = true
+			if pier.panel.phase == "waiting" and not pier.panel._line.is_empty() and not Fishing.shown(pier.panel._line) \
+					and not Fishing.shown(Fishing.fishing_of(pier.farm.fishing).cast):
+				hidden_waits += 1
+			if pier.panel.phase == "playing" and Fishing.shown(pier.panel._line): shown_reels += 1
 			await process_frame
+		# C-241: before the bite the save holds the cast without its tier and seed; the bite read shows them and the reel plays.
+		_check(hidden_waits > 0 and shown_reels > 0, "tap %d: no tier or seed before the bite, the reel on them after (%d, %d frames)" % [i + 1, hidden_waits, shown_reels])
 		seen[pier.panel._primary.text] = true
 		var last = Fishing.fishing_of(pier.farm.fishing).last
 		_check(pier.panel.phase == "result" and last is Dictionary and str(last.result) in ["landed", "escaped"],
