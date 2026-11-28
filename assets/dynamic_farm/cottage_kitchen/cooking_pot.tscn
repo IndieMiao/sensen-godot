@@ -1,0 +1,23 @@
+[gd_scene format=3]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cottage_kitchen/contact_shadow.tscn" id="Stamp"]
+
+[ext_resource type="PackedScene" path="res://assets/props/stove_pot/stove_pot.glb" id="Pot"]
+
+[node name="CookingPot" type="Node3D"]
+
+[node name="Pot" parent="." instance=ExtResource("Pot")]
+
+[node name="pot_big" parent="Pot"]
+visible = false
+
+[node name="PotShadow" parent="." instance=ExtResource("Stamp")]
+position = Vector3(0,0.006,0)
+scale = Vector3(0.42,1,0.39)
+
+[node name="normal_body" parent="Pot/pot_normal"]
+gi_mode = 2
+
+[node name="big_body" parent="Pot/pot_big"]
+gi_mode = 2
+
+[editable path="Pot"]
