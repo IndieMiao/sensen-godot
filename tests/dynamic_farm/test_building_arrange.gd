@@ -8,7 +8,10 @@ extends SceneTree
 ## stored (the question lists its blueprint; D1): it goes, its blueprint is in the bag, the mode stays. The coop is
 ## moved: its own preview starts where it stands, `Move` its key, its old outline dashed; Cancel leaves it; moved
 ## elsewhere it stands there with its hens and both eggs. Back folds the card, then ends the mode; Done ends it too.
-## Reopened, everything is where it was left.
+## Reopened, everything is where it was left. C-247 (V-779): an egg laid with the card up shows on it at once; the
+## Energy countdown goes on under the Move preview; the cottage moved over the player leaves them where the camera
+## sees them, not behind its roof. C-254 (V-798): a building panned up to the top bar keeps its marker just under the
+## bar (LOCK-06 as it was), still tappable, and loses it once up behind the bar.
 ## Run in the private preview project (README), optionally with `-- <farm.json>`.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
 const LocalStore = preload("res://modules/dynamic_farm/parcel_farm_local_store.gd")
@@ -141,6 +144,14 @@ func _settled() -> void:
 	while (scene._placement != null or scene._sending) and Time.get_ticks_msec() < deadline: await process_frame
 	for _i in 3: await process_frame
 
+## The step-out before C-247: the nearest clear point in rings of 0.1 m, wherever the camera is.
+func _nearest_clear(from: Vector3) -> Variant:
+	for ring in range(1, 40):
+		for k in 32:
+			var q := from + Vector3.FORWARD.rotated(Vector3.UP, TAU * k / 32.0) * ring * 0.1
+			if scene._walk.clear_position(q): return q
+	return null
+
 func _id_of(type: String) -> int:
 	for b: Dictionary in scene.buildings_state():
 		if b.type == type: return int(b.id)
@@ -150,6 +161,71 @@ func _state_of(id: int) -> Dictionary:
 	for b: Dictionary in scene.buildings_state():
 		if int(b.id) == id: return b
 	return {}
+
+## Where building `id`'s marker would be without the top bar (over its model's top, as marker_point).
+func _marker_raw(id: int) -> Vector2:
+	var lift: float = load("res://scenes/dynamic_farm/building_arrange.gd").MARKER_LIFT
+	var built: Dictionary = scene._buildings[id]
+	var b: Dictionary = built.state
+	var middle: Vector3 = Building.center(scene._walk, Building.at_of(b), Building.base_of(b), int(b.rotation))
+	var top := middle.y
+	for mesh: VisualInstance3D in (built.node as Node3D).find_children("*", "VisualInstance3D", true, false):
+		top = maxf(top, (mesh.global_transform * mesh.get_aabb()).end.y)
+	return scene._camera.unproject_position(Vector3(middle.x, top + lift, middle.z))
+
+## C-254 (C-247 V-798): the camera pans until building `id` goes up behind the top bar (LOCK-06). Its marker never
+## goes over the bar: where it would (the V-798 frame) it stays just under it, the bar as it was, and a tap on it
+## picks the building; once the building is up behind the bar the marker goes. Panned back, it is where it was.
+func _marker_under_bar(arrange: Control, id: int) -> void:
+	var focus_was: Vector3 = scene._focus
+	var overview_was: bool = scene._overview
+	var bar: float = scene.top_bar_bottom()
+	var hit: float = load("res://scenes/dynamic_farm/building_arrange.gd").MARKER_HIT
+	var header: Control = scene._header
+	var header_was := header.get_global_rect()
+	var marker: Control = arrange.markers[id]
+	var start_pos: Vector2 = marker.position + marker.size * 0.5
+	var middle: Vector2 = scene.get_viewport().get_visible_rect().size * 0.5
+	# First well under the bar: the marker is over its building, as before.
+	for _i in 200:
+		if _marker_raw(id).y > bar + hit * 2.0: break
+		scene.pan(middle, middle + Vector2(0, 4))
+	arrange._place_markers()
+	var low_raw := _marker_raw(id)
+	_check(low_raw.y > bar + hit * 2.0 and marker.visible and (marker.position + marker.size * 0.5).distance_to(low_raw) < 0.5,
+		"C-254: well under the bar, the marker is over its building: %s, unbarred %s" % [marker.position + marker.size * 0.5, low_raw])
+	var over := 0
+	var tucked := false
+	var picked := false
+	var hid_early := false
+	var gone := false
+	for _i in 600:
+		scene.pan(middle, middle - Vector2(0, 4))
+		arrange._place_markers()
+		var raw := _marker_raw(id)
+		if not marker.visible:
+			gone = true
+			hid_early = raw.y - hit * 0.5 > bar
+			break
+		if marker.position.y < bar - 0.01: over += 1
+		if raw.y < bar and not tucked:
+			# The V-798 frame: unbarred, the marker's middle would be on the bar.
+			tucked = absf(marker.position.y - bar) < 0.01
+			arrange.tap(marker.position + marker.size * 0.5)
+			picked = arrange.selected == id
+			arrange.close_card()
+	_check(tucked, "C-254: pushed up, building %d's marker would be on the top bar; it stays just under it" % id)
+	_check(over == 0, "C-254: the marker never goes over the top bar (%d frames did)" % over)
+	_check(picked, "C-254: a tap on the marker under the bar picks building %d" % id)
+	_check(gone and not hid_early, "C-254: up behind the bar the marker goes, not before")
+	_check(header.get_global_rect() == header_was and header.visible, "C-254: the top bar stays as it was")
+	scene._focus = focus_was
+	scene._overview = overview_was
+	scene._place_camera()
+	arrange._place_markers()
+	_check(marker.visible and (marker.position + marker.size * 0.5).distance_to(start_pos) < 0.5,
+		"C-254: panned back, the marker is where it was: %s, was %s" % [marker.position + marker.size * 0.5, start_pos])
+	await process_frame
 
 func _arrange() -> void:
 	var store := LocalStore.new(raw.block_id, dir)
@@ -190,7 +266,10 @@ func _arrange() -> void:
 	_check(arrange.markers.size() == 3, "one marker per building: %d" % arrange.markers.size())
 	for id: int in arrange.markers:
 		var m: Control = arrange.markers[id]
-		_check(m.visible and m.size == Vector2(44, 44), "building %d's marker shows, its hit area 44" % id)
+		# Approximate: a marker sits at its building's projected point, a fractional position, and a Control's size is
+		# kept as offset_bottom - offset_top in float32, so it can read 44.00001 at some points (C-249).
+		_check(m.visible and m.size.is_equal_approx(Vector2(44, 44)), "building %d's marker shows, its hit area 44: %s" % [id, m.size])
+	await _marker_under_bar(arrange, _id_of("coop"))
 	# The coop: its facts, Store waiting for the egg (D2).
 	arrange.select(coop_id)
 	await process_frame
@@ -200,6 +279,14 @@ func _arrange() -> void:
 	arrange.store_key.pressed.emit()
 	await process_frame
 	_check(not arrange.asking and scene.buildings_state().size() == 3, "the grey Store asks nothing and sends nothing")
+	# C-247: the egg on its way is laid while the card is up: the facts say so within the second, Store turns back.
+	for d: Dictionary in farming.farm.drops:
+		if int(d.id) == 2: d.ready_at = farming.server_now() - 1
+	arrange._process(1.0)
+	var lines: Array = arrange.card.find_children("Fact*", "Label", true, false).map(func(l: Label): return l.text)
+	_check(arrange.facts == ["3 Hens", "2 Egg on the ground"] and lines == arrange.facts,
+		"C-247: laid with the card up, the facts update at once: %s, shown %s" % [arrange.facts, lines])
+	_check(arrange.store_key != null and arrange.store_key.reason == "", "C-247: laid, Store is no longer grey")
 	# The cottage: Move only (D3).
 	var home := _id_of("cottage")
 	arrange.tap(arrange.markers[home].position + Vector2(22, 22))
@@ -243,6 +330,18 @@ func _arrange() -> void:
 	var yard = farming.livestock._yards.get(coop_id)
 	_check(not scene._buildings[coop_id].node.visible and yard != null and not yard.root.visible,
 		"the coop and its hens hide behind the preview")
+	# C-247: the Energy chip's `+1 in m:ss` counts on under the preview (the clock moved 5 s on).
+	farming.farm.energy = {"value": 10, "at": farming.server_now(), "rested_on": null}
+	for _i in 2: await process_frame
+	var regen_before: String = farming.energy_chip.regen
+	farming._clock_offset_ms += 5000
+	for _i in 2: await process_frame
+	var regen_after: String = farming.energy_chip.regen
+	var want := "+1 in " + str(load("res://modules/p0/p0_logic.gd").duration(float(farming.energy_now().next_in)))
+	_check(scene._placement == p and regen_before.begins_with("+1 in ") and regen_after != regen_before and regen_after == want,
+		"C-247: under the Move preview the Energy countdown goes on: %s -> %s (want %s)" % [regen_before, regen_after, want])
+	farming._clock_offset_ms -= 5000
+	farming.farm.erase("energy")
 	p._bar.cancelled.emit()
 	await process_frame
 	_check(scene._placement == null and scene._arrange != null and arrange.visible and _state_of(coop_id) == before,
@@ -274,6 +373,44 @@ func _arrange() -> void:
 	_check(farming.farm.drops.size() == 2 and farming.farm.drops.all(func(d): return int(d.building) == coop_id), "both eggs go with it")
 	_check(scene._buildings[coop_id].node.visible and farming.livestock._yards[coop_id].root.visible, "moved, the coop and its hens show")
 	_check(scene._arrange == arrange and arrange.visible and scene._placement == null, "back in the arrange mode")
+	# C-247: the cottage moved over the player, who stands by its back wall: they step out where the camera sees them,
+	# not behind its roof (the nearest clear point, as before, was behind it).
+	arrange.select(home)
+	await process_frame
+	arrange.move_key.pressed.emit()
+	await process_frame
+	p = scene._placement
+	var home_start: Vector2i = p.at
+	var spot = null
+	for r in range(3, 30):
+		for dy in range(-r, r + 1):
+			for dx in [-r, r]:
+				for cell in [home_start + Vector2i(dx, dy), home_start + Vector2i(dy, dx)]:
+					if spot != null: break
+					p.move_to(cell)
+					if p.reason == "": spot = cell
+	_check(spot != null, "C-247: the cottage fits elsewhere (%s)" % [spot])
+	var back: Vector3 = scene._camera.global_basis.z
+	var far := Vector3(-back.x, 0.0, -back.z).normalized()
+	var middle: Vector3 = Building.center(scene._walk, p.at, p.base, p.rotation_steps)
+	var stand: Vector3 = Vector3(middle.x, scene._walk.position.y, middle.z) + far * (float(mini(p.base.x, p.base.y)) * scene._walk.cell_m * 0.5 - 0.3)
+	_check(scene._walk.clear_position(stand), "C-247: the player can stand there before the cottage comes")
+	scene._walk.position = stand
+	scene._actor.position = stand
+	p._bar.confirmed.emit()
+	await _settled()
+	# The landing pop (Fence.POP_S) over, the cottage at its full size for the sight checks.
+	var pop_end := Time.get_ticks_msec() + int(float(load("res://scenes/p0/p0_fence.gd").POP_S) * 1000.0) + 300
+	while Time.get_ticks_msec() < pop_end: await process_frame
+	var standing := _state_of(home)
+	_check(Building.at_of(standing) == spot, "C-247: the cottage stands over where the player stood: %s" % [standing])
+	var now_at: Vector3 = scene._actor.position
+	_check(now_at.distance_to(stand) > 0.01 and scene._walk.clear_position(now_at) and now_at.distance_to(stand) < 6.0,
+		"C-247: the player stepped out to a clear point %.2f m away" % now_at.distance_to(stand))
+	_check(scene.seen(now_at), "C-247: the camera sees the player there (not behind the roof): %s" % [now_at])
+	var nearest: Variant = _nearest_clear(stand)
+	_check(nearest != null and not scene.seen(nearest),
+		"C-247 control: the nearest clear point (the old step-out) is hidden behind the cottage: %s" % [nearest])
 	# Back folds the card, then ends the mode.
 	arrange.select(home)
 	await process_frame

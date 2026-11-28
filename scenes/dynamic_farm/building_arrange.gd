@@ -9,10 +9,12 @@ extends Control
 ## or on a building's cells selects it and slides its card up (220): its picture, name, at most two facts (`4 Sheep`,
 ## `1 Wool on the ground`) and `Store` (secondary) + `Move` (primary); the cottage has `Move` only (D3). A drop still
 ## on its way greys Store with `Ready in m:ss`, counting each second and turning back into `Store` when laid (D2).
+## C-247: the facts follow the clock too: a drop laid while the card is up shows on it within the second (V-779).
 ## Store asks first (`Store <name>?`, what goes back into the bag: the blueprint with the animals that go with it, the
 ## materials, the drops on the ground; D1) with `Cancel` / `Store`. A tap on open ground, ✕ or Back folds the card.
 ## A drag on the scene pans the camera (LOCK-01's modal edit exception: no stick). The host (dynamic_farm.gd) does the
-## sending, the move preview and the building's going; this node asks it through the signals.
+## sending, the move preview and the building's going; this node asks it through the signals. C-254: a marker keeps
+## off the top bar (LOCK-06): the host puts it just under the bar, or none once its building is up behind it.
 
 signal done
 signal move_requested(id: int)
@@ -63,6 +65,8 @@ var store_key: UiCommandButton
 ## The card's facts, the question's rows (for tests).
 var facts: Array[String] = []
 var returns: Array[String] = []
+## The card's text column (name, then the facts) while the building's card is up.
+var _text: VBoxContainer
 var _press := Vector2.ZERO
 var _last := Vector2.ZERO
 var _finger := -1
@@ -126,7 +130,9 @@ func _process(delta: float) -> void:
 	_tick += delta
 	if _tick >= 1.0 or _tick < 0.0:
 		_tick = 0.0
-		if card != null and not asking: _refresh_store_key()
+		if card != null and not asking:
+			_refresh_facts()
+			_refresh_store_key()
 
 func _place_markers() -> void:
 	for id: int in markers:
@@ -158,6 +164,7 @@ func close_card() -> bool:
 		return false
 	card.queue_free()
 	card = null
+	_text = null
 	asking = false
 	selected = 0
 	move_key = null
@@ -177,6 +184,7 @@ func back() -> bool:
 func _new_card() -> VBoxContainer:
 	var slide := card == null
 	if card != null: card.queue_free()
+	_text = null
 	card = PanelContainer.new()
 	card.name = "StoreCard" if asking else "BuildingCard"
 	card.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -233,11 +241,8 @@ func _fill_card() -> void:
 	var title := UiKit.label(str(Building.kind(str(b.type)).get("name", b.type)), UiTokens.STYLE_ROW_TITLE_XB15)
 	title.name = "Name"
 	text.add_child(title)
-	facts = building_facts(b)
-	for line in facts:
-		var fact := UiKit.label(line, UiTokens.STYLE_BODY_B14, UiTokens.COLOR_TEXT_SECONDARY)
-		fact.name = "Fact"
-		text.add_child(fact)
+	_text = text
+	_show_facts(building_facts(b))
 	var keys := HBoxContainer.new()
 	keys.add_theme_constant_override(&"separation", 8)
 	col.add_child(keys)
@@ -257,6 +262,26 @@ func _fill_card() -> void:
 	move_key.activated.connect(func(): move_requested.emit(id))
 	keys.add_child(move_key)
 	_refresh_store_key()
+
+## The fact lines under the name.
+func _show_facts(lines: Array[String]) -> void:
+	facts = lines
+	for old: Node in _text.get_children():
+		if old.name.begins_with("Fact"):
+			_text.remove_child(old)
+			old.queue_free()
+	for i in facts.size():
+		var fact := UiKit.label(facts[i], UiTokens.STYLE_BODY_B14, UiTokens.COLOR_TEXT_SECONDARY)
+		fact.name = "Fact%d" % (i + 1)
+		_text.add_child(fact)
+
+## C-247: a drop laid (its ready_at passed) while the card is up: the facts say so now, not on reopening (V-779).
+func _refresh_facts() -> void:
+	if not is_instance_valid(_text) or selected == 0: return
+	var b := building()
+	if b.is_empty(): return
+	var now := building_facts(b)
+	if now != facts: _show_facts(now)
 
 ## The card's facts: the animals (`4 Sheep`), the drops on the ground (`1 Wool on the ground`).
 func building_facts(b: Dictionary) -> Array[String]:
