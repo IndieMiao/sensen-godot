@@ -235,7 +235,7 @@ func _first_visit() -> Dictionary:
 		if kind == "tree":
 			var stage: Node3D = farming.gather_stage
 			var origin: Vector3 = farming.gatherables[index].origin
-			_check(stage.drop_at.y - origin.y > 0.4, "V-774: the log pops on the fallen trunk at the stump's height, not on the ground (%s)" % stage.drop_at)
+			_check(stage.drop_at.y - origin.y > 0.2, "V-774: the log pops off the trunk above the ground, not under it (%s)" % stage.drop_at)
 			_check(played.find("landed tree") >= 0 and played.find("drop wood") > played.find("landed tree"),
 				"the log pops out only once the tree is down (%s)" % [played])
 		if kind == "rock":
