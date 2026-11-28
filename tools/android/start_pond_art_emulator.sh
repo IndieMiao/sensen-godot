@@ -6,10 +6,15 @@ pond_sdk="${ANDROID_SDK_ROOT:-$HOME/Library/Android/sdk}"
 pond_avd_root="$pond_root/output/pond-pitch-2026-09-25/avd"
 pond_port="${POND_AVD_PORT:-5580}"
 pond_template="${POND_AVD_TEMPLATE:-$HOME/.android/avd/Pixel_9_Pro.avd/config.ini}"
+# GPU mode for `emulator -gpu`; a machine's Run environment may set it (Steam Deck: host). Default unchanged.
+pond_gpu="${CARDIGAN_EMULATOR_GPU:-host}"
 export ADB_SERVER_SOCKET="tcp:localhost:${POND_ADB_PORT:-5041}"
 export ANDROID_ADB_SERVER_PORT="${POND_ADB_PORT:-5041}"
 [[ "$pond_port" =~ ^[0-9]+$ ]] && ((pond_port >= 5554 && pond_port <= 5682 && pond_port % 2 == 0)) || {
     echo 'POND_AVD_PORT must be an even number in 5554..5682.' >&2; exit 2;
+}
+[[ "$pond_gpu" =~ ^[A-Za-z0-9_-]+$ ]] || {
+    echo 'CARDIGAN_EMULATOR_GPU must be one emulator -gpu mode, e.g. host or swiftshader_indirect.' >&2; exit 2;
 }
 if "$pond_root/tools/android/pond_art_adb.sh" -s "emulator-$pond_port" get-state >/dev/null 2>&1; then
     echo "Port $pond_port is already in use; keeping that emulator intact."
@@ -39,4 +44,4 @@ if not (avd / 'config.ini').exists():
 PY
 exec env ANDROID_AVD_HOME="$pond_avd_root" "$pond_sdk/emulator/emulator" \
     -avd Sensen_Pond_Art -port "$pond_port" -no-window -no-snapshot -no-audio \
-    -no-boot-anim -gpu host -memory 2048 -cores 2
+    -no-boot-anim -gpu "$pond_gpu" -memory 2048 -cores 2
