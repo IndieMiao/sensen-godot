@@ -4,8 +4,8 @@
 background_mode = 1
 background_color = Color(0.91, 0.92, 0.83, 1)
 ambient_light_source = 2
-ambient_light_color = Color(1, 0.941, 0.863, 1)
-ambient_light_energy = 0.48
+ambient_light_color = Color(1, 0.924, 0.818, 1)
+ambient_light_energy = 0.55
 tonemap_mode = 4
 tonemap_exposure = 1.58
 
@@ -37,7 +37,7 @@ environment = SubResource("RoomDay")
 
 [node name="WindowSun" type="DirectionalLight3D" parent="."]
 rotation = Vector3(-0.84716, -1.32582, 0)
-light_color = Color(1, 0.902, 0.761, 1)
+light_color = Color(1, 0.875, 0.716, 1)
 light_energy = 0.54
 light_bake_mode = 1
 shadow_enabled = false
@@ -63,7 +63,7 @@ cast_shadow = 0
 
 [node name="FrontBounce" type="DirectionalLight3D" parent="."]
 rotation = Vector3(-0.61, 0.31, 0)
-light_color = Color(1, 0.95, 0.87, 1)
-light_energy = 0.23
+light_color = Color(1, 0.923, 0.800, 1)
+light_energy = 0.29
 light_bake_mode = 1
 shadow_enabled = false
