@@ -14,25 +14,27 @@ const Fishing = preload("res://modules/dynamic_farm/parcel_fishing.gd")
 const ParcelItems = preload("res://modules/dynamic_farm/parcel_items.gd")
 ## The tier names in the result line, as P0's rarity names.
 const TIERS := ["Common", "Fine", "Rare"]
-## Player-visible lines (copy after the P0 panel's; awaiting PM's C-45 final).
+## Player-visible lines as PM finalised them on C-232#28 (C-45: short, no working shown).
 const LINES := {
 	"ready": "Cast when you are ready.",
 	"casting": "Casting...",
-	"watch": "Watch the float. Tap when a fish bites!",
-	"bite": "A bite! Tap to hook the fish!",
-	"reel": "%s fish · Keep the fish inside the green bar.",
-	"missed": "Missed the bite. Tap Hook when the float dips.",
-	"escaped_line": "Reeling in the empty line…",
-	"escaped": "No fish this time. Tap Again to try another cast.",
+	"watch": "Tap when a fish bites!",
+	"bite": "A bite! Tap to hook!",
+	"reel": "Keep the fish in the green bar.",
+	"missed": "Missed the bite.",
+	"escaped_line": "Reeling in…",
+	"escaped": "No fish this time.",
 	"escaped_head": "Fish escaped",
 	"caught_head": "Fish caught!",
-	"caught": "%s · %s fish +1",
+	"caught": "%s · %s +1",
 	"saving": "Saving...",
-	"stopped": "Fishing stopped. Your saved catches are safe.",
+	"stopped": "Fishing stopped.",
+	"interrupted_head": "Fishing interrupted",
+	"interrupted": "Cast again.",
 	"no_energy": "Not enough Energy to cast.",
 	"no_rod": "You need a fishing rod.",
 	"no_bait": "That bait has run out.",
-	"unreachable": "Couldn't reach the server · tap Cast to try again",
+	"unreachable": "Couldn't reach the server. Tap Cast to retry.",
 }
 
 ## The pier: send(commands) -> the store's result, farm (the save it holds), server_now() and selected_bait().
@@ -130,7 +132,7 @@ func _start_reel() -> void:
 	phase = "playing"
 	_gauge.bar_size = float(tier.bar_size)
 	_gauge.fish_texture = P0Logic.icon("fish_sil")
-	_show_notice(LINES.reel % TIERS[clampi(int(_line.rarity) - 1, 0, TIERS.size() - 1)])
+	_show_notice(LINES.reel)
 	_refresh_button()
 
 func _process(dt: float) -> void:
@@ -239,7 +241,7 @@ func _cancel(reason := "stopped") -> void:
 		await _line_in()
 	elif phase == "casting":
 		return
-	if reason == "interrupted": _show_notice("Return to the water and cast again.", "Fishing interrupted", "failed")
+	if reason == "interrupted": _show_notice(LINES.interrupted, LINES.interrupted_head, "failed")
 	_refresh_button()
 
 func close() -> void:

@@ -219,7 +219,7 @@ in `test_claim_controller.gd`, `geo_screen` in `test_map_camera.gd`.
 ## Aquatic Park pier (C-232)
 
 The map's second place pin (`town_entry.gd` `pier()`: P0's coast pond glyph, short name `Aquatic Park`, card
-`Aquatic Park Pier` · `Fishing`, Distance, Go) at the Municipal Pier's foot (37.8066, -122.4242); one place card at a
+`Aquatic Park Pier`, Distance, Go; copy as PM finalised it on C-232#28) at the Municipal Pier's foot (37.8066, -122.4242); one place card at a
 time, Go travels there as to Washington Square (C-188) and opens `parcel_pier.tscn`. The pier reads SEN-C-233's model
 (`scenes/aquatic_park/aquatic_park_pier.tscn`): its root's `Entrance` and the metadata contours `walk_polygon`,
 `stand_polygon`, `fish_edge` and `water_polygon` (local x/z metres, C-233#72), the water height from its `Bay`; without

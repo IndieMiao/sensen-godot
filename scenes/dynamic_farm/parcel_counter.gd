@@ -16,8 +16,8 @@ extends UiDrawer
 ## C-232 (0.4.7): once the player has been to the Aquatic Park pier (the save's `fishing.gifted_at`), the shelf also has the
 ## tackle (`economy.buy_prices` rods and baits, limits in `fishing.goods`): a rod is a one-off row (no stepper) until owned,
 ## then its row goes; baits step up to what the coins and the day's limit cover. Below the item's farm level the key is the
-## grey `Farm Lv4 needed`, a used-up day `Sold out today`; the effect line is P0's (`Bite window 2.6 s`, `Faster bites`,
-## `More Rare fish`). More than SHELF_ROWS rows scroll in a shelf 2½ rows high; the drawer grows by what the shelf shows.
+## grey `Farm Lv4 needed`, a used-up day `Sold out today`; the effect line `Longer bite window` for a rod (C-232#28),
+## P0's `Faster bites` / `More Rare fish` for a bait. More than SHELF_ROWS rows scroll in a shelf 2½ rows high; the drawer grows by what the shelf shows.
 
 signal sell_requested(item_id: String, count: int)
 signal buy_requested(item_id: String, count: int)
@@ -326,12 +326,14 @@ func buy_spec(id: String, qty := 1) -> Dictionary:
 		price = {each = each, total = each * qty, text = "%d coins" % (each * qty), line = ""},
 		buttons = [button]}
 
-## C-232: a rod's or bait's effect in P0's words (P0ItemInfo: `Bite window 2.6 s`, `Faster bites`, `More Rare fish`); "".
+## C-232: a rod's or bait's effect, as PM finalised it on C-232#28 (C-45 ③: no numbers): the rods by their place in the
+## rules, worst to best `Short` / `Longer` / `Longest bite window`; the baits P0's `Faster bites` / `More Rare fish`; "".
+const ROD_EFFECTS := ["Short bite window", "Longer bite window", "Longest bite window"]
 static func tackle_effect(id: String) -> String:
 	var f: Dictionary = ParcelFarm.rules().get("fishing", {})
 	if f.is_empty(): return ""
-	for rod: Dictionary in f.rods:
-		if rod.id == id: return "Bite window %.1f s" % (float(int(f.hook_window_ms) + int(rod.hook_bonus_ms)) / 1000.0)
+	for i in (f.rods as Array).size():
+		if f.rods[i].id == id: return ROD_EFFECTS[mini(i, ROD_EFFECTS.size() - 1)]
 	if f.baits.has(id): return "More Rare fish" if int(f.baits[id].shift[f.baits[id].shift.size() - 1]) > 0 else "Faster bites"
 	return ""
 

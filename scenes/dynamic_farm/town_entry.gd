@@ -24,9 +24,9 @@ const SUBTITLE := "Market · Carpenter"
 const NO_HOME := "Claim a home first."
 const GO := "Go"
 ## C-232: the Aquatic Park Municipal Pier's foot (Van Ness Ave and Beach St), north-west of the North Beach starter area.
-## Copy after the Travel Post's form, awaiting PM's C-45 final.
+## Copy as PM finalised it on C-232#28 (C-45): the title only, no subtitle.
 const PIER := {"lat": 37.8066, "lon": -122.4242, "icon": "res://assets/p0/icons/pond_coast.svg", "short": "Aquatic Park",
-	"title": "Aquatic Park Pier", "subtitle": "Fishing", "node": "AquaticPark"}
+	"title": "Aquatic Park Pier", "subtitle": "", "node": "AquaticPark"}
 ## The pin's name is shown whole (C-145; C-115#62): "Washington Square" is wider than a map pin's usual 96 px short name.
 ## Only the width changes, not the copy or its style.
 const NAME_MAX_W := 160.0
