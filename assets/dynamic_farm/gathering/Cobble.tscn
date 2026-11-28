@@ -1,0 +1,239 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/gathering/Cobble.glb" id="geo"]
+[ext_resource type="Shader" path="res://assets/dynamic_farm/gathering/gather_surface.gdshader" id="paint"]
+
+[sub_resource type="ShaderMaterial" id="active"]
+resource_local_to_scene = true
+shader = ExtResource("paint")
+shader_parameter/rock_height = 0.8183019161224365
+
+[sub_resource type="Animation" id="stage_0"]
+resource_name = "stage_0"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Cobble/Whole:material_override:shader_parameter/fracture_stage")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0]}
+
+[sub_resource type="Animation" id="stage_1"]
+resource_name = "stage_1"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Cobble/Whole:material_override:shader_parameter/fracture_stage")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [1]}
+
+[sub_resource type="Animation" id="stage_2"]
+resource_name = "stage_2"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Cobble/Whole:material_override:shader_parameter/fracture_stage")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [2]}
+
+[sub_resource type="Animation" id="hit"]
+resource_name = "hit"
+length = 0.22
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Cobble/Whole:scale")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0, 0.08, 0.155, 0.22), "transitions": PackedFloat32Array(1, 1, 1, 1), "update": 0, "values": [Vector3(1, 1, 1), Vector3(1.03, 0.94, 1.03), Vector3(0.991, 1.025, 0.991), Vector3(1, 1, 1)]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Art/Cobble/Whole:material_override:shader_parameter/flash")
+tracks/1/interp = 1
+tracks/1/keys = {"times": PackedFloat32Array(0, 0.06), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [0.6, 0]}
+
+[sub_resource type="Animation" id="shatter"]
+resource_name = "shatter"
+length = 0.42
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Cobble/Whole:visible")
+tracks/0/interp = 0
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Art/Cobble/Scree:visible")
+tracks/1/interp = 0
+tracks/1/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [false, true]}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Art/Cobble/Shard1:visible")
+tracks/2/interp = 0
+tracks/2/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [true, false]}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Art/Cobble/Shard1:position")
+tracks/3/interp = 1
+tracks/3/keys = {"times": PackedFloat32Array(0.0, 0.035, 0.07, 0.105, 0.14, 0.175, 0.21, 0.245, 0.28, 0.315, 0.35, 0.385, 0.42), "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), "update": 0, "values": [Vector3(-0.111855, 0.47014, -0.0842494), Vector3(-0.145137, 0.528045, -0.109318), Vector3(-0.178419, 0.569283, -0.134386), Vector3(-0.211701, 0.593855, -0.159454), Vector3(-0.244983, 0.60176, -0.184522), Vector3(-0.278266, 0.592998, -0.20959), Vector3(-0.311548, 0.56757, -0.234658), Vector3(-0.34483, 0.525475, -0.259726), Vector3(-0.378112, 0.466713, -0.284795), Vector3(-0.411394, 0.391285, -0.309863), Vector3(-0.444676, 0.29919, -0.334931), Vector3(-0.477958, 0.190428, -0.359999), Vector3(-0.51124, 0.065, -0.385067)]}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Art/Cobble/Shard1:rotation_degrees")
+tracks/4/interp = 1
+tracks/4/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector3(0, 0, 0), Vector3(37, 28, -43)]}
+tracks/5/type = "value"
+tracks/5/path = NodePath("Art/Cobble/Shard1:scale")
+tracks/5/interp = 1
+tracks/5/keys = {"times": PackedFloat32Array(0, 0.22, 0.42), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector3(1, 1, 1), Vector3(1, 1, 1), Vector3(0.01, 0.01, 0.01)]}
+tracks/6/type = "value"
+tracks/6/path = NodePath("Art/Cobble/Shard2:visible")
+tracks/6/interp = 0
+tracks/6/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [true, false]}
+tracks/7/type = "value"
+tracks/7/path = NodePath("Art/Cobble/Shard2:position")
+tracks/7/interp = 1
+tracks/7/keys = {"times": PackedFloat32Array(0.0, 0.035, 0.07, 0.105, 0.14, 0.175, 0.21, 0.245, 0.28, 0.315, 0.35, 0.385, 0.42), "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), "update": 0, "values": [Vector3(0.104783, 0.45291, -0.105156), Vector3(0.134193, 0.512251, -0.134671), Vector3(0.163604, 0.554925, -0.164186), Vector3(0.193014, 0.580932, -0.193701), Vector3(0.222424, 0.590273, -0.223216), Vector3(0.251835, 0.582947, -0.252731), Vector3(0.281245, 0.558955, -0.282246), Vector3(0.310656, 0.518296, -0.311762), Vector3(0.340066, 0.46097, -0.341277), Vector3(0.369476, 0.386977, -0.370792), Vector3(0.398887, 0.296318, -0.400307), Vector3(0.428297, 0.188992, -0.429822), Vector3(0.457708, 0.065, -0.459337)]}
+tracks/8/type = "value"
+tracks/8/path = NodePath("Art/Cobble/Shard2:rotation_degrees")
+tracks/8/interp = 1
+tracks/8/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector3(0, 0, 0), Vector3(18, 53, -11)]}
+tracks/9/type = "value"
+tracks/9/path = NodePath("Art/Cobble/Shard2:scale")
+tracks/9/interp = 1
+tracks/9/keys = {"times": PackedFloat32Array(0, 0.22, 0.42), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector3(1, 1, 1), Vector3(1, 1, 1), Vector3(0.01, 0.01, 0.01)]}
+tracks/10/type = "value"
+tracks/10/path = NodePath("Art/Cobble/Shard3:visible")
+tracks/10/interp = 0
+tracks/10/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [true, false]}
+tracks/11/type = "value"
+tracks/11/path = NodePath("Art/Cobble/Shard3:position")
+tracks/11/interp = 1
+tracks/11/keys = {"times": PackedFloat32Array(0.0, 0.035, 0.07, 0.105, 0.14, 0.175, 0.21, 0.245, 0.28, 0.315, 0.35, 0.385, 0.42), "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), "update": 0, "values": [Vector3(0.167218, 0.387378, 0.103018), Vector3(0.202693, 0.45218, 0.124873), Vector3(0.238167, 0.500315, 0.146728), Vector3(0.273642, 0.531784, 0.168583), Vector3(0.309117, 0.546585, 0.190438), Vector3(0.344592, 0.544721, 0.212294), Vector3(0.380067, 0.526189, 0.234149), Vector3(0.415542, 0.490991, 0.256004), Vector3(0.451017, 0.439126, 0.277859), Vector3(0.486492, 0.370595, 0.299714), Vector3(0.521966, 0.285396, 0.321569), Vector3(0.557441, 0.183532, 0.343424), Vector3(0.592916, 0.065, 0.365279)]}
+tracks/12/type = "value"
+tracks/12/path = NodePath("Art/Cobble/Shard3:rotation_degrees")
+tracks/12/interp = 1
+tracks/12/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector3(0, 0, 0), Vector3(-1, 78, 21)]}
+tracks/13/type = "value"
+tracks/13/path = NodePath("Art/Cobble/Shard3:scale")
+tracks/13/interp = 1
+tracks/13/keys = {"times": PackedFloat32Array(0, 0.22, 0.42), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector3(1, 1, 1), Vector3(1, 1, 1), Vector3(0.01, 0.01, 0.01)]}
+tracks/14/type = "value"
+tracks/14/path = NodePath("Art/Cobble/Shard4:visible")
+tracks/14/interp = 0
+tracks/14/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [true, false]}
+tracks/15/type = "value"
+tracks/15/path = NodePath("Art/Cobble/Shard4:position")
+tracks/15/interp = 1
+tracks/15/keys = {"times": PackedFloat32Array(0.0, 0.035, 0.07, 0.105, 0.14, 0.175, 0.21, 0.245, 0.28, 0.315, 0.35, 0.385, 0.42), "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), "update": 0, "values": [Vector3(-0.114578, 0.399268, 0.144948), Vector3(-0.140417, 0.463079, 0.177636), Vector3(-0.166255, 0.510223, 0.210323), Vector3(-0.192094, 0.540701, 0.243011), Vector3(-0.217933, 0.554512, 0.275698), Vector3(-0.243772, 0.551656, 0.308386), Vector3(-0.26961, 0.532134, 0.341073), Vector3(-0.295449, 0.495945, 0.373761), Vector3(-0.321288, 0.443089, 0.406448), Vector3(-0.347126, 0.373567, 0.439136), Vector3(-0.372965, 0.287378, 0.471823), Vector3(-0.398804, 0.184522, 0.504511), Vector3(-0.424642, 0.065, 0.537198)]}
+tracks/16/type = "value"
+tracks/16/path = NodePath("Art/Cobble/Shard4:rotation_degrees")
+tracks/16/interp = 1
+tracks/16/keys = {"times": PackedFloat32Array(0, 0.42), "transitions": PackedFloat32Array(1, 1), "update": 0, "values": [Vector3(0, 0, 0), Vector3(-20, 103, 53)]}
+tracks/17/type = "value"
+tracks/17/path = NodePath("Art/Cobble/Shard4:scale")
+tracks/17/interp = 1
+tracks/17/keys = {"times": PackedFloat32Array(0, 0.22, 0.42), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector3(1, 1, 1), Vector3(1, 1, 1), Vector3(0.01, 0.01, 0.01)]}
+
+[sub_resource type="Animation" id="reset"]
+resource_name = "reset"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Art/Cobble/Whole:visible")
+tracks/0/interp = 0
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [true]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Art/Cobble/Scree:visible")
+tracks/1/interp = 0
+tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Art/Cobble/Whole:scale")
+tracks/2/interp = 1
+tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(1, 1, 1)]}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Art/Cobble/Whole:material_override:shader_parameter/flash")
+tracks/3/interp = 1
+tracks/3/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0]}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Art/Cobble/Whole:material_override:shader_parameter/fracture_stage")
+tracks/4/interp = 1
+tracks/4/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0]}
+tracks/5/type = "value"
+tracks/5/path = NodePath("Art/Cobble/Shard1:visible")
+tracks/5/interp = 0
+tracks/5/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/6/type = "value"
+tracks/6/path = NodePath("Art/Cobble/Shard1:scale")
+tracks/6/interp = 1
+tracks/6/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(1, 1, 1)]}
+tracks/7/type = "value"
+tracks/7/path = NodePath("Art/Cobble/Shard1:position")
+tracks/7/interp = 1
+tracks/7/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(-0.111855, 0.47014, -0.0842494)]}
+tracks/8/type = "value"
+tracks/8/path = NodePath("Art/Cobble/Shard1:rotation_degrees")
+tracks/8/interp = 1
+tracks/8/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(0, 0, 0)]}
+tracks/9/type = "value"
+tracks/9/path = NodePath("Art/Cobble/Shard2:visible")
+tracks/9/interp = 0
+tracks/9/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/10/type = "value"
+tracks/10/path = NodePath("Art/Cobble/Shard2:scale")
+tracks/10/interp = 1
+tracks/10/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(1, 1, 1)]}
+tracks/11/type = "value"
+tracks/11/path = NodePath("Art/Cobble/Shard2:position")
+tracks/11/interp = 1
+tracks/11/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(0.104783, 0.45291, -0.105156)]}
+tracks/12/type = "value"
+tracks/12/path = NodePath("Art/Cobble/Shard2:rotation_degrees")
+tracks/12/interp = 1
+tracks/12/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(0, 0, 0)]}
+tracks/13/type = "value"
+tracks/13/path = NodePath("Art/Cobble/Shard3:visible")
+tracks/13/interp = 0
+tracks/13/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/14/type = "value"
+tracks/14/path = NodePath("Art/Cobble/Shard3:scale")
+tracks/14/interp = 1
+tracks/14/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(1, 1, 1)]}
+tracks/15/type = "value"
+tracks/15/path = NodePath("Art/Cobble/Shard3:position")
+tracks/15/interp = 1
+tracks/15/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(0.167218, 0.387378, 0.103018)]}
+tracks/16/type = "value"
+tracks/16/path = NodePath("Art/Cobble/Shard3:rotation_degrees")
+tracks/16/interp = 1
+tracks/16/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(0, 0, 0)]}
+tracks/17/type = "value"
+tracks/17/path = NodePath("Art/Cobble/Shard4:visible")
+tracks/17/interp = 0
+tracks/17/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [false]}
+tracks/18/type = "value"
+tracks/18/path = NodePath("Art/Cobble/Shard4:scale")
+tracks/18/interp = 1
+tracks/18/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(1, 1, 1)]}
+tracks/19/type = "value"
+tracks/19/path = NodePath("Art/Cobble/Shard4:position")
+tracks/19/interp = 1
+tracks/19/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(-0.114578, 0.399268, 0.144948)]}
+tracks/20/type = "value"
+tracks/20/path = NodePath("Art/Cobble/Shard4:rotation_degrees")
+tracks/20/interp = 1
+tracks/20/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(0, 0, 0)]}
+
+[sub_resource type="AnimationLibrary" id="clips"]
+_data = {&"stage_0": SubResource("stage_0"), &"stage_1": SubResource("stage_1"), &"stage_2": SubResource("stage_2"), &"hit": SubResource("hit"), &"shatter": SubResource("shatter"), &"reset": SubResource("reset")}
+
+[node name="CobbleTarget" type="Node3D"]
+
+[node name="Art" parent="." instance=ExtResource("geo")]
+
+[node name="Whole" parent="Art/Cobble"]
+material_override = SubResource("active")
+
+[node name="Shard1" parent="Art/Cobble"]
+visible = false
+
+[node name="Shard2" parent="Art/Cobble"]
+visible = false
+
+[node name="Shard3" parent="Art/Cobble"]
+visible = false
+
+[node name="Shard4" parent="Art/Cobble"]
+visible = false
+
+[node name="Scree" parent="Art/Cobble"]
+visible = false
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries/ = SubResource("clips")
+
+[editable path="Art"]
