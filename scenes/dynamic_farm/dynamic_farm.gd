@@ -26,6 +26,10 @@ const Art = preload("res://modules/farm/farm_art.gd")
 const Placement = preload("res://scenes/dynamic_farm/building_placement.gd")
 const Book = preload("res://scenes/dynamic_farm/blueprint_book.gd")
 const Thumbs = preload("res://scenes/dynamic_farm/blueprint_thumbs.gd")
+const Arrange = preload("res://scenes/dynamic_farm/building_arrange.gd")
+## C-229 (SEN-C-227 README §8): a stored building shrinks away over STORE_FADE_MS with dust round its footprint.
+const STORE_FADE_MS := 220.0
+const STORED := "%s stored"
 const BLUEPRINT_ICON := preload("res://assets/ui/v3/hero/hero_blueprints.png")
 ## A card's grey key when the type is at its limit (as Scott's key words it).
 const BOOK_LEVEL := "Farm Lv%d needed"
@@ -148,6 +152,11 @@ var _thumbs: Node
 var _placing_chip: PanelContainer
 var _placing_name: Label
 var _placement: Placement
+## C-229: the arrange mode while on (building_arrange.gd), else null; the building being moved in the preview, else 0.
+var _arrange: Control
+var _moving := 0
+## Building id -> ms: the next time the save takes that building's model away it shrinks away (stored).
+var _fade_out := {}
 var _sending := false
 var _paths: RefCounted
 ## Waypoints of the current approach; the stick cancels it.
@@ -309,6 +318,7 @@ func _on_farm_changed(farm: Dictionary) -> void:
 	_sync_buildings(farm)
 	_ground_paint.update(farm)
 	_refresh_build()
+	if _arrange != null and _placement == null: _arrange.refresh()
 
 ## The saved buildings (ParcelFarm.buildings_of), or [] without the owner's farm.
 func buildings_state() -> Array:
@@ -366,7 +376,7 @@ func blueprint_count() -> int:
 ## is in the bag or a building stands, unless the book or a placement holds the screen. Its disc shows the
 ## blueprints in the bag (none drawn at 0); a change pops it (1 → 1.15 → 1 in 200).
 func _refresh_build() -> void:
-	var shown: bool = _farming != null and not _farming.farm.is_empty() and _placement == null and _book == null \
+	var shown: bool = _farming != null and not _farming.farm.is_empty() and _placement == null and _book == null and _arrange == null \
 		and (blueprint_count() > 0 or not buildings_state().is_empty())
 	_build.visible = shown
 	var count := blueprint_count()
@@ -387,15 +397,16 @@ func _bump_count() -> void:
 
 ## Opens the blueprint book (M-04 over the scrim); the farming UI is held under it (no key, no quick bar, no guide).
 func open_book() -> Control:
-	if _book != null or _farming == null or _farming.farm.is_empty() or _placement != null or _back_sent: return null
+	if _book != null or _farming == null or _farming.farm.is_empty() or _placement != null or _arrange != null or _back_sent: return null
 	if not _route.is_empty(): _end_route("cancelled")
 	_movement = Vector2.ZERO
 	_controls.reset()
 	_controls.process_mode = Node.PROCESS_MODE_DISABLED
 	_farming.held = true
-	_book = Book.new(book_entries(), _thumb)
+	_book = Book.new(book_entries(), _thumb, not buildings_state().is_empty())
 	_book.close_requested.connect(close_book)
 	_book.place_requested.connect(place_from_book)
+	_book.arrange_requested.connect(begin_arrange)
 	_canvas.add_child(_book)
 	_book.open()
 	_book.stagger(_book.cards)
@@ -510,27 +521,45 @@ func begin_placement(type := "") -> bool:
 ## where it was scrolled.
 func cancel_placement() -> void:
 	if _placement == null or _sending: return
+	var moving := _moving != 0
 	end_placement()
-	open_book()
+	if not moving: open_book()
 
 ## Cells walking cannot use besides a new footprint: solid core obstacles, the buildings standing and reserved cells.
-func _walk_blocked(obstacles: Dictionary) -> Dictionary:
-	return Building.solid(_plan.core_obstacles.layout, obstacles).merged(_walk.reserved).merged(ParcelFarm.building_cells(_farming.farm))
+## `farm`: the save to read the buildings from ({} the current one; C-229 a move's, without the building moved).
+func _walk_blocked(obstacles: Dictionary, farm := {}) -> Dictionary:
+	return Building.solid(_plan.core_obstacles.layout, obstacles).merged(_walk.reserved) \
+		.merged(ParcelFarm.building_cells(farm if not farm.is_empty() else _farming.farm))
 
 ## Building.reason's `taken` and `walk_blocked` with every core obstacle cleared (C-175: what clearing would allow).
-func _cleared() -> Dictionary:
-	return {"taken": Building.blocked({}, _farming.farm), "walk_blocked": _walk_blocked({})}
+func _cleared(farm := {}) -> Dictionary:
+	var f: Dictionary = farm if not farm.is_empty() else _farming.farm
+	return {"taken": Building.blocked({}, f), "walk_blocked": _walk_blocked({}, f)}
+
+## The save without building `id` (C-229: a moved building's own cells are free for it).
+func _farm_without(id: int) -> Dictionary:
+	var farm: Dictionary = _farming.farm.duplicate()
+	farm.buildings = buildings_state().filter(func(b: Dictionary): return int(b.id) != id)
+	farm.erase("house")
+	return farm
 
 func end_placement() -> void:
 	if _placement == null: return
 	_placement.queue_free()
 	_placement = null
+	_show_moved(true)
+	_moving = 0
 	_placing_chip.visible = false
 	_show_placement_grid(false)
 	_sending = false
-	_farming.held = false
-	_controls.process_mode = Node.PROCESS_MODE_INHERIT
-	_controls.reset()
+	if _arrange != null:
+		# C-229: a move's preview ends back in the arrange mode, which still holds the screen.
+		_arrange.visible = true
+		_arrange.refresh()
+	else:
+		_farming.held = false
+		_controls.process_mode = Node.PROCESS_MODE_INHERIT
+		_controls.reset()
 	_refresh_build()
 
 ## Build: the place_building command through ParcelFarming's save (Q-44); the reply builds it (state_changed).
@@ -552,6 +581,193 @@ func _on_place_confirmed(at: Vector2i, rotation_steps: int) -> void:
 	else:
 		var obstacles: Dictionary = _farming.obstacle_cells()
 		_placement.retake(Building.blocked(obstacles, _farming.farm), _walk_blocked(obstacles), _cleared())
+
+# ------------------------------------------------------------------ Arrange: moving and storing (C-229)
+
+## The book's Arrange (SEN-C-227 README §5): the book fades, the farming UI stays away (key, toggle, quick bar, phone,
+## Blueprints key: M-16), every building gets its marker and the bottom has one `Done`. The camera and the player stay
+## as they are (R1); a drag pans.
+func begin_arrange() -> Control:
+	if _arrange != null or _farming == null or _farming.farm.is_empty() or _placement != null or buildings_state().is_empty(): return null
+	if _book != null: close_book(true)
+	if not _route.is_empty(): _end_route("cancelled")
+	_movement = Vector2.ZERO
+	_controls.reset()
+	_controls.process_mode = Node.PROCESS_MODE_DISABLED
+	_farming.held = true
+	_play("idle")
+	_arrange = Arrange.new(self)
+	_arrange.done.connect(end_arrange)
+	_arrange.move_requested.connect(begin_move)
+	_arrange.store_requested.connect(_on_store_requested)
+	_canvas.add_child(_arrange)
+	_refresh_build()
+	return _arrange
+
+## Done (or Back with nothing up): the markers and the tray go, the farming UI comes back; the Blueprints key shows
+## the new count (it pops when it changed). False when the mode was not on.
+func end_arrange() -> bool:
+	if _arrange == null: return false
+	if _placement != null:
+		_show_moved(true)
+		_moving = 0
+		_placement.queue_free()
+		_placement = null
+		_placing_chip.visible = false
+		_show_placement_grid(false)
+		_sending = false
+	_arrange.queue_free()
+	_arrange = null
+	_farming.held = false
+	_controls.process_mode = Node.PROCESS_MODE_INHERIT
+	_controls.reset()
+	_focus = _actor.position if _actor != null else _focus
+	_place_camera()
+	_refresh_build()
+	return true
+
+func arranging() -> bool: return _arrange != null
+
+## The arrange mode's host calls (building_arrange.gd).
+func drops() -> Array: return _farming.farm.get("drops", []) if _farming != null else []
+func now_ms() -> int: return _farming.server_now()
+func thumb(type: String) -> Texture2D: return _thumb(type)
+func item_name(id: String) -> String: return _farming.item_name(id)
+func item_icon(id: String) -> Texture2D: return _farming.item_icon(id)
+
+## Where building `id`'s marker goes on the screen: over its model's top (or MARKER_LIFT over its middle without
+## one), null when that is behind the camera.
+func marker_point(id: int) -> Variant:
+	var built: Dictionary = _buildings.get(id, {})
+	var b: Dictionary = built.get("state", {})
+	if b.is_empty() or _camera == null: return null
+	var middle := Building.center(_walk, Building.at_of(b), Building.base_of(b), int(b.rotation))
+	var top := middle.y
+	var node = built.get("node")
+	if node is Node3D:
+		for mesh: VisualInstance3D in (node as Node3D).find_children("*", "VisualInstance3D", true, false):
+			var box := mesh.global_transform * mesh.get_aabb()
+			top = maxf(top, box.end.y)
+	var at := Vector3(middle.x, top + Arrange.MARKER_LIFT, middle.z)
+	if _camera.is_position_behind(at): return null
+	return _camera.unproject_position(at)
+
+## The building whose cells are under `screen`, 0 for none.
+func building_at_screen(screen: Vector2) -> int:
+	if _camera == null: return 0
+	var hit = Plane(Vector3.UP, 0.0).intersects_ray(_camera.project_ray_origin(screen), _camera.project_ray_normal(screen))
+	if not hit is Vector3: return 0
+	var cell: Vector2i = _walk.cell_at(hit)
+	for b: Dictionary in buildings_state():
+		if ParcelFarm.building_footprint(b).has(cell): return int(b.id)
+	return 0
+
+## A drag in the arrange mode: the ground under `from` follows the finger to `to`.
+func pan(from: Vector2, to: Vector2) -> void:
+	if _camera == null: return
+	var plane := Plane(Vector3.UP, 0.0)
+	var a = plane.intersects_ray(_camera.project_ray_origin(from), _camera.project_ray_normal(from))
+	var b = plane.intersects_ray(_camera.project_ray_origin(to), _camera.project_ray_normal(to))
+	if not a is Vector3 or not b is Vector3: return
+	_focus += (a as Vector3) - (b as Vector3)
+	_overview = false
+	_place_camera()
+
+## Move on a building's card (README §5): the card folds and the building's own placement preview starts where it
+## stands, turned as it is, its own cells free for it, its old outline dashed; `Cancel · Rotate · Move`.
+func begin_move(id: int) -> bool:
+	if _arrange == null or _placement != null: return false
+	var b: Dictionary = {}
+	for x: Dictionary in buildings_state():
+		if int(x.id) == id: b = x
+	if b.is_empty() or Building.kind(str(b.type)).is_empty(): return false
+	var type := str(b.type)
+	var base := Building.base_of(b)
+	var farm := _farm_without(id)
+	var obstacles: Dictionary = _farming.obstacle_cells()
+	_arrange.close_card()
+	_arrange.visible = false
+	_moving = id
+	_show_moved(false)
+	_placement = Placement.new()
+	_placement.confirm_word = Arrange.MOVE
+	_placement.origin = ParcelFarm.building_footprint(b)
+	_show_placement_grid(true)
+	add_child(_placement)
+	_placement.setup(type, base, _data, _walk, _camera, _canvas, Building.blocked(obstacles, farm), _farming.protected_path(),
+		_walk_blocked(obstacles, farm), Building.at_of(b), _cleared(farm), int(b.rotation))
+	_placement.confirmed.connect(_on_move_confirmed)
+	_placement.cancelled.connect(cancel_placement)
+	_placing_name.text = Building.kind(type).name
+	_placing_chip.visible = true
+	_refresh_build()
+	_focus = Building.center(_walk, _placement.at, base, _placement.rotation_steps)
+	_overview = false
+	_place_camera()
+	return true
+
+## The building being moved (and its yard's animals and drops) hidden while its see-through preview stands in for it
+## (README §5: the building becomes the preview; its old place keeps the dashed outline), or shown again.
+func _show_moved(shown: bool) -> void:
+	if _moving == 0: return
+	var node = _buildings.get(_moving, {}).get("node")
+	if node is Node3D and is_instance_valid(node): (node as Node3D).visible = shown
+	if _farming != null and _farming.livestock != null: _farming.livestock.show_yard(_moving, shown)
+
+## Move in the preview: move_building through ParcelFarming's save. The moved building lands with the Build pop where
+## the preview was; back in the arrange mode. A refused spot keeps the preview (judged again on the reply's farm, without the
+## building); anything else ends it.
+func _on_move_confirmed(at: Vector2i, rotation_steps: int) -> void:
+	if _sending or _farming.busy or _moving == 0: return
+	var id := _moving
+	var b: Dictionary = {}
+	for x: Dictionary in buildings_state():
+		if int(x.id) == id: b = x
+	if not b.is_empty() and Building.at_of(b) == at and int(b.rotation) == rotation_steps:
+		end_placement()   # where it stood, as it stood: nothing to send
+		return
+	_sending = true
+	var reply: Dictionary = await _farming.send({"type": "move_building", "building": id, "x": at.x, "y": at.y, "rotation": rotation_steps})
+	_sending = false
+	if not is_inside_tree() or _placement == null: return
+	if reply.get("ok", false):
+		for x: Dictionary in buildings_state():
+			if int(x.id) == id: _pop(x)
+		end_placement()
+	elif str(reply.get("code", "")) in ["CELL_OCCUPIED", "BUILDING_OVERLAP"]:
+		var obstacles: Dictionary = _farming.obstacle_cells()
+		var farm := _farm_without(id)
+		_placement.retake(Building.blocked(obstacles, farm), _walk_blocked(obstacles, farm), _cleared(farm))
+	else:
+		end_placement()
+
+## Store on the question: store_building through ParcelFarming's save; the building shrinks away with dust, a toast
+## says `<name> stored` and the gains fly into the Bag; the mode stays.
+func _on_store_requested(id: int) -> void:
+	if _arrange == null or _sending or _farming.busy: return
+	var b: Dictionary = {}
+	for x: Dictionary in buildings_state():
+		if int(x.id) == id: b = x
+	if b.is_empty(): return
+	var name_ := str(Building.kind(str(b.type)).get("name", b.type))
+	var from := screen_point(Building.center(_walk, Building.at_of(b), Building.base_of(b), int(b.rotation)), 1.0)
+	var before: Dictionary = _farming.farm.get("bag", {}).duplicate()
+	_sending = true
+	_fade_out[id] = STORE_FADE_MS
+	var reply: Dictionary = await _farming.send({"type": "store_building", "building": id})
+	_sending = false
+	if not reply.get("ok", false): _fade_out.erase(id)
+	if not is_inside_tree(): return
+	if reply.get("ok", false):
+		_farming._toast.show_toast(STORED % name_, ToastLayer.Severity.SUCCESS)
+		var gains := {}
+		for item: String in _farming.farm.get("bag", {}):
+			var more := int(_farming.farm.bag[item]) - int(before.get(item, 0))
+			if more > 0: gains[item] = more
+		_farming.announce_gains(gains, from)
+	if _arrange != null:
+		_arrange.close_card()
+		_arrange.refresh()
 
 ## Build succeeded (C-114): the building the reply just built grows in with the main farm's overshoot and puffs
 ## dust round its footprint. One that comes with the save (reopening, a refused Build) only stands there.
@@ -579,11 +795,35 @@ func _sync_buildings(farm: Dictionary) -> void:
 		if wanted.has(id) and _spot(wanted[id]) == _spot(_buildings[id].state): continue
 		var built: Dictionary = _buildings[id]
 		for proxy in built.proxies: _walk.remove_prop(proxy)
-		for node in [built.node] + built.wires:
+		for node in built.wires:
 			if is_instance_valid(node): node.queue_free()
+		if _fade_out.has(id) and is_instance_valid(built.node):
+			_leave(built, float(_fade_out[id]), not wanted.has(id))
+		elif is_instance_valid(built.node): built.node.queue_free()
+		_fade_out.erase(id)
 		_buildings.erase(id)
 	for id: int in wanted:
 		if not _buildings.has(id): _build_building(wanted[id])
+
+## C-229 a building leaving (README §5): moved, its old model fades over `ms`; stored (`gone`), it shrinks to nothing
+## over `ms` with dust round its footprint. Then it is freed.
+func _leave(built: Dictionary, ms: float, gone: bool) -> void:
+	var node: Node3D = built.node
+	node.name = "%sLeaving" % node.name
+	if gone:
+		var b: Dictionary = built.state
+		for point in Building.rim(_walk, Building.at_of(b), Building.base_of(b), int(b.rotation)): Fence.dust(self, point)
+	if UiMotion.reduced or not is_inside_tree():
+		node.queue_free()
+		return
+	var tw := create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	if gone:
+		tw.tween_property(node, "scale", Vector3.ONE * 0.01, UiMotion.secs(ms))
+	else:
+		for mesh: GeometryInstance3D in node.find_children("*", "GeometryInstance3D", true, false):
+			mesh.transparency = 0.0
+			tw.parallel().tween_property(mesh, "transparency", 1.0, UiMotion.secs(ms))
+	tw.tween_callback(node.queue_free)
 
 static func _spot(b: Dictionary) -> String:
 	return "%s %d %d %d %d %d" % [b.type, int(b.x), int(b.y), int(b.width), int(b.depth), int(b.rotation)]
@@ -765,7 +1005,7 @@ func _process(delta: float) -> void:
 		_farming.update(dt, _walk.cell_at(_actor.position + _facing * _walk.cell_m * 0.8), steering,
 			_actor.position, _facing)
 	if steering: _showing_house = false
-	if not _overview and not _showing_house:
+	if not _overview and not _showing_house and _arrange == null:
 		var size := get_viewport().get_visible_rect().size
 		var safe := Rect2(size*Vector2(0.23,0.26),size*Vector2(0.54,0.48))
 		_focus += CameraRules.follow_shift(_camera,_actor.position,safe)
@@ -1166,6 +1406,7 @@ func _request_back() -> void:
 	if _back_sent: return
 	_back_sent = true
 	end_placement()
+	end_arrange()
 	close_book()
 	_movement = Vector2.ZERO
 	_controls.reset()
@@ -1183,10 +1424,14 @@ func close_modal() -> bool:
 		_profile.back()
 		return true
 	# C-228: Back in a placement goes back to the book (as Cancel), Back in the book closes it.
+	# C-229: Back in a move's preview goes back to the arrange mode; there it folds the card, then ends the mode.
 	if _placement != null:
 		cancel_placement()
 		return true
 	if close_book(): return true
+	if _arrange != null:
+		if not _arrange.back(): end_arrange()
+		return true
 	return _farming != null and (_farming.close_energy() or _farming.close_bag() or _farming.close_phone())
 
 ## The profile over the parcel (C-108; C-85 ①: the HUD avatar opens it): the parcel's HUD hides and its touches stop
@@ -1195,6 +1440,7 @@ func open_profile() -> Control:
 	# A profile still fading out (MS-21) is still on its pages and its locale: a new one waits for it to go.
 	if is_instance_valid(_profile) or is_instance_valid(_profile_leaving) or _suspended or _back_sent: return null
 	end_placement()
+	end_arrange()
 	close_book()
 	if not _route.is_empty(): _end_route("cancelled")
 	_movement = Vector2.ZERO

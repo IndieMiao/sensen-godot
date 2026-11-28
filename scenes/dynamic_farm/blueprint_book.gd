@@ -6,9 +6,11 @@ extends UiModalPanel
 ## its name, its materials as NEED-TILE S (LOCK-10) and one key: `Place` (primary, the host starts the placement) or
 ## the reason it cannot (`Need 6 more Stone`, `Farm Lv3 needed`) in the neutral look, which only shakes when tapped
 ## (C-185 M-02's exception) and flashes the short tile. `No blueprints` alone when the bag has none. ✕, the scrim and
-## Android Back close it (the host). The Arrange key under the cards comes with moving and storing (C-229).
+## Android Back close it (the host). C-229: while a building stands, a full-width secondary `Arrange` key (44 high)
+## under the cards (under `No blueprints` too) asks the host for the arrange mode (moving and storing buildings).
 
 signal place_requested(type: String)
+signal arrange_requested
 
 const HERO := preload("res://assets/ui/v3/hero/hero_blueprints.png")
 const CARD := Vector2(248, 128)
@@ -25,6 +27,8 @@ const KEY_H := 32.0
 ## The panel is never taller than this share of the screen; the cards scroll inside it.
 const MAX_SCREEN := 0.8
 const EMPTY := "No blueprints"
+const ARRANGE := "Arrange"
+const ARRANGE_H := 44.0
 
 ## The entries shown (the host's book_entries()): [{type, name, count, materials: [{item, name, icon, have, need}],
 ## reason}], reason "" when it can be placed.
@@ -33,11 +37,14 @@ var scroll: TouchScrollContainer
 var cards: Array[Control] = []
 ## Each card's key, by type.
 var keys := {}
+## The Arrange key (C-229), or null when no building stands.
+var arrange_key: UiCommandButton
 var _list: VBoxContainer
 var _thumbs: Callable
 
 ## `thumbs`: type -> Texture2D (the building drawn once, BlueprintThumbs), or an empty Callable for none.
-func _init(entries_: Array = [], thumbs := Callable()) -> void:
+## `arrange`: a building stands, so the Arrange key shows (C-229).
+func _init(entries_: Array = [], thumbs := Callable(), arrange := false) -> void:
 	super("Blueprints", HERO)
 	name = "BlueprintBook"
 	theme = UiKit.theme()
@@ -50,6 +57,7 @@ func _init(entries_: Array = [], thumbs := Callable()) -> void:
 		empty.custom_minimum_size = Vector2(CARD.x, CARD.y * 0.75)
 		empty.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		body.add_child(empty)
+		_add_arrange(arrange)
 		return
 	scroll = TouchScrollContainer.new()
 	scroll.name = "Cards"
@@ -63,7 +71,17 @@ func _init(entries_: Array = [], thumbs := Callable()) -> void:
 		var card := _card(entry)
 		_list.add_child(card)
 		cards.append(card)
+	_add_arrange(arrange)
 	_fit_scroll()
+
+## C-229 (SEN-C-227 README §3): the full-width secondary Arrange key at the bottom.
+func _add_arrange(shown: bool) -> void:
+	if not shown: return
+	arrange_key = UiCommandButton.new(ARRANGE, UiCommandButton.Kind.SECONDARY)
+	arrange_key.name = "Arrange"
+	arrange_key.custom_minimum_size = Vector2(CARD.x, ARRANGE_H)
+	arrange_key.activated.connect(func(): if not closing: arrange_requested.emit())
+	body.add_child(arrange_key)
 
 func _ready() -> void:
 	get_viewport().size_changed.connect(_fit_scroll)
@@ -79,6 +97,7 @@ func _fit_scroll() -> void:
 	var want := maxf(entries.size() * CARD.y + maxi(entries.size() - 1, 0) * CARD_GAP, _list.get_combined_minimum_size().y)
 	var screen := get_viewport().get_visible_rect().size.y if is_inside_tree() else 800.0
 	var chrome := UiTokens.SIZE_PANEL_HEADER_H + UiTokens.SIZE_PANEL_PAD_TOP + UiTokens.SPACE_S8
+	if arrange_key != null: chrome += ARRANGE_H + UiTokens.SPACE_S8
 	scroll.custom_minimum_size = Vector2(CARD.x, minf(want, maxf(CARD.y, screen * MAX_SCREEN - chrome)))
 
 ## The card of `type`, or null.
