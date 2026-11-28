@@ -14,7 +14,7 @@ SEN-C-204。玩家可见文本已由 PM 按 SEN-C-45 定稿（SEN-C-204#12），
 ## 依据
 
 - 事件和属性：`server/src/analytics/events.ts`、`server/src/accounts/routes.ts`、`server/src/parcels/routes.ts`，清单见 `docs/plans/C-203.md`；重设密码记 `login`（`method=password_reset`）见 `docs/plans/C-205.md`。
-- 每条事件只带 `distinct_id`（`users.id`）、`time`、`$insert_id`（随机去重键）、`ip: 0`；由服务端发出，玩家手机不连 Mixpanel。
+- 每条事件只带 `distinct_id`（`users.id`）、`time`、`$insert_id`（去重键：`account_created` 用固定的 `account_created:<users.id>`，其余事件随机）、`ip: 0`；由服务端发出，玩家手机不连 Mixpanel。
 - 数据存放地区：美国。依据是所有者在 SEN-H-128 的回答“美国”（SEN-C-203#29）。
 - 删号：应用内和网页两个删号入口删库成功后，服务端向 Mixpanel 提交删除请求，Mixpanel 最长 30 天删完（`docs/plans/C-205.md`）。没配删除令牌或请求失败时由人到 Mixpanel 后台补删；政策只写“会请求删除”，不写实现。
 
@@ -60,7 +60,7 @@ Mixpanel 把这些数据存放在美国。我们只用它改进游戏，不用�
 | 认领地块或进入农场 | `parcel_claimed`、`parcel_enter` | `community_id`、`dataset_version`、`starter_zone`；`welcome_gift`、`rebased` |
 | 农场操作及是否成功 | `farm_command` | `community_id`、`command`、`count`、`outcome`、`reject_code` |
 | 出售物品或领取蓝图 | `market_sell`、`blueprint_claimed` | `community_id`、`item`、`count`、`coins`；`blueprint`、`item` |
-| 账号的内部编号、时间 | 全部 | `distinct_id`（`users.id`）、`time`；`$insert_id` 是随机去重键，不对应任何个人信息 |
+| 账号的内部编号、时间 | 全部 | `distinct_id`（`users.id`）、`time`；`$insert_id` 是去重键（`account_created` 为 `account_created:<users.id>`，其余随机），不带别的个人信息 |
 | 农场所在的地图区域 | 地块类事件 | `community_id`：社区编号，现在只有 `sf` |
 | 不含 IP，Mixpanel 拿不到 IP | 全部 | `ip: 0`，请求从服务端发出 |
 
@@ -68,7 +68,7 @@ Mixpanel 把这些数据存放在美国。我们只用它改进游戏，不用�
 
 ## 放进整份政策时要一起写的地方
 
-动态农场的整份政策和设置里的入口在 SEN-C-242 写，和这一节对齐：
+动态农场的整份政策和设置里的入口在 SEN-C-242 写（`docs/legal/dynamic-farm-privacy.md`），和这一节对齐：
 
 - “我们使用的服务”表加一行：Mixpanel（美国公司）｜产品分析｜上面列的游戏记录和账号内部编号，不含邮箱、IP 和位置坐标。
 - “存放在哪里”写上：分析数据由 Mixpanel 存在美国。

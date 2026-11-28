@@ -7,8 +7,9 @@ extends Control
 ## Only what applies here shows:
 ## - the profile: the name, and `My farm` with the home's card when there is a home (`home`: its name, status line and
 ##   what a tap does); no skills, collections or voice (no such data in the dynamic farm; ①-D ⑦);
-## - Settings with Legal alone — Licenses (and Map data's `Share anonymous map usage`, the map SDK's own switch) and
-##   the installed package's version; no Test options, Language, Notifications or account rows (sign-in stays on the map).
+## - Settings with Legal alone — Privacy Policy (C-242, once its page is up), Licenses (and Map data's `Share anonymous
+##   map usage`, the map SDK's own switch) and the installed package's version; no Test options, Language, Notifications
+##   or account rows (sign-in stays on the map).
 ## English only (C-82#48): the dynamic farm keeps Journey's 中文 table loaded, so the locale is English while these pages
 ## are open and comes back when they close.
 ## ‹ and Android Back (back()) close the page on top, the profile last; `closed` then.
@@ -18,6 +19,12 @@ extends Control
 signal closed
 
 const DRESS := "res://scenes/dressing_room/dressing_room.tscn"
+## C-242: the dynamic farm's own Privacy Policy (docs/legal/dynamic-farm-privacy.md), not the Gensen app's (P0Legal). Legal's
+## `Privacy Policy ›` opens it in the system browser. The row shows only once the page is up: putting it up is a release
+## the owner approves separately, so PRIVACY_LIVE stays false until then — turn it on with that release.
+const PRIVACY_URL := "https://gensen.app/privacy-dynamic-farm"
+const PRIVACY_LIVE := false
+static func privacy_url(live := PRIVACY_LIVE) -> String: return PRIVACY_URL if live else ""
 
 ## The pages open, the profile first; only the top one shows.
 var pages: Array[Control] = []
@@ -27,6 +34,8 @@ var map_view := Vector3.ZERO
 var home := {}
 ## MS-21: fade in when opened, fade out when closed.
 var fade := false
+## Settings' Privacy Policy address; "" leaves the row out (the page not up yet).
+var privacy := privacy_url()
 var _locale := ""
 var _closing := false
 
@@ -130,9 +139,11 @@ func profile_view() -> Dictionary:
 
 func open_settings() -> P0SettingsPage:
 	var page := P0SettingsPage.settings(version_line(), _safe_top(), _safe_bottom(), {}, "", P0SettingsPage.BLOCKED_NONE,
-		false, "", "", "", "", "", false)
+		false, "", privacy, "", "", "", false)
 	page.back_pressed.connect(back)
-	page.open_pressed.connect(func(what: String): if what == "licenses": open_licenses())
+	page.open_pressed.connect(func(what: String):
+		if what == "licenses": open_licenses()
+		elif what == "privacy" and privacy != "": ExternalLink.open(privacy))
 	_push(page)
 	return page
 
