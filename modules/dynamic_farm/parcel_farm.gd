@@ -48,6 +48,11 @@ extends RefCounted
 ## footprint that are not the building's, rects [x, z, width, depth] in its own unturned frame (as `livestock.spots`:
 ## origin at the rear-left corner, z toward the entry), turning with it. A building placed keeps a copy (`cutouts`, as it
 ## keeps its width and depth); other buildings, tilling and crops may use those cells.
+## C-229 (0.4.7, design SEN-C-227 D-555 README §5, owner SEN-Q-344 D1–D3) mirrors server farm.ts: `move_building`
+## {building, x, y, rotation} moves a building with the place checks, its own old cells not counting; its animals,
+## drops (kept by spot, so they go with it) and timers stay. `store_building` {building} takes it down into its
+## blueprint and the rules' materials (D1), its laid drops into the bag; never the cottage (D3, CANNOT_STORE), never
+## while a drop is on its way (D2, PRODUCING {ready_at} of the last). Both are free; no save field is added.
 ## C-209: a building placed before its type had cutouts (C-192's 8×6 barn) is taken down when the save is read, its
 ## blueprint, materials and drops given back (`retire_draft_buildings`); no save field is added.
 const RULES_PATH := "res://assets/farm/data/dynamic_farm.json"
@@ -57,7 +62,7 @@ const MAX_CELLS := 8192
 const MAX_BATCH := 50
 const COMMANDS := ["place_house", "place_building", "clear_obstacle", "till", "sow", "harvest", "sell", "buy", "claim_blueprint",
 	"gather", "rest", "feed", "pick_up", "draw_water", "water", "upgrade_farm", "accept_request", "deliver_request", "drop_request",
-	"claim_seed_aid"]
+	"claim_seed_aid", "move_building", "store_building"]
 ## C-191 request commands: the request id is their one field.
 const REQUEST_COMMANDS := ["accept_request", "deliver_request", "drop_request"]
 ## Most request board slots (server requests.ts MAX_SLOTS).
@@ -980,6 +985,12 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 				return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type == "draw_water":
 			if not whole_in(command.get("building"), 1, 1 << 30): return {"ok": false, "index": index, "code": "SCHEMA"}
+		elif command.type == "move_building":
+			if not whole_in(command.get("building"), 1, MAX_ID) or not whole_in(command.get("x"), 0, MAX_COORD - 1) \
+					or not whole_in(command.get("y"), 0, MAX_COORD - 1) or not whole_in(command.get("rotation"), 0, 3):
+				return {"ok": false, "index": index, "code": "SCHEMA"}
+		elif command.type == "store_building":
+			if not whole_in(command.get("building"), 1, MAX_ID): return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type in REQUEST_COMMANDS:
 			if not whole_in(command.get("request"), 1, MAX_ID): return {"ok": false, "index": index, "code": "SCHEMA"}
 		elif command.type == "place_house" or command.type == "place_building":
@@ -998,6 +1009,14 @@ static func apply(rule_set: Dictionary, state: Dictionary, commands: Array, now:
 		match command.type:
 			"place_house", "place_building":
 				var outcome := _place(rule_set, next, command, now)
+				failure = outcome.code
+				detail = outcome.detail
+			"move_building":
+				var outcome := _move(next, command)
+				failure = outcome.code
+				detail = outcome.detail
+			"store_building":
+				var outcome := _store(rule_set, next, int(command.building), now)
 				failure = outcome.code
 				detail = outcome.detail
 			"clear_obstacle":
@@ -1276,11 +1295,28 @@ static func _place(rule_set: Dictionary, next: Dictionary, command: Dictionary, 
 			return {"code": "NOT_ENOUGH", "detail": {"item": item, "have": int(next.bag.get(item, 0)), "need": need}}
 	var building := {"id": id + 1, "type": type, "model": rule.model, "x": int(command.x), "y": int(command.y),
 		"width": int(rule.width), "depth": int(rule.depth), "rotation": int(command.get("rotation", 0)), "built_at": now}
-	var far := Vector2i(building.x, building.y) + turned(Vector2i(building.width, building.depth), building.rotation) - Vector2i.ONE
-	if far.x >= MAX_COORD or far.y >= MAX_COORD: return {"code": "OUT_OF_BOUNDS", "detail": {}}
 	if not (rule.get("cutouts", []) as Array).is_empty(): building.cutouts = (rule.cutouts as Array).duplicate(true)
+	var spot := _spot_refusal(next, building)
+	if spot.code != "": return spot
+	_take(next.bag, rule.blueprint)
+	for item: String in rule.get("materials", {}): _take(next.bag, item, int(rule.materials[item]))
+	if rule.has("livestock"): building.animals = (rule.livestock.animals as Array).duplicate()
+	next.buildings.append(building)
+	next.house = home_of(next.buildings)
+	return {"code": "", "detail": {}}
+
+## Whether `building` (a saved building's shape at its spot) fits there, as the server's spotRefusal: on the grid
+## (OUT_OF_BOUNDS), off every other building (BUILDING_OVERLAP; `except` is the building's own id when moving it, C-229)
+## and off tilled cells and crops (CELL_OCCUPIED). {code, detail}, code "" when it fits.
+static func _spot_refusal(next: Dictionary, building: Dictionary, except := 0) -> Dictionary:
+	var far := Vector2i(int(building.x), int(building.y)) + turned(Vector2i(int(building.width), int(building.depth)), int(building.rotation)) \
+		- Vector2i.ONE
+	if far.x >= MAX_COORD or far.y >= MAX_COORD: return {"code": "OUT_OF_BOUNDS", "detail": {}}
 	var cells := building_footprint(building)
-	var under := building_cells(next)
+	var under := {}
+	for b: Dictionary in next.buildings:
+		if int(b.id) == except: continue
+		for at in building_footprint(b): under[at] = true
 	var overlap: Array = []
 	for at: Vector2i in cells:
 		if under.has(at): overlap.append(key(at))
@@ -1293,10 +1329,69 @@ static func _place(rule_set: Dictionary, next: Dictionary, command: Dictionary, 
 	if not covered.is_empty():
 		covered.sort()
 		return {"code": "CELL_OCCUPIED", "detail": {"cells": covered}}
-	_take(next.bag, rule.blueprint)
-	for item: String in rule.get("materials", {}): _take(next.bag, item, int(rule.materials[item]))
-	if rule.has("livestock"): building.animals = (rule.livestock.animals as Array).duplicate()
-	next.buildings.append(building)
+	return {"code": "", "detail": {}}
+
+## The index of building `id` in `next.buildings`, or -1.
+static func _building_at(next: Dictionary, id: int) -> int:
+	for i in next.buildings.size():
+		if int(next.buildings[i].id) == id: return i
+	return -1
+
+## C-229 `move_building` on `next`, changed only on success: the place checks at the new spot and turn, its own old
+## cells not counting; animals, drops (by spot), timers and `built_at` stay. {code, detail}, code "" when moved.
+static func _move(next: Dictionary, command: Dictionary) -> Dictionary:
+	var id := int(command.building)
+	var at := _building_at(next, id)
+	if at < 0: return {"code": "NO_BUILDING", "detail": {"building": id}}
+	var moved: Dictionary = next.buildings[at].duplicate(true)
+	moved.x = int(command.x)
+	moved.y = int(command.y)
+	moved.rotation = int(command.rotation)
+	var spot := _spot_refusal(next, moved, id)
+	if spot.code != "": return spot
+	next.buildings[at] = moved
+	next.house = home_of(next.buildings)
+	return {"code": "", "detail": {}}
+
+## C-229 why building `id` cannot be stored now ({code, detail}, code "" when it can), as the server: NO_BUILDING;
+## the cottage never (D3, CANNOT_STORE); a type the rules no longer have (UNKNOWN_BUILDING); a drop still on its way
+## (D2, PRODUCING with the last one's `ready_at`). The scene reads it for the Store key too.
+static func store_refusal(rule_set: Dictionary, state: Dictionary, id: int, now: int) -> Dictionary:
+	var building := {}
+	for b: Dictionary in buildings_of(state):
+		if int(b.id) == id: building = b
+	if building.is_empty(): return {"code": "NO_BUILDING", "detail": {"building": id}}
+	if str(building.type) == HOME_BUILDING: return {"code": "CANNOT_STORE", "detail": {"building": id}}
+	if not rule_set.get("buildings", {}).get(str(building.type)) is Dictionary:
+		return {"code": "UNKNOWN_BUILDING", "detail": {"building": str(building.type)}}
+	var last := 0
+	for d: Dictionary in drops_in(state, id):
+		if int(d.ready_at) > now: last = maxi(last, int(d.ready_at))
+	if last > 0: return {"code": "PRODUCING", "detail": {"ready_at": last}}
+	return {"code": "", "detail": {}}
+
+## What storing building `id` gives back (D1): its blueprint, the rules' materials and its laid drops, as
+## {item: count}; {} for a building that is not there or whose type the rules no longer have.
+static func store_returns(rule_set: Dictionary, state: Dictionary, id: int) -> Dictionary:
+	for b: Dictionary in buildings_of(state):
+		if int(b.id) != id: continue
+		var rule = rule_set.get("buildings", {}).get(str(b.type))
+		if not rule is Dictionary: return {}
+		var back := {rule.blueprint: 1}
+		for item: String in rule.get("materials", {}): back[item] = int(back.get(item, 0)) + int(rule.materials[item])
+		for d: Dictionary in drops_in(state, id): back[d.item] = int(back.get(d.item, 0)) + int(d.amount)
+		return back
+	return {}
+
+## C-229 `store_building` on `next`, changed only on success: the blueprint, materials and laid drops into the bag,
+## the building and its drops gone (its animals with it). {code, detail}, code "" when stored.
+static func _store(rule_set: Dictionary, next: Dictionary, id: int, now: int) -> Dictionary:
+	var refusal := store_refusal(rule_set, next, id, now)
+	if refusal.code != "": return refusal
+	var back := store_returns(rule_set, next, id)
+	for item: String in back: next.bag[item] = int(next.bag.get(item, 0)) + int(back[item])
+	next.drops = next.get("drops", []).filter(func(d: Dictionary): return int(d.building) != id)
+	next.buildings = next.buildings.filter(func(b: Dictionary): return int(b.id) != id)
 	next.house = home_of(next.buildings)
 	return {"code": "", "detail": {}}
 
