@@ -6,6 +6,8 @@
  */
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import type { PlayerRow } from '../http/store.js';
+import { EVENTS, farmCommandEvents } from '../analytics/events.js';
+import { NO_ANALYTICS, type Analytics } from '../analytics/mixpanel.js';
 import { energyOf } from './energy.js';
 import { applyFarmCommands, emptyFarm, grant, parseFarmCommands, rebaseFarm, retireDraftBuildings, welcome, withEconomy } from './farm.js';
 import { settleBoard } from './requests.js';
@@ -23,6 +25,8 @@ export interface ParcelRouteDeps {
   guestWrites?: boolean;
   /** 起步区（C-130）：开着时新玩家只能认领区内地块；不传等于不限制。 */
   starterZones?: StarterZones;
+  /** 产品分析上报（C-203）；不传不上报。 */
+  analytics?: Analytics;
 }
 
 interface Auth {
@@ -76,6 +80,7 @@ const farmView = (rules: ParcelRules, farm: OwnedParcel['farm'], at: number) => 
 
 export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps, { auth, writer }: Auth): void {
   const now = deps.now;
+  const analytics = deps.analytics ?? NO_ANALYTICS;
   const parcelView = (p: OwnedParcel) => ({
     community_id: p.community_id, layer: p.layer, parcel_id: p.parcel_id, dataset_version: p.dataset_version,
     center: [p.center.lng, p.center.lat], claimed_at: p.claimed_at, farm_version: p.farm_version, farm: farmView(deps.rules, p.farm, now()),
@@ -124,6 +129,8 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
       claim.center = { lng: inZone[0], lat: inZone[1] };
     }
     const out = await deps.store.claim(p.id, claim, emptyFarm(), at);
+    if (out.kind === 'claimed')
+      analytics.track(EVENTS.parcelClaimed, p.user_id, { community_id: community, dataset_version: b.dataset_version, starter_zone: zone?.id ?? null }, { time: at });
     switch (out.kind) {
       case 'claimed': return reply.code(201).send({ parcel: parcelView(out.parcel), server_time: at });
       case 'already_mine': return reply.send({ parcel: parcelView(out.parcel), server_time: at });
@@ -215,6 +222,7 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
     }, at);
     if (out.kind === 'no_parcel') return reply.code(404).send({ code: 'NO_PARCEL', server_time: at });
     if (rebased) req.log.info({ parcel_id: out.parcel.parcel_id, to: out.parcel.dataset_version, ...rebased }, 'parcel rebased to a newer dataset');
+    analytics.track(EVENTS.parcelEnter, p.user_id, { community_id: out.parcel.community_id, welcome_gift: out.granted, rebased: rebased !== null }, { time: at });
     return reply.send({ granted: out.granted, gift, parcel: parcelView(out.parcel), server_time: at });
   });
 
@@ -231,6 +239,8 @@ export function registerParcelRoutes(app: FastifyInstance, deps: ParcelRouteDeps
     if (!Number.isInteger(b?.base_version) || !commands) return reply.code(400).send({ code: 'SCHEMA', server_time: now() });
     const at = now();
     const out = await deps.store.updateFarm(p.id, b!.base_version as number, (farm, parcel) => applyFarmCommands(deps.rules, farm, commands, at, { parcel_id: parcel.parcel_id }), at);
+    if (out.kind !== 'no_parcel')
+      for (const e of farmCommandEvents(deps.rules, commands, out, out.parcel.community_id)) analytics.track(e.event, p.user_id, e.props, { time: at });
     switch (out.kind) {
       case 'applied': return reply.send({ parcel: parcelView(out.parcel), server_time: at });
       case 'rejected': return reply.code(422).send({ code: out.code, index: out.index, ...(out.detail ? { detail: out.detail } : {}),

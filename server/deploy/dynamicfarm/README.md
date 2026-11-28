@@ -48,7 +48,7 @@ handle_path /dynamicfarm/* {
 |---|---|
 | `.env` 必填 | `POSTGRES_PASSWORD`、`TOKEN_PEPPER`、`TRUSTED_PROXIES`、`INVITE_EMAIL_DOMAIN`、`PG_IMAGE`、`AGE_RECIPIENT`、`SMTP_URL`、`MAIL_FROM`（后两项 C-101 起必填，含发信密码，只放 `.env`） |
 | `ops.sh deploy` / `rollback` 写入，不要手改 | `APP_IMAGE`、`APP_IMAGE_ID`、`GIT_SHA` |
-| `.env` 选填 | `DF_HOST_PORT`、`DF_SUBNET`、`DF_BACKUP_DIR`、`DF_BACKUP_KEEP`、`PARCEL_IDLE_RECLAIM_DAYS`（游客地块闲置多少天收回，不写为 30，0 为不收回；C-100）、`ANONYMOUS_SIGNUPS_PER_NETWORK_HOUR` / `ANONYMOUS_SIGNUPS_PER_BLOCK_HOUR` / `ANONYMOUS_SIGNUPS_PER_HOUR`（每小时新建匿名玩家的上限：每个网络、每个 IPv6 /48、合计，不写为 10 / 50 / 1000；C-120）、`PARCEL_STARTER_ZONE`（起步区，不写按配置文件、0 关、1 开；C-130）、`LOGIN_ATTEMPTS_PER_NETWORK_15MIN` / `LOGIN_ATTEMPTS_PER_ACCOUNT_15MIN` / `LOGIN_TRUSTED_NETWORK_DAYS`（密码尝试：每个邮箱每个网络、每个邮箱来自没登录过的网络合计，不写为 10 / 10；登录过的网络记 90 天；C-132）、`MAIL_PER_RECIPIENT_HOUR` / `MAIL_PER_RECIPIENT_DAY` / `MAIL_PER_HOUR` / `MAIL_PER_DAY`（验证信：每个收件邮箱、整个服务，不写为 5 / 10 / 200 / 1000；C-132） |
+| `.env` 选填 | `DF_HOST_PORT`、`DF_SUBNET`、`DF_BACKUP_DIR`、`DF_BACKUP_KEEP`、`PARCEL_IDLE_RECLAIM_DAYS`（游客地块闲置多少天收回，不写为 30，0 为不收回；C-100）、`ANONYMOUS_SIGNUPS_PER_NETWORK_HOUR` / `ANONYMOUS_SIGNUPS_PER_BLOCK_HOUR` / `ANONYMOUS_SIGNUPS_PER_HOUR`（每小时新建匿名玩家的上限：每个网络、每个 IPv6 /48、合计，不写为 10 / 50 / 1000；C-120）、`PARCEL_STARTER_ZONE`（起步区，不写按配置文件、0 关、1 开；C-130）、`LOGIN_ATTEMPTS_PER_NETWORK_15MIN` / `LOGIN_ATTEMPTS_PER_ACCOUNT_15MIN` / `LOGIN_TRUSTED_NETWORK_DAYS`（密码尝试：每个邮箱每个网络、每个邮箱来自没登录过的网络合计，不写为 10 / 10；登录过的网络记 90 天；C-132）、`MAIL_PER_RECIPIENT_HOUR` / `MAIL_PER_RECIPIENT_DAY` / `MAIL_PER_HOUR` / `MAIL_PER_DAY`（验证信：每个收件邮箱、整个服务，不写为 5 / 10 / 200 / 1000；C-132）、`MIXPANEL_PROJECT_TOKEN` / `MIXPANEL_API_HOST`（产品分析上报，两项都填才开，不填不上报；见下文“产品分析（Mixpanel）”；C-203） |
 | `compose.yml` 写死 | `ACCOUNT_SIGNUP`、`GUEST_ACCOUNTS`、`GUEST_WRITES`、`PARCEL_GUEST_WRITES`、`DYNAMIC_FARM_RESELECT`、`GOOGLE_CLIENT_IDS`、`APPLE_BUNDLE_IDS`、`QA_EMAIL_DOMAIN`、`QA_EMAIL_CODE`、`QA_PLAYER_IDS`、`EMAIL_LOG_CODES`、`NODE_OPTIONS`、`DATABASE_URL` |
 | 只在操作员一侧，恢复加密备份时用 | `AGE_IDENTITY`（age 私钥文件的路径；私钥不放在服务器上） |
 
@@ -166,6 +166,18 @@ P0 正式服那台机器还剩多少资源没有核过。C-97 开工前先看 `f
 恢复把备份里的行原样插回，再核对和备份逐字节相同才提交；那块地已经被别人认领等冲突时整体回滚，库保持原样。整库备份 `pre-guest-purge` 仍可按“备份与恢复”整体恢复。
 
 工具也可以直接用（`tools/guest_purge.ts plan | backup --out <新文件|-> | verify | purge | restore`，只连 `DATABASE_URL`），`purge` 和 `restore` 要写 `--confirm-database <库名>`。正式服上实际删除随正式服部署（H-71）另行确认，由主机操作员执行。
+
+## 产品分析（Mixpanel）
+
+C-203。服务端把玩家的关键行为批量上报到 Mixpanel，游戏客户端不上报。默认关闭：`.env` 里 `MIXPANEL_PROJECT_TOKEN`、`MIXPANEL_API_HOST` 都空着时不建队列、不发任何外部请求；只填一项或地址不是 Mixpanel 的地区接口，app 拒绝启动。启动日志最后的 `analytics=` 显示 `off` 或接口主机名。事件和属性清单见 `docs/plans/C-203.md`。
+
+开启前必须先完成：所有者建好 Mixpanel 项目（数据存放地区建项目后不能改）、隐私政策加上分析服务商、Google Play 数据安全表单补“应用活动”。之后：
+
+1. 在 `.env` 填 `MIXPANEL_PROJECT_TOKEN`（项目设置里的 Project Token）和 `MIXPANEL_API_HOST`（美国 `https://api.mixpanel.com`、欧盟 `https://api-eu.mixpanel.com`、印度 `https://api-in.mixpanel.com`，按项目地区），然后 `ops.sh deploy` 或重启 app。
+2. 看启动日志的 `analytics=` 是接口主机名；在 Mixpanel 的 Events 页面能看到新的 `login` 等事件。日志里出现 `[analytics]` 开头的行表示某批没发出去（重试一次后已丢弃，玩家不受影响）。
+3. 可选：把已有注册补进去，方便从开服第一天算留存。在部署目录里先只数：`docker compose -f compose.yml --env-file .env exec -T app ./node_modules/.bin/tsx tools/mixpanel_backfill_signups.ts`，确认数量后加 `--send` 再跑一次（可加 `--since YYYY-MM-DD`）。重跑或与实时上报重叠都不会重复计数。
+
+关闭：把两项清空后重启 app。已经发到 Mixpanel 的数据要在 Mixpanel 后台删。
 
 ## 冒烟
 
