@@ -42,13 +42,13 @@ position = Vector3(-1.95, 1.377, -2.32)
 position = Vector3(-1.95, 1.637, -2.26)
 
 [node name="HearthGlow" type="OmniLight3D" parent="."]
-position = Vector3(-1.95, 0.53, -1.9)
-light_color = Color(1, 0.655, 0.341, 1)
+position = Vector3(-1.95, 0.43, -1.77)
+light_color = Color(1, 0.57, 0.25, 1)
 light_bake_mode = 0
 shadow_enabled = false
-light_energy = 0.44
+light_energy = 0.17
 omni_range = 1.25
-omni_attenuation = 1.35
+omni_attenuation = 1.44
 
 [node name="Flame" parent="." instance=ExtResource("FX")]
 position = Vector3(-1.95, 0.29, -2.26)
@@ -57,7 +57,7 @@ flame_height = 0.42
 flame_count = 16
 spark_count = 4
 light_path = NodePath("../HearthGlow")
-light_energy = 0.44
+light_energy = 0.17
 flicker_strength = 0.032
 
 [node name="FireplaceTools" parent="." instance=ExtResource("Trim")]
