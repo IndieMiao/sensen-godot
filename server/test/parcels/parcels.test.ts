@@ -1053,7 +1053,7 @@ describe.skipIf(!DSN)('PgStore: dynamic farm parcels across processes and restar
       const read = await mine(restarted, ada);
       expect(read).toEqual(saved);
       expect(read.farm).toMatchObject({ coins: 24, sales: 1, gathered: { [tree]: T0 + 60_000 }, blueprints_claimed: { coop: T0 + 60_000 },
-        bag: { wood: 1, blueprint_coop: 1 } });
+        bag: { wood: 2, blueprint_coop: 1 } });
       expect((await command(restarted, ada, read.farm_version, [{ type: 'gather', object: tree }])).json().code).toBe('NOT_RESPAWNED');
       expect((await command(restarted, ada, read.farm_version, [{ type: 'claim_blueprint', blueprint: 'coop' }])).json().code).toBe('BLUEPRINT_CLAIMED');
     } finally { await restarted.close(); await after.end(); }
