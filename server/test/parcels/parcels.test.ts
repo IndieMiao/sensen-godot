@@ -462,6 +462,31 @@ for (const [name, enabled, makeStores] of makers) {
       expect((await command(app, await account(app, 'Bob'), 0, [{ type: 'till', cell: '1,1' }])).json().code).toBe('NO_PARCEL');
     });
 
+    it('C-228 blueprint book: the well goes up before the cottage; no blueprint, a taken spot or tilled soil refuses and keeps the save', async () => {
+      const ada = await account(app, 'Ada');
+      await claim(app, ada, A);
+      await enter(app, ada);
+      const first = await mine(app, ada);
+      expect(first.farm.bag).toMatchObject({ blueprint_cottage: 1, blueprint_well: 1 });
+      const well = await command(app, ada, first.farm_version, [{ type: 'place_building', building: 'well', x: 20, y: 20, rotation: 2 }]);
+      expect(well.statusCode).toBe(200);
+      expect(well.json().parcel.farm).toMatchObject({ house: null, buildings: [{ id: 1, type: 'well', x: 20, y: 20, rotation: 2 }] });
+      expect(well.json().parcel.farm.bag.blueprint_cottage).toBe(1);
+      const saved = await mine(app, ada);
+      const refused = async (commands: object[], code: string) => {
+        const res = await command(app, ada, saved.farm_version, commands);
+        expect(res.statusCode).toBe(422);
+        expect(res.json()).toMatchObject({ code, parcel: { farm_version: saved.farm_version } });
+        expect(await mine(app, ada)).toEqual(saved);
+      };
+      await refused([{ type: 'place_building', building: 'cottage', x: 19, y: 19, rotation: 0 }], 'BUILDING_OVERLAP');
+      await refused([{ type: 'place_building', building: 'coop', x: 30, y: 30, rotation: 1 }], 'NO_BLUEPRINT');
+      await refused([{ type: 'till', cell: '31,31' }, { type: 'place_building', building: 'cottage', x: 30, y: 30, rotation: 3 }], 'CELL_OCCUPIED');
+      const home = await command(app, ada, saved.farm_version, [{ type: 'place_building', building: 'cottage', x: 30, y: 30, rotation: 3 }]);
+      expect(home.statusCode).toBe(200);
+      expect(home.json().parcel.farm).toMatchObject({ house: { x: 30, y: 30, rotation: 3 }, buildings: [{ type: 'well' }, { type: 'cottage' }] });
+    });
+
     it('C-58 sell: too few is refused; a sale takes from the bag and pays the configured price, server-side only', async () => {
       const ada = await account(app, 'Ada');
       const v = await withCarrots(app, ada, A);

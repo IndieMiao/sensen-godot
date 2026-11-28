@@ -1,0 +1,55 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://assets/dynamic_farm/gathering/parcel_pigment.tres" id="mat"]
+[ext_resource type="PackedScene" path="res://assets/farm/art/wild_pz_bush_05.glb" id="geo"]
+
+[sub_resource type="Animation" id="reset"]
+resource_name = "reset"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Plant:scale")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(1, 1, 1)]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Plant:rotation_degrees:x")
+tracks/1/interp = 1
+tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0]}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Plant:visible")
+tracks/2/interp = 0
+tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [true]}
+
+[sub_resource type="Animation" id="hit"]
+resource_name = "hit"
+length = 0.26
+tracks/0/type = "value"
+tracks/0/path = NodePath("Plant:rotation_degrees:x")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0, 0.04, 0.105, 0.16, 0.22, 0.26), "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1), "update": 0, "values": [0, 4, -2.6, 1.5, -0.7, 0]}
+
+[sub_resource type="Animation" id="collapse"]
+resource_name = "collapse"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("Plant:scale")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0, 0.09, 0.3), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector3(1, 1, 1), Vector3(1.09, 0.72, 1.08), Vector3(0.01, 0.01, 0.01)]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Plant:visible")
+tracks/1/interp = 0
+tracks/1/keys = {"times": PackedFloat32Array(0, 0.3), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [true, false]}
+
+[sub_resource type="AnimationLibrary" id="clips"]
+_data = {&"reset": SubResource("reset"), &"hit": SubResource("hit"), &"collapse": SubResource("collapse")}
+
+[node name="PlantTarget" type="Node3D"]
+
+[node name="Plant" parent="." instance=ExtResource("geo")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries/ = SubResource("clips")
+
+[node name="pg_bushl_05" parent="Plant"]
+material_override = ExtResource("mat")
+
+[editable path="Plant"]

@@ -19,6 +19,7 @@
 | [superpowers](superpowers/README.md) | 沿用的 Avatar / 地图 / 移动端技术资料与历史交接 |
 | [release](release/release-log.md) | P0 Demo 各版本的内容、构建身份与发布记录 |
 | [qa](qa/README.md) | 按日期的实际检查、发布、设备与数据完整性证据 |
+| [legal](legal/dynamic-farm-privacy-analytics.md) | 动态农场隐私政策条文草稿和 Google Play 数据安全表单答案（未发布） |
 
 开发与发布工具见 [服务端](../server/README.md)、[Android](../tools/android/README.md)、[iOS](../tools/ios/README.md)。这些技术资料不能覆盖 v2 的玩法与分期，也不能把历史安装结果解释为当前设备状态。
 

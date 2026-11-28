@@ -190,6 +190,29 @@ holds Lv2's Timber and Stone, `upgrade` (at Scott's) after; nothing once the far
 the phone's task rows follow (`ParcelTasks`: GET STARTED, TOWN, YOUR FARM). A tap on the coop's floor offers the
 nearest feeder's Feed and walks there on the press. Copy: `docs/plans/C-175.md`.
 
+## Blueprint book (C-228, 0.4.7)
+
+The owner's SEN-C-214 (building was linear, one `Build <name>` key at the bottom left, the rules' first type whose
+blueprint is in the bag) and design SEN-C-227 D-555, accepted with R1, R2 and D1–D5 (SEN-Q-344). The key in the same
+place and size (180 × 48 clay side key) is now `Blueprints` (`blueprint_book.gd` opens from it): the book's rolled
+blueprint (`assets/ui/v3/hero/hero_blueprints.png`, also the book's hero) and a cream disc with the blueprints in the
+bag, none drawn at 0; a change pops the disc (1 → 1.15 → 1 in 200). It shows on one's own loaded parcel while a
+blueprint is in the bag or a building stands (R2), and hides under the book and a placement. The book is the bag's UI v3
+modal panel (`Blueprints` tag, the hero, ✕, scrim, Back): one 248 × 128 card per type of the rules' `buildings` in that
+order whose blueprint the bag holds (`book_entries()`), the list scrolling past 80 % of the screen. A card shows the
+building drawn once at the farm's 43° / 14.5° angle (`blueprint_thumbs.gd`, a SubViewport per type) on blueprint paper with
+`×N`, its name, its `materials` as NEED-TILE S and one key: `Place`, `Need N more <item>` (`build_gap`) or `Farm Lv3
+needed` (the level whose limit allows one more; a type at a limit no level raises is left out). A grey key shakes and
+flashes the short tile, nothing more. `No blueprints` alone when the bag has none. Place fades the book (120) into that
+type's placement (`begin_placement(type)`), with the type's name in a dark glass chip under the avatar; Rotate turns
+the model over 160 ms ease-out (the spot is judged at once). Build lands back on the farm; Cancel and Android Back in a
+preview go back to the book where it was scrolled; Back in the book closes it. The camera and the player stay as they
+are while placing (R1). Blueprints are no longer on the quick bar (D4; still in the bag). The guide's build, well and
+coop lines point at Blueprints (draft copy, PM finalises it, C-45). The server already took any blueprint in any order;
+`server/test/parcels/farm.test.ts` and `parcels.test.ts` pin it and that a missing blueprint, a taken spot and short
+materials refuse the whole batch with the save unchanged. The Arrange key, moving and storing are SEN-C-229.
+Tests: `tests/dynamic_farm/test_blueprint_book.gd`; emulator package `GATHER_QA_ENTRY=book`. Notes: `docs/plans/C-228.md`.
+
 ## Washington Square room (C-115)
 
 The owner on C-103#17: no place icons on the map, one fixed 3D space entry in San Francisco, its look and interaction

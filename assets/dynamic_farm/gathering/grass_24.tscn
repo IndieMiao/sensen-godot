@@ -1,0 +1,67 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://assets/dynamic_farm/gathering/parcel_pigment.tres" id="mat"]
+[ext_resource type="PackedScene" path="res://assets/farm/art/wild_pz_grass_24.glb" id="geo"]
+
+[sub_resource type="Animation" id="reset"]
+resource_name = "reset"
+length = 0.01
+tracks/0/type = "value"
+tracks/0/path = NodePath("Plant:scale")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector3(1, 1, 1)]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Plant:rotation_degrees:x")
+tracks/1/interp = 1
+tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0]}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Plant:visible")
+tracks/2/interp = 0
+tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [true]}
+
+[sub_resource type="Animation" id="pull"]
+resource_name = "pull"
+length = 0.9
+tracks/0/type = "value"
+tracks/0/path = NodePath("Plant:rotation_degrees:x")
+tracks/0/interp = 1
+tracks/0/keys = {"times": PackedFloat32Array(0, 0.26, 0.57, 0.6), "transitions": PackedFloat32Array(1, 1, 1, 1), "update": 0, "values": [0, 0, -8, -8]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Plant:scale")
+tracks/1/interp = 1
+tracks/1/keys = {"times": PackedFloat32Array(0, 0.26, 0.57), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector3(1, 1, 1), Vector3(1, 1, 1), Vector3(1, 1.1, 1)]}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Plant:visible")
+tracks/2/interp = 0
+tracks/2/keys = {"times": PackedFloat32Array(0, 0.6), "transitions": PackedFloat32Array(1, 1), "update": 1, "values": [true, false]}
+
+[sub_resource type="Animation" id="settle"]
+resource_name = "settle"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/path = NodePath("Plant:visible")
+tracks/0/interp = 0
+tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 1, "values": [true]}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Plant:rotation_degrees:x")
+tracks/1/interp = 1
+tracks/1/keys = {"times": PackedFloat32Array(0, 0.17, 0.3), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [-8, 1.8, 0]}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Plant:scale")
+tracks/2/interp = 1
+tracks/2/keys = {"times": PackedFloat32Array(0, 0.18, 0.3), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector3(1, 1.1, 1), Vector3(1, 0.972, 1), Vector3(1, 1, 1)]}
+
+[sub_resource type="AnimationLibrary" id="clips"]
+_data = {&"reset": SubResource("reset"), &"pull": SubResource("pull"), &"settle": SubResource("settle")}
+
+[node name="PlantTarget" type="Node3D"]
+
+[node name="Plant" parent="." instance=ExtResource("geo")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries/ = SubResource("clips")
+
+[node name="pg_grass_24" parent="Plant"]
+material_override = ExtResource("mat")
+
+[editable path="Plant"]

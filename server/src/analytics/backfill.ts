@@ -27,6 +27,8 @@ export async function backfillSignups(db: Queryable, analytics: Analytics, o: { 
       { time: Number(r.created_at), insertId: accountCreatedInsertId(r.id) });
     if ((i + 1) % batch === 0) await analytics.flush();
   }
+  // 先不限时发完，再 close（close 有关停时限，C-205）。
+  await analytics.flush();
   await analytics.close();
   return rows.length;
 }
