@@ -14,6 +14,10 @@ extends Node
 ##                        tag names the state. Some columns are left unripe so only ripe carrots sway. Runs on game
 ##                        time (the scene steps at most 0.1 s a frame) and saves every frame to `user://frames/`,
 ##                        so a slow emulator still gives a real-speed video at 10 frames per game second.
+##   {"mode": "shots"}    C-208: the record field, the player standing at the start: stills at zoom 1, 0.6 and 1.4
+##                        with the sway off (the plant layers on the imported material, as C-139 drew them), then
+##                        one at zoom 1 with it on, to user://shots/<name>.png; then the app quits. Two builds give
+##                        the same stills, so a change in what the carrots draw shows as a frame difference.
 ## `vsync` (true) false asks for an uncapped frame rate. Staged only by gather_qa_apk.sh with
 ## GATHER_QA_ENTRY=sway; never the main scene of a delivered package.
 const SCENE_PATH := "res://scenes/dynamic_farm/dynamic_farm.tscn"
@@ -31,6 +35,10 @@ const ParcelFarm = preload("res://modules/dynamic_farm/parcel_farm.gd")
 ## A waypoint is reached this close (m); one the player cannot get nearer to for STUCK_S is skipped.
 const ARRIVE_M := 0.4
 const STUCK_S := 3.0
+## Shots (C-208): [name, sway, zoom] in order; each is saved this many frames after its zoom and sway change (the redraw
+## and the camera settle first).
+const SHOTS := [["off-zoom1", false, 1.0], ["off-zoom0.6", false, 0.6], ["off-zoom1.4", false, 1.4], ["on-zoom1", true, 1.0]]
+const SHOT_SETTLE_FRAMES := 6
 
 var config := {"mode": "measure", "vsync": true, "warmup_s": 15.0, "phase_s": 30.0}
 var scene: Node
@@ -56,6 +64,9 @@ var next_beat := 0.0
 var started_us := 0
 var last_us := 0
 var frame_index := 0
+## Shots: the still being taken and frames drawn since it was set up.
+var shot := 0
+var shot_frames := 0
 
 func _ready() -> void:
 	var raw_config = JSON.parse_string(FileAccess.get_file_as_string(CONFIG_PATH)) if FileAccess.file_exists(CONFIG_PATH) else null
@@ -74,7 +85,7 @@ func _ready() -> void:
 		push_error("QA parcel invalid: " + str(data.get("error")))
 		return
 	var walk := Walk.new(data)
-	_plant(data, walk, str(config.mode) == "record", str(config.mode) == "baseline")
+	_plant(data, walk, str(config.mode) in ["record", "shots"], str(config.mode) == "baseline")
 	_plan_loop(data, walk)
 	scene = (load(SCENE_PATH) as PackedScene).instantiate()
 	scene.setup({"farm": raw, "dataset": raw.get("dataset_version"), "block_id": raw.get("block_id"), "own_parcel": true})
@@ -153,6 +164,7 @@ func _process(delta: float) -> void:
 		started_us = Time.get_ticks_usec()
 		last_us = started_us
 		if str(config.mode) == "record": _start_record()
+		elif str(config.mode) == "shots": DirAccess.make_dir_recursive_absolute("user://shots")
 		else: _start_measure()
 	var now_us := Time.get_ticks_usec()
 	var frame_ms := (now_us - last_us) / 1000.0
@@ -165,6 +177,7 @@ func _process(delta: float) -> void:
 		print("CROP_SWAY_BEAT ", JSON.stringify({"clock": snappedf(clock, 0.1), "fps": Engine.get_frames_per_second(),
 			"phase": phases[phase].name if phase >= 0 and phase < phases.size() else "", "sway": farming.sway}))
 	if str(config.mode) == "record": _record_step()
+	elif str(config.mode) == "shots": _shots_step()
 	else: _measure_step(frame_ms)
 	scene.set("_movement", _steer(delta) if walking else Vector2.ZERO)
 
@@ -310,4 +323,25 @@ func _record_step() -> void:
 	frame_index += 1
 	if clock >= 54.0:
 		print("CROP_SWAY_RECORDED ", frame_index)
+		get_tree().quit()
+
+## Shots: each still's sway and zoom are set, the camera held on the standing player, and the frame drawn
+## SHOT_SETTLE_FRAMES later saved; after the last one the app quits.
+func _shots_step() -> void:
+	if shot >= SHOTS.size(): return
+	var take: Array = SHOTS[shot]
+	if shot_frames == 0: _set_sway(bool(take[1]))
+	scene.set("_zoom", float(take[2]))
+	scene.set("_focus", scene.player_position())
+	shot_frames += 1
+	if shot_frames <= SHOT_SETTLE_FRAMES: return
+	var image := get_viewport().get_texture().get_image()
+	if image != null: image.save_png("user://shots/%s.png" % take[0])
+	print("CROP_SWAY_SHOT ", JSON.stringify({"name": take[0], "sway": take[1], "zoom": take[2],
+		"primitives": Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME),
+		"draws": Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)}))
+	shot += 1
+	shot_frames = 0
+	if shot >= SHOTS.size():
+		print("CROP_SWAY_SHOTS ", SHOTS.size())
 		get_tree().quit()
