@@ -3,10 +3,12 @@
  * 在关着注册、关着 Google 或开着重选的服务上报错；冒烟不建号。compose 写死正式配置，只在回环地址发布端口，
  * 模板和 ops.sh 的禁写清单与 compose 一致；开放注册后发信必填。
  * C-146：正式配置关掉游客入口，冒烟核对它关着；ops.sh guests 删游客号前先整库备份、再备份游客数据并核对、加密，才删。
+ * C-259：Google 登录按实际配置核对。正式服按所有者 Q-243 把 GOOGLE_CLIENT_IDS 置空，冒烟确认 503 GOOGLE_UNAVAILABLE 即通过；开着时照旧。
  */
 import { afterEach, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
-import { spawnSync } from 'node:child_process';
+import { execFile, spawnSync } from 'node:child_process';
+import { promisify } from 'node:util';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -19,7 +21,7 @@ import { MemoryParcelStore } from '../../src/parcels/store.js';
 import { firstInvite, runSmoke } from '../../src/ops/dynamicfarm_smoke.js';
 import { makeKeys, signToken } from '../fixtures/firebase_tokens.js';
 import { sha256Hex } from '../../src/accounts/apple_token.js';
-import { verifyGoogleIdToken } from '../../src/accounts/google_token.js';
+import { DEFAULT_GOOGLE_CLIENT_IDS, googleClientIdsFromEnv, verifyGoogleIdToken } from '../../src/accounts/google_token.js';
 
 const content = loadContent(DEFAULT_CONTENT_DIR);
 const CV = contentVersion(DEFAULT_CONTENT_DIR);
@@ -75,6 +77,62 @@ describe('dynamic farm smoke', () => {
     expect(result.ok).toBe(false);
     expect(result.failures).toEqual([`运行的是 ${'b'.repeat(40)}`, '邮箱注册已开放', 'Google 登录已开启', '游客入口已关', '“放弃并重选”关闭']);
   });
+
+  // C-259：正式服按 Q-243 只开邮箱注册，Google 登录关着；按配置判断时这一项通过，其余各项照旧核对。
+  it('passes with Google sign-in off when the configuration has it off, and still checks everything else', async () => {
+    const { base } = await serve({ signupClosed: false, reselect: false, google: false });
+    const lines: string[] = [];
+    const result = await runSmoke({ base, gitSha: 'a'.repeat(40), invite, google: false, log: l => { lines.push(l); } });
+    expect(result.failures).toEqual([]);
+    expect(lines).toEqual(['✓ 健康检查', `✓ 运行的是 ${'a'.repeat(40)}`, '✓ 邮箱注册已开放', '✓ Google 登录已关闭（按配置）',
+      '✓ 游客入口已关', '✓ 不登录不能认领', '✓ 不登录不能存档', '✓ 邀请账号登录', '✓ “放弃并重选”关闭']);
+    // Without the configuration the default still expects Google on, as before (C-101).
+    expect((await runSmoke({ base })).failures).toEqual(['Google 登录已开启']);
+  });
+
+  it('fails when the configuration says Google is off but the server still accepts Google sign-in', async () => {
+    const { base } = await serve({ signupClosed: false, reselect: false });
+    const lines: string[] = [];
+    const result = await runSmoke({ base, google: false, log: l => { lines.push(l); } });
+    expect(result.failures).toEqual(['Google 登录已关闭（按配置）']);
+    expect(lines).toContain('✗ Google 登录已关闭（按配置）（HTTP 401 GOOGLE_TOKEN_MALFORMED）');
+  });
+
+  it('reads Google on or off from GOOGLE_CLIENT_IDS the same way the server does', () => {
+    expect(googleClientIdsFromEnv({})).toEqual([DEFAULT_GOOGLE_CLIENT_IDS]);
+    expect(googleClientIdsFromEnv({ GOOGLE_CLIENT_IDS: '' })).toEqual([]);
+    expect(googleClientIdsFromEnv({ GOOGLE_CLIENT_IDS: ' , ' })).toEqual([]);
+    expect(googleClientIdsFromEnv({ GOOGLE_CLIENT_IDS: ' a.apps.googleusercontent.com , b ' })).toEqual(['a.apps.googleusercontent.com', 'b']);
+  });
+
+  // ops.sh runs the tool inside the app container; by default it judges Google by that container's GOOGLE_CLIENT_IDS.
+  it('the smoke tool judges Google by GOOGLE_CLIENT_IDS unless told otherwise', async () => {
+    const { base } = await serve({ signupClosed: false, reselect: false, google: false });
+    const run = async (env: Record<string, string>, ...extra: string[]) => {
+      try {
+        const { stderr } = await promisify(execFile)(path.join(ROOT, 'server', 'node_modules', '.bin', 'tsx'),
+          ['tools/dynamicfarm_smoke.ts', '--base', base, ...extra], { cwd: path.join(ROOT, 'server'), env: { PATH: process.env.PATH ?? '', ...env } });
+        return { code: 0, stderr };
+      } catch (error) { const e = error as { code: number; stderr: string }; return { code: e.code, stderr: e.stderr }; }
+    };
+    const off = await run({ GOOGLE_CLIENT_IDS: '' });
+    expect(off.stderr).toContain('Google 登录按配置判断：关着（GOOGLE_CLIENT_IDS 为空）');
+    expect(off.stderr).toContain('✓ Google 登录已关闭（按配置）');
+    expect(off.stderr).toContain('冒烟通过');
+    expect(off.code).toBe(0);
+    const on = await run({ GOOGLE_CLIENT_IDS: 'web-client.apps.googleusercontent.com' });
+    expect(on.stderr).toContain('Google 登录按配置判断：开着');
+    expect(on.stderr).toContain('✗ Google 登录已开启（HTTP 503 GOOGLE_UNAVAILABLE）');
+    expect(on.code).toBe(1);
+    // Unset means the server's default client, so Google is expected on, as the rehearsal runs it from the host.
+    expect((await run({})).stderr).toContain('✗ Google 登录已开启（HTTP 503 GOOGLE_UNAVAILABLE）');
+    const forced = await run({ GOOGLE_CLIENT_IDS: 'web-client.apps.googleusercontent.com' }, '--google', 'off');
+    expect(forced.stderr).not.toContain('按配置判断');
+    expect(forced.code).toBe(0);
+    const bad = await run({}, '--google', 'maybe');
+    expect(bad.stderr).toContain('--google 只能是 on、off 或 env');
+    expect(bad.code).toBe(2);
+  }, 30_000);
 
   it('reads the first account from a CSV and ignores an empty input', () => {
     expect(invite).toEqual({ email: 'df-abcdefgh@invite.example.org', password: 'k3mq-7hxa-pt2d-wz9e' });
@@ -180,6 +238,7 @@ case "$sub" in
       pg_restore) cat > /dev/null ;;
       psql) case "$*" in *parcel_claims_md5*) printf 'users 0\\nplayers 0\\n' ;; esac ;;
       ./node_modules/.bin/tsx) shift
+        [ "$1" != tools/dynamicfarm_smoke.ts ] || exit 0
         [ "$1" = tools/guest_purge.ts ] || exit 2; shift
         case "$1" in
           plan) echo 'plan players=2' ;;
@@ -268,6 +327,20 @@ cp "$1" "$out"
     expect(failed.run.stderr).toContain('什么都没删');
     expect(failed.calls).not.toMatch(/guest_purge\.ts purge/);
     expect(readdirSync(path.join(failed.deploy, 'backups')).filter(f => f.includes('guests'))).toEqual([]);
+  });
+
+  // C-259：smoke 在 app 容器里跑冒烟工具，工具按容器的 GOOGLE_CLIENT_IDS 判断 Google 登录；命令行不加新参数，回滚到旧镜像也能跑；--invite 和入口地址照旧。
+  it.skipIf(realTools)('smoke runs the tool in the app container with the same arguments as before', () => {
+    const plain = (root: string) => { const m = PATH_LINE.exec(ops)!; return ops.replace(m[0], () => `PATH="\${PATH:+$PATH:}${m[1].split(':').map(d => root + d).join(':')}"; export PATH`); };
+    const release = [`GIT_SHA=${'c'.repeat(40)}`, `APP_IMAGE=dynamicfarm-server:${'c'.repeat(40)}`, `APP_IMAGE_ID=sha256:${'d'.repeat(64)}`];
+    const withInspect = (root: string) => plain(root).replace('docker image inspect --format \'{{.Id}}\' "$(envget APP_IMAGE)"', `echo sha256:${'d'.repeat(64)}`);
+    const local = stage(withInspect, 'smoke', release);
+    expect(local.run.status, local.run.stderr).toBe(0);
+    expect(local.calls).toMatch(new RegExp(`^docker compose .* exec -T app \\./node_modules/\\.bin/tsx tools/dynamicfarm_smoke\\.ts --base http://127\\.0\\.0\\.1:3000/v1 --git-sha ${'c'.repeat(40)}$`, 'm'));
+    rmSync(tmp!, { recursive: true, force: true });
+    const entry = stage(withInspect, ['smoke', '--invite', 'https://farm.example.org/dynamicfarm/v1'], release);
+    expect(entry.run.status, entry.run.stderr).toBe(0);
+    expect(entry.calls).toMatch(new RegExp(`tools/dynamicfarm_smoke\\.ts --base https://farm\\.example\\.org/dynamicfarm/v1 --git-sha ${'c'.repeat(40)} --invite-stdin$`, 'm'));
   });
 
   it.skipIf(realTools)('fails to find docker without the PATH line (the cron failure this guards against)', () => {

@@ -16,6 +16,12 @@ export const GOOGLE_JWKS_URL = 'https://www.googleapis.com/oauth2/v3/certs';
 export const GOOGLE_ISSUERS = ['accounts.google.com', 'https://accounts.google.com'];
 export const googleIdJwksFetcher = () => googleJwksFetcher(GOOGLE_JWKS_URL);
 
+/** 服务端按 GOOGLE_CLIENT_IDS 开关 Google 登录：没设时用默认 Web 客户端，设成空（或只有逗号、空格）就关闭。冒烟按同一规则判断（C-259）。 */
+export const DEFAULT_GOOGLE_CLIENT_IDS = '105022638066-s710gs2tsaikbkhbtvstdino7cq661go.apps.googleusercontent.com';
+export function googleClientIdsFromEnv(env: Record<string, string | undefined> = process.env): string[] {
+  return (env.GOOGLE_CLIENT_IDS ?? DEFAULT_GOOGLE_CLIENT_IDS).split(',').map(v => v.trim()).filter(Boolean);
+}
+
 export interface GoogleIdentity {
   sub: string; aud: string; email?: string; emailVerified: boolean; givenName?: string; familyName?: string;
   /** token 里的 nonce 声明（原始 nonce 的 SHA-256），服务端记下它防重放（C-132）。 */
