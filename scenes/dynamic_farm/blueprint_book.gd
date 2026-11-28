@@ -68,11 +68,13 @@ func _init(entries_: Array = [], thumbs := Callable()) -> void:
 func _ready() -> void:
 	get_viewport().size_changed.connect(_fit_scroll)
 	_fit_scroll()
+	_fit_scroll.call_deferred()
 
 ## The list as tall as its cards, at most what leaves the panel within MAX_SCREEN of the screen.
 func _fit_scroll() -> void:
 	if scroll == null: return
-	var want := entries.size() * CARD.y + maxi(entries.size() - 1, 0) * CARD_GAP
+	# A card with two materials grows past CARD.y (its NEED-TILEs wrap), so the list's own height counts once laid out.
+	var want := maxf(entries.size() * CARD.y + maxi(entries.size() - 1, 0) * CARD_GAP, _list.get_combined_minimum_size().y)
 	var screen := get_viewport().get_visible_rect().size.y if is_inside_tree() else 800.0
 	var chrome := UiTokens.SIZE_PANEL_HEADER_H + UiTokens.SIZE_PANEL_PAD_TOP + UiTokens.SPACE_S8
 	scroll.custom_minimum_size = Vector2(CARD.x, minf(want, maxf(CARD.y, screen * MAX_SCREEN - chrome)))
