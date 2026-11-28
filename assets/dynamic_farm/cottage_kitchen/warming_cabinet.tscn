@@ -1,0 +1,93 @@
+[gd_scene format=3]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cottage_kitchen/contact_shadow.tscn" id="Stamp"]
+[ext_resource type="Material" path="res://assets/dynamic_farm/cottage_kitchen/lantern.tres" id="LightGlass"]
+
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cottage_kitchen/cabinet_stock.glb" id="Stock"]
+
+[sub_resource type="BoxShape3D" id="shape_cabinet"]
+size = Vector3(0.56, 1.32, 0.5)
+
+[sub_resource type="BoxMesh" id="LampStrip"]
+size = Vector3(0.36,0.015,0.025)
+material = ExtResource("LightGlass")
+
+[node name="WarmingCabinet" type="Node3D"]
+
+[node name="Stock" parent="." instance=ExtResource("Stock")]
+position = Vector3(-2.85, 0.082, 1.65)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="dish_1" parent="Stock"]
+gi_mode = 2
+visible = false
+
+[node name="dish_2" parent="Stock"]
+gi_mode = 2
+visible = false
+
+[node name="dish_3" parent="Stock"]
+gi_mode = 2
+visible = false
+
+[node name="dish_4" parent="Stock"]
+gi_mode = 2
+visible = false
+
+[node name="dish_5" parent="Stock"]
+gi_mode = 2
+visible = false
+
+[node name="dish_6" parent="Stock"]
+gi_mode = 2
+visible = false
+
+[node name="Solid" type="StaticBody3D" parent="Stock"]
+
+[node name="cabinet" type="CollisionShape3D" parent="Stock/Solid"]
+position = Vector3(0, 0.66, 0.25)
+shape = SubResource("shape_cabinet")
+
+[node name="use_warming_cabinet" type="Marker3D" parent="."]
+position = Vector3(-2.6, 1.402, 1.65)
+
+[node name="CabinetShadow" parent="." instance=ExtResource("Stamp")]
+position = Vector3(-2.55,0.089,1.65)
+scale = Vector3(0.96,1,0.84)
+
+[node name="WarmStrip" type="MeshInstance3D" parent="Stock"]
+position = Vector3(0,1.22,0.31)
+cast_shadow = 0
+gi_mode = 0
+mesh = SubResource("LampStrip")
+
+[node name="Contact" parent="Stock/dish_1" instance=ExtResource("Stamp")]
+position = Vector3(-0.1110,0.9440,0.3350)
+scale = Vector3(0.2024,1,0.2024)
+
+[node name="Contact" parent="Stock/dish_2" instance=ExtResource("Stamp")]
+position = Vector3(0.1110,0.9440,0.3350)
+scale = Vector3(0.2024,1,0.2024)
+
+[node name="Contact" parent="Stock/dish_3" instance=ExtResource("Stamp")]
+position = Vector3(-0.1110,0.6680,0.3350)
+scale = Vector3(0.2024,1,0.2024)
+
+[node name="Contact" parent="Stock/dish_4" instance=ExtResource("Stamp")]
+position = Vector3(0.1110,0.6680,0.3350)
+scale = Vector3(0.2024,1,0.2024)
+
+[node name="Contact" parent="Stock/dish_5" instance=ExtResource("Stamp")]
+position = Vector3(-0.1110,0.3920,0.3350)
+scale = Vector3(0.2024,1,0.2024)
+
+[node name="Contact" parent="Stock/dish_6" instance=ExtResource("Stamp")]
+position = Vector3(0.1110,0.3920,0.3350)
+scale = Vector3(0.2024,1,0.2024)
+
+[node name="cabinet" parent="Stock"]
+gi_mode = 2
+
+[node name="highlights" parent="Stock"]
+gi_mode = 2
+
+[editable path="Stock"]

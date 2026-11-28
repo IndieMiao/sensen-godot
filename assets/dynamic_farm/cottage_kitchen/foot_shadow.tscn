@@ -1,0 +1,6 @@
+[gd_scene format=3]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cottage_kitchen/contact_shadow.tscn" id="Stamp"]
+
+[node name="FootShadow" instance=ExtResource("Stamp")]
+position = Vector3(0, 0.009, 0)
+scale = Vector3(0.52, 1, 0.37)

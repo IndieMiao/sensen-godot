@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/dynamic_farm/cottage_kitchen/contact.png" id="Mask"]
+
+[resource]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+albedo_texture = ExtResource("Mask")
+render_priority = 1
