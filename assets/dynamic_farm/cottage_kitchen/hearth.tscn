@@ -1,7 +1,13 @@
 [gd_scene format=3]
+[ext_resource type="LightmapGIData" path="res://assets/dynamic_farm/cottage_kitchen/start_room.lmbake" id="LightMap"]
+[ext_resource type="Material" path="res://assets/dynamic_farm/cottage_kitchen/ember.tres" id="ember"]
+[ext_resource type="Material" path="res://assets/dynamic_farm/cottage_kitchen/room_matte.tres" id="room_matte"]
 
-[ext_resource type="PackedScene" path="res://assets/rooms/basic_room/hearth.glb" id="hearth"]
-[ext_resource type="Material" path="res://assets/dynamic_farm/cottage_kitchen/room_matte.tres" id="Mat"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cottage_kitchen/hearth_trim.glb" id="Trim"]
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cottage_kitchen/contact_shadow.tscn" id="Stamp"]
+
+[ext_resource type="PackedScene" path="res://assets/dynamic_farm/cottage_kitchen/hearth_main.glb" id="hearth"]
+[ext_resource type="Material" path="res://assets/dynamic_farm/cottage_kitchen/p0_uv.tres" id="Mat"]
 [ext_resource type="PackedScene" path="res://assets/rooms/basic_room/kettle.glb" id="kettle"]
 [ext_resource type="PackedScene" path="res://assets/rooms/_shared/fx/fx_hearth_fire.tscn" id="FX"]
 
@@ -10,16 +16,17 @@ size = Vector3(1.17, 1.54, 1)
 
 [node name="Stove" type="Node3D"]
 
-[node name="hearth" parent="." instance=ExtResource("hearth")]
-position = Vector3(-1.95, 0.082, -2.53)
+[node name="hearth" type="Node3D" parent="."]
+position = Vector3(-1.95,0.082,-2.53)
 
-[node name="hearth_001" parent="hearth"]
-material_override = ExtResource("Mat")
+[node name="hearth_001" parent="hearth" instance=ExtResource("hearth")]
+position = Vector3(1.95,-0.082,2.53)
 
 [node name="kettle" parent="." instance=ExtResource("kettle")]
 position = Vector3(-1.95, 1.405, -2.32)
 
 [node name="kettle_001" parent="kettle"]
+gi_mode = 2
 material_override = ExtResource("Mat")
 
 [node name="Solid" type="StaticBody3D" parent="hearth"]
@@ -37,7 +44,9 @@ position = Vector3(-1.95, 1.637, -2.26)
 [node name="HearthGlow" type="OmniLight3D" parent="."]
 position = Vector3(-1.95, 0.53, -1.9)
 light_color = Color(1, 0.608, 0.208, 1)
-light_energy = 0.72
+light_bake_mode = 0
+shadow_enabled = false
+light_energy = 0.27
 omni_range = 1.25
 omni_attenuation = 1.6
 
@@ -48,9 +57,27 @@ flame_height = 0.42
 flame_count = 16
 spark_count = 4
 light_path = NodePath("../HearthGlow")
-light_energy = 0.72
-flicker_strength = 0.0486
+light_energy = 0.27
+flicker_strength = 0.032
 
-[editable path="hearth"]
+[node name="FireplaceTools" parent="." instance=ExtResource("Trim")]
+
+[node name="KettleShadow" parent="kettle" instance=ExtResource("Stamp")]
+scale = Vector3(0.4,1,0.33)
+position = Vector3(0,-0.025,0)
+
+[node name="hearth_main" parent="hearth/hearth_001"]
+surface_material_override/0 = ExtResource("room_matte")
+
+[node name="hearth_trim" parent="FireplaceTools"]
+surface_material_override/0 = ExtResource("room_matte")
+surface_material_override/1 = ExtResource("ember")
+
+[node name="SoftLight" type="LightmapGI" parent="."]
+light_data = ExtResource("LightMap")
 
 [editable path="kettle"]
+
+[editable path="hearth/hearth_001"]
+
+[editable path="FireplaceTools"]

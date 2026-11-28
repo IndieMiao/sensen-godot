@@ -1,14 +1,13 @@
 [gd_scene format=3]
 
-
-
 [sub_resource type="Environment" id="RoomDay"]
 background_mode = 1
 background_color = Color(0.91, 0.92, 0.83, 1)
 ambient_light_source = 2
 ambient_light_color = Color(1, 0.941, 0.863, 1)
 ambient_light_energy = 0.48
-tonemap_mode = 2
+tonemap_mode = 4
+tonemap_exposure = 1.58
 
 [sub_resource type="Shader" id="BackdropShader"]
 code = "shader_type spatial;
@@ -39,13 +38,14 @@ environment = SubResource("RoomDay")
 [node name="WindowSun" type="DirectionalLight3D" parent="."]
 rotation = Vector3(-0.84716, -1.32582, 0)
 light_color = Color(1, 0.902, 0.761, 1)
-light_energy = 1.05
-shadow_enabled = true
+light_energy = 0.54
+light_bake_mode = 1
+shadow_enabled = false
 directional_shadow_mode = 0
 directional_shadow_max_distance = 32
 shadow_bias = 0.045
 shadow_normal_bias = 0.4
-light_angular_distance = 1.4
+light_angular_distance = 4.0
 
 [node name="RoomCamera" type="Camera3D" parent="."]
 projection = 1
@@ -64,5 +64,6 @@ cast_shadow = 0
 [node name="FrontBounce" type="DirectionalLight3D" parent="."]
 rotation = Vector3(-0.61, 0.31, 0)
 light_color = Color(1, 0.95, 0.87, 1)
-light_energy = 0.47
+light_energy = 0.23
+light_bake_mode = 1
 shadow_enabled = false

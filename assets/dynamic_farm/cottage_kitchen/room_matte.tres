@@ -1,8 +1,8 @@
 [gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" path="res://assets/rooms/basic_room/room_albedo_ao.png" id="Atlas"]
+[ext_resource type="Texture2D" path="res://assets/dynamic_farm/cottage_kitchen/room_color.png" id="Atlas"]
 
 [resource]
 albedo_texture = ExtResource("Atlas")
-metallic_specular = 0.28
-roughness = 0.8
+metallic_specular = 0.21
+roughness = 0.86
